@@ -1,0 +1,19 @@
+{
+	"name": "LOQUI",
+	"description": "Web messenger based on HTML5 and XMPP",
+	"launch_path": "/app.htm",
+	"icons": {
+		"128": "/img/icon-128.png"
+	},
+	"developer": {
+		"name": "Waalt Communications",
+		"url": "http://waalt.com"
+	},
+	"default_locale": "en",
+	"activities": {
+		"share": {
+			"filters": {},
+			"href": "app.htm"
+		}
+	}
+}

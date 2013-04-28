@@ -1,0 +1,143 @@
+<!DOCTYPE HTML>
+<html lang="es-ES">
+<head>
+	<meta charset="UTF-8">
+	<title>LOQUI by Waaltcom</title>
+	<link rel="stylesheet" href="style/app.css" />
+	<script data-main="scripts/main" src="scripts/require-jquery.js"></script>
+</head>
+<body>
+	<section id="splash">
+		<img src="img/logo.png" alt="LOQUI by Waaltcom" />
+	</section>
+	<section id="wizard">
+		<article id="welcome">
+			<h1>Welcome :)</h1>
+			<p>This seems to be the first time you run LOQUI in this device.</p>
+			<p>You need an account for using this app.</p>
+			<button class="ok" onclick="app.sectionShow('wizard', 'newaccount')">I want to sign up now</button>
+			<button onclick="app.sectionShow('wizard', 'login')">I already have an account</button>
+		</article>
+		<article id="newaccount">
+			<a href="#" class="back" onclick="app.sectionShow('wizard', 'welcome')">< Back</a>
+			<h1>It's your choice</h1>
+			<p>One thing that makes LOQUI so different is that you are completely free to choose your own host.</p>
+			<button class="ok" onclick="app.xmpp.hostChoose(0)">JUST SIGN ME UP!</button>
+			<!--<button onclick="app.sectionShow('wizard', 'hosts')">Choose a host</button>-->
+			<p>You can also use your <a href="#" onclick="app.sectionShow('wizard', 'login', 'xmpp')">Jabber/XMPP</a> account for logging in.</p>
+		</article>
+		<article id="signup">
+			<a href="#" class="back" onclick="app.sectionShow('wizard', 'newaccount')">< Back</a>
+			<h1>Easy sign up</h1>
+			<p>This will create a FREE account for you at <span id="server"></span> servers. You can still <a href="#" onclick="app.sectionShow('wizard', 'hosts')">choose</a> other host.</p>
+			<input type="text" name="user" placeholder="Username" required/>
+			<input type="password" name="pass" placeholder="Password" required/>
+			<input type="password" name="pass2" placeholder="Type your password again" required/>
+			<button class="ok" onclick="app.xmpp.register()">Let's go!</button>
+		</article>
+		<article id="hosts">
+			<h1>Hosts</h1>
+			<p>Choose the host you want to sign up with from the list below. We recommend you using the one with the lowest latency in your area.</p>
+			<ul></ul>
+			<p>Didn't find the one that suits you? You can still use a existing <a href="#" onclick="app.sectionShow('wizard', 'login', 'xmpp')">Jabber/XMPP</a> account from any other host not listed here.</p>
+		</article>
+		<article id="login">
+			<a href="#" class="back" onclick="app.sectionShow('wizard', 'welcome')">< Back</a>
+			<h1>Log in</h1>
+			<input type="text" name="user" placeholder="Username" required/>
+			<input type="password" name="pass" placeholder="Password" required/>
+			<input type="checkbox" name="spCheck" onclick="app.sectionShow('wizard', 'login', this.checked)"/><label for="spCheck">Advanced (Host, XMPP, BOSH...)</label>
+			<div></div>
+			<button class="ok" onclick="app.xmpp.login()">Let's go!</button>
+		</article>
+	</section>
+	<section id="login">
+		<article id="connecting">
+			<h1>Connecting</h1>
+			<progress></progress>
+		</article>
+	</section>
+	<section id="main" role="region">
+		<header>
+			<menu type="toolbar">
+				<a onclick="app.sectionShow('main', 'list')"><img src="img/tools/chats.svg" /></p></a>
+				<a onclick="app.sectionShow('main', 'people')"><img src="img/tools/people.svg" /></a>
+				<a onclick="app.sectionShow('main', 'me')"><img src="img/tools/me.svg" /></a>
+			</menu>
+			<h1></h1>
+			<span id="totalUnread"></span>
+		</header>
+		<article id="list">
+			<ul class="list"></ul>
+			<footer class="toolbar">
+				<a class="right" onclick="app.messenger.search()"><img src="img/tools/search.svg" /></a>
+			</footer>
+		</article>
+		<article id="people">
+			<ul class="list"></ul>
+			<div class="popup" id="personAdd">
+				<header>Adding a person</header>
+				<p>LOQUI user / JabberID / GTalk user</p>
+				<input type="text" name="jid" id="jid" />
+				<p>Nickname<small>(Optional)</small></p>
+				<input type="text" name="nickname" id="nickname" />
+				<menu>
+					<button onclick="app.messenger.personAdd()" class="recommend">Add person</button>
+					<button onclick="app.popdown(this)" class="danger">Cancel</button>
+				</menu>
+			</div>
+			<footer class="toolbar">
+				<a class="left" onclick="app.popup('personAdd')"><img src="img/tools/personadd.svg" /></a>
+				<a class="right" onclick="app.messenger.search()"><img src="img/tools/search.svg" /></a>
+			</footer>
+		</article>
+		<article id="me">
+			<div id="vcard">
+				<span class="avatar"><img src="" /></span>
+				<h1></h1>
+				<h2></h2>
+			</div>
+			<div id="status">
+				<h1>Status</h1>
+				<input type="text" name="status" id="status" /><button onclick="app.messenger.presenceSet()">Apply</button>
+				<ul id="show">
+					<li class="show chat" onclick="app.messenger.presenceSet('chat')"></li>
+					<li class="show a" onclick="app.messenger.presenceSet('a')"></li>
+					<li class="show away" onclick="app.messenger.presenceSet('away')"></li>
+					<li class="show xa" onclick="app.messenger.presenceSet('xa')"></li>
+					<li class="show dnd" onclick="app.messenger.presenceSet('dnd')"></li>
+				</ul>
+				<span id="showcaption"></span>
+			</div>
+			<div>
+				<small>LOQUI version: <em>alpha003</em></small>
+				<button onclick="app.xmpp.connection.disconnect()">QUIT</button>
+			</div>
+		</article>
+	</section>
+	<section id="chat" role="region">
+		<header>
+			<button type="back"onclick="app.sectionShow('main', 'list')"><span class="icon icon-back">back</span></button>
+			<span class="name"></span>
+			<span class="status"></span>
+			<span class="avatar"></span>
+			<span class="show"></span>
+		</header>
+		<article id="one">
+			<ul id="messages" class="paper"></ul>
+			<footer>
+				<div id="typing">This person is typing right now...</div>
+				<button id="say" onclick="app.messenger.say()" class="recommend" type="send">SAY</button>
+				<div id="text" contenteditable></div>
+			</footer>
+		</article>
+		<article id="muc">
+		</article>	
+	</section>
+	<audio id="login" src="audio/login.ogg" preload ></audio>
+	<audio id="logout" src="audio/logout.ogg" preload ></audio>
+	<audio id="sent" src="audio/sent.ogg" preload ></audio>
+	<audio id="received" src="audio/received.ogg" preload ></audio>
+	<audio id="newchat" src="audio/newchat.ogg" preload ></audio>
+</body>
+</html>
