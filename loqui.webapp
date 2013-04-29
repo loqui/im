@@ -15,5 +15,8 @@
 			"filters": {},
 			"href": "app.htm"
 		}
+	},
+	"permissions": {
+	    "desktop-notification":{}
 	}
 }

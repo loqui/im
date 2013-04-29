@@ -214,6 +214,8 @@ function Messenger(){
 				newChat.messages.push(newMessage);
 				this.list.push(newChat);
 				$("audio#newchat").get(0).play();
+				var not = navigator.mozNotification.createNotification(from, newMessage.text, app.messenger.avatars[from] || "img/foovatar.png");
+				not.show();
 			}else{
 				this.list[ci].messages.push(newMessage);
 				//this.pull(ci);
