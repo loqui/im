@@ -6,6 +6,7 @@ function Messenger(){
 
 	this.capabilities = new Object();
 	this.state = "active";
+	this.lastnot = null;
 
 	this.Chat = function(jid){
 		this.jid = jid;
@@ -214,8 +215,6 @@ function Messenger(){
 				newChat.messages.push(newMessage);
 				this.list.push(newChat);
 				$("audio#newchat").get(0).play();
-				var not = navigator.mozNotification.createNotification(from, newMessage.text, app.messenger.avatars[from] || "img/foovatar.png");
-				not.show();
 			}else{
 				this.list[ci].messages.push(newMessage);
 				//this.pull(ci);
@@ -223,6 +222,10 @@ function Messenger(){
 			}
 			if(app.curSection=="chat" && app.curArticle=="one")this.render("messages");
 			else if(app.curSection=="main")this.chatList();
+			if(document.hidden){
+				this.lastnot = navigator.mozNotification.createNotification(from, newMessage.text, app.messenger.avatars[from] || "img/foovatar.png");
+				this.lastnot.show();
+			}
 			app.save();
 		}
 		if(composing){
