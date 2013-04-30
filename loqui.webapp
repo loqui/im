@@ -1,7 +1,8 @@
 {
 	"name": "LOQUI",
-	"description": "Web messenger based on HTML5 and XMPP",
+	"description": "It just kick ass all other chat apps!",
 	"launch_path": "/app.htm",
+	"version": "pre-alpha004",
 	"icons": {
 		"128": "/img/icon-128.png"
 	},
@@ -10,13 +11,14 @@
 		"url": "http://waalt.com"
 	},
 	"default_locale": "en",
-	"activities": {
-		"share": {
-			"filters": {},
-			"href": "app.htm"
+	"locales": {
+		"es": {
+		  "description": "¡Le da en la boca a todas las demás apps de chat!"
 		}
 	},
 	"permissions": {
-	    "desktop-notification":{}
+	    "desktop-notification":{
+	    	"description": "Required to show message notifications"
+	    }
 	}
 }
