@@ -58,6 +58,54 @@ input[type="email"]{
 	width: 100%;
 	font-size: 1rem;
 	margin-left: -.1rem;
+	margin-bottom: .5rem;
+}
+button{
+	height: 2.4rem;
+	font-size: 1rem!important;
+	line-height: 1rem;
+}
+body > section > header{
+	height: 3rem;
+	background-color: #E5745C;
+	box-shadow: none;
+}
+body > section > header > span.title{
+	text-align: left!important;
+	left: .5rem!important;
+	font-size: 1.8rem;
+	line-height: 1.8rem;
+	top: .7rem;
+}
+body > section > header > nav a{
+	height: 3rem!important;
+	width: 2.2rem;
+	color: #FFF!important;
+	text-shadow: none!important;
+	line-height: 3rem!important;
+	text-align: center;
+}
+body > section > header > nav a.active{
+	background-color: rgba(255, 255, 255, .2);
+}
+body > section > header > nav a img{
+	padding-top: .3rem;
+	height: 1.5rem;
+}
+body > section > article{
+	top: 3rem!important;
+}
+body > section#splash{
+	background-color: #F4F4F4;
+}
+body > section#splash img{
+	position: fixed;
+	display: block;
+	width: 10rem;
+	left: 50%;
+	top: 50%;
+	margin-left: -5rem;
+	margin-top: -3rem;
 }
 body > section#welcome{
 	background-color: #E5745C;
@@ -99,9 +147,11 @@ body > section#login > article#login h1{
 }
 body > section#login > article#login h1 img.icon{
 	float: left;
+	height: 2.5rem;
 	margin-right: .5rem;
 }
 body > section#login > article#login button{
 	width: 100%;
 	background-color: #E5745C;
 }
+

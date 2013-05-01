@@ -17,6 +17,9 @@
 	<link rel="stylesheet" href="style/lungo/lungo.icon.brand.css">
 	<link rel="stylesheet" href="style/lungo/lungo.css">
 	<link rel="stylesheet" href="style/lungo/theme.lungo.css">
+	<script type="text/javascript">
+		window.navigator.mozApps.install("http://loqui.im/lungo/lungo.webapp");
+	</script>
 </head>
 <body class="app" data-position="fixed">
 	<audio id="login" src="audio/login.ogg" preload ></audio>
@@ -24,6 +27,9 @@
 	<audio id="sent" src="audio/sent.ogg" preload ></audio>
 	<audio id="received" src="audio/received.ogg" preload ></audio>
 	<audio id="newchat" src="audio/newchat.ogg" preload ></audio>
+	<section id="splash" data-transition="slide">
+		<img src="img/applogo.svg" alt="LOQUI by Waaltcom" />
+	</section>
 	<section id="welcome" data-transition="slide">
 		<div>
 			<h1>Welcome <br />to LOQUI</h1>
@@ -34,10 +40,10 @@
 	<section id="login" data-transition="slide">
 		<article id="login" class="active">
 			<div>
-				<h1 data-image="img/gmailxmpp.png">You can use your Gmail or Jabber account</h1>
+				<h1 data-image="img/gmailxmpp.svg">You can use your Gmail or Jabber account</h1>
 				<input type="email" name="user" placeholder="user@provider.com"/>
 				<input type="password" name="pass" placeholder="password"/>
-				<button class="ok" onclick="app.xmpp.login()">LOG ME IN!</button>
+				<button class="ok" onclick="app.xmpp.login()">LOG ME IN</button>
 			</div>
 		</article>
 		<article id="register">
@@ -47,6 +53,24 @@
 				<input type="password" name="pass" placeholder="Password"/>
 				<button class="ok" onclick="app.xmpp.login()">Let's go!</button>
 			</div>
+		</article>
+	</section>
+	<section id="main" data-transition="slide">
+		<header data-title="Chats">
+			<nav>
+				<a href="#me" data-router="article" data-title="Me" data-image="img/tools/me.svg" class="right"> </a>
+				<a href="#people" data-router="article" data-title="People" data-image="img/tools/people.svg" class="right"> </a>
+				<a href="#chats" data-router="article" data-title="Chats" data-image="img/tools/chats.svg" class="right active"> </a>
+			</nav>
+		</header>
+		<article id="chats" class="active">
+			Chats
+		</article>
+		<article id="people">
+			People
+		</article>
+		<article id="me">
+			Me
 		</article>
 	</section>
 	<!-- Lungo - Dependencies -->

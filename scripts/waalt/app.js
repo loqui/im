@@ -76,9 +76,8 @@ function App(){
 	}
 	
 	this.start = function(){
-		var section = $.isEmptyObject(this.xmpp.settings) ? "wizard" : "login";
-		var article = $.isEmptyObject(this.xmpp.settings) ? "welcome" : "connecting";
-		this.sectionShow(section, article);
+		if($.isEmptyObject(this.xmpp.settings)) Lungo.Router.section("welcome");		
+		else this.xmpp.connect();
 	}
 	
 	this.load = function(){
