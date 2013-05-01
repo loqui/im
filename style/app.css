@@ -1,11 +1,21 @@
-@import url("BB/progress-activity.css");
+/*@import url("BB/progress-activity.css");
 @import url("BB/headers.css");
 @import url("BB/buttons.css");
-@import url("BB/input_areas.css");
+@import url("BB/input_areas.css");*/
+@font-face{
+	font-family:'mozTT';
+	src:url('fonts/MozTT-Bold.ttf');
+	font-weight: 700;
+}
+@font-face{
+	font-family:'mozTT';
+	src:url('fonts/MozTT-Medium.ttf');
+	font-weight: 500;
+}
 @font-face{
 	font-family:'mozTT';
 	src:url('fonts/MozTT-Regular.ttf');
-	font-weight: 500;
+	font-weight: 300;
 }
 @font-face{
 	font-family:'mozTT';
@@ -14,12 +24,12 @@
 }
 @media screen and (orientation:portrait) {
 	html{
-		font-size: 5vw;
+		font-size: 5vw!important;
 	}
 }
 @media screen and (orientation:landscape) {
 	html{
-		font-size: 5vh;
+		font-size: 5vh!important;
 	}
 }
 @media screen and (min-width: 1000px){
@@ -35,550 +45,63 @@
 }
 body *{
 	font-family: MozTT, Open Sans, Ubuntu, Droid Sans, Roboto, Sans;
-	font-weight: 300;
+	font-weight: 200;
 	letter-spacing: -0.05em;
 }
-button::-moz-focus-inner{
-	border: 0;
-}
 a{
-	cursor: pointer;
+	color: inherit;
 }
-strong{
-	font-weight: bold;
-}
-input[type="text"]{
-	font-size: 1rem;
-	line-height: 1rem;
-	padding: .3rem !important;
-	height: 2.2rem;
-}
-button:not([type]){
-	height: 3rem;
-	padding: .3rem 0 0 0 !important;
-	font-size: .9rem !important;
-	line-height: 1rem;
-	font-weight: bold;
-}
-ul{
-	list-style-type: none;
-}
-body > section{
-	display: none;
-	position: absolute;
-	top: 0;right: 0;bottom: 0;left: 0;
-}
-body > section > article{
-	display: none;
-	position: absolute;
-	top: 0;right: 0;bottom: 0;left: 0;
-}
-body > section > article > div.popup{
-	display: none;
-	position: fixed;
-	top: 0rem;
-	right: 0rem;
-	bottom: 0rem;
-	left: 0rem;
-	padding: 2rem;
-	background-color: #333;
-	color: #FFF;
-	z-index: 10;
-}
-body > section > article > div.popup > header{
-	position: relative;
-	padding: 1.5rem 2rem 1rem 2rem;
-	margin: -2rem -2rem 2rem -2rem;
-	font-size: 1.5rem;
-	border-bottom: .1rem solid #5F5F5F;
-	background-color: #222;
-}
-body > section > article > div.popup > p{
-	margin: .5em 0 .2em 0;
-}
-body > section > article > div.popup > input{
-	padding: .7em;
-}
-body > section > article > div.popup > menu{
-	position: absolute;
-	bottom: 2rem;
-	left: 2rem;
-	right: 2rem;
-	padding: 0;
-	margin: 0;
-}
-body > section > article > div.popup > menu > button{
-	margin-bottom: .5rem;
-}
-body > section#splash{
-	background-color: #F6F6F6;
-}
-body > section#splash img{
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	margin-top: -45px;
-	margin-left: -100px;
-}
-body > section#wizard{
-	background-color: #4D4D4D;
-	color: #FFF;
-	overflow: auto;
-}
-body > section#wizard a.back{
-	display: block;
-	background: none;
-	border: none;
-	color: #FFF;
-	margin-bottom: 1rem;
-}
-body > section#wizard article{
-	padding: 10%;
-}
-body > section#wizard article h1{
-	font-size: 3rem;
-	margin: 0 0 0.5em 0;
-	line-height: 0.8em;
-}
-body > section#wizard article button{
+input[type="text"],
+input[type="password"],
+input[type="email"]{
+	height: 2rem;
 	width: 100%;
-	margin-top: 3%;
-	padding: 4%;
-	font-size: 1.3rem;
-}
-body > section#wizard button{
-	border-radius: 0.2rem;
-}
-body > section#wizard input{
-	width: 90%;
-	margin-top: 3%;
-	padding: 4%;
-	font-size: 1.3rem;
-}
-body > section#wizard input[type="checkbox"]{
-	width: 5rem;
-	padding: 30px;
-}
-body > section#wizard a{
-	padding: 0.1em 0.2em;
-	color: #666;
-	text-decoration: none;
-	background-color: #F3F3F3;
-	border-radius: 0.2rem;
-}
-body > section#wizard ul{
-	list-style-type: none;
-	padding: 0;
-}
-body > section#wizard ul li{
-	margin: 0;
-	margin-top: 3%;
-	padding: 0.3rem 0.5rem;
-	font-size: 1.2rem;
-	background-color: #F6F6F6;
-	color: #333;
-	border-radius: 0.2rem;
-	cursor: pointer;
-}
-body > section#wizard > article#hosts ul li span.ping{
-	float: right;
-	font-size: 0.8rem;
-	margin-right: 0.5rem;
-	margin-top: 0.3rem;
-}
-body > section#wizard > article#hosts ul li img.flag{
-	float: right;
-	width: 1.4rem;
-	margin-top: 0.25rem;
-}
-body > section#login > article#connecting{
-	background-color: #333;
-	color: #FFF;
 	font-size: 1rem;
-	overflow: auto;
+	margin-left: -.1rem;
 }
-body > section#login > article#connecting h1{
-	position: absolute;
-	margin: 0;
-	width: 100%;
-	top: 35%;
-	text-align: center;
-	font-size: 200%;
-}
-body > section#login > article#connecting progress{
-	width: 2rem;
-	position: absolute;
-	top: 45%;
-	left: 50%;
-	margin-left: -1rem;
-}
-body > section#main{
-	background-color: #F6F6F6;
-}
-body > section > header{
-	height: 3rem !important;
-}
-body > section > header > h1{
-	display: inline !important;
-	position: absolute !important;
-	margin: .8rem .6rem !important;
-	font-size: 1.5rem !important;
-	line-height: 1.5rem !important;
-}
-body > section > header > menu a,
-body > section > header > button{
-	height: 3rem !important;
-	min-width: 3rem !important;
-	background: none !important;
-	cursor: pointer;
-}
-body > section > header > menu a span,
-body > section > header > button span{
-	height: 3rem !important;
-	background-size: 2rem auto !important;
-}
-body > section > header > menu a > img{
-	position: absolute;
-	top: 1rem;
-	right: .6rem;
-	height: 1.2rem;
-	width: 1.7rem;
-}
-body > section#main > article{
-	display: none;
-	position: absolute;
-	top: 3rem;right: 0;bottom: 0;left: 0;
-	overflow: auto;
-}
-body > section#main > article > ul.list{
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 3rem;
-	left: 0;
-	padding: 0;
-	margin: 0;
-	overflow: auto;
-}
-body > section#main > article > ul.list li{
-	position: relative;
-	height: 3rem;
-	margin: 0;
-	/*border-bottom: .05rem solid #CCC;*/
-	color: #666;
-	font-size: 1rem;
-	cursor: pointer;
-	background-color: #F9F9F9;
-}
-body > section#main > article > ul.list li:nth-child(2n){
-	background-color: #F3F3F3;
-}
-body > section#main > article > ul.list li:active{
-	background-color: #DDD;
-}
-body > section#main > article > ul.list li.person span.name{
-	position: absolute;
-	left: 3.7rem;
-	top: .5rem;
-	font-weight: 400;
-}
-body > section#main > article > ul.list li.person span.unread{
-	position: absolute;
-	right: .5rem;
-	top: .5rem;
-	padding: 0 .2rem;
-	background-color: #333;
-	color: #FFF;
-	border-radius: .2rem;
-	font-weight: bold;
-	font-size: .8rem;
-}
-body > section#main > article > ul.list li.person span.status{
-	position: absolute;
-	left: 3.7rem;
-	top: 1.7rem;
-	font-size: .8rem;
-	color: #888;
-}
-body > section#main > article > ul.list li.person span.show{
-	display: block;
-	position: absolute;
-	right: 0;
-	top: 0;
-	width: .3rem;
-	height: 3rem;
-}
-body > section#main > article > ul.list li.person span.avatar{
-	display: block;
-	width: 3rem;
-	height: 3rem;
-	overflow: hidden;
-}
-body > section#main > article > ul.list li.person span.avatar img{
-	margin: 0 auto;
-	height: 3rem;
-}
-body > section#main > article#me > div{
-	position: relative;
-	margin: .8rem;
-	padding: .8rem;
-	background-color: #FFF;
-	box-shadow: 0 0 2rem rgba(0, 0, 0, .1);
-	overflow-y: auto;
-	color: #666;
-}
-body > section#main > article#me > div#vcard h1,
-body > section#main > article#me > div#vcard h2{
-	margin: 0;
-	font-size: 1rem;
-	text-align: center;
-	width: 100%;
-}
-body > section#main > article#me > div#vcard h1{
-	margin-top: .3rem;
-	font-weight: 500;
-}
-body > section#main > article#me > div#vcard h2{
-}
-body > section#main > article#me > div#vcard span.avatar{
-	display: block;
-	margin: 0 auto;
-	width: 4rem;
-	overflow: hidden;
-}
-body > section#main > article#me > div#vcard span.avatar img{
-	border-radius: 10%;
-	width: 4rem;
-}
-body > section#main > article#me > div#status h1{
-	margin: 0;
-}
-body > section#main > article#me > div#status input#status{
-	margin-top: .2rem;
-	padding: .2rem;
-	font-size: .8rem;
-}
-body > section#main > article#me > div#status button{
-	margin-left: .2rem;
-	padding: .3rem;
-	font-size: .8rem;
-	border-radius: .2rem;
-}
-body > section#main > article#me > div#status ul{
-	padding: 0;
-}
-body > section#main > article#me > div#status li{
-	display: block;
-	float: left;
-	width: 1rem;
-	height: 1rem;
-	margin-right: 1rem;
-	border-radius: .2rem;
-	cursor: pointer;
-}
-body > section#main > article#me > div#status li.selected{
-	width: 1.5rem;
-	height: 1.5rem;
-	margin-top: -.5rem;
-}
-body > section#main > article > footer.toolbar{
-	position: fixed;
-	right: 0;bottom: 0;left: 0;
-	height: 3rem;
-	background-color: #333;
-	color: #FFF;
-}
-body > section#main > article > footer.toolbar a{
-	height: 2.7rem;
-	background: none;
-	padding: 1rem;
-	border-radius: 0;
-	opacity: .5;
-}
-body > section#main > article > footer.toolbar a img{
-	height: .9rem;
-}
-body > section .show.chat{
-	background-color: #82C82D;
-}
-body > section .show.a{
-	background-color: #5F9B0A;
-}
-body > section .show.away{
-	background-color: #008EAB;
-}
-body > section .show.xa{
+body > section#welcome{
 	background-color: #E5745C;
+	color: #FFF;
 }
-body > section .show.dnd{
-	background-color: #B90000;
+body > section#welcome > div{
+	margin: 4rem 2rem;
 }
-body > section .show.na{
-	background-color: #858585;
-}
-body > section#chat{
-	background-color: #F6F6F6;
-}
-body > section#chat > header span.name{
-	position: absolute;
-	top: .5rem;
-	left: 2.5rem;
-	margin: 0;
-	font-size: 1rem;
+body > section#welcome h1{
+	font-size: 2.5rem;
+	line-height: 2.5rem;
+	margin: .5rem 0 1rem 0;
 	font-weight: 500;
-	color: #FFF;
 }
-body > section#chat > header span.status{
-	position: absolute;
-	top: 1.5rem;
-	left: 2.5rem;
-	font-size: 0.8rem;
-	color: #FFF;
+body > section#welcome h2{
+	font-size: 1.3rem;
+	line-height: 1.3rem;
 }
-body > section#chat > header span.show{
-	display: block;
-	position: absolute;
-	right: 0;
-	top: 0;
-	width: 0.3rem;
-	height: 3rem;
+body > section#welcome a{
+	position: fixed;
+	bottom: 2rem;
+	right: 2rem;
+	font-size: 1.5rem;
 }
-body > section#chat > header span.avatar{
-	float: right;
-	display: block;
-	width: 3rem;
-	height: 3rem;
-	overflow: hidden;
-	margin-right: 0.3rem;
+body > section#login{
+	background-color: #F4F4F4;
 }
-body > section#chat > header span.avatar img{
-	margin: 0 auto;
-	height: 3rem;
+body > section#login > article > div{
+	padding: 2rem;
 }
-body > section#chat > article#one > ul#messages{
-	position: absolute;
-	top: 3rem;
-	right: 0;
-	left: 0;
-	bottom: 3rem;
-	margin: 0;
-	padding: 1rem;
-	list-style-type: none;
-	overflow-y: auto;
-	overflow-x: hidden;
+body > section#login > article#login h1{
+	position: relative;
+	width: 16rem;
+	font-size: 1.3rem;
+	line-height: 1.3rem;
+	margin: .5rem 0 1rem 0;
+	font-weight: 500;
+	color: #E5745C;
 }
-body > section#chat > article#one > ul#messages li{
-	width: 85%;
-	margin-bottom: 0.8rem;
-	background-color: #FFF;
-	box-shadow: 0 0 2rem rgba(0, 0, 0, .1);
-	padding: 1rem;
-	overflow: hidden;
-}
-body > section#chat > article#one > ul#messages li.in{
+body > section#login > article#login h1 img.icon{
 	float: left;
-	text-align: left;
-	color: #666;
+	margin-right: .5rem;
 }
-body > section#chat > article#one > ul#messages li.out{
-	float: right;
-	text-align: right;
-	background-color: #F2F2F2;
-	color: #888;
-}
-body > section#chat > article#one > ul#messages > li > div.msg{
-	margin: 0;
-	letter-spacing: 0rem;
-	font-weight: 400;
-}
-body > section#chat > article#one > ul#messages > li > div.msg:not(:first-child){
-	border-top: .05rem solid #E3E3E3;
-	margin-top: 0.3rem;
-	padding-top: 0.3rem;
-}
-body > section#chat > article#one > ul#messages > li > div.msg > span.stamp{
-	font-size: .7rem;
-	color: #BBB;
-}
-body > section#chat > article#one > ul#messages > li.in > div.msg > span.stamp{
-	float: right;
-}
-body > section#chat > article#one > ul#messages > li.out > div.msg > span.stamp{
-	float: left;
-}
-body > section#chat > article#one > ul#messages > li p{
-	margin: 0;
-}
-body > section#chat > article#one > ul#messages > li img{
-	max-width: 100%;
-}
-body > section#chat > article#one > ul#messages > span.daychange{
-	display: block;
+body > section#login > article#login button{
 	width: 100%;
-	margin-bottom: 1rem;
-	border-bottom: .05rem solid #CCC;
-	color: #999;
-}
-body > section#chat > article#one > ul#messages hr.end{
-	float: left;
-	margin-top: 3rem;
-	border: none;
-	width: 100%;
-}
-body > section#chat > article#one #typing{
-	display: none;
-	position: relative;
-	top: -3rem;
-	margin-bottom: -2rem;
-	height: 1rem;
-	padding: .5rem;
-	background-color: rgba(255, 255, 255, .9);
-	text-align: center;
-	font-size: .8rem;
-	z-index: 1;
-}
-body > section#chat > article#one > footer{
-	position: absolute;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	padding: .6rem;
-	background-color: #EAEAEA;
-	border-top: .05rem solid #DDD;
-}
-body > section#chat > article#one div#text{
-	position: relative;
-	padding: .5rem;
-	min-height: 1.3rem;
-	max-height: 4rem;
-	background-color: #FFF;
-	border: .05rem solid #DDD;
-	border-radius: .2rem;
-	color: #666;
-	outline: none;
-	overflow: auto;
-}
-body > section#chat > article#one button#say{
-	position: relative;
-	float: right;
-	top: 0.05rem;
-	font-size: .7rem;
-	padding: .1rem 1rem;
-	width: 1rem;
-	height: 2.3rem;
-	line-height: 2rem;
-	margin: 0;
-	margin-left: 0.5rem;
-	font-weight: bold;
-}
-body > section#main > header #totalUnread{
-	position: absolute;
-	right: 5.5rem;
-	top: .3rem;
-	background-color: #333;
-	font-weight: bold;
-	font-size: .8rem;
-	padding: 0 .2rem;
-	border-radius: .2rem;
-	z-index: 5;
+	background-color: #E5745C;
 }
