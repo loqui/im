@@ -33,14 +33,16 @@
 	<section id="welcome" data-transition="slide">
 		<div>
 			<h1>Welcome <br />to LOQUI</h1>
-			<h2>You are about to go a step <br />forward in chat experience.</h2>
+			<h2>This is PRE-ALPHA software so it might be full of bugs, glitches and the like.</h2>
+			<br />
+			<h2>Do you dare to test it anyway?</h2>
 		</div>
-		<a href="#login" data-router="section">Can't wait! ></a>
+		<a href="#login" data-router="section">YES, I do! ></a>
 	</section>
 	<section id="login" data-transition="slide">
 		<article id="login" class="active">
 			<div>
-				<h1 data-image="img/gmailxmpp.svg">You can use your Gmail or Jabber account</h1>
+				<h1 data-image="img/gmailxmpp.svg">Enter your Gmail or Jabber account below</h1>
 				<input type="email" name="user" placeholder="user@provider.com"/>
 				<input type="password" name="pass" placeholder="password"/>
 				<button class="ok" onclick="app.xmpp.login()">LOG ME IN</button>
@@ -88,7 +90,7 @@
 				<span id="showcaption"></span>
 			</div>
 			<div>
-				<small>LOQUI version: <em>pre-alpha004</em></small>
+				<small>LOQUI version: <em>pre-alpha005</em></small>
 				<button onclick="app.xmpp.connection.disconnect()">QUIT</button>
 			</div>
 		</article>

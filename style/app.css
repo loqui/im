@@ -296,6 +296,7 @@ body > section#chat > article#one button#say{
 }
 body > section#chat > article#one > ul#messages{
 	position: absolute;
+	top: 0;
 	right: 0;
 	left: 0;
 	bottom: 3.7rem;
