@@ -42,21 +42,19 @@ function XMPP(){
 		this.settings.host = this.hosts[i].domain;
 		this.settings.bosh = this.hosts[i].bosh;
 		$("section#wizard>article#signup span#server").html(this.hosts[i].name);
-		app.sectionShow("wizard", "signup");
+		//app.sectionShow("wizard", "signup");
 	}
 	
 	this.login = function(){
-		var user = $("section#wizard>article#login input[name=\"user\"]").val();
-		var pass = $("section#wizard>article#login input[name=\"pass\"]").val();
-		var host = $("section#wizard>article#login input[name=\"host\"]").val();
-		var bosh = $("section#wizard>article#login input[name=\"bosh\"]").val();
-		if(user && pass){
-			this.settings.username = user;
+		var jid = $("section#login>article#login input[name=\"user\"]").val();
+		var pass = $("section#login>article#login input[name=\"pass\"]").val();
+		if(jid && pass){
+			this.settings.username = jid.split("@")[0];
 			this.settings.password = pass;
-			this.settings.host = host ? host : this.hosts[0].domain;
-			this.settings.bosh = bosh ? bosh : this.hosts[0].bosh;
+			this.settings.host = jid.split("@")[1];
+			this.settings.bosh = this.hosts[0].bosh;
+			this.connect();
 			app.save();
-			app.sectionShow("login", "connecting");	
 		}else alert("You didn't fill in the form properly");
 	}
 	
@@ -81,7 +79,7 @@ function XMPP(){
 				app.xmpp.settings.password = pass;
 				app.save();
 				alert("GREAT!\nYou have signed up succesfully.");
-				app.sectionShow("login", "connecting");
+				//app.sectionShow("login", "connecting");
 			}
 		});
 		else alert("You didn't fill in the form properly or password fields missmatch");
@@ -138,7 +136,7 @@ function XMPP(){
 				app.messenger.me();
 			});
 		});
-		app.sectionShow('main', 'list');
+		Lungo.Router.section("main");
 	}
 	
 	this.send = function(jid, text, html){
