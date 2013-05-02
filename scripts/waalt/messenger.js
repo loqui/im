@@ -35,7 +35,7 @@ function Messenger(){
 				var show = person.resources[i].show || "a";
 				break;
 			}
-			ul.append("<li onclick=\"app.sectionShow('chat', 'one', '"+person.jid+"')\" id=\""+person.jid+"\" class=\"person\">"
+			ul.append("<li onclick=\"app.messenger.chatWith('"+person.jid+"')\" id=\""+person.jid+"\" class=\"person\">"
 				+"<span class=\"avatar\"><img id=\""+person.jid+"\" src=\"img/foovatar.png\" /></span>"
 				+"<span class=\"name\">"+name+"</span>"
 				+"<span class=\"show "+show+"\"></span>"
@@ -46,36 +46,38 @@ function Messenger(){
 	}
 	
 	this.chatList = function(){
-		var ul = $("section#main>article#list ul");
+		var ul = $("section#main>article#chats ul");
 		var totalUnread = 0;
-		ul.empty();
-		for(i=this.list.length-1;i>=0;i--){
-			if(this.list[i].messages.length){
-				var person = app.xmpp.connection.roster.findItem(this.list[i].jid);
-				var name = person.name != null ? person.name : person.jid;
-				var status = "Disconnected";
-				var show = "na";
-				for(j in person.resources){
-					status = person.resources[j].status;
-					show = person.resources[j].show || "a";
-					break;
+		if(this.list.length > 0){
+			ul.empty();
+			for(i=this.list.length-1;i>=0;i--){
+				if(this.list[i].messages.length){
+					var person = app.xmpp.connection.roster.findItem(this.list[i].jid);
+					var name = person.name != null ? person.name : person.jid;
+					var status = "Disconnected";
+					var show = "na";
+					for(j in person.resources){
+						status = person.resources[j].status;
+						show = person.resources[j].show || "a";
+						break;
+					}
+					var last = this.list[i].messages[this.list[i].messages.length-1].text;
+					last = last.length > 42 ? last.substring(0, 42) + "..." : last;
+					var unread = this.unread(i);
+					totalUnread += unread;
+					ul.append("<li onclick=\"app.messenger.chatWith('"+person.jid+"')\" id=\""+person.jid+"\" class=\"person\">"
+						+"<span class=\"avatar\"><img id=\""+person.jid+"\" src=\"img/foovatar.png\" /></span>"
+						+"<span class=\"name\">"+name+"</span>"
+						+"<span class=\"unread\">"+(unread > 0 ? "+" + unread : "")+"</span>"
+						+"<span class=\"show "+show+"\"></span>"
+						+"<span class=\"status\">"+last+"</span>"
+					+"</li>");
 				}
-				var last = this.list[i].messages[this.list[i].messages.length-1].text;
-				last = last.length > 42 ? last.substring(0, 42) + "..." : last;
-				var unread = this.unread(i);
-				totalUnread += unread;
-				ul.append("<li onclick=\"app.sectionShow('chat', 'one', '"+person.jid+"')\" id=\""+person.jid+"\" class=\"person\">"
-					+"<span class=\"avatar\"><img id=\""+person.jid+"\" src=\"img/foovatar.png\" /></span>"
-					+"<span class=\"name\">"+name+"</span>"
-					+"<span class=\"unread\">"+(unread > 0 ? "+" + unread : "")+"</span>"
-					+"<span class=\"show "+show+"\"></span>"
-					+"<span class=\"status\">"+last+"</span>"
-				+"</li>");
 			}
+			if(totalUnread)$("section#main > header #totalUnread").html("+"+totalUnread).fadeIn("fast");
+			else $("section#main > header #totalUnread").hide();
+			this.avatarize();
 		}
-		if(totalUnread)$("section#main > header #totalUnread").html("+"+totalUnread).fadeIn("fast");
-		else $("section#main > header #totalUnread").hide();
-		this.avatarize();
 	}
 	
 	this.chatWith = function(jid){
@@ -87,6 +89,7 @@ function Messenger(){
 			this.pull(ci);	
 		}
 		this.capabilities.CSN = -1;
+		Lungo.Router.section("chat");
 		this.render();
 		app.save();
 	}
@@ -120,7 +123,7 @@ function Messenger(){
 					var html;
 					for(i in chat.messages){
 						var msg = chat.messages[i];
-						var text = /*chat.messages[i].html ||*/ chat.messages[i].text;
+						var text = chat.messages[i].text;
 						var type = msg.from == chat.jid ? "in" : "out";
 						var day = this.day(msg.stamp);
 						var stamp = "<span class=\"stamp\">"+this.hour(msg.stamp)+"</span>";
@@ -139,6 +142,7 @@ function Messenger(){
 					}
 					ul.html(html+"</li><hr class=\"end\" />");
 					$(ul).animate({scrollTop:ul[0].scrollHeight}, 'fast');
+					this.chatList();
 					app.save();
 				}else ul.empty();
 				break;
@@ -189,6 +193,7 @@ function Messenger(){
 			$("section#chat>article#one div#text").empty();
 			this.state = "active";
 			this.render("messages");
+			this.chatList();
 			$("audio#sent").get(0).play();
 			app.save();
 		}
@@ -217,22 +222,22 @@ function Messenger(){
 				$("audio#newchat").get(0).play();
 			}else{
 				this.list[ci].messages.push(newMessage);
-				//this.pull(ci);
+				this.pull(ci);
 				$("audio#received").get(0).play();
 			}
-			if(app.curSection=="chat" && app.curArticle=="one")this.render("messages");
-			else if(app.curSection=="main")this.chatList();
 			if(document.hidden){
 				this.lastnot = navigator.mozNotification.createNotification(from, newMessage.text, app.messenger.avatars[from] || "img/foovatar.png");
 				this.lastnot.show();
 			}
 			app.save();
+			if($("section#chat").hasClass("show"))this.render("messages");
+			else this.chatList();
 		}
 		if(composing){
 			$("section#chat>article#one #typing").show();
 		}else if(paused){
 			$("section#chat>article#one #typing").hide();
-		}else console.log("UNKNOWN");
+		}
 	}
 	
 	this.avatarize = function(){
