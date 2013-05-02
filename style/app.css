@@ -34,14 +34,8 @@
 }
 @media screen and (min-width: 1000px){
 	html{
-		font-size: 1.5em;
+		font-size: 1.5em!important;
 	}
-}
-.left{
-	float: left;
-}
-.right{
-	float: right;
 }
 body *{
 	font-family: MozTT, Open Sans, Ubuntu, Droid Sans, Roboto, Sans;
@@ -67,19 +61,21 @@ button{
 }
 body > section > header{
 	height: 3rem;
-	background-color: #E5745C;
 	box-shadow: none;
+	background: url("BB/headers/images/ui/header.png") repeat-x scroll 0 0 / auto 100% transparent;
+	box-shadow: 0 0 .5rem #333;
+	z-index: 2;
 }
 body > section > header > span.title{
 	text-align: left!important;
-	left: .5rem!important;
-	font-size: 1.8rem;
-	line-height: 1.8rem;
-	top: .7rem;
+	left: .3rem!important;
+	font-size: 1.5rem;
+	line-height: 1.5rem;
+	top: .8rem;
 }
 body > section > header > nav a{
 	height: 3rem!important;
-	width: 2.2rem;
+	width: 2rem;
 	color: #FFF!important;
 	text-shadow: none!important;
 	line-height: 3rem!important;
@@ -89,8 +85,15 @@ body > section > header > nav a.active{
 	background-color: rgba(255, 255, 255, .2);
 }
 body > section > header > nav a img{
-	padding-top: .3rem;
-	height: 1.5rem;
+	width: 1.4rem;
+}
+body > section > header > nav a.left{
+	width: 1.2rem!important;
+	padding: 0 .2rem!important;
+	background-color: rgba(0, 0, 0, .1);
+}
+body > section > header > nav a.left span{
+	font-size: 1rem!important;
 }
 body > section > article{
 	top: 3rem!important;
@@ -108,7 +111,7 @@ body > section#splash img{
 	margin-top: -3rem;
 }
 body > section#welcome{
-	background-color: #E5745C;
+	background-color: #D45500;
 	color: #FFF;
 }
 body > section#welcome > div{
@@ -143,7 +146,7 @@ body > section#login > article#login h1{
 	line-height: 1.3rem;
 	margin: .5rem 0 1rem 0;
 	font-weight: 500;
-	color: #E5745C;
+	color: #D45500;
 }
 body > section#login > article#login h1 img.icon{
 	float: left;
@@ -152,6 +155,229 @@ body > section#login > article#login h1 img.icon{
 }
 body > section#login > article#login button{
 	width: 100%;
+	background-color: #D45500;
+}
+body > section#main > article.list ul li{
+	height: 3rem;
+	padding: 0;
+	color: #666;
+	cursor: pointer;
+	overflow: hidden;
+	background-color: #F9F9F9;
+	border: none!important;
+}
+body > section#main > article.list ul li:nth-child(2n){
+	background-color: #F3F3F3;
+}
+body > section#main > article.list ul li span.avatar{
+	position: absolute;
+	display: block;
+	width: 3rem;
+	height: 3rem;
+	overflow: hidden;
+	background-color: #FFF;
+}
+body > section#main > article.list ul li span.avatar img{
+	height: 3rem;
+}
+body > section#main > article.list ul li span.name{
+	position: absolute;
+	left: 3.7rem;
+	top: .5rem;
+	font-weight: 300;
+	font-size: 1rem;
+}
+body > section#main > article.list ul li span.status{
+	position: absolute;
+	left: 3.7rem;
+	top: 1.7rem;
+	font-size: .8rem;
+	font-weight: 100;
+	color: #888;
+}
+body > section#main > article.list span.notyet{
+	position: absolute;
+	display: block;
+	top: 45%;
+	width: 100%;
+	text-align: center;
+	font-size: 1rem;
+	color: #666;
+}
+body > section#chat > header span.name{
+	position: absolute;
+	top: .7rem;
+	left: 2rem;
+	margin: 0;
+	font-size: 1rem;
+	line-height: 1rem;
+	font-weight: 500;
+	color: #FFF;
+}
+body > section#chat > header span.status{
+	position: absolute;
+	top: 1.7rem;
+	left: 2rem;
+	font-size: 0.8rem;
+	line-height: 0.8rem;
+	font-weight: 100;
+	color: #FFF;
+}
+body > section#chat > header span.show{
+	display: block;
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 0.3rem;
+	height: 3rem;
+}
+body > section#chat > header span.avatar{
+	float: right;
+	display: block;
+	width: 3rem;
+	height: 3rem;
+	overflow: hidden;
+	margin-right: 0.3rem;
+	background-color: #FFF;
+}
+body > section#chat > header span.avatar img{
+	margin: 0 auto;
+	height: 3rem;
+}
+body > section#chat > article#one #typing{
+	display: none;
+	position: relative;
+	top: -3rem;
+	margin-bottom: -2rem;
+	height: 1rem;
+	padding: .5rem;
+	background-color: rgba(255, 255, 255, .9);
+	text-align: center;
+	font-size: .8rem;
+	z-index: 1;
+}
+body > section#chat > article#one > div#footbox{
+	position: fixed!important;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	padding: .6rem;
+	background-color: #EAEAEA;
+	border-top: .05rem solid #DDD;
+}
+body > section#chat > article#one div#text{
+	position: relative;
+	padding: .5rem;
+	min-height: 1.3rem;
+	max-height: 4rem;
+	background-color: #FFF;
+	border: .05rem solid #DDD;
+	border-radius: .2rem;
+	font-size: 1rem;
+	font-weight: 300;
+	line-height: 1rem;
+	color: #666;
+	outline: none;
+	overflow: auto;
+}
+body > section#chat > article#one button#say{
+	position: relative;
+	float: right;
+	top: 0.05rem;
+	font-size: .8rem!important;
+	line-height: .8rem!important;
+	padding: .1rem 1rem;
+	height: 2.3rem;
+	width: 1.2rem;
+	line-height: 2rem;
+	margin: 0;
+	margin-left: 0.5rem;
+	font-weight: bold;
+}
+body > section#chat > article#one > ul#messages{
+	position: absolute;
+	right: 0;
+	left: 0;
+	bottom: 3.7rem;
+	margin: 0;
+	padding: 1rem;
+	list-style-type: none;
+	overflow-x: hidden;
+}
+body > section#chat > article#one > ul#messages li{
+	width: 85%;
+	margin-bottom: 0.8rem;
+	background-color: #FFF;
+	box-shadow: 0 0 2rem rgba(0, 0, 0, .1);
+	padding: 1rem;
+	overflow: hidden;
+}
+body > section#chat > article#one > ul#messages li.in{
+	float: left;
+	text-align: left;
+	color: #666;
+}
+body > section#chat > article#one > ul#messages li.out{
+	float: right;
+	text-align: right;
+	background-color: #F2F2F2;
+	color: #888;
+}
+body > section#chat > article#one > ul#messages > li > div.msg{
+	margin: 0;
+	letter-spacing: 0rem;
+	font-weight: 300;
+	font-size: 1rem;
+}
+body > section#chat > article#one > ul#messages > li > div.msg:not(:first-child){
+	border-top: .05rem solid #E3E3E3;
+	margin-top: 0.3rem;
+	padding-top: 0.3rem;
+}
+body > section#chat > article#one > ul#messages > li > div.msg > span.stamp{
+	font-size: .7rem;
+	color: #BBB;
+}
+body > section#chat > article#one > ul#messages > li.in > div.msg > span.stamp{
+	float: right;
+}
+body > section#chat > article#one > ul#messages > li.out > div.msg > span.stamp{
+	float: left;
+}
+body > section#chat > article#one > ul#messages > li p{
+	margin: 0;
+}
+body > section#chat > article#one > ul#messages > li img{
+	max-width: 100%;
+}
+body > section#chat > article#one > ul#messages > span.daychange{
+	display: block;
+	width: 100%;
+	margin-bottom: 1rem;
+	border-bottom: .05rem solid #CCC;
+	color: #999;
+}
+body > section#chat > article#one > ul#messages hr.end{
+	float: left;
+	margin-top: 3rem;
+	border: none;
+	width: 100%;
+}
+body > section .show.chat{
+	background-color: #82C82D;
+}
+body > section .show.a{
+	background-color: #5F9B0A;
+}
+body > section .show.away{
+	background-color: #008EAB;
+}
+body > section .show.xa{
 	background-color: #E5745C;
 }
-
+body > section .show.dnd{
+	background-color: #B90000;
+}
+body > section .show.na{
+	background-color: #858585;
+}

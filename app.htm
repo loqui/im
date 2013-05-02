@@ -63,15 +63,53 @@
 				<a href="#chats" data-router="article" data-title="Chats" data-image="img/tools/chats.svg" class="right active"> </a>
 			</nav>
 		</header>
-		<article id="chats" class="active">
-			Chats
+		<article id="chats" class="active list scroll">
+			<ul><span class="notyet">You have no chats yet.</span></ul>
 		</article>
-		<article id="people">
-			People
+		<article id="people" class="list scroll">
+			<ul><span class="notyet">There is no people yet.</span></ul>
 		</article>
 		<article id="me">
-			Me
+			<div id="vcard">
+				<span class="avatar"><img src="" /></span>
+				<h1></h1>
+				<h2></h2>
+			</div>
+			<div id="status">
+				<h1>Status</h1>
+				<input type="text" name="status" id="status" /><button onclick="app.messenger.presenceSet()">Apply</button>
+				<ul id="show">
+					<li class="show chat" onclick="app.messenger.presenceSet('chat')"></li>
+					<li class="show a" onclick="app.messenger.presenceSet('a')"></li>
+					<li class="show away" onclick="app.messenger.presenceSet('away')"></li>
+					<li class="show xa" onclick="app.messenger.presenceSet('xa')"></li>
+					<li class="show dnd" onclick="app.messenger.presenceSet('dnd')"></li>
+				</ul>
+				<span id="showcaption"></span>
+			</div>
+			<div>
+				<small>LOQUI version: <em>pre-alpha004</em></small>
+				<button onclick="app.xmpp.connection.disconnect()">QUIT</button>
+			</div>
 		</article>
+	</section>
+	<section id="chat" data-transition="slide">
+		<header data-back="left">
+			<span class="name"></span>
+			<span class="status"></span>
+			<span class="avatar"></span>
+			<span class="show"></span>
+		</header>
+		<article id="one" class="active">
+			<ul id="messages" class="paper scroll"></ul>
+			<div id="footbox">
+				<div id="typing">This person is typing right now...</div>
+				<button id="say" onclick="app.messenger.say()" class="recommend" type="send">SAY</button>
+				<div id="text" contenteditable></div>
+			</div>
+		</article>
+		<article id="muc">
+		</article>	
 	</section>
 	<!-- Lungo - Dependencies -->
 	<script src="scripts/quojs/quo.js"></script>

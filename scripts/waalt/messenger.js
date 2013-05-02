@@ -64,7 +64,7 @@ function Messenger(){
 				last = last.length > 42 ? last.substring(0, 42) + "..." : last;
 				var unread = this.unread(i);
 				totalUnread += unread;
-				ul.append("<li onclick=\"app.sectionShow('chat', 'one', '"+person.jid+"')\" id=\""+person.jid+"\" class=\"person\">"
+				ul.append("<li onclick=\"app.messenger.chatWith('"+person.jid+"')\" id=\""+person.jid+"\" class=\"person\">"
 					+"<span class=\"avatar\"><img id=\""+person.jid+"\" src=\"img/foovatar.png\" /></span>"
 					+"<span class=\"name\">"+name+"</span>"
 					+"<span class=\"unread\">"+(unread > 0 ? "+" + unread : "")+"</span>"
@@ -88,6 +88,7 @@ function Messenger(){
 		}
 		this.capabilities.CSN = -1;
 		this.render();
+		Lungo.Router.section("chat");
 		app.save();
 	}
 	
