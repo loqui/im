@@ -42,7 +42,7 @@ function XMPP(){
 		this.settings.host = this.hosts[i].domain;
 		this.settings.bosh = this.hosts[i].bosh;
 		$("section#wizard>article#signup span#server").html(this.hosts[i].name);
-		app.sectionShow("wizard", "signup");
+		//app.sectionShow("wizard", "signup");
 	}
 	
 	this.login = function(){
@@ -53,8 +53,8 @@ function XMPP(){
 			this.settings.password = pass;
 			this.settings.host = jid.split("@")[1];
 			this.settings.bosh = this.hosts[0].bosh;
+			this.connect();
 			app.save();
-			app.sectionShow("login", "connecting");	
 		}else alert("You didn't fill in the form properly");
 	}
 	
@@ -79,7 +79,7 @@ function XMPP(){
 				app.xmpp.settings.password = pass;
 				app.save();
 				alert("GREAT!\nYou have signed up succesfully.");
-				app.sectionShow("login", "connecting");
+				//app.sectionShow("login", "connecting");
 			}
 		});
 		else alert("You didn't fill in the form properly or password fields missmatch");

@@ -58,6 +58,7 @@ button{
 	height: 2.4rem;
 	font-size: 1rem!important;
 	line-height: 1rem;
+	background-color: #D45500!important;
 }
 body > section > header{
 	height: 3rem;
@@ -155,7 +156,18 @@ body > section#login > article#login h1 img.icon{
 }
 body > section#login > article#login button{
 	width: 100%;
-	background-color: #D45500;
+}
+body > section#main > header #totalUnread{
+	position: relative!important;
+	top: -3.5rem;
+	right: -.8rem!important;
+	background-color: #333;
+	font-weight: bold;
+	font-size: .8rem;
+	line-height: 1rem;
+	padding: 0 .2rem;
+	border-radius: .2rem;
+	z-index: 3;
 }
 body > section#main > article.list ul li{
 	height: 3rem;
@@ -194,6 +206,26 @@ body > section#main > article.list ul li span.status{
 	font-size: .8rem;
 	font-weight: 100;
 	color: #888;
+}
+body > section#main > article.list ul li span.show{
+	display: block;
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: .3rem;
+	height: 3rem;
+}
+body > section#main > article.list ul li span.unread{
+	position: absolute;
+	right: .5rem;
+	top: .5rem;
+	padding: 0 .2rem;
+	background-color: #333;
+	color: #FFF;
+	border-radius: .2rem;
+	font-weight: bold;
+	font-size: .8rem;
+	line-height: 1rem;
 }
 body > section#main > article.list span.notyet{
 	position: absolute;
@@ -363,6 +395,75 @@ body > section#chat > article#one > ul#messages hr.end{
 	margin-top: 3rem;
 	border: none;
 	width: 100%;
+}
+body > section#main > article#me > div{
+	position: relative;
+	margin: .8rem;
+	padding: .8rem;
+	background-color: #FFF;
+	box-shadow: 0 0 2rem rgba(0, 0, 0, .1);
+	color: #666;
+	font-size: 1rem;
+}
+body > section#main > article#me > div#vcard h1,
+body > section#main > article#me > div#vcard h2{
+	margin: 0;
+	font-size: 1rem;
+	text-align: center;
+	width: 100%;
+}
+body > section#main > article#me > div#vcard h1{
+	margin-top: .3rem;
+	font-weight: 500;
+}
+body > section#main > article#me > div#vcard h2{
+}
+body > section#main > article#me > div#vcard span.avatar{
+	display: block;
+	margin: 0 auto;
+	width: 4rem;
+	overflow: hidden;
+}
+body > section#main > article#me > div#vcard span.avatar img{
+	border-radius: 10%;
+	width: 4rem;
+}
+body > section#main > article#me > div#status{
+	padding-top: 2rem;
+}
+body > section#main > article#me > div#status h1{
+	margin: 0;
+}
+body > section#main > article#me > div#status input#status{
+	left: 1rem;
+	margin-top: .2rem;
+	padding: .2rem;
+	font-size: .8rem;
+}
+body > section#main > article#me > div#status button{
+	width: 100%;
+	margin-left: .2rem;
+	padding: .3rem;
+	font-size: .8rem;
+	border-radius: .2rem;
+}
+body > section#main > article#me > div#status ul{
+	position: absolute;
+	top: .5rem;
+	right: .5rem;
+	padding: 0;
+	margin: 0;
+	overflow-x: hidden;
+}
+body > section#main > article#me > div#status li{
+	display: block;
+	float: left;
+	width: 2rem;
+	height: 2rem;
+	cursor: pointer;
+}
+body > section#main > article#me > div#status li.selected{
+	width: 4rem;
 }
 body > section .show.chat{
 	background-color: #82C82D;

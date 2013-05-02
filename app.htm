@@ -60,9 +60,9 @@
 	<section id="main" data-transition="slide">
 		<header data-title="Chats">
 			<nav>
-				<a href="#me" data-router="article" data-title="Me" data-image="img/tools/me.svg" class="right"> </a>
-				<a href="#people" data-router="article" data-title="People" data-image="img/tools/people.svg" class="right"> </a>
-				<a href="#chats" data-router="article" data-title="Chats" data-image="img/tools/chats.svg" class="right active"> </a>
+				<a href="#me" data-router="article" data-title="Me" data-image="img/tools/me.svg" class="right"></a>
+				<a href="#people" data-router="article" data-title="People" data-image="img/tools/people.svg" class="right"></a>
+				<a href="#chats" data-router="article" data-title="Chats" data-image="img/tools/chats.svg" class="right active"><span id="totalUnread"></span></a>
 			</nav>
 		</header>
 		<article id="chats" class="active list scroll">
@@ -103,7 +103,7 @@
 			<span class="show"></span>
 		</header>
 		<article id="one" class="active">
-			<ul id="messages" class="paper scroll"></ul>
+			<ul id="messages" class="paper"></ul>
 			<div id="footbox">
 				<div id="typing">This person is typing right now...</div>
 				<button id="say" onclick="app.messenger.say()" class="recommend" type="send">SAY</button>

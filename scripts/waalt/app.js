@@ -13,58 +13,7 @@ function App(){
 	
 	this.run = function(){
 		this.load();
-		this.sectionShow("splash");
 		app.start();
-	}
-	
-	this.sectionShow = function(section, article, data){
-		this.curSection = section;
-		if(article){
-			$("section#"+section+">article#"+article).show().siblings("article").hide();
-			this.curArticle = article;
-		}
-		$("section#"+section).show().siblings().hide();
-		switch(section){
-			case "wizard":
-				switch(article){
-					case "hosts":
-						this.xmpp.hostsList();
-						break;
-					case "login":
-						$("section#wizard article#login div").html(data==true?"<input name=\"host\" type=\"text\" placeholder=\"XMPP host\" required /><input name=\"bosh\" type=\"text\" placeholder=\"BOSH URL\" required />":"");
-						break;
-				}
-				break;
-			case "login":
-				switch(article){
-					case "connecting":
-						this.xmpp.connect();
-				}
-				break;
-			case "main":
-				switch(article){
-					case "list":
-						if(this.xmpp.roster)this.messenger.chatList();
-						$("section#main header h1").html("Chats");
-						break;
-					case "people":
-						//this.messenger.peopleList();
-						$("section#main header h1").html("People");
-						break;
-					case "me":
-						//this.messenger.me();
-						$("section#main header h1").html("Me");
-						break;
-				}
-				break;
-			case "chat":
-				switch(article){
-					case "one":
-						this.messenger.chatWith(data);
-						break;					
-				}
-				break;
-		}
 	}
 	
 	this.popup = function(id){
