@@ -13,7 +13,7 @@ function App(){
 	
 	this.run = function(){
 		this.load();
-		app.start();
+		this.start();
 	}
 	
 	this.popup = function(id){
@@ -25,22 +25,27 @@ function App(){
 	}
 	
 	this.start = function(){
-		if($.isEmptyObject(this.xmpp.settings)) Lungo.Router.section("welcome");		
-		else this.xmpp.connect();
+		if($.isEmptyObject(this.xmpp.settings))Lungo.Router.section("welcome");		
+		else{
+			Lungo.Router.section("main")
+			this.xmpp.connect();
+		}
 	}
 	
 	this.load = function(){
 		this.xmpp.settings = localStorage.xsettings ? JSON.parse(localStorage.getItem("xsettings")) : new Object();
 		this.xmpp.presence = localStorage.xpresence ? JSON.parse(localStorage.getItem("xpresence")) : {show: "a", status: "Started using LOQUI"};
+		this.xmpp.roster = localStorage.xroster ? JSON.parse(localStorage.getItem("xroster")) : new Object();
 		this.messenger.list = localStorage.clist ? JSON.parse(localStorage.getItem("clist")) : new Array();
-		this.messenger.avatars = sessionStorage.avatars ? JSON.parse(sessionStorage.getItem("avatars")) : new Object();
+		this.messenger.avatars = localStorage.avatars ? JSON.parse(localStorage.getItem("avatars")) : new Object();
 	}
 	
 	this.save = function(){
 		localStorage.setItem("xsettings", JSON.stringify(this.xmpp.settings));
 		localStorage.setItem("xpresence", JSON.stringify(this.xmpp.presence));
+		localStorage.setItem("xroster", JSON.stringify(this.xmpp.roster));
 		localStorage.setItem("clist", JSON.stringify(this.messenger.list));
-		sessionStorage.setItem("avatars", JSON.stringify(this.messenger.avatars));
+		localStorage.setItem("avatars", JSON.stringify(this.messenger.avatars));
 	}
 	
 }

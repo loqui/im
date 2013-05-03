@@ -86,31 +86,39 @@ function XMPP(){
 	}
 	
 	this.connect = function(){
-		console.log("Trying to connect to "+this.settings.bosh);
-		this.connection = new Strophe.Connection(this.settings.bosh);
-		var lc = this.connection;
-		this.connection.connect(this.settings.username+"@"+this.settings.host, this.settings.password, function(status){
-			switch(status){
-				case Strophe.Status.CONNECTING:
-					console.log('Strophe is connecting as '+this.settings.username+"@"+this.settings.host);
-					break;
-				case Strophe.Status.CONNFAIL: break;
-				case Strophe.Status.DISCONNECTING:
-					console.log('Strophe is disconnecting.');
-					break;
-				case Strophe.Status.DISCONNECTED:
-					$("audio#logout").get(0).play();
-				case Strophe.Status.CONNECTED:
-					lc.addHandler(onChatMessage, null, 'message', 'chat', null, null);
-					$("section#main > article#me div#status input#status").val(app.xmpp.presence.status);
-					app.messenger.presenceSet();
-					app.xmpp.connection.vcard.get(function(data){
-						app.xmpp.vCard = $(data).find("vCard").get(0);
-						app.xmpp.rosterGet();
-					});
-					$("audio#login").get(0).play();
-			}
-		});
+		if(navigator.onLine){
+			console.log("Trying to connect to "+this.settings.bosh);
+			this.connection = new Strophe.Connection(this.settings.bosh);
+			var lc = this.connection;
+			this.connection.connect(this.settings.username+"@"+this.settings.host, this.settings.password, function(status){
+				switch(status){
+					case Strophe.Status.CONNECTING:
+						console.log('Strophe is connecting as '+this.settings.username+"@"+this.settings.host);
+						break;
+					case Strophe.Status.CONNFAIL: break;
+					case Strophe.Status.DISCONNECTING:
+						console.log('Strophe is disconnecting.');
+						break;
+					case Strophe.Status.DISCONNECTED:
+						$("audio#logout").get(0).play();
+					case Strophe.Status.CONNECTED:
+						lc.addHandler(onChatMessage, null, 'message', 'chat', null, null);
+						$("section#main > article#me div#status input#status").val(app.xmpp.presence.status);
+						app.messenger.presenceSet();
+						app.xmpp.connection.vcard.get(function(data){
+							app.xmpp.vCard = $(data).find("vCard").get(0);
+							app.xmpp.rosterGet();
+						});
+						$("audio#login").get(0).play();
+				}
+			});
+		}else{
+			console.log("OFFLINE: Loading from cache");
+			app.messenger.chatList();
+			app.messenger.peopleList();
+			app.messenger.me();
+		}
+		Lungo.Router.section("main");
 	}
 	
 	function onChatMessage(msg){
@@ -132,11 +140,11 @@ function XMPP(){
 				console.log("Roster was updated to "+data);
 				app.messenger.chatList();
 				app.messenger.peopleList();
-				app.messenger.render("presence");
 				app.messenger.me();
+				app.messenger.render("presence");
 			});
+			app.save();
 		});
-		Lungo.Router.section("main");
 	}
 	
 	this.send = function(jid, text, html){

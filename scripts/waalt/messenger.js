@@ -245,7 +245,7 @@ function Messenger(){
 			var jid = el.id;
 			if(app.messenger.avatars[jid]){
 				$(el).attr("src", app.messenger.avatars[jid]);
-			}else app.xmpp.connection.vcard.get(function(data){
+			}else if(navigator.onLine) app.xmpp.connection.vcard.get(function(data){
 				var vCard = $(data).find("vCard");
 				var img = vCard.find('BINVAL').text();
 				var type = vCard.find('TYPE').text();
