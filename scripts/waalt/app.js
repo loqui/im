@@ -24,6 +24,11 @@ function App(){
 		$(obj).closest(".popup").fadeOut(200);
 	}
 	
+	this.numify = function(num){
+		var base = "LOQUI by Waaltcom";
+		window.document.title = num ? base + " (" + num + ")" : base;
+	}
+	
 	this.start = function(){
 		if($.isEmptyObject(this.xmpp.settings))Lungo.Router.section("welcome");		
 		else{
@@ -47,5 +52,9 @@ function App(){
 		localStorage.setItem("clist", JSON.stringify(this.messenger.list));
 		localStorage.setItem("avatars", JSON.stringify(this.messenger.avatars));
 	}
+	
+	document.body.addEventListener("online", function(){
+		app.xmpp.connect();
+	}, false);
 	
 }

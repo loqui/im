@@ -74,8 +74,13 @@ function Messenger(){
 					+"</li>");
 				}
 			}
-			if(totalUnread)$("section#main > header #totalUnread").html("+"+totalUnread).fadeIn("fast");
-			else $("section#main > header #totalUnread").hide();
+			if(totalUnread){
+				$("section#main > header #totalUnread").html("+"+totalUnread).fadeIn("fast");
+				app.numify(totalUnread);
+			}else{
+				$("section#main > header #totalUnread").hide();
+				app.numify();
+			}
 			this.avatarize();
 		}
 	}
@@ -225,7 +230,7 @@ function Messenger(){
 				this.pull(ci);
 				$("audio#received").get(0).play();
 			}
-			if(document.hidden){
+			if(document.hidden && navigator.mozNotification){
 				this.lastnot = navigator.mozNotification.createNotification(from, newMessage.text, app.messenger.avatars[from] || "img/foovatar.png");
 				this.lastnot.show();
 			}
