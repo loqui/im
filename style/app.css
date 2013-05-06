@@ -28,9 +28,9 @@
 		font-size: 5vh!important;
 	}
 }
-@media screen and (min-width: 1000px){
+@media only screen and (min-resolution: 90dpi) and (min-width: 540px){
 	html{
-		font-size: 1.5em!important;
+		font-size: 150%!important;
 	}
 }
 body *{
@@ -408,6 +408,7 @@ body > section#main > article#me > div#vcard h1,
 body > section#main > article#me > div#vcard h2{
 	margin: 0;
 	font-size: 1rem;
+	line-height: 1rem;
 	text-align: center;
 	width: 100%;
 }
