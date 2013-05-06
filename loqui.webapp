@@ -2,7 +2,7 @@
 	"name": "LOQUI",
 	"description": "It just kick ass all other chat apps!",
 	"launch_path": "/app.htm",
-	"version": "pre-alpha004",
+	"version": "pre-alpha005",
 	"icons": {
 		"128": "/img/icon-128.png"
 	},
