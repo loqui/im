@@ -94,16 +94,25 @@ function XMPP(){
 				switch(status){
 					case Strophe.Status.CONNECTING:
 						Lungo.Notification.show();
-						console.log('Strophe is connecting as '+this.settings.username+"@"+this.settings.host);
+						console.log("CONNECTING");
 						break;
 					case Strophe.Status.CONNFAIL:
+						console.log("CONNFAIL");
+						Lungo.Notification.hide();
+						Lungo.Router.section("login");
+						alert("Could not reach server!\nPlease check your username domain.");
 						break;
-					case Strophe.Status.DISCONNECTING:
-						console.log('Strophe is disconnecting.');
+					case Strophe.Status.AUTHENTICATING:
+						console.log("AUTHENTICATING");
 						break;
-					case Strophe.Status.DISCONNECTED:
-						$("audio#logout").get(0).play();
+					case Strophe.Status.AUTHFAIL:
+						console.log("AUTHFAIL");
+						Lungo.Notification.hide();
+						Lungo.Router.section("login");
+						alert("Authentication failed!\nPlease check your username and password.");
+						break;
 					case Strophe.Status.CONNECTED:
+						console.log("CONNECTED");
 						lc.addHandler(onChatMessage, null, 'message', 'chat', null, null);
 						$("section#main > article#me div#status input#status").val(app.xmpp.presence.status);
 						app.messenger.presenceSet();
@@ -118,6 +127,17 @@ function XMPP(){
 						});
 						Lungo.Notification.hide();
 						$("audio#login").get(0).play();
+						break;
+					case Strophe.Status.DISCONNECTED:
+						console.log("DISCONNECTED");
+						$("audio#logout").get(0).play();
+						break;
+					case Strophe.Status.DISCONNECTING:
+						console.log("DISCONNECTING");
+						break;
+					case Strophe.Status.ATTACHED:
+						console.log("ATTACHED");
+						break;
 				}
 			});
 		}else{

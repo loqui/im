@@ -1,9 +1,9 @@
 CACHE MANIFEST
-#rev005011
+#rev005012
 NETWORK:
 https://app.loqui.im
 https://app.loqui.im/app.htm
-#CACHE:
+
 https://app.loqui.im/style/app.css
 https://app.loqui.im/style/lungo/lungo.css
 https://app.loqui.im/style/lungo/lungo.icon.brand.css
