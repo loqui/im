@@ -42,6 +42,7 @@ function App(){
 		this.xmpp.settings = localStorage.xsettings ? JSON.parse(localStorage.getItem("xsettings")) : new Object();
 		this.xmpp.presence = localStorage.xpresence ? JSON.parse(localStorage.getItem("xpresence")) : {show: "a", status: "Started using LOQUI"};
 		this.xmpp.roster = localStorage.xroster ? JSON.parse(localStorage.getItem("xroster")) : new Object();
+		this.xmpp.rosterdict = localStorage.xrd ? JSON.parse(localStorage.getItem("xrd")) : new Array();
 		this.xmpp.me = localStorage.xme ? JSON.parse(localStorage.getItem("xme")) : new Object();
 		this.messenger.list = localStorage.clist ? JSON.parse(localStorage.getItem("clist")) : new Array();
 		this.messenger.avatars = localStorage.avatars ? JSON.parse(localStorage.getItem("avatars")) : new Object();
@@ -52,6 +53,7 @@ function App(){
 		localStorage.setItem("xpresence", JSON.stringify(this.xmpp.presence));
 		localStorage.setItem("xroster", JSON.stringify(this.xmpp.roster));
 		localStorage.setItem("xme", JSON.stringify(this.xmpp.me));
+		localStorage.setItem("xrd", JSON.stringify(this.xmpp.rosterdict));
 		localStorage.setItem("clist", JSON.stringify(this.messenger.list));
 		localStorage.setItem("avatars", JSON.stringify(this.messenger.avatars));
 	}

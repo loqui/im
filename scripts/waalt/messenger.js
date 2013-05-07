@@ -42,6 +42,7 @@ function Messenger(){
 				+"<span class=\"show "+show+"\"></span>"
 				+"<span class=\"status\">"+status+"</span>"
 			+"</li>");
+			app.xmpp.rosterdict[person.jid] = name;
 		}
 		this.avatarize();
 	}
@@ -93,7 +94,7 @@ function Messenger(){
 	this.chatWith = function(jid){
 		var ci = this.find(jid);
 		if(ci<0){
-			title = app.xmpp.connection.roster.findItem(jid).name || jid;
+			title = app.xmpp.rosterdict[jid];
 			var newChat = new this.Chat(jid, title);
 			this.list.push(newChat);
 		}else{
@@ -110,20 +111,23 @@ function Messenger(){
 		switch(what){
 			case "presence":
 				if(this.list.length){
-					var person = app.xmpp.connection.roster.findItem(this.list[this.list.length-1].jid);
-					var name = person.name != null ? person.name : person.jid;
+					var name = this.list[this.list.length-1].title;
+					var jid = this.list[this.list.length-1].jid;
 					var j = -1;
 					status = "Disconnected";
 					show = "na";
-					for(i in person.resources){
-						var status = person.resources[i].status;
-						var show = person.resources[i].show || "a";
-						break;
+					if(navigator.onLine){
+						var person = app.xmpp.connection.roster.findItem(this.list[this.list.length-1].jid);
+						for(i in person.resources){
+							var status = person.resources[i].status;
+							var show = person.resources[i].show || "a";
+							break;
+						}
 					}
 					$("section#chat>header span.name").html(name);
 					$("section#chat>header span.status").html(status);
 					$("section#chat>header span.show").removeClass("chat a away xa dnd na").addClass(show);
-					$("section#chat>header span.avatar").html("<img id=\""+person.jid+"\" src=\"img/foovatar.png\" />");
+					$("section#chat>header span.avatar").html("<img id=\""+jid+"\" src=\"img/foovatar.png\" />");
 					this.avatarize();
 				}
 				break;
