@@ -8,7 +8,8 @@ function Messenger(){
 	this.state = "active";
 	this.lastnot = null;
 
-	this.Chat = function(jid){
+	this.Chat = function(jid, title){
+		this.title = title;
 		this.jid = jid;
 		this.messages = new Array();
 	}
@@ -52,22 +53,26 @@ function Messenger(){
 			ul.empty();
 			for(i=this.list.length-1;i>=0;i--){
 				if(this.list[i].messages.length){
-					var person = app.xmpp.connection.roster.findItem(this.list[i].jid);
-					var name = person.name != null ? person.name : person.jid;
+					//var person = app.xmpp.connection.roster.findItem(this.list[i].jid);
+					//var name = person.name != null ? person.name : person.jid;
+					var chat = this.list[i];
 					var status = "Disconnected";
 					var show = "na";
-					for(j in person.resources){
-						status = person.resources[j].status;
-						show = person.resources[j].show || "a";
-						break;
+					if(navigator.onLine){
+						var person = app.xmpp.connection.roster.findItem(this.list[i].jid);
+						for(j in person.resources){
+							status = person.resources[j].status;
+							show = person.resources[j].show || "a";
+							break;
+						}
 					}
 					var last = this.list[i].messages[this.list[i].messages.length-1].text;
 					last = last.length > 42 ? last.substring(0, 42) + "..." : last;
 					var unread = this.unread(i);
 					totalUnread += unread;
-					ul.append("<li onclick=\"app.messenger.chatWith('"+person.jid+"')\" id=\""+person.jid+"\" class=\"person\">"
-						+"<span class=\"avatar\"><img id=\""+person.jid+"\" src=\"img/foovatar.png\" /></span>"
-						+"<span class=\"name\">"+name+"</span>"
+					ul.append("<li onclick=\"app.messenger.chatWith('"+chat.jid+"')\" id=\""+chat.jid+"\" class=\"person\">"
+						+"<span class=\"avatar\"><img id=\""+chat.jid+"\" src=\"img/foovatar.png\" /></span>"
+						+"<span class=\"name\">"+chat.title+"</span>"
 						+"<span class=\"unread\">"+(unread > 0 ? "+" + unread : "")+"</span>"
 						+"<span class=\"show "+show+"\"></span>"
 						+"<span class=\"status\">"+last+"</span>"
@@ -88,7 +93,8 @@ function Messenger(){
 	this.chatWith = function(jid){
 		var ci = this.find(jid);
 		if(ci<0){
-			var newChat = new this.Chat(jid);
+			title = app.xmpp.connection.roster.findItem(jid).name || jid;
+			var newChat = new this.Chat(jid, title);
 			this.list.push(newChat);
 		}else{
 			this.pull(ci);	
@@ -270,10 +276,8 @@ function Messenger(){
 	
 	this.me = function(){
 		var art = $("section#main > article#me");
-		var jid = Strophe.getBareJidFromJid(app.xmpp.connection.jid);
-		var vCard = $(app.xmpp.vCard);
-		art.find("div#vcard h1").html(jid);
-		art.find("div#vcard h2").html(vCard.find("FN").text());
+		art.find("div#vcard h1").html(app.xmpp.me.jid);
+		art.find("div#vcard h2").html(app.xmpp.me.fn);
 		art.find("div#status input#status").val(app.xmpp.presence.status);
 		this.avatarize();
 	}

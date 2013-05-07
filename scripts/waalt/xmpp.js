@@ -108,7 +108,12 @@ function XMPP(){
 						$("section#main > article#me div#status input#status").val(app.xmpp.presence.status);
 						app.messenger.presenceSet();
 						app.xmpp.connection.vcard.get(function(data){
-							app.xmpp.vCard = $(data).find("vCard").get(0);
+							var vCard =  $(data).find("vCard").get(0);
+							app.xmpp.me = {
+								jid: $(vCard).find("USERID").text(),
+								fn: $(vCard).find("FN").text(),
+								avatar: "data:"+ $(vCard).find("TYPE").text() + ";base64," + $(vCard).find("BINVAL").text()
+							}
 							app.xmpp.rosterGet();
 						});
 						Lungo.Notification.hide();
