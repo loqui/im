@@ -93,23 +93,23 @@ function XMPP(){
 			this.connection.connect(this.settings.username+"@"+this.settings.host, this.settings.password, function(status){
 				switch(status){
 					case Strophe.Status.CONNECTING:
-						Lungo.Notification.show();
 						console.log("CONNECTING");
+						Lungo.Notification.show("Connecting", "clock");
 						break;
 					case Strophe.Status.CONNFAIL:
 						console.log("CONNFAIL");
 						Lungo.Notification.hide();
 						Lungo.Router.section("login");
-						alert("Could not reach server!\nPlease check your username domain.");
+						Lungo.Notification.error("Could not reach server!", "Please check your username.", "warning", 3);
 						break;
 					case Strophe.Status.AUTHENTICATING:
 						console.log("AUTHENTICATING");
+						Lungo.Notification.show("Authenticating", "clock");
 						break;
 					case Strophe.Status.AUTHFAIL:
 						console.log("AUTHFAIL");
-						Lungo.Notification.hide();
 						Lungo.Router.section("login");
-						alert("Authentication failed!\nPlease check your username and password.");
+						Lungo.Notification.error("Authentication failed!", "Please check your username and password.", "warning", 3);
 						break;
 					case Strophe.Status.CONNECTED:
 						console.log("CONNECTED");
