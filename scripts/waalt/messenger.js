@@ -96,6 +96,7 @@ function Messenger(){
 		this.capabilities.CSN = -1;
 		Lungo.Router.section("chat");
 		this.render();
+		$("section#chat>article#one #typing").hide();
 		app.save();
 	}
 	
@@ -232,6 +233,9 @@ function Messenger(){
 			}
 			if(document.hidden && navigator.mozNotification){
 				this.lastnot = navigator.mozNotification.createNotification(from, newMessage.text, app.messenger.avatars[from] || "img/foovatar.png");
+				this.lastnot.onclick = function(){
+					app.messenger.chatWith(from);
+				}
 				this.lastnot.show();
 			}
 			app.save();

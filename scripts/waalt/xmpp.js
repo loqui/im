@@ -93,9 +93,11 @@ function XMPP(){
 			this.connection.connect(this.settings.username+"@"+this.settings.host, this.settings.password, function(status){
 				switch(status){
 					case Strophe.Status.CONNECTING:
+						Lungo.Notification.show();
 						console.log('Strophe is connecting as '+this.settings.username+"@"+this.settings.host);
 						break;
-					case Strophe.Status.CONNFAIL: break;
+					case Strophe.Status.CONNFAIL:
+						break;
 					case Strophe.Status.DISCONNECTING:
 						console.log('Strophe is disconnecting.');
 						break;
@@ -109,6 +111,7 @@ function XMPP(){
 							app.xmpp.vCard = $(data).find("vCard").get(0);
 							app.xmpp.rosterGet();
 						});
+						Lungo.Notification.hide();
 						$("audio#login").get(0).play();
 				}
 			});
