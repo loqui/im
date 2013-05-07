@@ -194,7 +194,7 @@ body > section#main > article.list ul li span.avatar img{
 body > section#main > article.list ul li span.name{
 	position: absolute;
 	left: 3.7rem;
-	top: .5rem;
+	top: .7rem;
 	font-weight: 300;
 	font-size: 1rem;
 }
@@ -237,7 +237,7 @@ body > section#main > article.list span.notyet{
 }
 body > section#chat > header span.name{
 	position: absolute;
-	top: .7rem;
+	top: .5rem;
 	left: 2rem;
 	margin: 0;
 	font-size: 1rem;
@@ -247,7 +247,7 @@ body > section#chat > header span.name{
 }
 body > section#chat > header span.status{
 	position: absolute;
-	top: 1.7rem;
+	top: 1.6rem;
 	left: 2rem;
 	font-size: 0.8rem;
 	line-height: 0.8rem;
@@ -298,7 +298,7 @@ body > section#chat > article#one > div#footbox{
 }
 body > section#chat > article#one div#text{
 	position: relative;
-	padding: .5rem;
+	padding: .7rem .5rem .5rem .5rem;
 	min-height: 1.3rem;
 	max-height: 4rem;
 	background-color: #FFF;
@@ -360,6 +360,7 @@ body > section#chat > article#one > ul#messages > li > div.msg{
 	letter-spacing: 0rem;
 	font-weight: 300;
 	font-size: 1rem;
+	line-height: 1rem;
 }
 body > section#chat > article#one > ul#messages > li > div.msg:not(:first-child){
 	border-top: .05rem solid #E3E3E3;
