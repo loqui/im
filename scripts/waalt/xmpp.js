@@ -163,23 +163,10 @@ function XMPP(){
 			app.messenger.chatList();
 			app.messenger.peopleList();
 			app.messenger.me();
-<<<<<<< HEAD
 			app.messenger.render("presence");
 			app.save();
 		});
 		this.connection.roster.get();
-=======
-			app.xmpp.connection.roster.registerCallback(function(data){
-				app.xmpp.roster = data;
-				console.log("Roster was updated to "+data);
-				app.messenger.chatList();
-				app.messenger.peopleList();
-				app.messenger.me();
-				app.messenger.render("presence");
-			});
-			app.save();
-		});
->>>>>>> d44e8d0fa8e6955f3800141a890f5a2288a1c192
 	}
 	
 	this.send = function(msg, delayed){
