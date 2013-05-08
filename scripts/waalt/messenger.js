@@ -7,7 +7,7 @@ function Messenger(){
 	this.capabilities = new Object();
 	this.state = "active";
 	this.lastNot = null;
-	this.lastChat = null;
+	this.lastChat = 0;
 
 	this.Chat = function(jid, title){
 		this.title = title;
@@ -101,8 +101,8 @@ function Messenger(){
 		}
 		this.capabilities.CSN = -1;
 		Lungo.Router.section("chat");
-		this.render();
 		this.lastChat = jid;
+		this.render();
 		$("section#chat>article#one #typing").hide();
 		app.save();
 	}
@@ -111,13 +111,14 @@ function Messenger(){
 		switch(what){
 			case "presence":
 				if(this.list.length){
-					var name = this.list[this.list.length-1].title;
-					var jid = this.list[this.list.length-1].jid;
+					var ci = this.find(this.lastChat);
+					var name = this.list[ci].title;
+					var jid = this.list[ci].jid;
 					var j = -1;
 					status = "Disconnected";
 					show = "na";
 					if(navigator.onLine){
-						var person = app.xmpp.connection.roster.findItem(this.list[this.list.length-1].jid);
+						var person = app.xmpp.connection.roster.findItem(this.list[ci].jid);
 						for(i in person.resources){
 							var status = person.resources[i].status;
 							var show = person.resources[i].show || "a";
