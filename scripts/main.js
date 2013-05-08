@@ -1,4 +1,4 @@
-require(["jquery", "jquery/autogrow", "waalt/app"], function($) {
+require(["jquery", "waalt/app"], function($) {
     $(function() {
     });
 });
