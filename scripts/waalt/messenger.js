@@ -192,7 +192,6 @@ function Messenger(){
 	}
 	
 	this.say = function(e){
-		console.log(e);
 		var jid = this.list[this.list.length-1].jid;
 		var text = $("section#chat>article#one div#text").text().replace(/^\s+/g,'').replace(/\s+$/g,'');
 		var html = $("section#chat>article#one div#text").html();
@@ -201,14 +200,20 @@ function Messenger(){
 		var stamp = date.getUTCFullYear()+"-"+("0"+(date.getUTCMonth()+1)).slice(-2)+"-"+("0"+(date.getUTCDate())).slice(-2)+"T"+("0"+(date.getUTCHours())).slice(-2)+":"+("0"+(date.getUTCMinutes())).slice(-2)+":"+("0"+(date.getUTCSeconds())).slice(-2)+"Z";
 		var localstamp = date.getFullYear()+"-"+("0"+(date.getMonth()+1)).slice(-2)+"-"+("0"+(date.getDate())).slice(-2)+"T"+("0"+(date.getHours())).slice(-2)+":"+("0"+(date.getMinutes())).slice(-2)+":"+("0"+(date.getSeconds())).slice(-2)+"Z";
 		if(text.length){
-			app.xmpp.send(jid, text, dom);
 			var newMessage = new this.Message(Strophe.getBareJidFromJid(app.xmpp.connection.jid), jid, text, html, localstamp);
 			this.list[this.list.length-1].messages.push(newMessage);
 			$("section#chat>article#one div#text").empty();
 			this.state = "active";
 			this.render("messages");
 			this.chatList();
-			$("audio#sent").get(0).play();
+			if(navigator.onLine){
+				app.xmpp.send(newMessage);
+				$("audio#sent").get(0).play();
+			}else{
+				Lungo.Notification.show("You are currently Offline, message will be sent when connected again.", "warning", 3);
+				newMessage.stamp = stamp;
+				this.sendQ.push(newMessage);
+			}
 			app.save();
 		}
 	}
@@ -223,10 +228,8 @@ function Messenger(){
 		var paused = tree.children("paused").length || tree.children("active").length;
 		this.capabilities.CSN = (composing || paused);
 		if(text || html){
-			console.log("TEXT OR HTML");
 			var date = new Date();
 			var stamp = tree.children("delay").attr("stamp") ? this.localize(tree.children("delay").attr("stamp")) : date.getFullYear()+"-"+("0"+(date.getMonth()+1)).slice(-2)+"-"+("0"+(date.getDate())).slice(-2)+"T"+("0"+(date.getHours())).slice(-2)+":"+("0"+(date.getMinutes())).slice(-2)+":"+("0"+(date.getSeconds())).slice(-2)+"Z";
-			console.log(text);
 			var newMessage = new this.Message(from, to, text, html, stamp);
 			var ci = this.find(from);
 			if(ci<0){

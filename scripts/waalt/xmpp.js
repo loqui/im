@@ -124,6 +124,7 @@ function XMPP(){
 								avatar: "data:"+ $(vCard).find("TYPE").text() + ";base64," + $(vCard).find("BINVAL").text()
 							}
 							app.xmpp.rosterGet();
+							app.xmpp.bulkSend(app.messenger.sendQ);
 						});
 						Lungo.Notification.hide();
 						$("audio#login").get(0).play();
@@ -175,11 +176,19 @@ function XMPP(){
 		});
 	}
 	
-	this.send = function(jid, text, html){
-		app.xmpp.connection.Messaging.send(jid, text, html);
+	this.send = function(msg, delayed){
+		app.xmpp.connection.Messaging.send(msg.to, msg.text, delayed ? msg.stamp : delayed);
 		if(app.messenger.capabilities.CSN != 0){
-			app.xmpp.connection.Messaging.csnSend(jid, "active");
+			app.xmpp.connection.Messaging.csnSend(msg.to, "active");
 		}
+	}
+	
+	this.bulkSend = function(q){
+		for(i in q){
+			this.send(q[i], true);
+		}
+		q.length = 0;
+		app.save();
 	}
 	
 	this.csnSend = function(jid, state){

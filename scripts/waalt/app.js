@@ -46,6 +46,7 @@ function App(){
 		this.xmpp.me = localStorage.xme ? JSON.parse(localStorage.getItem("xme")) : new Object();
 		this.messenger.list = localStorage.clist ? JSON.parse(localStorage.getItem("clist")) : new Array();
 		this.messenger.avatars = localStorage.avatars ? JSON.parse(localStorage.getItem("avatars")) : new Object();
+		this.messenger.sendQ = localStorage.sendQ ? JSON.parse(localStorage.getItem("sendQ")) : new Array();
 	}
 	
 	this.save = function(){
@@ -56,6 +57,7 @@ function App(){
 		localStorage.setItem("xrd", JSON.stringify(this.xmpp.rosterdict));
 		localStorage.setItem("clist", JSON.stringify(this.messenger.list));
 		localStorage.setItem("avatars", JSON.stringify(this.messenger.avatars));
+		localStorage.setItem("sendQ", JSON.stringify(this.messenger.sendQ));
 	}
 	
 	document.body.addEventListener("online", function(){
