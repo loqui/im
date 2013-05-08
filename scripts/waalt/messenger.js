@@ -8,7 +8,8 @@ function Messenger(){
 	this.state = "active";
 	this.lastnot = null;
 
-	this.Chat = function(jid){
+	this.Chat = function(jid, title){
+		this.title = title;
 		this.jid = jid;
 		this.messages = new Array();
 	}
@@ -41,6 +42,7 @@ function Messenger(){
 				+"<span class=\"show "+show+"\"></span>"
 				+"<span class=\"status\">"+status+"</span>"
 			+"</li>");
+			app.xmpp.rosterdict[person.jid] = name;
 		}
 		this.avatarize();
 	}
@@ -52,30 +54,37 @@ function Messenger(){
 			ul.empty();
 			for(i=this.list.length-1;i>=0;i--){
 				if(this.list[i].messages.length){
-					var person = app.xmpp.connection.roster.findItem(this.list[i].jid);
-					var name = person.name != null ? person.name : person.jid;
+					var chat = this.list[i];
 					var status = "Disconnected";
 					var show = "na";
-					for(j in person.resources){
-						status = person.resources[j].status;
-						show = person.resources[j].show || "a";
-						break;
+					if(navigator.onLine){
+						var person = app.xmpp.connection.roster.findItem(this.list[i].jid);
+						for(j in person.resources){
+							status = person.resources[j].status;
+							show = person.resources[j].show || "a";
+							break;
+						}
 					}
 					var last = this.list[i].messages[this.list[i].messages.length-1].text;
 					last = last.length > 42 ? last.substring(0, 42) + "..." : last;
 					var unread = this.unread(i);
 					totalUnread += unread;
-					ul.append("<li onclick=\"app.messenger.chatWith('"+person.jid+"')\" id=\""+person.jid+"\" class=\"person\">"
-						+"<span class=\"avatar\"><img id=\""+person.jid+"\" src=\"img/foovatar.png\" /></span>"
-						+"<span class=\"name\">"+name+"</span>"
+					ul.append("<li onclick=\"app.messenger.chatWith('"+chat.jid+"')\" id=\""+chat.jid+"\" class=\"person\">"
+						+"<span class=\"avatar\"><img id=\""+chat.jid+"\" src=\"img/foovatar.png\" /></span>"
+						+"<span class=\"name\">"+chat.title+"</span>"
 						+"<span class=\"unread\">"+(unread > 0 ? "+" + unread : "")+"</span>"
 						+"<span class=\"show "+show+"\"></span>"
 						+"<span class=\"status\">"+last+"</span>"
 					+"</li>");
 				}
 			}
-			if(totalUnread)$("section#main > header #totalUnread").html("+"+totalUnread).fadeIn("fast");
-			else $("section#main > header #totalUnread").hide();
+			if(totalUnread){
+				$("section#main > header #totalUnread").html("+"+totalUnread).fadeIn("fast");
+				app.numify(totalUnread);
+			}else{
+				$("section#main > header #totalUnread").hide();
+				app.numify();
+			}
 			this.avatarize();
 		}
 	}
@@ -83,7 +92,8 @@ function Messenger(){
 	this.chatWith = function(jid){
 		var ci = this.find(jid);
 		if(ci<0){
-			var newChat = new this.Chat(jid);
+			var title = app.xmpp.rosterdict[jid];
+			var newChat = new this.Chat(jid, title);
 			this.list.push(newChat);
 		}else{
 			this.pull(ci);	
@@ -91,6 +101,7 @@ function Messenger(){
 		this.capabilities.CSN = -1;
 		Lungo.Router.section("chat");
 		this.render();
+		$("section#chat>article#one #typing").hide();
 		app.save();
 	}
 	
@@ -98,20 +109,23 @@ function Messenger(){
 		switch(what){
 			case "presence":
 				if(this.list.length){
-					var person = app.xmpp.connection.roster.findItem(this.list[this.list.length-1].jid);
-					var name = person.name != null ? person.name : person.jid;
+					var name = this.list[this.list.length-1].title;
+					var jid = this.list[this.list.length-1].jid;
 					var j = -1;
 					status = "Disconnected";
 					show = "na";
-					for(i in person.resources){
-						var status = person.resources[i].status;
-						var show = person.resources[i].show || "a";
-						break;
+					if(navigator.onLine){
+						var person = app.xmpp.connection.roster.findItem(this.list[this.list.length-1].jid);
+						for(i in person.resources){
+							var status = person.resources[i].status;
+							var show = person.resources[i].show || "a";
+							break;
+						}
 					}
 					$("section#chat>header span.name").html(name);
 					$("section#chat>header span.status").html(status);
 					$("section#chat>header span.show").removeClass("chat a away xa dnd na").addClass(show);
-					$("section#chat>header span.avatar").html("<img id=\""+person.jid+"\" src=\"img/foovatar.png\" />");
+					$("section#chat>header span.avatar").html("<img id=\""+jid+"\" src=\"img/foovatar.png\" />");
 					this.avatarize();
 				}
 				break;
@@ -178,7 +192,6 @@ function Messenger(){
 	}
 	
 	this.say = function(e){
-		console.log(e);
 		var jid = this.list[this.list.length-1].jid;
 		var text = $("section#chat>article#one div#text").text().replace(/^\s+/g,'').replace(/\s+$/g,'');
 		var html = $("section#chat>article#one div#text").html();
@@ -187,14 +200,20 @@ function Messenger(){
 		var stamp = date.getUTCFullYear()+"-"+("0"+(date.getUTCMonth()+1)).slice(-2)+"-"+("0"+(date.getUTCDate())).slice(-2)+"T"+("0"+(date.getUTCHours())).slice(-2)+":"+("0"+(date.getUTCMinutes())).slice(-2)+":"+("0"+(date.getUTCSeconds())).slice(-2)+"Z";
 		var localstamp = date.getFullYear()+"-"+("0"+(date.getMonth()+1)).slice(-2)+"-"+("0"+(date.getDate())).slice(-2)+"T"+("0"+(date.getHours())).slice(-2)+":"+("0"+(date.getMinutes())).slice(-2)+":"+("0"+(date.getSeconds())).slice(-2)+"Z";
 		if(text.length){
-			app.xmpp.send(jid, text, dom);
 			var newMessage = new this.Message(Strophe.getBareJidFromJid(app.xmpp.connection.jid), jid, text, html, localstamp);
 			this.list[this.list.length-1].messages.push(newMessage);
 			$("section#chat>article#one div#text").empty();
 			this.state = "active";
 			this.render("messages");
 			this.chatList();
-			$("audio#sent").get(0).play();
+			if(navigator.onLine){
+				app.xmpp.send(newMessage);
+				$("audio#sent").get(0).play();
+			}else{
+				Lungo.Notification.show("You are currently Offline, message will be sent when connected again.", "warning", 3);
+				newMessage.stamp = stamp;
+				this.sendQ.push(newMessage);
+			}
 			app.save();
 		}
 	}
@@ -209,14 +228,12 @@ function Messenger(){
 		var paused = tree.children("paused").length || tree.children("active").length;
 		this.capabilities.CSN = (composing || paused);
 		if(text || html){
-			console.log("TEXT OR HTML");
 			var date = new Date();
 			var stamp = tree.children("delay").attr("stamp") ? this.localize(tree.children("delay").attr("stamp")) : date.getFullYear()+"-"+("0"+(date.getMonth()+1)).slice(-2)+"-"+("0"+(date.getDate())).slice(-2)+"T"+("0"+(date.getHours())).slice(-2)+":"+("0"+(date.getMinutes())).slice(-2)+":"+("0"+(date.getSeconds())).slice(-2)+"Z";
-			console.log(text);
 			var newMessage = new this.Message(from, to, text, html, stamp);
 			var ci = this.find(from);
 			if(ci<0){
-				var newChat = new this.Chat(from);
+				var newChat = new this.Chat(from, app.xmpp.rosterdict[from]);
 				newChat.messages.push(newMessage);
 				this.list.push(newChat);
 				$("audio#newchat").get(0).play();
@@ -225,8 +242,11 @@ function Messenger(){
 				this.pull(ci);
 				$("audio#received").get(0).play();
 			}
-			if(document.hidden){
+			if(document.hidden && navigator.mozNotification){
 				this.lastnot = navigator.mozNotification.createNotification(from, newMessage.text, app.messenger.avatars[from] || "img/foovatar.png");
+				this.lastnot.onclick = function(){
+					app.messenger.chatWith(from);
+				}
 				this.lastnot.show();
 			}
 			app.save();
@@ -245,7 +265,7 @@ function Messenger(){
 			var jid = el.id;
 			if(app.messenger.avatars[jid]){
 				$(el).attr("src", app.messenger.avatars[jid]);
-			}else app.xmpp.connection.vcard.get(function(data){
+			}else if(navigator.onLine) app.xmpp.connection.vcard.get(function(data){
 				var vCard = $(data).find("vCard");
 				var img = vCard.find('BINVAL').text();
 				var type = vCard.find('TYPE').text();
@@ -261,10 +281,8 @@ function Messenger(){
 	
 	this.me = function(){
 		var art = $("section#main > article#me");
-		var jid = Strophe.getBareJidFromJid(app.xmpp.connection.jid);
-		var vCard = $(app.xmpp.vCard);
-		art.find("div#vcard h1").html(jid);
-		art.find("div#vcard h2").html(vCard.find("FN").text());
+		art.find("div#vcard h1").html(app.xmpp.me.jid);
+		art.find("div#vcard h2").html(app.xmpp.me.fn);
 		art.find("div#status input#status").val(app.xmpp.presence.status);
 		this.avatarize();
 	}

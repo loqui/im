@@ -1,8 +1,8 @@
 {
 	"name": "LOQUI",
-	"description": "It just kick ass all other chat apps!",
+	"description": "LOQUI Instant Messenger is a mobile chat app that allows you to use your Google Talk™ or Jabber® account.",
 	"launch_path": "/app.htm",
-	"version": "pre-alpha004",
+	"version": "pre-alpha005",
 	"icons": {
 		"128": "/img/icon-128.png"
 	},
@@ -13,7 +13,7 @@
 	"default_locale": "en",
 	"locales": {
 		"es": {
-		  "description": "¡Le da en la boca a todas las demás apps de chat!"
+			"description": "Con LOQUI Instant Messenger puedes chatear desde tu smartphone usando tu cuenta de Google Talk™ o Jabber®."
 		}
 	},
 	"permissions": {
