@@ -6,7 +6,8 @@ function Messenger(){
 
 	this.capabilities = new Object();
 	this.state = "active";
-	this.lastnot = null;
+	this.lastNot = null;
+	this.lastChat = null;
 
 	this.Chat = function(jid, title){
 		this.title = title;
@@ -101,6 +102,7 @@ function Messenger(){
 		this.capabilities.CSN = -1;
 		Lungo.Router.section("chat");
 		this.render();
+		this.lastChat = jid;
 		$("section#chat>article#one #typing").hide();
 		app.save();
 	}
@@ -243,14 +245,14 @@ function Messenger(){
 				$("audio#received").get(0).play();
 			}
 			if(document.hidden && navigator.mozNotification){
-				this.lastnot = navigator.mozNotification.createNotification(from, newMessage.text, app.messenger.avatars[from] || "img/foovatar.png");
-				this.lastnot.onclick = function(){
+				this.lastNot = navigator.mozNotification.createNotification(from, newMessage.text, app.messenger.avatars[from] || "img/foovatar.png");
+				this.lastNot.onclick = function(){
 					app.messenger.chatWith(from);
 				}
-				this.lastnot.show();
+				this.lastNot.show();
 			}
 			app.save();
-			if($("section#chat").hasClass("show"))this.render("messages");
+			if($("section#chat").hasClass("show") && from == this.lastChat)this.render("messages");
 			else this.chatList();
 		}
 		if(composing){
