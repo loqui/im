@@ -54,8 +54,6 @@ function Messenger(){
 			ul.empty();
 			for(i=this.list.length-1;i>=0;i--){
 				if(this.list[i].messages.length){
-					//var person = app.xmpp.connection.roster.findItem(this.list[i].jid);
-					//var name = person.name != null ? person.name : person.jid;
 					var chat = this.list[i];
 					var status = "Disconnected";
 					var show = "na";
@@ -94,7 +92,7 @@ function Messenger(){
 	this.chatWith = function(jid){
 		var ci = this.find(jid);
 		if(ci<0){
-			title = app.xmpp.rosterdict[jid];
+			var title = app.xmpp.rosterdict[jid];
 			var newChat = new this.Chat(jid, title);
 			this.list.push(newChat);
 		}else{
@@ -232,7 +230,7 @@ function Messenger(){
 			var newMessage = new this.Message(from, to, text, html, stamp);
 			var ci = this.find(from);
 			if(ci<0){
-				var newChat = new this.Chat(from);
+				var newChat = new this.Chat(from, app.xmpp.rosterdict[from]);
 				newChat.messages.push(newMessage);
 				this.list.push(newChat);
 				$("audio#newchat").get(0).play();
