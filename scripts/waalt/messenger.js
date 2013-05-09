@@ -112,24 +112,26 @@ function Messenger(){
 			case "presence":
 				if(this.list.length){
 					var ci = this.find(this.lastChat);
-					var name = this.list[ci].title;
-					var jid = this.list[ci].jid;
-					var j = -1;
-					status = "Disconnected";
-					show = "na";
-					if(navigator.onLine){
-						var person = app.xmpp.connection.roster.findItem(this.list[ci].jid);
-						for(i in person.resources){
-							var status = person.resources[i].status;
-							var show = person.resources[i].show || "a";
-							break;
+					if(ci > -1){
+						var name = app.messenger.list[ci].title;
+						var jid = app.messenger.list[ci].jid;
+						var j = -1;
+						status = "Disconnected";
+						show = "na";
+						if(navigator.onLine){
+							var person = app.xmpp.connection.roster.findItem(jid);
+							for(i in person.resources){
+								var status = person.resources[i].status;
+								var show = person.resources[i].show || "a";
+								break;
+							}
 						}
+						$("section#chat>header span.name").html(name);
+						$("section#chat>header span.status").html(status);
+						$("section#chat>header span.show").removeClass("chat a away xa dnd na").addClass(show);
+						$("section#chat>header span.avatar").html("<img id=\""+jid+"\" src=\"img/foovatar.png\" />");
+						this.avatarize();
 					}
-					$("section#chat>header span.name").html(name);
-					$("section#chat>header span.status").html(status);
-					$("section#chat>header span.show").removeClass("chat a away xa dnd na").addClass(show);
-					$("section#chat>header span.avatar").html("<img id=\""+jid+"\" src=\"img/foovatar.png\" />");
-					this.avatarize();
 				}
 				break;
 			case "messages":

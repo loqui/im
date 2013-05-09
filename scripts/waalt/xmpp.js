@@ -159,14 +159,14 @@ function XMPP(){
 	this.rosterGet = function(){
 		app.xmpp.connection.roster.registerCallback(function(data){
 			app.xmpp.roster = data;
-			console.log("Roster was updated to "+data);
+			console.log("ROSTER UPDATE");
 			app.messenger.chatList();
 			app.messenger.peopleList();
 			app.messenger.me();
 			app.messenger.render("presence");
 			app.save();
 		});
-		this.connection.roster.get();
+		this.connection.roster.get(function(){});
 	}
 	
 	this.send = function(msg, delayed){
