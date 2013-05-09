@@ -135,7 +135,7 @@ function Messenger(){
 				}
 				break;
 			case "messages":
-				var chat = this.list[this.list.length-1];
+				var chat = this.list[this.find(this.lastChat)];
 				var ul = $("section#chat>article#one>ul#messages");
 				var pType;
 				if(chat.messages.length){
@@ -197,7 +197,7 @@ function Messenger(){
 	}
 	
 	this.say = function(e){
-		var jid = this.list[this.list.length-1].jid;
+		var jid = this.lastChat;
 		var text = $("section#chat>article#one div#text").text().replace(/^\s+/g,'').replace(/\s+$/g,'');
 		var html = $("section#chat>article#one div#text").html();
 		var dom = $("section#chat>article#one div#text").get(0).childNodes[0];
@@ -206,7 +206,7 @@ function Messenger(){
 		var localstamp = date.getFullYear()+"-"+("0"+(date.getMonth()+1)).slice(-2)+"-"+("0"+(date.getDate())).slice(-2)+"T"+("0"+(date.getHours())).slice(-2)+":"+("0"+(date.getMinutes())).slice(-2)+":"+("0"+(date.getSeconds())).slice(-2)+"Z";
 		if(text.length){
 			var newMessage = new this.Message(Strophe.getBareJidFromJid(app.xmpp.me.jid), jid, text, html, localstamp);
-			this.list[this.list.length-1].messages.push(newMessage);
+			this.list[this.find(jid)].messages.push(newMessage);
 			$("section#chat>article#one div#text").empty();
 			this.state = "active";
 			this.render("messages");
@@ -356,11 +356,11 @@ function Messenger(){
 	});
 	$("section#chat>article#one div#text").keyup(function(e){
 		if(app.messenger.state != "composing" && e.which != 13){
-			app.xmpp.csnSend(app.messenger.list[app.messenger.list.length-1].jid, "composing");
+			app.xmpp.csnSend(app.messenger.lastChat, "composing");
 			app.messenger.state = "composing";
 		}
 		if(app.messenger.state != "paused" && (e.which == 8 || e.which == 46) && $(e.target).text().length<1){
-			app.xmpp.csnSend(app.messenger.list[app.messenger.list.length-1].jid, "paused");
+			app.xmpp.csnSend(app.messenger.lastChat, "paused");
 			app.messenger.state = "paused";
 		}
 	});
