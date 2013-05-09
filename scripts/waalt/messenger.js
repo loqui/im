@@ -258,9 +258,9 @@ function Messenger(){
 			if($("section#chat").hasClass("show") && from == this.lastChat)this.render("messages");
 			else this.chatList();
 		}
-		if(composing){
+		if(composing && from == this.lastChat){
 			$("section#chat>article#one #typing").show();
-		}else if(paused){
+		}else if(paused && from == this.lastChat){
 			$("section#chat>article#one #typing").hide();
 		}
 	}
