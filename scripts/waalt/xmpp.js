@@ -157,6 +157,7 @@ function XMPP(){
 	}
 	
 	this.rosterGet = function(){
+		Lungo.Notification.show("Updating contacts list", "clock");
 		app.xmpp.connection.roster.registerCallback(function(data){
 			app.xmpp.roster = data;
 			console.log("ROSTER UPDATE");
@@ -166,7 +167,9 @@ function XMPP(){
 			app.messenger.render("presence");
 			app.save();
 		});
-		this.connection.roster.get(function(){});
+		this.connection.roster.get(function(){
+			Lungo.Notification.hide();
+		});
 	}
 	
 	this.send = function(msg, delayed){
