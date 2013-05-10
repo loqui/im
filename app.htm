@@ -87,8 +87,10 @@
 				<span id="showcaption"></span>
 			</div>
 			<div>
-				<small>LOQUI version: <em>pre-alpha005</em></small>
-				<button onclick="app.xmpp.connection.disconnect()">QUIT</button>
+				<h1>Debug options</h1>
+				<p>LOQUI version: <em>pre-alpha005</em></p>
+				<button onclick="app.xmpp.connection.disconnect()">Disconnect</button>
+				<button onclick="app.xmpp.connection.disconnect();app.xmpp.connect()">Reconnect</button>
 			</div>
 		</article>
 	</section>
