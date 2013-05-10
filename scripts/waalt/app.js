@@ -1,9 +1,7 @@
 define(["./xmpp", "./messenger"], function(xmpp, messenger){
 	app.xmpp = xmpp;
 	app.messenger = messenger;
-	$(document).ready(function(){
-		app.run();
-	});
+	app.run();
 });
 
 var app = new App();
