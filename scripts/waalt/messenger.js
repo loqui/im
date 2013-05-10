@@ -66,7 +66,7 @@ function Messenger(){
 							break;
 						}
 					}
-					var last = this.list[i].messages[this.list[i].messages.length-1].text.replace(/[&<>"'`]/g,function(chr){return'&#'+chr.charCodeAt(0)+';';});
+					var last = this.list[i].messages[this.list[i].messages.length-1].text.replace(/&(?!\w+([;\s]|$))/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 					last = last.length > 42 ? last.substring(0, 42) + "..." : last;
 					var unread = this.unread(i);
 					totalUnread += unread;
@@ -142,7 +142,7 @@ function Messenger(){
 					var html;
 					for(i in chat.messages){
 						var msg = chat.messages[i];
-						var text = chat.messages[i].text.replace(/[&<>"'`]/g,function(chr){return'&#'+chr.charCodeAt(0)+';';});
+						var text = chat.messages[i].text.replace(/&(?!\w+([;\s]|$))/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 						var type = msg.from == chat.jid ? "in" : "out";
 						var day = this.day(msg.stamp);
 						var stamp = "<span class=\"stamp\">"+this.hour(msg.stamp)+"</span>";
