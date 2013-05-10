@@ -66,7 +66,7 @@ function Messenger(){
 							break;
 						}
 					}
-					var last = this.list[i].messages[this.list[i].messages.length-1].text;
+					var last = this.list[i].messages[this.list[i].messages.length-1].text.replace(/[&<>"'`]/g,function(chr){return'&#'+chr.charCodeAt(0)+';';});
 					last = last.length > 42 ? last.substring(0, 42) + "..." : last;
 					var unread = this.unread(i);
 					totalUnread += unread;
@@ -80,7 +80,7 @@ function Messenger(){
 				}
 			}
 			if(totalUnread){
-				$("section#main > header #totalUnread").html("+"+totalUnread).fadeIn("fast");
+				$("section#main > header #totalUnread").text("+"+totalUnread).fadeIn("fast");
 				app.numify(totalUnread);
 			}else{
 				$("section#main > header #totalUnread").hide();
@@ -126,8 +126,8 @@ function Messenger(){
 								break;
 							}
 						}
-						$("section#chat>header span.name").html(name);
-						$("section#chat>header span.status").html(status);
+						$("section#chat>header span.name").text(name);
+						$("section#chat>header span.status").text(status);
 						$("section#chat>header span.show").removeClass("chat a away xa dnd na").addClass(show);
 						$("section#chat>header span.avatar").html("<img id=\""+jid+"\" src=\"img/foovatar.png\" />");
 						this.avatarize();
@@ -142,7 +142,7 @@ function Messenger(){
 					var html;
 					for(i in chat.messages){
 						var msg = chat.messages[i];
-						var text = chat.messages[i].text;
+						var text = chat.messages[i].text.replace(/[&<>"'`]/g,function(chr){return'&#'+chr.charCodeAt(0)+';';});
 						var type = msg.from == chat.jid ? "in" : "out";
 						var day = this.day(msg.stamp);
 						var stamp = "<span class=\"stamp\">"+this.hour(msg.stamp)+"</span>";
@@ -286,8 +286,8 @@ function Messenger(){
 	
 	this.me = function(){
 		var art = $("section#main > article#me");
-		art.find("div#vcard h1").html(app.xmpp.me.jid);
-		art.find("div#vcard h2").html(app.xmpp.me.fn);
+		art.find("div#vcard h1").text(app.xmpp.me.jid);
+		art.find("div#vcard h2").text(app.xmpp.me.fn);
 		art.find("div#status input#status").val(app.xmpp.presence.status);
 		this.avatarize();
 	}
