@@ -14,6 +14,9 @@
 	"locales": {
 		"es": {
 			"description": "Con LOQUI Instant Messenger puedes chatear desde tu smartphone usando tu cuenta de Google Talk™ o Jabber®."
+		},
+		"pt": {
+			"description": "Com LOQUI Instant Messenger você pode conversar em seu smartphone usando sua conta do Google Talk ™ ou Jabber ®."
 		}
 	},
 	"permissions": {
