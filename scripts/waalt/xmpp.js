@@ -132,10 +132,12 @@ function XMPP(){
 						break;
 					case Strophe.Status.DISCONNECTED:
 						console.log("DISCONNECTED");
+						Lungo.Notification.hide();
 						$("audio#logout").get(0).play();
 						break;
 					case Strophe.Status.DISCONNECTING:
 						console.log("DISCONNECTING");
+						Lungo.Notification.show("Disconnecting", "clock");
 						break;
 					case Strophe.Status.ATTACHED:
 						console.log("ATTACHED");
@@ -164,7 +166,7 @@ function XMPP(){
 	}
 	
 	this.rosterGet = function(){
-		Lungo.Notification.show("Updating contacts list", "clock");
+		Lungo.Notification.show("Updating contacts", "clock");
 		app.xmpp.connection.roster.registerCallback(function(data){
 			app.xmpp.roster = data;
 			console.log("ROSTER UPDATE");
