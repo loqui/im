@@ -86,9 +86,9 @@ function XMPP(){
 	}
 	
 	this.connect = function(){
+		this.connection = new Strophe.Connection(this.settings.bosh);
 		if(navigator.onLine){
 			console.log("Trying to connect to "+this.settings.bosh);
-			this.connection = new Strophe.Connection(this.settings.bosh);
 			var lc = this.connection;
 			this.connection.connect(this.settings.username+"@"+this.settings.host, this.settings.password, function(status){
 				switch(status){
@@ -114,6 +114,7 @@ function XMPP(){
 					case Strophe.Status.CONNECTED:
 						console.log("CONNECTED");
 						lc.addHandler(onChatMessage, null, 'message', 'chat', null, null);
+						lc.addHandler(onSubRequest, null, 'presence', 'subscribe', null, null);
 						$("section#main > article#me div#status input#status").val(app.xmpp.presence.status);
 						app.messenger.presenceSet();
 						app.xmpp.connection.vcard.get(function(data){
@@ -153,6 +154,12 @@ function XMPP(){
 	function onChatMessage(msg){
 		console.log(Strophe.serialize(msg));
 		app.messenger.process(msg);
+		return true;
+	}
+	
+	function onSubRequest(msg){
+		console.log(Strophe.serialize(msg));
+		app.xmpp.connection.roster.authorize(Strophe.getBareJidFromJid(msg.getAttribute('from')));
 		return true;
 	}
 	
