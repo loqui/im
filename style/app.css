@@ -32,6 +32,9 @@
 	html{
 		font-size: 150%!important;
 	}
+	.notification .window.growl.show{
+		transform: scale(2)!important;
+	}
 }
 body *{
 	font-family: MozTT, Open Sans, Ubuntu, Droid Sans, Roboto, Sans;
