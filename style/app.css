@@ -275,7 +275,7 @@ body > section#chat > header span.avatar{
 	height: 3rem;
 	overflow: hidden;
 	margin-right: 0.3rem;
-	background-color: #FFF;
+	background-color: #CCC;
 }
 body > section#chat > header span.avatar img{
 	margin: 0 auto;
