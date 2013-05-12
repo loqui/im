@@ -71,7 +71,7 @@ body > section > header{
 }
 body > section > header > span.title{
 	text-align: left!important;
-	left: .3rem!important;
+	left: 2rem!important;
 	font-size: 1.5rem;
 	line-height: 1.5rem;
 	top: .8rem;
@@ -87,8 +87,8 @@ body > section > header > nav a{
 body > section > header > nav a.active{
 	background-color: rgba(255, 255, 255, .2);
 }
-body > section > header > nav a img{
-	width: 1.4rem;
+body > section > header > nav a span.icon{
+	font-size: 1.3rem!important;
 }
 body > section > header > nav a.left{
 	width: 1.2rem!important;
@@ -97,9 +97,6 @@ body > section > header > nav a.left{
 }
 body > section > header > nav a.left span{
 	font-size: 1rem!important;
-}
-body > section > article{
-	top: 3rem!important;
 }
 body > section#splash{
 	background-color: #F4F4F4;
@@ -159,17 +156,23 @@ body > section#login > article#login h1 img.icon{
 body > section#login > article#login button{
 	width: 100%;
 }
+body > section#main > article{
+	top: 3rem!important;
+}
 body > section#main > header #totalUnread{
+	display: block;
 	position: relative!important;
-	top: -3.5rem;
-	right: -.8rem!important;
-	background-color: #333;
+	top: -2.7rem;
+	left: 0;
 	font-weight: bold;
-	font-size: .8rem;
-	line-height: 1rem;
-	padding: 0 .2rem;
-	border-radius: .2rem;
+	font-size: 1.2rem;
+	line-height: 1.2rem;
 	z-index: 3;
+	height: 1.2rem;
+	padding: .3rem;
+	background-color: #333;
+	border-radius: .2rem;
+	animation: blink .5s infinite alternate;
 }
 body > section#main > article.list ul li{
 	height: 3rem;
@@ -189,7 +192,7 @@ body > section#main > article.list ul li span.avatar{
 	width: 3rem;
 	height: 3rem;
 	overflow: hidden;
-	background-color: #FFF;
+	background-color: #CCC;
 }
 body > section#main > article.list ul li span.avatar img{
 	height: 3rem;
@@ -272,7 +275,7 @@ body > section#chat > header span.avatar{
 	height: 3rem;
 	overflow: hidden;
 	margin-right: 0.3rem;
-	background-color: #FFF;
+	background-color: #CCC;
 }
 body > section#chat > header span.avatar img{
 	margin: 0 auto;
@@ -469,6 +472,33 @@ body > section#main > article#me > div#status li{
 body > section#main > article#me > div#status li.selected{
 	width: 4rem;
 }
+body > section#dialog > article{
+	background-color: #333;
+	color: #FFF;
+}
+body > section#dialog > article > header{
+	height: 1.8rem;
+	background-color: #222;
+	border-bottom: .1rem solid #666;
+	font-size: .8rem;
+	line-height: 1rem;
+	padding-top: 1.2rem;
+}
+body > section#dialog > article > header > nav{
+	font-size: .5rem;
+}
+body > section#dialog > article > header > a.right{
+	position: absolute;
+	top: 0;
+	right: 0;
+	padding: 1rem;
+}
+body > section#dialog > article{
+	padding-top: 3rem;
+}
+body > section#dialog > article > div{
+	padding: 2rem;
+}
 body > section .show.chat{
 	background-color: #82C82D;
 }
@@ -486,4 +516,59 @@ body > section .show.dnd{
 }
 body > section .show.na{
 	background-color: #858585;
+}
+label{
+	display: block;
+	font-size: 1rem!important;
+	line-height: 1rem!important;
+	margin: .2rem 0!important;
+}
+/*  LUNGO FIXES  */
+aside.show{
+	transform: translateX(-264px);
+	font-size: .8rem;
+}
+aside.show header{
+	font-size: 1rem;
+	line-height: 1rem;
+	height: 3rem;
+}
+aside.show header span.title{
+	margin-top: 1rem;
+}
+aside.show article{
+	top: 3rem!important;
+}
+aside.show article ul li{
+	height: 1rem;
+	padding: 1rem;
+	cursor: pointer;
+}
+aside.show article ul li a{
+	color: #FFF!important;
+	font-size: 1rem;
+}
+aside.show article ul li a span.icon{
+	margin-right: .5rem;
+}
+section .list li:not(.anchor){
+	border-bottom: none!important;
+}
+article.list ul li{
+	transition: all .2s ease;
+}
+article.list ul li:active{
+	background-color: #D45500!important;
+}
+article.list ul li:active *{
+	color: #FFF!important;
+}
+/* KEYFRAMES */
+@keyframes blink{
+	from{
+		transform: scale(1);
+	}
+	to{
+		transform: scale(.9);
+	}
 }

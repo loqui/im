@@ -337,8 +337,10 @@ function Messenger(){
 		var nickname = $("#personAdd input#nickname").val();
 		if(jid){
 			app.xmpp.connection.roster.add(jid, nickname, false, false);
+			app.xmpp.connection.roster.subscribe(jid);
 			$("#personAdd input").val("");
-			$("#personAdd").hide();
+			Lungo.Router.back();
+			Lungo.Notification.show((nickname||jid)+" was added succesfully", "check", 2);
 		}else alert("No LOQUI user or JabberID specified!");
 	}
 	

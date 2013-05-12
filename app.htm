@@ -57,11 +57,32 @@
 	<section id="main" data-transition="slide">
 		<header data-title="Chats">
 			<nav>
-				<a href="#me" data-router="article" data-title="Me" data-image="img/tools/me.svg" class="right"></a>
-				<a href="#people" data-router="article" data-title="People" data-image="img/tools/people.svg" class="right"></a>
-				<a href="#chats" data-router="article" data-title="Chats" data-image="img/tools/chats.svg" class="right active"><span id="totalUnread"></span></a>
+				<a href="#me" data-router="article" data-title="Me" data-icon="user" class="right"></a>
+				<a href="#people" data-router="article" data-title="People" data-icon="users" class="right"></a>
+				<a href="#chats" data-router="article" data-title="Chats" data-icon="message" class="right active"><span id="totalUnread"></span></a>
+				<a href="#options" data-router="aside" data-title="Options" data-icon="menu" class="left"></a>
 			</nav>
 		</header>
+		<aside id="options">
+			<header data-title="Chats"></header>
+			<article id="chats" class="active list">
+				<ul>
+					<li><a href="#search" data-icon="search" onclick="app.messenger.search()">Search...</a></li>
+				</ul>
+			</article>
+			<article id="people" class="list">
+				<ul>
+					<li><a href="#search" data-icon="search" onclick="app.messenger.search()">Search...</a></li>
+					<li><a href="#personAdd" data-icon="plus" onclick="app.dialog('personAdd')">Add person...</a></li>
+				</ul>
+			</article>
+			<article id="me" class="list">
+				<ul>
+					<li><a data-icon="cancel" onclick="app.xmpp.connection.disconnect()">Disconnect</a></li>
+					<li><a data-icon="refresh" onclick="app.xmpp.connection.disconnect();app.xmpp.connect()">Reconnect</a></li>
+				</ul>
+			</article>
+		</aside>
 		<article id="chats" class="active list scroll">
 			<ul><span class="notyet">You have no chats yet.</span></ul>
 		</article>
@@ -87,10 +108,7 @@
 				<span id="showcaption"></span>
 			</div>
 			<div>
-				<h1>Debug options</h1>
-				<p>LOQUI version: <em>pre-alpha005</em></p>
-				<button onclick="app.xmpp.connection.disconnect()">Disconnect</button>
-				<button onclick="app.xmpp.connection.disconnect();app.xmpp.connect()">Reconnect</button>
+				<p>LOQUI version: <em>pre-alpha006</em></p>
 			</div>
 		</article>
 	</section>
@@ -110,7 +128,21 @@
 			</div>
 		</article>
 		<article id="muc">
-		</article>	
+		</article>
+	</section>
+	<section id="dialog" data-transition="slide">
+		<article class="active"></article>
+		<article id="personAdd">
+			<header data-back="left" data-title="Add person">
+				<a href="#me" data-icon="check" class="right" onclick="app.messenger.personAdd()"></a>
+			</header>
+			<div>
+				<label for="jid">Adress or JID:</label>
+				<input type="email" name="jid" id="jid" placeholder="user@provider.com"/>
+				<label for="nickname">Nickname:</label>
+				<input type="text" name="nickname" id="nickname" placeholder="John Doe"/>
+			</div>
+		</article>
 	</section>
 	<script data-main="scripts/main" src="scripts/require-jquery.js"></script>
 	<script src="scripts/quojs/quo.js"></script>
