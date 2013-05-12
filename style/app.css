@@ -71,7 +71,7 @@ body > section > header{
 }
 body > section > header > span.title{
 	text-align: left!important;
-	left: .3rem!important;
+	left: 2rem!important;
 	font-size: 1.5rem;
 	line-height: 1.5rem;
 	top: .8rem;
@@ -486,4 +486,45 @@ body > section .show.dnd{
 }
 body > section .show.na{
 	background-color: #858585;
+}
+
+/*     */
+
+aside.show{
+	transform: translateX(-264px);
+	font-size: .8rem;
+}
+aside.show header{
+	font-size: 1rem;
+	line-height: 1rem;
+	height: 3rem;
+}
+aside.show header span.title{
+	margin-top: 1rem;
+}
+aside.show article{
+	top: 3rem!important;
+}
+aside.show article ul li{
+	height: 1rem;
+	padding: 1rem;
+}
+aside.show article ul li a{
+	color: #FFF!important;
+	font-size: 1rem;
+}
+aside.show article ul li a span.icon{
+	margin-right: .5rem;
+}
+section .list li:not(.anchor){
+	border-bottom: none!important;
+}
+article.list ul li{
+	transition: all .2s ease;
+}
+article.list ul li:active{
+	background-color: #D45500!important;
+}
+article.list ul li:active *{
+	color: #FFF!important;
 }
