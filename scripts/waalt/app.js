@@ -14,8 +14,10 @@ function App(){
 		this.start();
 	}
 	
-	this.popup = function(id){
-		$(".popup#"+id).fadeIn(200);
+	this.dialog = function(id){
+		Lungo.Router.aside("main", "options");
+		Lungo.Router.section("dialog");
+		Lungo.Router.article(id, id);
 	}
 	
 	this.popdown = function(obj){

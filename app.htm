@@ -73,7 +73,7 @@
 			<article id="people" class="list">
 				<ul>
 					<li><a href="#search" data-icon="search" onclick="app.messenger.search()">Search...</a></li>
-					<li><a href="#addperson" data-icon="plus">Add person...</a></li>
+					<li><a href="#personAdd" data-icon="plus" onclick="app.dialog('personAdd')">Add person...</a></li>
 				</ul>
 			</article>
 			<article id="me" class="list">
@@ -128,7 +128,21 @@
 			</div>
 		</article>
 		<article id="muc">
-		</article>	
+		</article>
+	</section>
+	<section id="dialog" data-transition="slide">
+		<article class="active"></article>
+		<article id="personAdd">
+			<header data-back="left" data-title="Add person">
+				<a href="#me" data-icon="check" class="right" onclick="app.messenger.personAdd()"></a>
+			</header>
+			<div>
+				<label for="jid">Adress or JID:</label>
+				<input type="email" name="jid" id="jid" placeholder="user@provider.com"/>
+				<label for="nickname">Nickname:</label>
+				<input type="text" name="nickname" id="nickname" placeholder="John Doe"/>
+			</div>
+		</article>
 	</section>
 	<script data-main="scripts/main" src="scripts/require-jquery.js"></script>
 	<script src="scripts/quojs/quo.js"></script>
