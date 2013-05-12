@@ -67,15 +67,21 @@
 			<header data-title="Chats"></header>
 			<article id="chats" class="active list">
 				<ul>
-					<li><a href="#search" data-icon="search">Search...</a></li>
+					<li><a href="#search" data-icon="search" onclick="app.messenger.search()">Search...</a></li>
 				</ul>
 			</article>
 			<article id="people" class="list">
 				<ul>
-					<li><a href="#addperson" data-icon="user">Add person...</a></li>
+					<li><a href="#search" data-icon="search" onclick="app.messenger.search()">Search...</a></li>
+					<li><a href="#addperson" data-icon="plus">Add person...</a></li>
 				</ul>
 			</article>
-			<article id="me" class="list"></article>
+			<article id="me" class="list">
+				<ul>
+					<li><a data-icon="cancel" onclick="app.xmpp.connection.disconnect()">Disconnect</a></li>
+					<li><a data-icon="refresh" onclick="app.xmpp.connection.disconnect();app.xmpp.connect()">Reconnect</a></li>
+				</ul>
+			</article>
 		</aside>
 		<article id="chats" class="active list scroll">
 			<ul><span class="notyet">You have no chats yet.</span></ul>
@@ -102,10 +108,7 @@
 				<span id="showcaption"></span>
 			</div>
 			<div>
-				<h1>Debug options</h1>
 				<p>LOQUI version: <em>pre-alpha006</em></p>
-				<button onclick="app.xmpp.connection.disconnect()">Disconnect</button>
-				<button onclick="app.xmpp.connection.disconnect();app.xmpp.connect()">Reconnect</button>
 			</div>
 		</article>
 	</section>
