@@ -87,8 +87,8 @@ body > section > header > nav a{
 body > section > header > nav a.active{
 	background-color: rgba(255, 255, 255, .2);
 }
-body > section > header > nav a img{
-	width: 1.4rem;
+body > section > header > nav a span.icon{
+	font-size: 1.3rem!important;
 }
 body > section > header > nav a.left{
 	width: 1.2rem!important;
