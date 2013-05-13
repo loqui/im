@@ -286,7 +286,6 @@ body > section#chat > header span.avatar img{
 body > section#chat > article#one #typing{
 	display: none;
 	position: relative;
-	top: -3rem;
 	margin-bottom: -2rem;
 	height: 1rem;
 	padding: .5rem;
