@@ -486,7 +486,12 @@ body > section#dialog > article > header{
 	padding-top: 1.2rem;
 }
 body > section#dialog > article > header > nav{
+	position: absolute;
+	top: 0;
 	font-size: .5rem;
+}
+body > section#dialog > article > header > nav > a{
+	padding-top: 1rem!important;
 }
 body > section#dialog > article > header > a.right{
 	position: absolute;
