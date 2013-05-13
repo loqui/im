@@ -58,6 +58,7 @@ function App(){
 		localStorage.setItem("clist", JSON.stringify(this.messenger.list));
 		localStorage.setItem("avatars", JSON.stringify(this.messenger.avatars));
 		localStorage.setItem("sendQ", JSON.stringify(this.messenger.sendQ));
+		localStorage.setItem("version", "006");
 	}
 	
 	document.body.addEventListener("online", function(){
