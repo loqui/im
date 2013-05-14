@@ -152,14 +152,6 @@ function App(){
 		], function(err, results){
 			app.load();
 		});
-		
-		asyncStorage.setItem("xroster", localStorage.xroster);
-		asyncStorage.setItem("xme", localStorage.xme);
-		asyncStorage.setItem("xrd", localStorage.xrd);
-		asyncStorage.setItem("mchats", localStorage.clist);
-		asyncStorage.setItem("mavatars", localStorage.avatars);
-		asyncStorage.setItem("msendQ", localStorage.sendQ);
-		asyncStorage.setItem("xsettings", localStorage.xsettings, function(){app.load()});
 	}
 	
 	this.clear = function(){
