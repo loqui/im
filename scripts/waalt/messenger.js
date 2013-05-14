@@ -350,10 +350,6 @@ function Messenger(){
 				e.preventDefault();
 				app.messenger.say();
 				break;
-			case 107:
-				e.preventDefault();
-				app.xmpp.connection.disconnect();
-				break;
 		}
 	});
 	$("section#chat>article#one div#text").keyup(function(e){
