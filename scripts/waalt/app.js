@@ -1,4 +1,4 @@
-define(["../scripts/mozilla/async_storage.js", "./xmpp", "./messenger"], function(asyncstorage, xmpp, messenger){
+define(["./xmpp", "./messenger"], function(xmpp, messenger){
 	app.xmpp = xmpp;
 	app.messenger = messenger;
 	app.run();
