@@ -40,30 +40,57 @@ function App(){
 	}
 	
 	this.load = function(){
-		asyncStorage.getItem("xpresence", function(val){
-			app.xmpp.presence = val?JSON.parse(val) : {show: "a", status: "Started using LOQUI"};
-		});
-		asyncStorage.getItem("xroster", function(val){
-			app.xmpp.roster = val?JSON.parse(val) : new Object();
-		});
-		asyncStorage.getItem("xrd", function(val){
-			app.xmpp.rosterdict = val?JSON.parse(val) : new Array();
-		});
-		asyncStorage.getItem("xme", function(val){
-			app.xmpp.me = val?JSON.parse(val) : new Object();
-		});
-		asyncStorage.getItem("mchats", function(val){
-			app.messenger.list = val?JSON.parse(val) : new Array();
-		});
-		asyncStorage.getItem("mavatars", function(val){
-			app.messenger.avatars = val?JSON.parse(val) : new Object();
-		});
-		asyncStorage.getItem("msendQ", function(val){
-			app.messenger.sendQ = val?JSON.parse(val) : new Array();
-		});
-		asyncStorage.getItem("xsettings", function(val){
-			app.xmpp.settings = val?JSON.parse(val) : new Object();
-			app.start()
+		async.parallel([
+			function(callback){
+				asyncStorage.getItem("xpresence", function(val){
+					app.xmpp.presence = val?JSON.parse(val) : {show: "a", status: "Started using LOQUI"};
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.getItem("xroster", function(val){
+					app.xmpp.roster = val?JSON.parse(val) : new Object();
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.getItem("xrd", function(val){
+					app.xmpp.rosterdict = val?JSON.parse(val) : new Array();
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.getItem("xme", function(val){
+					app.xmpp.me = val?JSON.parse(val) : new Object();
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.getItem("mchats", function(val){
+					app.messenger.list = val?JSON.parse(val) : new Array();
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.getItem("mavatars", function(val){
+					app.messenger.avatars = val?JSON.parse(val) : new Object();
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.getItem("msendQ", function(val){
+					app.messenger.sendQ = val?JSON.parse(val) : new Array();
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.getItem("xsettings", function(val){
+					app.xmpp.settings = val?JSON.parse(val) : new Object();
+					callback(null);
+				});
+			}
+		], function(err, results){
+			app.start();
 		});
 	}
 	
