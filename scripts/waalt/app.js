@@ -34,7 +34,7 @@ function App(){
 		// Check wether app has beeen runned previously or not
 		if($.isEmptyObject(this.xmpp.settings))Lungo.Router.section("welcome");		
 		else{
-			Lungo.Router.section("main")
+			Lungo.Router.section("main");
 			this.xmpp.connect();
 		}
 	}
@@ -155,10 +155,14 @@ function App(){
 	}
 	
 	this.clear = function(){
-		localStorage.clear();
-		asyncStorage.clear();
-		this.xmpp.connection.disconnect();
-		this.run();
+		if(confirm("Do you want to exit this account? This will remove all data including message history.")){
+			Lungo.Router.aside("main", "options");
+			Lungo.Router.article("chats", "chats");
+			localStorage.clear();
+			asyncStorage.clear();
+			this.xmpp.connection.disconnect();
+			this.run();
+		}
 	}
 	
 	document.body.addEventListener("online", function(){
