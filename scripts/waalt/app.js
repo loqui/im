@@ -85,10 +85,17 @@ function App(){
 		asyncStorage.setItem("xroster", localStorage.xroster);
 		asyncStorage.setItem("xme", localStorage.xme);
 		asyncStorage.setItem("xrd", localStorage.xrd);
-		asyncStorage.setItem("clist", localStorage.clist);
-		asyncStorage.setItem("avatars", localStorage.avatars);
-		asyncStorage.setItem("sendQ", localStorage.sendQ);
+		asyncStorage.setItem("mchats", localStorage.clist);
+		asyncStorage.setItem("mavatars", localStorage.avatars);
+		asyncStorage.setItem("msendQ", localStorage.sendQ);
 		asyncStorage.setItem("xsettings", localStorage.xsettings, function(){app.load()});
+	}
+	
+	this.clear = function(){
+		localStorage.clear();
+		asyncStorage.clear();
+		this.xmpp.connection.disconnect();
+		this.run();
 	}
 	
 	document.body.addEventListener("online", function(){
