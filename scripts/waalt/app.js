@@ -1,4 +1,4 @@
-define(["./xmpp", "./messenger"], function(xmpp, messenger){
+define(["../scripts/mozilla/async_storage.js", "./xmpp", "./messenger"], function(asyncstorage, xmpp, messenger){
 	app.xmpp = xmpp;
 	app.messenger = messenger;
 	app.run();
@@ -7,15 +7,18 @@ define(["./xmpp", "./messenger"], function(xmpp, messenger){
 var app = new App();
 
 function App(){
-	
+
+	this.version = "007";	
 	
 	this.run = function(){
-		this.load();
-		this.start();
+		if(localStorage.version < this.version)this.asyncify();
+		else this.load();
 	}
 	
-	this.popup = function(id){
-		$(".popup#"+id).fadeIn(200);
+	this.dialog = function(id){
+		Lungo.Router.aside("main", "options");
+		Lungo.Router.section("dialog");
+		Lungo.Router.article(id, id);
 	}
 	
 	this.popdown = function(obj){
@@ -37,25 +40,62 @@ function App(){
 	}
 	
 	this.load = function(){
-		this.xmpp.settings = localStorage.xsettings ? JSON.parse(localStorage.getItem("xsettings")) : new Object();
-		this.xmpp.presence = localStorage.xpresence ? JSON.parse(localStorage.getItem("xpresence")) : {show: "a", status: "Started using LOQUI"};
-		this.xmpp.roster = localStorage.xroster ? JSON.parse(localStorage.getItem("xroster")) : new Object();
-		this.xmpp.rosterdict = localStorage.xrd ? JSON.parse(localStorage.getItem("xrd")) : new Array();
-		this.xmpp.me = localStorage.xme ? JSON.parse(localStorage.getItem("xme")) : new Object();
-		this.messenger.list = localStorage.clist ? JSON.parse(localStorage.getItem("clist")) : new Array();
-		this.messenger.avatars = localStorage.avatars ? JSON.parse(localStorage.getItem("avatars")) : new Object();
-		this.messenger.sendQ = localStorage.sendQ ? JSON.parse(localStorage.getItem("sendQ")) : new Array();
+		asyncStorage.getItem("xpresence", function(val){
+			app.xmpp.presence = val?JSON.parse(val) : {show: "a", status: "Started using LOQUI"};
+		});
+		asyncStorage.getItem("xroster", function(val){
+			app.xmpp.roster = val?JSON.parse(val) : new Object();
+		});
+		asyncStorage.getItem("xrd", function(val){
+			app.xmpp.rosterdict = val?JSON.parse(val) : new Array();
+		});
+		asyncStorage.getItem("xme", function(val){
+			app.xmpp.me = val?JSON.parse(val) : new Object();
+		});
+		asyncStorage.getItem("mchats", function(val){
+			app.messenger.list = val?JSON.parse(val) : new Array();
+		});
+		asyncStorage.getItem("mavatars", function(val){
+			app.messenger.avatars = val?JSON.parse(val) : new Object();
+		});
+		asyncStorage.getItem("msendQ", function(val){
+			app.messenger.sendQ = val?JSON.parse(val) : new Array();
+		});
+		asyncStorage.getItem("xsettings", function(val){
+			app.xmpp.settings = val?JSON.parse(val) : new Object();
+			app.start()
+		});
 	}
 	
 	this.save = function(){
-		localStorage.setItem("xsettings", JSON.stringify(this.xmpp.settings));
-		localStorage.setItem("xpresence", JSON.stringify(this.xmpp.presence));
-		localStorage.setItem("xroster", JSON.stringify(this.xmpp.roster));
-		localStorage.setItem("xme", JSON.stringify(this.xmpp.me));
-		localStorage.setItem("xrd", JSON.stringify(this.xmpp.rosterdict));
-		localStorage.setItem("clist", JSON.stringify(this.messenger.list));
-		localStorage.setItem("avatars", JSON.stringify(this.messenger.avatars));
-		localStorage.setItem("sendQ", JSON.stringify(this.messenger.sendQ));
+		asyncStorage.setItem("xpresence", JSON.stringify(this.xmpp.presence));
+		asyncStorage.setItem("xroster", JSON.stringify(this.xmpp.roster));
+		asyncStorage.setItem("xme", JSON.stringify(this.xmpp.me));
+		asyncStorage.setItem("xrd", JSON.stringify(this.xmpp.rosterdict));
+		asyncStorage.setItem("mchats", JSON.stringify(this.messenger.list));
+		asyncStorage.setItem("mavatars", JSON.stringify(this.messenger.avatars));
+		asyncStorage.setItem("msendQ", JSON.stringify(this.messenger.sendQ));
+		asyncStorage.setItem("aversion", this.version);
+		asyncStorage.setItem("xsettings", JSON.stringify(this.xmpp.settings));
+	}
+	
+	this.asyncify = function(){
+		localStorage.version = this.version;
+		asyncStorage.setItem("xpresence", localStorage.xpresence);
+		asyncStorage.setItem("xroster", localStorage.xroster);
+		asyncStorage.setItem("xme", localStorage.xme);
+		asyncStorage.setItem("xrd", localStorage.xrd);
+		asyncStorage.setItem("mchats", localStorage.clist);
+		asyncStorage.setItem("mavatars", localStorage.avatars);
+		asyncStorage.setItem("msendQ", localStorage.sendQ);
+		asyncStorage.setItem("xsettings", localStorage.xsettings, function(){app.load()});
+	}
+	
+	this.clear = function(){
+		localStorage.clear();
+		asyncStorage.clear();
+		this.xmpp.connection.disconnect();
+		this.run();
 	}
 	
 	document.body.addEventListener("online", function(){
