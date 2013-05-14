@@ -108,7 +108,51 @@ function App(){
 	
 	this.asyncify = function(){
 		localStorage.version = this.version;
-		asyncStorage.setItem("xpresence", localStorage.xpresence);
+		async.parallel([
+			function(callback){
+				asyncStorage.setItem("xpresence", localStorage.xpresence, function(){
+					callback(null);				
+				});
+			},
+			function(callback){
+				asyncStorage.setItem("xroster", localStorage.xroster, function(){
+					callback(null);			
+				});
+			},
+			function(callback){
+				asyncStorage.setItem("xme", localStorage.xme, function(){				
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.setItem("xrd", localStorage.xrd, function(){
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.setItem("mchats", localStorage.clist, function(){
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.setItem("mavatars", localStorage.avatars, function(){
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.setItem("msendQ", localStorage.sendQ, function(){
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.setItem("xsettings", localStorage.xsettings, function(){
+					callback(null);
+				});
+			}
+		], function(err, results){
+			app.load();
+		});
+		
 		asyncStorage.setItem("xroster", localStorage.xroster);
 		asyncStorage.setItem("xme", localStorage.xme);
 		asyncStorage.setItem("xrd", localStorage.xrd);
