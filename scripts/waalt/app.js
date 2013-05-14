@@ -1,4 +1,4 @@
-define(["../scripts/mozilla/async_storage.js", "./xmpp", "./messenger"], function(asyncstorage, xmpp, messenger){
+define(["./xmpp", "./messenger"], function(xmpp, messenger){
 	app.xmpp = xmpp;
 	app.messenger = messenger;
 	app.run();
@@ -40,30 +40,57 @@ function App(){
 	}
 	
 	this.load = function(){
-		asyncStorage.getItem("xpresence", function(val){
-			app.xmpp.presence = val?JSON.parse(val) : {show: "a", status: "Started using LOQUI"};
-		});
-		asyncStorage.getItem("xroster", function(val){
-			app.xmpp.roster = val?JSON.parse(val) : new Object();
-		});
-		asyncStorage.getItem("xrd", function(val){
-			app.xmpp.rosterdict = val?JSON.parse(val) : new Array();
-		});
-		asyncStorage.getItem("xme", function(val){
-			app.xmpp.me = val?JSON.parse(val) : new Object();
-		});
-		asyncStorage.getItem("mchats", function(val){
-			app.messenger.list = val?JSON.parse(val) : new Array();
-		});
-		asyncStorage.getItem("mavatars", function(val){
-			app.messenger.avatars = val?JSON.parse(val) : new Object();
-		});
-		asyncStorage.getItem("msendQ", function(val){
-			app.messenger.sendQ = val?JSON.parse(val) : new Array();
-		});
-		asyncStorage.getItem("xsettings", function(val){
-			app.xmpp.settings = val?JSON.parse(val) : new Object();
-			app.start()
+		async.parallel([
+			function(callback){
+				asyncStorage.getItem("xpresence", function(val){
+					app.xmpp.presence = val?JSON.parse(val) : {show: "a", status: "Started using LOQUI"};
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.getItem("xroster", function(val){
+					app.xmpp.roster = val?JSON.parse(val) : new Object();
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.getItem("xrd", function(val){
+					app.xmpp.rosterdict = val?JSON.parse(val) : new Array();
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.getItem("xme", function(val){
+					app.xmpp.me = val?JSON.parse(val) : new Object();
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.getItem("mchats", function(val){
+					app.messenger.list = val?JSON.parse(val) : new Array();
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.getItem("mavatars", function(val){
+					app.messenger.avatars = val?JSON.parse(val) : new Object();
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.getItem("msendQ", function(val){
+					app.messenger.sendQ = val?JSON.parse(val) : new Array();
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.getItem("xsettings", function(val){
+					app.xmpp.settings = val?JSON.parse(val) : new Object();
+					callback(null);
+				});
+			}
+		], function(err, results){
+			app.start();
 		});
 	}
 	
@@ -81,14 +108,50 @@ function App(){
 	
 	this.asyncify = function(){
 		localStorage.version = this.version;
-		asyncStorage.setItem("xpresence", localStorage.xpresence);
-		asyncStorage.setItem("xroster", localStorage.xroster);
-		asyncStorage.setItem("xme", localStorage.xme);
-		asyncStorage.setItem("xrd", localStorage.xrd);
-		asyncStorage.setItem("mchats", localStorage.clist);
-		asyncStorage.setItem("mavatars", localStorage.avatars);
-		asyncStorage.setItem("msendQ", localStorage.sendQ);
-		asyncStorage.setItem("xsettings", localStorage.xsettings, function(){app.load()});
+		async.parallel([
+			function(callback){
+				asyncStorage.setItem("xpresence", localStorage.xpresence, function(){
+					callback(null);				
+				});
+			},
+			function(callback){
+				asyncStorage.setItem("xroster", localStorage.xroster, function(){
+					callback(null);			
+				});
+			},
+			function(callback){
+				asyncStorage.setItem("xme", localStorage.xme, function(){				
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.setItem("xrd", localStorage.xrd, function(){
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.setItem("mchats", localStorage.clist, function(){
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.setItem("mavatars", localStorage.avatars, function(){
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.setItem("msendQ", localStorage.sendQ, function(){
+					callback(null);
+				});
+			},
+			function(callback){
+				asyncStorage.setItem("xsettings", localStorage.xsettings, function(){
+					callback(null);
+				});
+			}
+		], function(err, results){
+			app.load();
+		});
 	}
 	
 	this.clear = function(){
