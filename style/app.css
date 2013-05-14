@@ -159,16 +159,18 @@ body > section#login > article#login button{
 body > section#main > article{
 	top: 3rem!important;
 }
+body > section#main > header nav a{
+	position: relative;
+}
 body > section#main > header #totalUnread{
-	display: block;
-	position: relative!important;
-	top: -2.7rem;
-	left: 0;
+	display: none;
+	position: absolute!important;
+	top: .3rem;
+	left: 1.8rem;
 	font-weight: bold;
-	font-size: 1.2rem;
-	line-height: 1.2rem;
+	font-size: .8rem;
+	line-height: .8rem;
 	z-index: 3;
-	height: 1.2rem;
 	padding: .3rem;
 	background-color: #333;
 	border-radius: .2rem;
@@ -283,9 +285,10 @@ body > section#chat > header span.avatar img{
 }
 body > section#chat > article#one #typing{
 	display: none;
-	position: relative;
-	top: -3rem;
-	margin-bottom: -2rem;
+	position: absolute;
+	left: 0;
+	right: 0;
+	margin-top: -3rem;
 	height: 1rem;
 	padding: .5rem;
 	background-color: rgba(255, 255, 255, .9);
@@ -485,7 +488,12 @@ body > section#dialog > article > header{
 	padding-top: 1.2rem;
 }
 body > section#dialog > article > header > nav{
+	position: absolute;
+	top: 0;
 	font-size: .5rem;
+}
+body > section#dialog > article > header > nav > a{
+	padding-top: 1rem!important;
 }
 body > section#dialog > article > header > a.right{
 	position: absolute;
@@ -569,6 +577,6 @@ article.list ul li:active *{
 		transform: scale(1);
 	}
 	to{
-		transform: scale(.9);
+		transform: scale(.8);
 	}
 }
