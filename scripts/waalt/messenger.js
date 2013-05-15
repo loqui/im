@@ -142,7 +142,7 @@ function Messenger(){
 					var html;
 					for(i in chat.messages){
 						var msg = chat.messages[i];
-						var text = chat.messages[i].text.replace(/&(?!\w+([;\s]|$))/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+						var text = this.urlHL(chat.messages[i].text.replace(/&(?!\w+([;\s]|$))/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"));
 						var type = msg.from == chat.jid ? "in" : "out";
 						var day = this.day(msg.stamp);
 						var stamp = "<span class=\"stamp\">"+this.hour(msg.stamp)+"</span>";
@@ -330,6 +330,11 @@ function Messenger(){
 		var date = new Date(ymd[0], ymd[1]-1, ymd[2], hms[0], hms[1], hms[2]);
 		date.setTime(date.getTime()-60000*offset);
 		return date.getFullYear()+"-"+("0"+(date.getMonth()+1)).slice(-2)+"-"+("0"+(date.getDate())).slice(-2)+"T"+("0"+(date.getHours())).slice(-2)+":"+("0"+(date.getMinutes())).slice(-2)+":"+("0"+(date.getSeconds())).slice(-2)+"Z";
+	}
+	
+	this.urlHL = function(text){
+		var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+		return text.replace(exp,"<a href='$1' target='_blank'>$1</a>"); 
 	}
 	
 	this.personAdd = function(){

@@ -386,6 +386,10 @@ body > section#chat > article#one > ul#messages > li.in > div.msg > span.stamp{
 body > section#chat > article#one > ul#messages > li.out > div.msg > span.stamp{
 	float: left;
 }
+body > section#chat > article#one > ul#messages > li.out > div.msg > a{
+	text-decoration: underline;
+	color: #D45500;
+}
 body > section#chat > article#one > ul#messages > li p{
 	margin: 0;
 }
