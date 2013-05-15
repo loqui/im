@@ -540,8 +540,14 @@ label{
 	margin: .2rem 0!important;
 }
 /*  LUNGO FIXES  */
+section.aside:not(.small){
+	transform: translateX(16rem)!important;
+}
+aside{
+	width: 16rem!important;
+}
 aside.show{
-	transform: translateX(-264px);
+	transform: translateX(-16rem);
 	font-size: .8rem;
 }
 aside.show header{
