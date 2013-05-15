@@ -283,6 +283,10 @@ body > section#chat > header span.avatar img{
 	margin: 0 auto;
 	height: 3rem;
 }
+body > section#chat > article{
+	position: absolute;
+	top: 3rem;
+}
 body > section#chat > article#one #typing{
 	display: none;
 	position: absolute;
