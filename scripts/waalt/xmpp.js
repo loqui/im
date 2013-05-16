@@ -116,7 +116,7 @@ function XMPP(){
 						lc.addHandler(onChatMessage, null, 'message', 'chat', null, null);
 						lc.addHandler(onSubRequest, null, 'presence', 'subscribe', null, null);
 						$("section#main > article#me div#status input#status").val(app.xmpp.presence.status);
-						app.messenger.presenceSet();
+						//app.messenger.presenceSet();
 						app.xmpp.connection.vcard.get(function(data){
 							var vCard =  $(data).find("vCard").get(0);
 							app.xmpp.me = {
@@ -177,6 +177,7 @@ function XMPP(){
 			app.save();
 		});
 		this.connection.roster.get(function(){
+			app.messenger.presenceSet();
 			Lungo.Notification.hide();
 		});
 	}
