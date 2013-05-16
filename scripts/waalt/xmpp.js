@@ -42,7 +42,6 @@ function XMPP(){
 		this.settings.host = this.hosts[i].domain;
 		this.settings.bosh = this.hosts[i].bosh;
 		$("section#wizard>article#signup span#server").html(this.hosts[i].name);
-		//app.sectionShow("wizard", "signup");
 	}
 	
 	this.login = function(){
@@ -62,7 +61,6 @@ function XMPP(){
 		var user = $("section#wizard>article#signup input[name=\"user\"]").val();
 		var pass = $("section#wizard>article#signup input[name=\"pass\"]").val();
 		var pass2 = $("section#wizard>article#signup input[name=\"pass2\"]").val();
-		//if(user && pass && pass == pass2)$.post("https://"+this.settings.host+"/app/register.php", { username: user, password: pass}, function(data){
 		if(user && pass && pass == pass2)$.post("https://app.loqui.im/register.php", { username: user, password: pass}, function(data){
 			var json = JSON.parse(data);
 			if(json.length>1){
@@ -79,7 +77,6 @@ function XMPP(){
 				app.xmpp.settings.password = pass;
 				app.save();
 				alert("GREAT!\nYou have signed up succesfully.");
-				//app.sectionShow("login", "connecting");
 			}
 		});
 		else alert("You didn't fill in the form properly or password fields missmatch");
@@ -116,7 +113,6 @@ function XMPP(){
 						lc.addHandler(onChatMessage, null, 'message', 'chat', null, null);
 						lc.addHandler(onSubRequest, null, 'presence', 'subscribe', null, null);
 						$("section#main > article#me div#status input#status").val(app.xmpp.presence.status);
-						//app.messenger.presenceSet();
 						app.xmpp.connection.vcard.get(function(data){
 							var vCard =  $(data).find("vCard").get(0);
 							app.xmpp.me = {
