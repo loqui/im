@@ -201,14 +201,14 @@ body > section#main > article.list ul li span.avatar img{
 }
 body > section#main > article.list ul li span.name{
 	position: absolute;
-	left: 3.7rem;
+	left: 4rem;
 	top: .7rem;
 	font-weight: 300;
 	font-size: 1rem;
 }
 body > section#main > article.list ul li span.status{
 	position: absolute;
-	left: 3.7rem;
+	left: 4rem;
 	top: 1.7rem;
 	font-size: .8rem;
 	font-weight: 100;
@@ -217,7 +217,7 @@ body > section#main > article.list ul li span.status{
 body > section#main > article.list ul li span.show{
 	display: block;
 	position: absolute;
-	right: 0;
+	left: 3rem;
 	top: 0;
 	width: .3rem;
 	height: 3rem;
@@ -375,10 +375,6 @@ body > section#chat > article#one > ul#messages > li > div.msg{
 	font-size: 1rem;
 	line-height: 1rem;
 }
-body > section#chat > article#one > ul#messages > li > div.msg > a{
-	text-decoration: underline;
-	color: #D45500;
-}
 body > section#chat > article#one > ul#messages > li > div.msg:not(:first-child){
 	border-top: .05rem solid #E3E3E3;
 	margin-top: 0.3rem;
@@ -393,6 +389,10 @@ body > section#chat > article#one > ul#messages > li.in > div.msg > span.stamp{
 }
 body > section#chat > article#one > ul#messages > li.out > div.msg > span.stamp{
 	float: left;
+}
+body > section#chat > article#one > ul#messages > li.out > div.msg > a{
+	text-decoration: underline;
+	color: #D45500;
 }
 body > section#chat > article#one > ul#messages > li p{
 	margin: 0;
@@ -531,7 +531,7 @@ body > section .show.dnd{
 	background-color: #B90000;
 }
 body > section .show.na{
-	background-color: #858585;
+	background-color: #AAA;
 }
 label{
 	display: block;
