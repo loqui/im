@@ -375,6 +375,10 @@ body > section#chat > article#one > ul#messages > li > div.msg{
 	font-size: 1rem;
 	line-height: 1rem;
 }
+body > section#chat > article#one > ul#messages > li > div.msg > a{
+	text-decoration: underline;
+	color: #D45500;
+}
 body > section#chat > article#one > ul#messages > li > div.msg:not(:first-child){
 	border-top: .05rem solid #E3E3E3;
 	margin-top: 0.3rem;
@@ -389,10 +393,6 @@ body > section#chat > article#one > ul#messages > li.in > div.msg > span.stamp{
 }
 body > section#chat > article#one > ul#messages > li.out > div.msg > span.stamp{
 	float: left;
-}
-body > section#chat > article#one > ul#messages > li.out > div.msg > a{
-	text-decoration: underline;
-	color: #D45500;
 }
 body > section#chat > article#one > ul#messages > li p{
 	margin: 0;
