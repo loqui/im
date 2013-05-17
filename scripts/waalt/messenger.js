@@ -286,8 +286,8 @@ function Messenger(){
 	
 	this.me = function(){
 		var art = $("section#main > article#me");
-		art.find("div#vcard h1").text(app.xmpp.me.jid);
-		art.find("div#vcard h2").text(app.xmpp.me.fn);
+		art.find("div#vcard h1").text(app.xmpp.me.fn);
+		art.find("div#vcard h2").text(app.xmpp.me.jid);
 		art.find("div#status input#status").val(app.xmpp.presence.status);
 		this.avatarize();
 	}

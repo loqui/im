@@ -116,7 +116,7 @@ function XMPP(){
 						app.xmpp.connection.vcard.get(function(data){
 							var vCard =  $(data).find("vCard").get(0);
 							app.xmpp.me = {
-								jid: $(vCard).find("USERID").text(),
+								jid: app.xmpp.settings.username+"@"+app.xmpp.settings.host,
 								fn: $(vCard).find("FN").text(),
 								avatar: "data:"+ $(vCard).find("TYPE").text() + ";base64," + $(vCard).find("BINVAL").text()
 							}

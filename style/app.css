@@ -413,6 +413,9 @@ body > section#chat > article#one > ul#messages hr.end{
 	border: none;
 	width: 100%;
 }
+body > section#main > article#me{
+	padding-top: .5rem;
+}
 body > section#main > article#me > div{
 	position: relative;
 	margin: .8rem;
@@ -421,29 +424,38 @@ body > section#main > article#me > div{
 	box-shadow: 0 0 2rem rgba(0, 0, 0, .1);
 	color: #666;
 	font-size: 1rem;
+	overflow: auto;
 }
 body > section#main > article#me > div#vcard h1,
 body > section#main > article#me > div#vcard h2{
+	float: right;
 	margin: 0;
 	font-size: 1rem;
 	line-height: 1rem;
-	text-align: center;
+	text-align: right;
 	width: 100%;
+	max-width: 12rem;
 }
 body > section#main > article#me > div#vcard h1{
-	margin-top: .3rem;
-	font-weight: 500;
 }
 body > section#main > article#me > div#vcard h2{
+	font-weight: 500;
+	font-size: .8rem;
+	color: #999;
 }
 body > section#main > article#me > div#vcard span.avatar{
+	position: fixed;
 	display: block;
-	margin: 0 auto;
 	width: 4rem;
 	overflow: hidden;
+	top: 3.8rem;
+	padding: .2rem;
+	border-radius: 5%;
+	background-color: #FFF;
+	box-shadow: 0 0 .5rem #999;
 }
 body > section#main > article#me > div#vcard span.avatar img{
-	border-radius: 10%;
+	border-radius: 5%;
 	width: 4rem;
 }
 body > section#main > article#me > div#status{
