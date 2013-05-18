@@ -37,7 +37,7 @@ function Messenger(){
 				var show = person.resources[i].show || "a";
 				break;
 			}
-			ul.append("<li onclick=\"app.messenger.chatWith('"+person.jid+"')\" id=\""+person.jid+"\" class=\"person\">"
+			if(this.settings.disPeopleShow || show != "na")ul.append("<li onclick=\"app.messenger.chatWith('"+person.jid+"')\" id=\""+person.jid+"\" class=\"person\">"
 				+"<span class=\"avatar\"><img id=\""+person.jid+"\" src=\"img/foovatar.png\" /></span>"
 				+"<span class=\"name\">"+name+"</span>"
 				+"<span class=\"show "+show+"\"></span>"
@@ -347,6 +347,13 @@ function Messenger(){
 			Lungo.Router.back();
 			Lungo.Notification.show((nickname||jid)+" was added succesfully", "check", 2);
 		}else alert("No LOQUI user or JabberID specified!");
+	}
+	
+	this.disPeopleToggle = function(){
+		this.settings.disPeopleShow = !this.settings.disPeopleShow;
+		this.peopleList();
+		app.save();
+		Lungo.Router.aside("main", "options");
 	}
 	
 	$("section#chat>article#one div#text").keydown(function(e){

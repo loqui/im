@@ -88,6 +88,12 @@ function App(){
 					app.xmpp.settings = val?JSON.parse(val) : new Object();
 					callback(null);
 				});
+			},
+			function(callback){
+				asyncStorage.getItem("msettings", function(val){
+					app.messenger.settings = val?JSON.parse(val) : {disPeopleShow: true};
+					callback(null);
+				});
 			}
 		], function(err, results){
 			app.start();
@@ -104,6 +110,7 @@ function App(){
 		asyncStorage.setItem("msendQ", JSON.stringify(this.messenger.sendQ));
 		asyncStorage.setItem("aversion", this.version);
 		asyncStorage.setItem("xsettings", JSON.stringify(this.xmpp.settings));
+		asyncStorage.setItem("msettings", JSON.stringify(this.messenger.settings));
 	}
 	
 	this.asyncify = function(){
