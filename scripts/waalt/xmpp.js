@@ -110,6 +110,9 @@ function XMPP(){
 						break;
 					case Strophe.Status.CONNECTED:
 						console.log("CONNECTED");
+						app.messenger.chatList();
+						app.messenger.peopleList();
+						app.messenger.me();
 						lc.addHandler(onChatMessage, null, 'message', 'chat', null, null);
 						lc.addHandler(onSubRequest, null, 'presence', 'subscribe', null, null);
 						$("section#main > article#me div#status input#status").val(app.xmpp.presence.status);
@@ -162,7 +165,6 @@ function XMPP(){
 	}
 	
 	this.rosterGet = function(){
-		Lungo.Notification.show("Updating contacts", "clock");
 		app.xmpp.connection.roster.registerCallback(function(data){
 			app.xmpp.roster = data;
 			console.log("ROSTER UPDATE");
@@ -174,7 +176,6 @@ function XMPP(){
 		});
 		this.connection.roster.get(function(){
 			app.messenger.presenceStart();
-			Lungo.Notification.hide();
 		});
 	}
 	
