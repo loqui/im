@@ -173,7 +173,7 @@ function XMPP(){
 			app.save();
 		});
 		this.connection.roster.get(function(){
-			app.messenger.presenceSet();
+			app.messenger.presenceStart();
 			Lungo.Notification.hide();
 		});
 	}

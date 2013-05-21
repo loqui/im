@@ -40,18 +40,35 @@ body *{
 	font-family: MozTT, Open Sans, Ubuntu, Droid Sans, Roboto, Sans;
 	font-weight: 200;
 	letter-spacing: -0.05em;
+	position: relative;
 }
 a{
 	color: inherit;
+	cursor: pointer;
+}
+small{
+	font-size: .8em!important;
 }
 input[type="text"],
 input[type="password"],
 input[type="email"]{
-	height: 2rem;
+	display: inline;
+	left: 0rem;
+	right: 1rem;
 	width: 100%;
+	height: 2rem;
 	font-size: 1rem;
-	margin-left: -.1rem;
 	margin-bottom: .5rem;
+}
+select{
+	display: inline;
+	width: 100%;
+	height: 2.4rem;
+	font-size: 1.3rem;
+	margin-bottom: .5rem!important;
+}
+select > option{
+	padding: .5rem;
 }
 button{
 	height: 2.4rem;
@@ -158,6 +175,7 @@ body > section#login > article#login button{
 }
 body > section#main > article{
 	top: 3rem!important;
+	overflow: auto;
 }
 body > section#main > header nav a{
 	position: relative;
@@ -234,14 +252,20 @@ body > section#main > article.list ul li span.unread{
 	font-size: .8rem;
 	line-height: 1rem;
 }
-body > section#main > article.list span.notyet{
-	position: absolute;
+body > section#main > article.list .notyet{
+	position: fixed;
 	display: block;
 	top: 45%;
-	width: 100%;
+	left: 2rem;
+	right: 2rem;
 	text-align: center;
-	font-size: 1rem;
+	font-size: 1.1rem;
+	line-height: 1.1rem;
 	color: #666;
+}
+body > section#main > article.list .notyet small{
+	display: block;
+	margin-top: .5rem;
 }
 body > section#chat > header span.name{
 	position: absolute;
@@ -424,76 +448,60 @@ body > section#main > article#me > div{
 	box-shadow: 0 0 2rem rgba(0, 0, 0, .1);
 	color: #666;
 	font-size: 1rem;
-	overflow: auto;
+	overflow: show;
 }
-body > section#main > article#me > div#vcard h1,
-body > section#main > article#me > div#vcard h2{
+body > section#main > article#me > div#vcard h1#fn,
+body > section#main > article#me > div#vcard h2#jid{
 	float: right;
+	clear: right;
 	margin: 0;
-	font-size: 1rem;
-	line-height: 1rem;
 	text-align: right;
 	width: 100%;
 	max-width: 12rem;
 }
-body > section#main > article#me > div#vcard h1{
+body > section#main > article#me > div#vcard h1#fn{
+	margin-top: -1rem;
+	font-size: 1.1rem;
+	line-height: 1.1rem;
 }
-body > section#main > article#me > div#vcard h2{
+body > section#main > article#me > div#vcard h2#jid{
 	font-weight: 500;
-	font-size: .8rem;
+	font-size: .9rem;
 	color: #999;
+	margin-bottom: 1.5rem;
 }
 body > section#main > article#me > div#vcard span.avatar{
-	position: fixed;
+	position: absolute;
 	display: block;
 	width: 4rem;
 	overflow: hidden;
-	top: 3.8rem;
+	top: -.5rem;
+	left: .5rem;
 	padding: .2rem;
 	border-radius: 5%;
 	background-color: #FFF;
 	box-shadow: 0 0 .5rem #999;
+	z-index: 1;
 }
 body > section#main > article#me > div#vcard span.avatar img{
 	border-radius: 5%;
 	width: 4rem;
 }
-body > section#main > article#me > div#status{
+body > section#main > article#me > div#vcard{
 	padding-top: 2rem;
 }
-body > section#main > article#me > div#status h1{
+body > section#main > article#me > div#vcard h1{
 	margin: 0;
 }
-body > section#main > article#me > div#status input#status{
-	left: 1rem;
-	margin-top: .2rem;
-	padding: .2rem;
-	font-size: .8rem;
+body > section#main > article#me > div#vcard input#status{
+
 }
-body > section#main > article#me > div#status button{
+body > section#main > article#me > div#vcard button{
 	width: 100%;
 	margin-left: .2rem;
 	padding: .3rem;
 	font-size: .8rem;
 	border-radius: .2rem;
-}
-body > section#main > article#me > div#status ul{
-	position: absolute;
-	top: .5rem;
-	right: .5rem;
-	padding: 0;
-	margin: 0;
-	overflow-x: hidden;
-}
-body > section#main > article#me > div#status li{
-	display: block;
-	float: left;
-	width: 2rem;
-	height: 2rem;
-	cursor: pointer;
-}
-body > section#main > article#me > div#status li.selected{
-	width: 4rem;
 }
 body > section#dialog > article{
 	background-color: #333;
@@ -527,22 +535,28 @@ body > section#dialog > article{
 body > section#dialog > article > div{
 	padding: 2rem;
 }
-body > section .show.chat{
-	background-color: #82C82D;
+body > section .show.chat,
+select > option[value=chat]{
+	background-color: #AD0;
 }
-body > section .show.a{
-	background-color: #5F9B0A;
+body > section .show.a,
+select > option[value=a]{
+	background-color: #8A0;
 }
-body > section .show.away{
-	background-color: #008EAB;
+body > section .show.away,
+select > option[value=away]{
+	background-color: #8BF;
 }
-body > section .show.xa{
-	background-color: #E5745C;
+body > section .show.xa,
+select > option[value=xa]{
+	background-color: #FC0;
 }
-body > section .show.dnd{
-	background-color: #B90000;
+body > section .show.dnd,
+select > option[value=dnd]{
+	background-color: #D55;
 }
-body > section .show.na{
+body > section .show.na,
+select > option[value=na]{
 	background-color: #AAA;
 }
 label{
