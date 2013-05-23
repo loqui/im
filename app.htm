@@ -74,6 +74,7 @@
 				<ul>
 					<li><a href="#search" data-icon="search" onclick="app.messenger.search()">Search...</a></li>
 					<li><a href="#personAdd" data-icon="plus" onclick="app.dialog('personAdd')">Add person...</a></li>
+					<li><a href="#personAdd" data-icon="users" onclick="app.messenger.disPeopleToggle()">Toggle disconnected people</a></li>
 				</ul>
 			</article>
 			<article id="me" class="list">
@@ -85,28 +86,25 @@
 			</article>
 		</aside>
 		<article id="chats" class="active list scroll">
-			<ul><span class="notyet">You have no chats yet.</span></ul>
+			<ul><a href="#people" data-router="article" class="notyet">You have no chats yet. <br /><small>Why don't you ask your contacts if they can read you?</small></a></ul>
 		</article>
 		<article id="people" class="list scroll">
-			<ul><span class="notyet">There is no people yet.</span></ul>
+			<ul><a onclick="app.dialog('personAdd')" class="notyet">There is no people yet. <br /><small>Press me to add your first contact.</small></a></ul>
 		</article>
 		<article id="me">
 			<div id="vcard">
+				<h1 id="fn"></h1>
+				<h2 id="jid"></h2>
 				<span class="avatar"><img src="" /></span>
-				<h1></h1>
-				<h2></h2>
-			</div>
-			<div id="status">
-				<h1>Status</h1>
-				<input type="text" name="status" id="status" /><button onclick="app.messenger.presenceSet()">Apply</button>
-				<ul id="show">
-					<li class="show chat" onclick="app.messenger.presenceSet('chat')"></li>
-					<li class="show a" onclick="app.messenger.presenceSet('a')"></li>
-					<li class="show away" onclick="app.messenger.presenceSet('away')"></li>
-					<li class="show xa" onclick="app.messenger.presenceSet('xa')"></li>
-					<li class="show dnd" onclick="app.messenger.presenceSet('dnd')"></li>
-				</ul>
-				<span id="showcaption"></span>
+				<input type="text" name="status" id="status" />
+				<select name="show" id="show">
+					<option value="chat">Talkative</option>
+					<option value="a">Available</option>
+					<option value="away">Away</option>
+					<option value="xa">Extended absence</option>
+					<option value="dnd">Do not disturb</option>
+				</select>
+				<button onclick="app.messenger.presenceSet()">Apply</button>
 			</div>
 			<div>
 				<p>LOQUI version: <em>pre-alpha007</em></p>

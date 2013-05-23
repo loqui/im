@@ -37,7 +37,7 @@ function Messenger(){
 				var show = person.resources[i].show || "a";
 				break;
 			}
-			ul.append("<li onclick=\"app.messenger.chatWith('"+person.jid+"')\" id=\""+person.jid+"\" class=\"person\">"
+			if(this.settings.disPeopleShow || show != "na")ul.append("<li onclick=\"app.messenger.chatWith('"+person.jid+"')\" id=\""+person.jid+"\" class=\"person\">"
 				+"<span class=\"avatar\"><img id=\""+person.jid+"\" src=\"img/foovatar.png\" /></span>"
 				+"<span class=\"name\">"+name+"</span>"
 				+"<span class=\"show "+show+"\"></span>"
@@ -286,16 +286,14 @@ function Messenger(){
 	
 	this.me = function(){
 		var art = $("section#main > article#me");
-		art.find("div#vcard h1").text(app.xmpp.me.jid);
-		art.find("div#vcard h2").text(app.xmpp.me.fn);
-		art.find("div#status input#status").val(app.xmpp.presence.status);
+		art.find("div#vcard h1").text(app.xmpp.me.fn);
+		art.find("div#vcard h2").text(app.xmpp.me.jid);
 		this.avatarize();
 	}
 	
-	this.presenceSet = function(show){
-		var show = show || app.xmpp.presence.show;
-		var status = $("section#main > article#me div#status input#status").val();
-		$("section#main > article#me div#status ul#show li."+show).addClass("selected").siblings().removeClass("selected");
+	this.presenceSet = function(){
+		var show = $("section#main > article#me div#vcard select#show").val();
+		var status = $("section#main > article#me div#vcard input#status").val();
 		var msg = $pres();
 		if(show!="a")msg.c("show", {}, show);
 		if(status)msg.c("status", {}, status);
@@ -303,7 +301,17 @@ function Messenger(){
 		app.xmpp.presence.show = show;
 		app.xmpp.presence.status = status;
 		app.save();
-		this.me();
+	}
+	
+	this.presenceStart = function(){
+		var show = app.xmpp.presence.show;
+		var status = app.xmpp.presence.status;
+		$("section#main > article#me div#vcard select#show").val(show);
+		$("section#main > article#me div#vcard input#status").val(status);
+		var msg = $pres();
+		if(show!="a")msg.c("show", {}, show);
+		if(status)msg.c("status", {}, status);
+		app.xmpp.connection.send(msg.tree());
 	}
 	
 	this.search = function(){
@@ -347,6 +355,13 @@ function Messenger(){
 			Lungo.Router.back();
 			Lungo.Notification.show((nickname||jid)+" was added succesfully", "check", 2);
 		}else alert("No LOQUI user or JabberID specified!");
+	}
+	
+	this.disPeopleToggle = function(){
+		this.settings.disPeopleShow = !this.settings.disPeopleShow;
+		this.peopleList();
+		app.save();
+		Lungo.Router.aside("main", "options");
 	}
 	
 	$("section#chat>article#one div#text").keydown(function(e){
