@@ -8,7 +8,7 @@ var app = new App();
 
 function App(){
 
-	this.version = "007";	
+	this.version = "008";	
 	
 	this.run = function(){
 		if(localStorage.version < this.version)this.asyncify();
@@ -16,7 +16,7 @@ function App(){
 	}
 	
 	this.dialog = function(id){
-		Lungo.Router.aside("main", "options");
+		if($("section#main > aside#options").hasClass("show"))Lungo.Router.aside("main", "options");
 		Lungo.Router.section("dialog");
 		Lungo.Router.article(id, id);
 	}
@@ -84,6 +84,12 @@ function App(){
 				});
 			},
 			function(callback){
+				asyncStorage.getItem("msettings", function(val){
+					app.messenger.settings = val?JSON.parse(val) : {disPeopleShow: true};
+					callback(null);
+				});
+			},
+			function(callback){
 				asyncStorage.getItem("xsettings", function(val){
 					app.xmpp.settings = val?JSON.parse(val) : new Object();
 					callback(null);
@@ -94,7 +100,7 @@ function App(){
 		});
 	}
 	
-	this.save = function(){
+	this.save = function(done){
 		asyncStorage.setItem("xpresence", JSON.stringify(this.xmpp.presence));
 		asyncStorage.setItem("xroster", JSON.stringify(this.xmpp.roster));
 		asyncStorage.setItem("xme", JSON.stringify(this.xmpp.me));
@@ -102,8 +108,10 @@ function App(){
 		asyncStorage.setItem("mchats", JSON.stringify(this.messenger.list));
 		asyncStorage.setItem("mavatars", JSON.stringify(this.messenger.avatars));
 		asyncStorage.setItem("msendQ", JSON.stringify(this.messenger.sendQ));
-		asyncStorage.setItem("aversion", this.version);
+		asyncStorage.setItem("msettings", JSON.stringify(this.messenger.settings));
 		asyncStorage.setItem("xsettings", JSON.stringify(this.xmpp.settings));
+		asyncStorage.setItem("aversion", this.version);
+		console.log("SAVING");
 	}
 	
 	this.asyncify = function(){
