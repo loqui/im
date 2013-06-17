@@ -143,6 +143,13 @@ Strophe.addConnectionPlugin('roster',
     {
         this._callbacks.push(call_back);
     },
+    /** Function: clearCallbacks
+     * clear all callbacks on roster
+     */
+    clearCallbacks: function()
+    {
+        this._callbacks.length = 0;
+    },
     /** Function: findItem
      * Find item by JID
      *

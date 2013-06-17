@@ -6,15 +6,34 @@
  *
  * @author Javier Jimenez Villar <javi@tapquo.com> || @soyjavi
  */
-/*@import url("http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700");/*/
+/*@import url("http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700");*/
 /* -------------------------- THEME -------------------------- */
+@media screen and (orientation:portrait) {
+  html{
+    font-size: 5vw!important;
+  }
+}
+@media screen and (orientation:landscape) {
+  html{
+    font-size: 5vh!important;
+  }
+}
+@media only screen and (min-resolution: 90dpi) and (min-width: 540px){
+  html{
+    font-size: 150%!important;
+  }
+  .notification .window.growl.show{
+    transform: scale(1.5);
+    font-size: .8rem;
+  }
+}
 body {
   background-color: #222;
-  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-weight: 400;
-  font-size: 13px;
-  line-height: 1.3em;
-  letter-spacing: -0.05em;
+  font-family: "mozTT", "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 200;
+  line-height: 1rem;
+  font-size: 1rem;
+  letter-spacing: -.05em;
 }
 .theme,
 li.theme,
@@ -32,16 +51,25 @@ a.theme:active {
   -moz-text-shadow: 0 1px 0 #fff;
   text-shadow: 0 1px 0 #fff;
 }
+section:not(#dialog) > header > span.title{
+  text-align: left!important;
+  left: 2rem!important;
+  font-size: 1.3rem;
+  line-height: 1.3rem;
+  letter-spacing: -.05em;
+  top: .9rem;
+  text-transform: uppercase;
+  font-weight: 700;
+}
 /* -------------------------- LAYOUT COLORS -------------------------- */
-section > header {
-  background-color: #0093d5;
-  -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.25), inset 0 1px 0 #03b1ff, inset 0 -1px 0 #007db5;
-  -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.25), inset 0 1px 0 #03b1ff, inset 0 -1px 0 #007db5;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.25), inset 0 1px 0 #03b1ff, inset 0 -1px 0 #007db5;
-  color: #fff;
-  -webkit-border-radius: 4px 4px 0 0;
-  -moz-border-radius: 4px 4px 0 0;
-  border-radius: 4px 4px 0 0;
+section:not(#dialog) > header {
+  height: 3rem;
+  background-color: #333;
+  color: #F9F9F9;
+  -webkit-border-radius: .4rem .4rem 0 0;
+  -moz-border-radius: .4rem .4rem 0 0;
+  border-radius: .4rem .4rem 0 0;
+  z-index: 2;
 }
 section > footer,
 section nav.groupbar {
@@ -52,7 +80,12 @@ section nav.groupbar {
 }
 section > article,
 section > [data-control="pull"] {
+  top: 3.4rem!important;
   background-color: #f4f5f5;
+  color: #555;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 section > article.splash,
 section > [data-control="pull"].splash {
@@ -69,28 +102,66 @@ section.aside.right {
   -moz-box-shadow: 1px 0 2px rgba(0,0,0,0.2);
   box-shadow: 1px 0 2px rgba(0,0,0,0.2);
 }
+section.aside:not(.small){
+  transform: translateX(16rem)!important;
+}
 aside {
   background-color: #1d1d1d;
   color: #fff;
+  width: 16rem;
 }
 aside > header,
 aside > footer {
   background-color: #181818;
+  font-size: 1rem;
+  line-height: 1rem;
+  height: 3.15rem;
+  padding-top: .2rem;
 }
 aside > header {
   -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.25), inset 0 1px 0 #222, inset 0 -1px 0 #141414;
   -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.25), inset 0 1px 0 #222, inset 0 -1px 0 #141414;
   box-shadow: 0 1px 3px rgba(0,0,0,0.25), inset 0 1px 0 #222, inset 0 -1px 0 #141414;
 }
+aside > header span.title{
+  margin-top: 1rem;
+}
+aside > article{
+  top: 3.5rem!important;
+}
+aside > article ul li{
+  padding: .8rem!important;
+  cursor: pointer;
+}
+aside > article ul li:active{
+  background-color: #E95644;
+}
+aside > article ul li a span.icon{
+  margin-right: .5rem;
+  color: rgba(255, 255, 255, .4)!important;
+}
 /* -------------------------- NAVIGATION -------------------------- */
 section > header > nav a:not(.button) {
-  color: #00608a;
-  -webkit-text-shadow: 0 1px 0 #20baff;
-  -moz-text-shadow: 0 1px 0 #20baff;
-  text-shadow: 0 1px 0 #20baff;
+  position: relative;
+  color: #999;
+  width: 2rem;
+  height: 3rem;
+  line-height: 3rem;
+  text-align: center;
 }
 section > header > nav a:not(.button):active {
-  color: #004a6b;
+  background: rgba(0, 0, 0, .1)!important;
+  color: #E95644;
+}
+section > header > nav a:not(.button).active {
+  color: #E95644;
+}
+section > header > nav a span.icon{
+  font-size: 1.3rem!important;
+}
+section > header > nav a.left{
+  width: 1.8rem;
+  padding: 0 .2rem!important;
 }
 section > nav.groupbar > a.active {
   -webkit-box-shadow: inset 0 -3px 0 #0093d5;
@@ -333,7 +404,7 @@ article button[disabled] {
 article button,
 article .button,
 article .tag:not(.icon) {
-  background-color: #007db5;
+  background-color: #E95644;
 }
 article button.secondary,
 article .button.secondary,
@@ -365,6 +436,12 @@ form fieldset .icon,
 .form fieldset .icon {
   color: #ccc;
 }
+form [data-pretend="input-text"]{
+  padding: 0 .3rem;
+  line-height: 2rem;
+  margin-bottom: .3rem;
+}
+form [data-pretend="input-text"],
 form input[type="text"],
 .form input[type="text"],
 form input[type="password"],
@@ -389,15 +466,26 @@ form select,
 .form select,
 form textarea,
 .form textarea {
+  height: 2rem;
   background-color: #fff;
   color: rgba(0,0,0,0.75);
-  border: 1px solid #ddd;
+  border: .05rem solid #ddd;
   -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
   -moz-box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
   box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-  -webkit-border-radius: 0px;
-  -moz-border-radius: 0px;
-  border-radius: 0px;
+  -webkit-border-radius: .2rem;
+  -moz-border-radius: .2rem;
+  border-radius: .2rem;
+  font-size: 1em;
+  font-weight: 300;
+  position: relative;
+  left: 0;
+  width: calc(100vw - 3.8rem);
+  transition: all .5s ease;
+}
+form select {
+  width: calc(100vw - 3.1rem);
+  padding: .2rem;
 }
 form input[type="text"].error,
 .form input[type="text"].error,
@@ -451,6 +539,7 @@ form textarea:required,
   color: color_alert;
   background-color: rgba(198,15,19,0.1);
 }
+form [data-pretend="input-text"]:focus,
 form input[type="text"]:focus,
 .form input[type="text"]:focus,
 form input[type="password"]:focus,
@@ -476,7 +565,7 @@ form select:focus,
 form textarea:focus,
 .form textarea:focus {
   background: #fafafa;
-  border-color: #0093d5;
+  border-color: #E95644;
   color: rgba(0,0,0,0.75);
 }
 form input[type="text"][disabled],

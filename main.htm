@@ -1,0 +1,184 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>xLOQUI</title>
+    <meta name='description' content=''>
+    <meta name='author' content='Waalt Communications (@waaltcom)'>
+    <meta name='HandheldFriendly' content='True'>
+    <meta name='viewport' content='initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
+    <meta name='apple-mobile-web-app-capable' content='yes'>
+    <meta name='apple-mobile-web-app-status-bar-style' content='black'>
+    <meta name='format-detection' content='telephone=no'>
+    <meta http-equiv='cleartype' content='on'>
+    <link rel='stylesheet' href='style/lungo/lungo.css'>
+    <link rel='stylesheet' href='style/lungo/lungo.icon.css'>
+    <link rel='stylesheet' href='style/lungo/lungo.icon.brand.css'>
+    <link rel='stylesheet' href='style/lungo/lungo.css'>
+    <link rel='stylesheet' href='style/lungo/theme.lungo.css'>
+    <link rel='stylesheet' href='style/app.css'>
+</head>
+<body class='app'>
+  <section id='splash' data-transition='slide'>
+    <article id='splash' data-transition='slide' class='active'>
+      <img src='img/applogo.svg' alt='LOQUI by Waaltcom' />
+    </article>
+  </section>
+	<section id="welcome" data-transition="slide">
+		<div>
+			<h1>Welcome <br />to LOQUI</h1>
+			<h2>This is PRE-ALPHA software so it might be full of bugs, glitches and the like.</h2>
+			<br />
+			<h2>Do you dare to test it anyway?</h2>
+		</div>
+		<a href="#login" data-router="section">YES, I do! ></a>
+	</section>
+	<section id="login" data-transition="slide">
+		<article id="login" class="active">
+			<form>
+				<h1 data-image="img/protocols.svg">Enter your Hangouts or Jabber account below</h1>
+				<input type="email" name="user" placeholder="user@provider.com" class="nopretend" />
+				<input type="password" name="pass" placeholder="password" class="nopretend" />
+				<button class="ok">LOG ME IN</button>
+			</form>
+		</article>
+		<article id="register">
+			<form>
+				<h1>Register</h1>
+				<input type="text" name="user" placeholder="Username"/>
+				<input type="password" name="pass" placeholder="Password"/>
+				<button class="ok">Let's go!</button>
+			</form>
+		</article>
+	</section>
+  <section id='main' data-transition='slide'>
+    <header data-title='Chats'>
+      <span class='showbar' data-show='na'></span>
+      <nav>
+        <a href='#me' data-router='article' data-title='Me' data-icon='user' class='right'></a>
+        <a href='#contacts' data-router='article' data-title='Contacts' data-icon='users' class='right'></a>
+        <a href='#chats' data-router='article' data-title='Chats' data-icon='message' class='right active'><span class='totalUnread'></span></a>
+        <a href='#options' data-router='aside' data-title='Options' data-icon='menu' class='left'></a>
+      </nav>
+    </header>
+    <article id='chats' class='active list scroll'>
+      <ul></ul>
+    </article>
+    <article id='contacts' class='list scroll'>
+      <ul><a href='#dialog' data-router='section' class='notyet'>There are no contacts yet. <br /><small>Press me to add your first contact.</small><img src="img/foreveralone.svg" class="foreveralone" /></a></ul>
+    </article>
+    <article id='me'>
+      <div id='vcard'>
+        <h1 id='fn'></h1>
+        <h2 id='jid'></h2>
+        <span class='avatar'><img /></span>
+      </div>
+      <div id='status'>
+        <div>
+          <h1>My status</h1>
+          <h2>Only your contacts can see your status</h2>
+          <form>
+            <input type='text' name='status' id='status' />
+            <select name='show' id='show'>
+              <option value='chat'>Talkative</option>
+              <option value='a'>Available</option>
+              <option value='away'>Away</option>
+              <option value='xa'>Extended absence</option>
+              <option value='dnd'>Do not disturb</option>
+            </select>
+          </form>
+        </div>
+        <div>
+          <h1>Payment info</h1>
+          <h2>Just kidding. LOQUI is free forever!</h2>
+        </div>
+        <div>
+          <h1>LOQUI version</h1>
+          <h2>You are running <em>LOQUI pre-alpha009</em></h2>
+        </div>
+      </div>
+    </article>
+  </section>
+  <section id='chat' data-transition='slide'>
+		<header data-back='left'>
+		  <span class='totalUnread'></span>
+		  <span class='showbar' data-show='na'></span>
+			<span class='name'></span>
+			<span class='status'></span>
+			<span class='avatar'></span>
+			<span class='show'></span>
+		</header>
+    <article id='chat' class='active'>
+      <ul id='messages' class='paper'></ul>
+      <div id='footbox'>
+        <div id='typing'>Typing...</div>
+        <button id='say' class='recommend' type='send'>SAY</button>
+        <div id='text' contenteditable></div>
+      </div>
+    </article>
+  </section>
+  <section id='dialog' data-transition='slide'>
+    <header data-back='left' data-title='Add contact'>
+      <a href='#me' data-icon='check' class='right'></a>
+    </header>
+    <article id='contactAdd' data-title='Add contact' class='active'>
+      <p class='tip'>
+        <img src='img/protocols.svg' />
+        You can add any Google Talk, Hangouts or XMPP/Jabber user.
+      </p>
+      <form>
+        <label for='jid'>Adress or JID:</label>
+        <input type='email' name='jid' id='jid' placeholder='user@provider.com'/>
+        <label for='nickname'>Nickname:</label>
+        <input type='text' name='nickname' id='nickname' placeholder='John Doe (optional)'/>
+      </form>
+    </article>
+    <article id='contactEdit' data-title='Editing contact'>
+      <p class='tip'>
+        <img class='avatar' />
+    <strong id='jid'></strong>
+      </p>
+      <form>
+        <label for='nickname'>Nickname:</label>
+        <input type='text' name='nickname' id='nickname'/>
+      <button id='delete' data-icon='remove'>Delete this contact</button>
+      </form>
+    </article>
+  </section>
+  <aside id='options'>
+    <header data-title='Options'></header>
+    <article id='chats' class='active list'>
+      <ul>
+        <li data-event='contactAdd'><a data-icon='plus'>Add contact...</a></li>
+        <li data-event='disHide'><a data-icon='users'>Toggle disconnected contacts</a></li>
+        <li data-event='mute'><a data-icon='music'>Toggle sound</a></li>
+        <li data-event='reconnect'><a data-icon='refresh'>Reconnect</a></li>
+        <li data-event='exit'><a data-icon='cancel'>Exit account</a></li>
+        <li data-event='forget'><a data-icon='remove'>Forget everything</a></li>
+      </ul>
+    </article>
+  </aside>
+  <audio src='audio/login.ogg' preload></audio>
+  <audio src='audio/logout.ogg' preload></audio>
+  <audio src='audio/newchat.ogg' preload></audio>
+  <audio src='audio/received.ogg' preload></audio>
+  <audio src='audio/sent.ogg' preload></audio>
+  <audio src='audio/error.ogg' preload></audio>
+  <script type='text/javascript' src='scripts/tapquo/quo.js'></script>
+  <script type='text/javascript' src='scripts/tapquo/lungo.js'></script>
+  <script type='text/javascript' src='scripts/mozilla/async_storage.js'></script>
+  <script type='text/javascript' src='scripts/caolan/async.js'></script>
+  <script type='text/javascript' src='scripts/strophe/strophe.js'></script>
+  <script type='text/javascript' src='scripts/strophe/plugins/messaging.js'></script>
+  <script type='text/javascript' src='scripts/strophe/plugins/roster.js'></script>
+  <script type='text/javascript' src='scripts/strophe/plugins/vcard.js'></script>
+  <script type='text/javascript' src='scripts/waalt/tool.js'></script>
+  <script type='text/javascript' src='scripts/waalt/store.js'></script>
+  <script type='text/javascript' src='scripts/waalt/app.js'></script>
+  <script type='text/javascript' src='scripts/waalt/xmpp.js'></script>
+  <script type='text/javascript' src='scripts/waalt/chat.js'></script>
+  <script type='text/javascript' src='scripts/waalt/message.js'></script>
+  <script type='text/javascript' src='scripts/waalt/messenger.js'></script>
+  <script type='text/javascript' src='scripts/waalt/bindings.js'></script>
+</body>
+</html>

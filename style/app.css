@@ -1,317 +1,397 @@
-@font-face{
-	font-family:'mozTT';
-	src:url('fonts/MozTT-Bold.ttf');
-	font-weight: 700;
+@font-face {
+  font-family:'mozTT';
+  src:url('fonts/MozTT-Bold.ttf');
+  font-weight: 700;
 }
-@font-face{
-	font-family:'mozTT';
-	src:url('fonts/MozTT-Medium.ttf');
-	font-weight: 500;
+@font-face {
+  font-family:'mozTT';
+  src:url('fonts/MozTT-Medium.ttf');
+  font-weight: 500;
 }
-@font-face{
-	font-family:'mozTT';
-	src:url('fonts/MozTT-Regular.ttf');
-	font-weight: 300;
+@font-face {
+  font-family:'mozTT';
+  src:url('fonts/MozTT-Regular.ttf');
+  font-weight: 300;
 }
-@font-face{
-	font-family:'mozTT';
-	src:url('fonts/MozTT-Light.ttf');
-	font-weight: 100;
+@font-face {
+  font-family:'mozTT';
+  src:url('fonts/MozTT-Light.ttf');
+  font-weight: 100;
 }
-@media screen and (orientation:portrait) {
-	html{
-		font-size: 5vw!important;
-	}
+a {
+  color: inherit;
+  cursor: pointer;
 }
-@media screen and (orientation:landscape) {
-	html{
-		font-size: 5vh!important;
-	}
+small {
+  font-size: .8em!important;
 }
-@media only screen and (min-resolution: 90dpi) and (min-width: 540px){
-	html{
-		font-size: 150%!important;
-	}
-	.notification .window.growl.show{
-		transform: scale(2)!important;
-	}
+.notyet {
+  display: block;
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  margin-left: -7rem;
+  width: 14rem;
+  text-align: center;
 }
-body *{
-	font-family: MozTT, Open Sans, Ubuntu, Droid Sans, Roboto, Sans;
-	font-weight: 200;
-	letter-spacing: -0.05em;
-	position: relative;
+img.foreveralone{
+  position: fixed;
+  bottom: -.1rem;
+  width: 10rem;
+  left: 50%;
+  margin-left: -5rem;
 }
-a{
-	color: inherit;
-	cursor: pointer;
-}
-small{
-	font-size: .8em!important;
-}
-input[type="text"],
-input[type="password"],
-input[type="email"]{
-	display: inline;
-	left: 0rem;
-	right: 1rem;
-	width: 100%;
-	height: 2rem;
-	font-size: 1rem;
-	margin-bottom: .5rem;
-}
-select{
-	display: inline;
-	width: 100%;
-	height: 2.4rem;
-	font-size: 1.3rem;
-	margin-bottom: .5rem!important;
-}
-select > option{
-	padding: .5rem;
-}
-button{
-	height: 2.4rem;
-	font-size: 1rem!important;
-	line-height: 1rem;
-	background-color: #D45500!important;
-}
-button::-moz-focus-inner{
+button::-moz-focus-inner {
 	border: 0;
 }
-body > section > header{
-	height: 3rem;
-	box-shadow: none;
-	background: url("BB/headers/images/ui/header.png") repeat-x scroll 0 0 / auto 100% transparent;
-	box-shadow: 0 0 .5rem #333;
-	z-index: 2;
+section {
+  background-color: #222;
 }
-body > section > header > span.title{
-	text-align: left!important;
-	left: 2rem!important;
-	font-size: 1.5rem;
-	line-height: 1.5rem;
-	top: .8rem;
+section#splash {
+  background-color: #F4F4F4;
 }
-body > section > header > nav a{
-	height: 3rem!important;
-	width: 2rem;
-	color: #FFF!important;
-	text-shadow: none!important;
-	line-height: 3rem!important;
-	text-align: center;
+section#splash > article {
+  top: 0!important;
 }
-body > section > header > nav a.active{
-	background-color: rgba(255, 255, 255, .2);
+section#splash img {
+  position: fixed;
+  display: block;
+  width: 10rem;
+  left: 50%;
+  top: 50%;
+  margin-left: -5rem;
+  margin-top: -3rem;
 }
-body > section > header > nav a span.icon{
-	font-size: 1.3rem!important;
-}
-body > section > header > nav a.left{
-	width: 1.2rem!important;
-	padding: 0 .2rem!important;
-	background-color: rgba(0, 0, 0, .1);
-}
-body > section > header > nav a.left span{
-	font-size: 1rem!important;
-}
-body > section#splash{
-	background-color: #F4F4F4;
-}
-body > section#splash img{
-	position: fixed;
-	display: block;
-	width: 10rem;
-	left: 50%;
-	top: 50%;
-	margin-left: -5rem;
-	margin-top: -3rem;
-}
-body > section#welcome{
-	background-color: #D45500;
+body > section#welcome {
+	background-color: #E95644;
 	color: #FFF;
 }
-body > section#welcome > div{
+body > section#welcome > div {
 	margin: 4rem 2rem;
 }
-body > section#welcome h1{
+body > section#welcome h1 {
 	font-size: 2.5rem;
 	line-height: 2.5rem;
 	margin: .5rem 0 1rem 0;
 	font-weight: 500;
 }
-body > section#welcome h2{
+body > section#welcome h2 {
 	font-size: 1.3rem;
 	line-height: 1.3rem;
 }
-body > section#welcome a{
+body > section#welcome a {
 	position: fixed;
 	bottom: 2rem;
 	right: 2rem;
 	font-size: 1.5rem;
 }
-body > section#login{
+body > section#login {
 	background-color: #F4F4F4;
 }
-body > section#login > article > div{
-	padding: 2rem;
+body > section#login > article > form {
+	padding: 1.5rem;
 }
-body > section#login > article#login h1{
+body > section#login > article#login {
+  top: 1rem!important;
+}
+body > section#login > article#login h1 {
 	position: relative;
 	width: 16rem;
 	font-size: 1.3rem;
 	line-height: 1.3rem;
 	margin: .5rem 0 1rem 0;
 	font-weight: 500;
-	color: #D45500;
+	color: #E95644;
 }
-body > section#login > article#login h1 img.icon{
+body > section#login > article#login h1 img.icon {
 	float: left;
 	height: 2.5rem;
 	margin-right: .5rem;
 }
-body > section#login > article#login button{
+body > section#login > article#login button {
 	width: 100%;
 }
-body > section#main > article{
-	top: 3rem!important;
-	overflow: auto;
+section > header span.showbar {
+  display: block;
+  position: absolute;
+  top: 3rem;
+  left: 0;
+  right: 0;
+  height: .4rem;
+  transition: all .5s ease;
 }
-body > section#main > header nav a{
-	position: relative;
+span.totalUnread {
+  display: none;
 }
-body > section#main > header #totalUnread{
-	display: none;
-	position: absolute!important;
-	top: .3rem;
-	left: 1.8rem;
-	font-weight: bold;
-	font-size: .8rem;
-	line-height: .8rem;
-	z-index: 3;
-	padding: .3rem;
-	background-color: #333;
-	border-radius: .2rem;
-	animation: blink .5s infinite alternate;
+body[data-unread='1'] span.totalUnread {
+  display: block;
+  position: absolute;
+  top: .8rem;
+  left: .6rem;
+  border-radius: .2rem;
+  background-color: #E95644;
+  color: #FFF;
+  border: .1rem solid #D14D3D;
+  padding: .2rem .5rem .3rem .4rem;
+  line-height: 1em;
+  font-weight: 700;
+  z-index: 1000;
+  animation: blink .5s infinite alternate;
 }
-body > section#main > article.list ul li{
-	height: 3rem;
-	padding: 0;
-	color: #666;
-	cursor: pointer;
-	overflow: hidden;
-	background-color: #F9F9F9;
-	border: none!important;
+section#main > article.list > ul > li {
+  background-color: #F9F9F9;
+  border-bottom: .05rem solid #E6E6E6;
+  height: 3rem;
+  padding: .5rem;
+  cursor: pointer;
+  perspective: 15rem;
+  perspective-origin: 3rem 3rem;
+  transition: all .5s ease;
 }
-body > section#main > article.list ul li:nth-child(2n){
-	background-color: #F3F3F3;
+section#main > article.list > ul > li:active {
+  background-color: #E95644;
 }
-body > section#main > article.list ul li span.avatar{
+section#main > article.list > ul > li > span.avatar {
+  position: absolute;
+  display: block;
+  height: 3.2rem;
+  width: 3rem;
+  top: .4rem;
+  left: .4rem;
+}
+section#main > article.list > ul > li[data-unread='1'] > span.avatar {
+  transform: rotateY(50deg) translateX(-.4rem);
+}
+section#main > article.list > ul > li > span.avatar > img {
+  display: block;
+  width: 3.2rem;
+  border-radius: .2rem;
+  overflow: hidden;
+}
+section#main > article.list > ul > li > span.avatar > img:not([src]) {
+  height: 3.2rem;
+  width: 3.2rem;
+  background-image: url('../img/foovatar.png');
+  background-size: 100%;
+  background-color: #D4D2C5;
+}
+section#main > article.list > ul > li > span.name {
+  position: absolute;
+  left: 4.2rem;
+  top: .8rem;
+  right: 1rem;
+  color: #666;
+  font-size: 1.1rem;
+  line-height: 1.2rem;
+  height: 1.2rem;
+  font-weight: 400;
+  overflow: hidden;
+}
+body:not([data-show="na"]) > section#main > article.list > ul > li > span.name {
+  left: 5.2rem;
+}
+section#main > article.list > ul > li:active > span.name {
+  color: #FFF;
+}
+section#main > article.list > ul > li > span.status,
+section#main > article.list > ul > li > span.last {
+  position: absolute;
+  left: 4.2rem;
+  top: 2.2rem;
+  color: #888;
+  font-size: .9rem;
+  font-weight: 200;
+  width: calc(100vw - 5rem);
+  height: 1.2em;
+  overflow: hidden;
+}
+section#main > article.list > ul > li:active > span.status,
+section#main > article.list > ul > li:active > span.last {
+  color: #FFF;
+}
+section#main > article.list > ul > li > span.show {
+  display: block;
+  position: absolute;
+  top: 1rem;
+  left: 4.2rem;
+  width: .7rem;
+  height: .7rem;
+  border-radius: .1rem;
+}
+section#main > article.list > ul > li > span.unread {
+  display: none;
+}
+section#main > article.list > ul > li[data-unread='1'] > span.unread {
+  display: block;
+  position: absolute;
+  top: 1.4rem;
+  left: 2rem;
+  border-radius: .2rem;
+  background-color: #E95644;
+  color: #FFF;
+  padding: .1rem .3rem .2rem .2rem;
+  font-weight: 700;
+}
+section#main > article#me > div#status {
+  position: absolute;
+  left: 1.5rem;
+  right: 1.5rem;
+}
+section#main > article#me > div#status > div {
+  margin: 1.5rem 0;
+}
+section#main > article#me > div#status > div > h1 {
+  color: #E95644;
+  margin-bottom: .5rem;
+  font-size: 1.1rem;
+}
+section#main > article#me > div#status > div > h2 {
+  font-weight: 300;
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: .5rem;
+}
+section#main > article#me > div#vcard {
+  background-color: #EBE9DD;
+  height: 6rem;
+  overflow: hidden;
+}
+section#main > article#me > div#vcard h1#fn {
+  position: relative;
+  top: 1.2rem;
+  left: 7rem;
+  max-width: 60vw;
+  font-size: 1.1rem;
+  line-height: 1rem;
+  color: #666;
+}
+section#main > article#me > div#vcard h2#jid {
+  position: relative;
+  top: 1.5rem;
+  left: 7rem;
+  font-size: .9rem;
+  font-weight: 300;
+  color: #666;
+}
+section#main > article#me > div#vcard span.avatar {
+  position: absolute;
+  display: block;
+  width: 6rem;
+  height: 6rem;
+  overflow: hidden;
+  top: 0;
+  left: 0;
+  background-image: url('../img/foovatar.png');
+  background-size: 100%;
+  background-color: #CCC;
+}
+section#main > article#me > div#vcard span.avatar img {
+  width: 6rem;
+}
+section#chat > header .name {
+  position: absolute;
+  left: 2rem;
+  top: .6rem;
+  font-size: 1rem;
+  line-height: 1rem;
+}
+body:not([data-show="na"]) > section#chat > header .name {
+  left: 3rem;
+}
+section#chat > header .status {
+  position: absolute;
+  left: 2rem;
+  top: 1.55rem;
+  font-size: .9rem;
+  line-height: 1rem;
+  font-weight: 200;
+}
+section#chat > header .show {
+  display: block;
+  position: absolute;
+  top: .75rem;
+  left: 2rem;
+  width: .7rem;
+  height: .7rem;
+  border-radius: .1rem;
+}
+section#chat > header .avatar {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 3rem;
+  height: 3rem;
+  overflow: hidden;
+}
+section#chat > header .avatar img {
+  height: 3rem;
+}
+section#chat span.totalUnread {
+  top: 3.7rem;
+  left: -1rem;
+  padding: .5rem .5rem .5rem 1.5rem;
+  cursor: pointer;
+  animation: none;
+}
+section#chat > article#chat > ul#messages {
 	position: absolute;
-	display: block;
-	width: 3rem;
-	height: 3rem;
-	overflow: hidden;
-	background-color: #CCC;
-}
-body > section#main > article.list ul li span.avatar img{
-	height: 3rem;
-}
-body > section#main > article.list ul li span.name{
-	position: absolute;
-	left: 4rem;
-	top: .7rem;
-	font-weight: 300;
-	font-size: 1rem;
-}
-body > section#main > article.list ul li span.status{
-	position: absolute;
-	left: 4rem;
-	top: 1.7rem;
-	font-size: .8rem;
-	font-weight: 100;
-	color: #888;
-}
-body > section#main > article.list ul li span.show{
-	display: block;
-	position: absolute;
-	left: 3rem;
 	top: 0;
-	width: .3rem;
-	height: 3rem;
-}
-body > section#main > article.list ul li span.unread{
-	position: absolute;
-	right: .5rem;
-	top: .5rem;
-	padding: 0 .2rem;
-	background-color: #333;
-	color: #FFF;
-	border-radius: .2rem;
-	font-weight: bold;
-	font-size: .8rem;
-	line-height: 1rem;
-}
-body > section#main > article.list .notyet{
-	position: fixed;
-	display: block;
-	top: 45%;
-	left: 2rem;
-	right: 2rem;
-	text-align: center;
-	font-size: 1.1rem;
-	line-height: 1.1rem;
-	color: #666;
-}
-body > section#main > article.list .notyet small{
-	display: block;
-	margin-top: .5rem;
-}
-body > section#chat > header span.name{
-	position: absolute;
-	top: .5rem;
-	left: 2rem;
-	margin: 0;
-	font-size: 1rem;
-	line-height: 1rem;
-	font-weight: 500;
-	color: #FFF;
-}
-body > section#chat > header span.status{
-	position: absolute;
-	top: 1.6rem;
-	left: 2rem;
-	font-size: 0.8rem;
-	line-height: 0.8rem;
-	font-weight: 100;
-	color: #FFF;
-}
-body > section#chat > header span.show{
-	display: block;
-	position: absolute;
 	right: 0;
-	top: 0;
-	width: 0.3rem;
-	height: 3rem;
+	left: 0;
+	padding-top: .5rem;
+	bottom: 4rem;
+	overflow-x: hidden;
+  list-style-type: none;
 }
-body > section#chat > header span.avatar{
-	float: right;
-	display: block;
-	width: 3rem;
-	height: 3rem;
-	overflow: hidden;
-	margin-right: 0.3rem;
-	background-color: #CCC;
+section#chat > article#chat > ul#messages > li > div {
+  position: relative;
+  border: .1rem solid #DDD;
+  background-color: #FFF;
+  padding: .7rem;
+  margin: .5rem 0;
+  border-radius: .2rem;
+  width: calc(100% - 4.5rem);
 }
-body > section#chat > header span.avatar img{
-	margin: 0 auto;
-	height: 3rem;
+section#chat > article#chat > ul#messages > li > div a{
+  color: #E95644;
 }
-body > section#chat > article{
-	position: absolute;
-	top: 3rem;
+section#chat > article#chat > ul#messages > li > div[data-type='out'] {
+  text-align: right;
+  margin-left: 2.5rem;
+  background-color: #F3F3F3;
+  color: #777;
 }
-body > section#chat > article#one #typing{
+section#chat > article#chat > ul#messages > li > div[data-type='in'] {
+  text-align: left;
+  margin-left: .5rem;
+}
+section#chat > article#chat > ul#messages > li > div.same {
+  margin-top: -.7rem;
+  border-radius: 0 0 .2rem .2rem;
+  border-top: .1rem solid #EEE;
+  padding: .7rem .7rem;
+}
+section#chat > article#chat > ul#messages > li > div span.stamp {
+  position: absolute;
+  font-size: .7rem;
+  font-weight: 300;
+  color: #999;
+}
+section#chat > article#chat > ul#messages > li > div[data-type='out'] span.stamp {
+  top: .7rem;
+  left: -2rem;
+}
+section#chat > article#chat > ul#messages > li > div[data-type='in'] span.stamp {
+  top: .7rem;
+  right: -2rem;
+}
+section#chat > article#chat > ul#messages > li > div > span.text {
+  font-weight: 300;
+}
+section#chat > article#chat > ul#messages > li:last-child {
+  margin-bottom: 3.5rem;
+}
+section#chat > article#chat #typing {
 	display: none;
 	position: absolute;
 	left: 0;
@@ -324,16 +404,16 @@ body > section#chat > article#one #typing{
 	font-size: .8rem;
 	z-index: 1;
 }
-body > section#chat > article#one > div#footbox{
-	position: fixed!important;
+section#chat > article#chat > div#footbox {
+	position: fixed;
 	right: 0;
 	bottom: 0;
 	left: 0;
 	padding: .6rem;
-	background-color: #EAEAEA;
-	border-top: .05rem solid #DDD;
+	background-color: #EBE9DD;
+	border-top: .05rem solid #D4D2C5;
 }
-body > section#chat > article#one div#text{
+section#chat > article#chat > div#footbox > div#text {
 	position: relative;
 	padding: .7rem .5rem .5rem .5rem;
 	min-height: 1.3rem;
@@ -348,275 +428,115 @@ body > section#chat > article#one div#text{
 	outline: none;
 	overflow: auto;
 }
-body > section#chat > article#one button#say{
+section#chat > article#chat > div#footbox > div#text:focus {
+  border: .05rem solid #BBB;
+}
+section#chat > article#chat > div#footbox > button#say {
 	position: relative;
 	float: right;
 	top: 0.05rem;
-	font-size: .8rem!important;
-	line-height: .8rem!important;
-	padding: .1rem 1rem;
-	height: 2.3rem;
-	width: 1.2rem;
-	line-height: 2rem;
+	font-size: .8rem;
+	line-height: 1.5rem;
+	padding: .1rem 1rem .2rem 1rem;
+	width: 2.5rem;
+	height: 2.5rem;
 	margin: 0;
 	margin-left: 0.5rem;
 	font-weight: bold;
 }
-body > section#chat > article#one > ul#messages{
-	position: absolute;
-	top: 0;
-	right: 0;
-	left: 0;
-	bottom: 3.7rem;
-	margin: 0;
-	padding: 1rem;
-	list-style-type: none;
-	overflow-x: hidden;
+section#dialog > article {
+	background-color: #F4F5F5;
+	color: #444;
 }
-body > section#chat > article#one > ul#messages li{
-	width: 85%;
-	margin-bottom: 0.8rem;
-	background-color: #FFF;
-	box-shadow: 0 0 2rem rgba(0, 0, 0, .1);
-	padding: 1rem;
-	overflow: hidden;
-}
-body > section#chat > article#one > ul#messages li.in{
-	float: left;
-	text-align: left;
-	color: #666;
-}
-body > section#chat > article#one > ul#messages li.out{
-	float: right;
-	text-align: right;
-	background-color: #F2F2F2;
-	color: #888;
-}
-body > section#chat > article#one > ul#messages > li > div.msg{
-	margin: 0;
-	letter-spacing: 0rem;
-	font-weight: 300;
-	font-size: 1rem;
-	line-height: 1rem;
-}
-body > section#chat > article#one > ul#messages > li > div.msg > a{
-	text-decoration: underline;
-	color: #D45500;
-}
-body > section#chat > article#one > ul#messages > li > div.msg:not(:first-child){
-	border-top: .05rem solid #E3E3E3;
-	margin-top: 0.3rem;
-	padding-top: 0.3rem;
-}
-body > section#chat > article#one > ul#messages > li > div.msg > span.stamp{
-	font-size: .7rem;
-	color: #BBB;
-}
-body > section#chat > article#one > ul#messages > li.in > div.msg > span.stamp{
-	float: right;
-}
-body > section#chat > article#one > ul#messages > li.out > div.msg > span.stamp{
-	float: left;
-}
-body > section#chat > article#one > ul#messages > li p{
-	margin: 0;
-}
-body > section#chat > article#one > ul#messages > li img{
-	max-width: 100%;
-}
-body > section#chat > article#one > ul#messages > span.daychange{
-	display: block;
-	width: 100%;
-	margin-bottom: 1rem;
-	border-bottom: .05rem solid #CCC;
-	color: #999;
-}
-body > section#chat > article#one > ul#messages hr.end{
-	float: left;
-	margin-top: 3rem;
-	border: none;
-	width: 100%;
-}
-body > section#main > article#me{
-	padding-top: .5rem;
-}
-body > section#main > article#me > div{
-	position: relative;
-	margin: .8rem;
-	padding: .8rem;
-	background-color: #FFF;
-	box-shadow: 0 0 2rem rgba(0, 0, 0, .1);
-	color: #666;
-	font-size: 1rem;
-	overflow: show;
-}
-body > section#main > article#me > div#vcard h1#fn,
-body > section#main > article#me > div#vcard h2#jid{
-	float: right;
-	clear: right;
-	margin: 0;
-	text-align: right;
-	width: 100%;
-	max-width: 12rem;
-}
-body > section#main > article#me > div#vcard h1#fn{
-	margin-top: -1rem;
-	font-size: 1.1rem;
-	line-height: 1.1rem;
-}
-body > section#main > article#me > div#vcard h2#jid{
-	font-weight: 500;
-	font-size: .9rem;
-	color: #999;
-	margin-bottom: 1.5rem;
-}
-body > section#main > article#me > div#vcard span.avatar{
-	position: absolute;
-	display: block;
-	width: 4rem;
-	overflow: hidden;
-	top: -.5rem;
-	left: .5rem;
-	padding: .2rem;
-	border-radius: 5%;
-	background-color: #FFF;
-	box-shadow: 0 0 .5rem #999;
-	z-index: 1;
-}
-body > section#main > article#me > div#vcard span.avatar img{
-	border-radius: 5%;
-	width: 4rem;
-}
-body > section#main > article#me > div#vcard{
-	padding-top: 2rem;
-}
-body > section#main > article#me > div#vcard h1{
-	margin: 0;
-}
-body > section#main > article#me > div#vcard input#status{
-
-}
-body > section#main > article#me > div#vcard button{
-	width: 100%;
-	margin-left: .2rem;
-	padding: .3rem;
-	font-size: .8rem;
-	border-radius: .2rem;
-}
-body > section#dialog > article{
+section#dialog > header {
+	height: 2.05rem;
 	background-color: #333;
-	color: #FFF;
-}
-body > section#dialog > article > header{
-	height: 1.8rem;
-	background-color: #222;
 	border-bottom: .1rem solid #666;
 	font-size: .8rem;
 	line-height: 1rem;
-	padding-top: 1.2rem;
+	padding-top: 1.4rem;
+	color: #FFF;
 }
-body > section#dialog > article > header > nav{
+section#dialog > header > nav {
 	position: absolute;
-	top: 0;
-	font-size: .5rem;
+	top: .2rem;
 }
-body > section#dialog > article > header > nav > a{
-	padding-top: 1rem!important;
+section#dialog > header > nav > a > span {
+  font-size: 1rem!important;
+  color: #FFF;
 }
-body > section#dialog > article > header > a.right{
+section#dialog > header > a.right {
 	position: absolute;
-	top: 0;
+	top: .2rem;
 	right: 0;
 	padding: 1rem;
 }
-body > section#dialog > article{
-	padding-top: 3rem;
+section#dialog > article > form,
+section#dialog > article > p {
+	padding: 1.5rem;
 }
-body > section#dialog > article > div{
-	padding: 2rem;
+section#dialog > article > p.tip {
+  background-color: #E3DEDB;
+  min-height: 2rem;
 }
-body > section .show.chat,
-select > option[value=chat]{
-	background-color: #AD0;
+section#dialog > article > p.tip img {
+  height: 2rem;
+	float: left;
+  margin-right: 1rem;
 }
-body > section .show.a,
-select > option[value=a]{
-	background-color: #8A0;
+section#dialog > article > form > label {
+  color: #555;
 }
-body > section .show.away,
-select > option[value=away]{
-	background-color: #8BF;
+section#dialog > article > form > input,
+section#dialog > article > form > [data-pretend=input-text] {
+  margin: .5rem 0 1rem 0;
 }
-body > section .show.xa,
-select > option[value=xa]{
-	background-color: #FC0;
-}
-body > section .show.dnd,
-select > option[value=dnd]{
-	background-color: #D55;
-}
-body > section .show.na,
-select > option[value=na]{
-	background-color: #AAA;
-}
-label{
+section#dialog > article button {
 	display: block;
-	font-size: 1rem!important;
-	line-height: 1rem!important;
-	margin: .2rem 0!important;
+	margin: 0 auto;
 }
-/*  LUNGO FIXES  */
-section.aside:not(.small){
-	transform: translateX(16rem)!important;
-}
-aside{
-	width: 16rem!important;
-}
-aside.show{
-	transform: translateX(-16rem);
-	font-size: .8rem;
-}
-aside.show header{
-	font-size: 1rem;
-	line-height: 1rem;
-	height: 3rem;
-}
-aside.show header span.title{
-	margin-top: 1rem;
-}
-aside.show article{
-	top: 3rem!important;
-}
-aside.show article ul li{
-	height: 1rem;
-	padding: 1rem;
-	cursor: pointer;
-}
-aside.show article ul li a{
-	color: #FFF!important;
-	font-size: 1rem;
-}
-aside.show article ul li a span.icon{
+section#dialog > article button span.icon {
 	margin-right: .5rem;
+	font-size: 1rem;
 }
-section .list li:not(.anchor){
-	border-bottom: none!important;
+section#dialog > article#contactEdit .avatar {
+  height: 3rem;
+  margin-top: -.5rem;
+  border-radius: .2rem;
 }
-article.list ul li{
-	transition: all .2s ease;
+section#dialog > article#contactEdit p.tip strong {
+  display: block;
+  margin-top: .5rem;
+  width: 18rem;
+  word-break: break-all;
 }
-article.list ul li:active{
-	background-color: #D45500!important;
+section [data-show=chat] {
+  background-color: #2ECC71;
 }
-article.list ul li:active *{
-	color: #FFF!important;
+section [data-show=a] {
+  background-color: #2ECC71;
+}
+section [data-show=away] {
+  background-color: #3498DF;
+}
+section [data-show=xa] {
+  background-color: #F1C40F;
+}
+section [data-show=dnd] {
+  background-color: #E95644;
+}
+section [data-show=na] {
+  background-color: #BDC3C7;
+}
+section#main article#contacts.disHide li[data-show='na'] {
+	display: none;
 }
 /* KEYFRAMES */
-@keyframes blink{
-	from{
+@keyframes blink {
+	from {
 		transform: scale(1);
 	}
-	to{
+	to {
 		transform: scale(.8);
 	}
 }
