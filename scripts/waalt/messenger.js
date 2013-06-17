@@ -192,8 +192,8 @@ var Messenger = {
         XMPP.miniRoster[i].status = status;
         var li = $$('section#main article.list [data-jid=\''+contact.jid+'\']');
         li.attr('data-show', show);
-        li.find('.show').attr('data-show', show).show();
-        li.find('.status').text(status).show();
+        li.find('.show').show().attr('data-show', show);
+        li.find('.status').show().text(status);
         if (Messenger.lastChat == contact.jid) {
           var section = $$('section#chat');
           section.find('header .show').attr('data-show', show).show();
