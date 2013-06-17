@@ -49,7 +49,11 @@ var Message = function (from, to, text, stamp) {
 	        if (contact) {
 	          var curAvatar = $$('section#main > article#contacts li[data-jid=\'' + chat.jid + '\'] span.avatar img').attr('src');
 	        }
-          $$('section#main > article#chats ul').empty().prepend('<li data-jid= \'' + chat.jid + '\' data-unread=\'0\' class=\'person\'>'
+	        var ul = $$('section#main > article#chats ul');
+	        if (!ul.children('li').length) {
+	           ul.empty();
+	        }
+          ul.prepend('<li data-jid= \'' + chat.jid + '\' data-unread=\'0\' class=\'person\'>'
             + '<span class=\'avatar\'><img id=\'' + chat.jid + '\' ' + (curAvatar ? ('src=\'' + curAvatar + '\'') : '') + ' /></span>'
             + '<span class=\'name\'>' + chat.title + '</span>'
             + '<span class=\'show\'></span>'
@@ -100,7 +104,11 @@ var Message = function (from, to, text, stamp) {
         if (contact) {
           var curAvatar = $$('section#main > article#contacts li[data-jid=\'' + chat.jid + '\'] span.avatar img').attr('src');
         }
-        $$('section#main > article#chats ul').empty().prepend('<li data-jid= \'' + chat.jid + '\' data-unread=\'0\' class=\'person\'>'
+        var ul = $$('section#main > article#chats ul');
+        if (!ul.children('li').length) {
+           ul.empty();
+        }
+        ul.prepend('<li data-jid= \'' + chat.jid + '\' data-unread=\'0\' class=\'person\'>'
           + '<span class=\'avatar\'><img id=\'' + chat.jid + '\' ' + (curAvatar ? ('src=\'' + curAvatar + '\'') : '') + ' /></span>'
           + '<span class=\'name\'>' + chat.title + '</span>'
           + '<span class=\'show\'></span>'
