@@ -1,7 +1,7 @@
 LOQUI Instant Messenger
 =====
 
-LOQUI Instant Messenger is a mobile chat app for Firefox OS that allows you to use your Google Talk™ or Jabber® account.
+LOQUI Instant Messenger is a mobile chat app for Firefox OS that allows you to use your Hangouts™ or Jabber® account.
 https://loqui.im
 
 How does it work? (It does!)
