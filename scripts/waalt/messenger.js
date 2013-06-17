@@ -350,14 +350,16 @@ var Messenger = {
   },
   
   chatPull: function (index) {
+	  var temp = Messenger.chats[index];
+	  Messenger.chats.splice(index, 1);
+	  Messenger.chats.push(temp);
+	  Store.simple('mchats', Messenger.chats);
 		var ul = $$('section#main > article#chats > ul');
 		var li = ul.children('li[data-jid=\'' + Messenger.chats[index].jid + '\']')[0];
-		ul.prepend(li.outerHTML);
-		li.remove();
-		var temp = Messenger.chats[index];
-		Messenger.chats.splice(index, 1);
-		Messenger.chats.push(temp);
-		Store.simple('mchats', Messenger.chats);
+		if (li.length) {
+		  ul.prepend(li.outerHTML);
+		  li.remove();
+		}
 	},
   
   chatDelete: function (jid) {
