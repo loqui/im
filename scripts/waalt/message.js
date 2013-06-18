@@ -65,6 +65,7 @@ var Message = function (from, to, text, stamp) {
             Messenger.toSendQ(stIndex);
 	        }
 	        $$('section#chat > article#chat > ul#messages').append('<li class=\'chunk\' data-chunk=\'' + stIndex + '\'></li>');
+          pType = null;
 	      }
         this.render();
         App.audio('sent');
