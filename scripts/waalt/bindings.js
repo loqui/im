@@ -24,7 +24,7 @@ $$('section#main article.list ul li').singleTap(function (e){
 $$('section#main article#chats ul li').hold(function (e){
   var jid = e.currentTarget.dataset.jid;
   var chat = Messenger.chatFind(jid);
-  var will = confirm('Do you really want to delete "' + chat.title + '"');
+  var will = confirm('Do you really want to delete the conversation with "' + chat.title + '"');
   if (will) {
     Messenger.chatDelete(jid);
   }
