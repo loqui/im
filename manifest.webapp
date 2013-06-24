@@ -4,7 +4,7 @@
 		"name": "Waalt Communications",
 		"url": "http://waalt.com"
 	},
-	"launch_path": "/launch.htm",
+	"launch_path": "/index.htm",
 	"description": "LOQUI Instant Messenger is a mobile chat app that allows you to use your Hangouts™ or Jabber® account.",
 	"version": "009",
 	"icons": {
