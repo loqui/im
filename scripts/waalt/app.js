@@ -14,9 +14,9 @@ App = {
     XMPP: {
       settings: {
         reconnect: false,
-        resource: 'LOQUI-' + ($$.environment().os ? $$.environment().os.name : 'PC')
+        resource: 'Loqui-' + ($$.environment().os ? $$.environment().os.name : 'PC')
       },
-      presence: { show: 'a', status: 'Using LOQUI on ' + ($$.environment().os ? $$.environment().os.name : 'my PC') },
+      presence: { show: 'a', status: 'Using Loqui on ' + ($$.environment().os ? $$.environment().os.name : 'my PC') },
       miniRoster: { },
       me: { }
     },
