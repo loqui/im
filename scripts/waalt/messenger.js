@@ -5,7 +5,6 @@ var Messenger = {
   lastChat: null,
   
   onChatMessage: function (msg) {
-    console.log(Strophe.serialize(msg));
     Messenger.msgProcess(msg);
     return true;
   },

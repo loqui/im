@@ -28,7 +28,7 @@ var XMPP = {
     if (navigator.onLine){
       console.log('Trying to connect to ' + XMPP.settings.bosh);
       if (XMPP.settings.jid && XMPP.settings.password) {
-        XMPP.connection.connect(XMPP.settings.jid, XMPP.settings.password, XMPP.status);
+        XMPP.connection.connect(XMPP.settings.jid + '/' + (XMPP.settings.resource || App.default.XMPP.settings.resource), XMPP.settings.password, XMPP.status);
       } else {
         alert('NO LOGIN DATA');
       }
