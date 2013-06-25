@@ -12,7 +12,10 @@ App = {
       settings: { muted: false }
     },
     XMPP: {
-      settings: { reconnect: false },
+      settings: {
+        reconnect: false,
+        resource: 'LOQUI-' + ($$.environment().os ? $$.environment().os.name : 'PC')
+      },
       presence: { show: 'a', status: 'Using LOQUI on ' + ($$.environment().os ? $$.environment().os.name : 'my PC') },
       miniRoster: { },
       me: { }
