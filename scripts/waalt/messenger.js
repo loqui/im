@@ -24,6 +24,7 @@ var Messenger = {
     if (status) {
       msg.c('status', {}, status);
     }
+    msg.c('priority', {}, '127');
     XMPP.connection.send(msg.tree());
     App.light(show);
   },
@@ -40,6 +41,7 @@ var Messenger = {
       if (status) {
         msg.c('status', {}, status);
       }
+      msg.c('priority', {}, '127');
       XMPP.connection.send(msg.tree());
       App.light(show);
     }
