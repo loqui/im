@@ -1,8 +1,6 @@
 'use strict';
 
-var App;
-
-App = {
+var App = {
   
   version: '009',
   connected: false,
