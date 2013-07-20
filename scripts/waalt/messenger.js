@@ -24,6 +24,7 @@ var Messenger = {
     if (status) {
       msg.c('status', {}, status);
     }
+    msg.c('priority', {}, '127');
     XMPP.connection.send(msg.tree());
     App.light(show);
   },
@@ -40,6 +41,7 @@ var Messenger = {
       if (status) {
         msg.c('status', {}, status);
       }
+      msg.c('priority', {}, '127');
       XMPP.connection.send(msg.tree());
       App.light(show);
     }
@@ -349,16 +351,17 @@ var Messenger = {
   },
   
   chatPull: function (index) {
+		var ul = $$('section#main > article#chats > ul');
+		var li = ul.children('li[data-jid=\'' + Messenger.chats[index].jid + '\']')[0];
 	  var temp = Messenger.chats[index];
 	  Messenger.chats.splice(index, 1);
 	  Messenger.chats.push(temp);
 	  Store.simple('mchats', Messenger.chats);
-		var ul = $$('section#main > article#chats > ul');
-		var li = ul.children('li[data-jid=\'' + Messenger.chats[index].jid + '\']')[0];
-		if (li.length) {
+		if (li) {
+		  console.log("Moviendo...");
 		  ul.prepend(li.outerHTML);
 		  li.remove();
-		}
+		} else console.log("No hay ná que mover...");
 	},
   
   chatDelete: function (jid) {

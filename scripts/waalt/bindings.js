@@ -164,6 +164,22 @@ $$('aside#options li[data-event=forget]').on('click', function (e) {
   }
 });
 
+document.addEventListener("visibilitychange", function() {
+  if (document.hidden) {
+    var status = $$('section#main > article#me div#status div#status[data-pretend=input-text]').text();
+    var msg = $pres();
+    msg.c('show', {}, 'away');
+    if (status) {
+      msg.c('status', {}, status);
+    }
+    msg.c('priority', {}, '127');
+    XMPP.connection.send(msg.tree());
+  } else {
+    Messenger.presenceUpdate();
+  }
+});
+
+
 /* This is a provisional workaround until misterious bug concerning text inputs is solved */
 
 $$('input:not(.nopretend)').each(function(){

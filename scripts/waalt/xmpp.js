@@ -28,7 +28,7 @@ var XMPP = {
     if (navigator.onLine){
       console.log('Trying to connect to ' + XMPP.settings.bosh);
       if (XMPP.settings.jid && XMPP.settings.password) {
-        XMPP.connection.connect(XMPP.settings.jid + '/' + (XMPP.settings.resource || App.default.XMPP.settings.resource), XMPP.settings.password, XMPP.status);
+        XMPP.connection.connect(XMPP.settings.jid + '/' + (XMPP.settings.resource || App.default.XMPP.settings.resource), XMPP.settings.password, XMPP.status, XMPP.settings.timeout || App.default.XMPP.settings.timeout);
       } else {
         alert('NO LOGIN DATA');
       }
@@ -83,6 +83,7 @@ var XMPP = {
   attach: function () {
     XMPP.connection.addHandler(Messenger.onChatMessage, null, 'message', 'chat', null, null);
     XMPP.connection.addHandler(Messenger.onSubRequest, null, 'presence', 'subscribe', null, null);
+    XMPP.discoStart();
   },
 
   goOnline: function () {
@@ -152,6 +153,19 @@ var XMPP = {
     } else {
       Store.simple('msendQ', Messenger.sendQ);
     }
+  },
+  
+  discoStart: function () {
+    XMPP.connection.disco.addIdentity('client', $$.environment().isMobile ? 'handheld' : 'web', XMPP.settings.resource || App.default.XMPP.settings.resource, 'en_GB');
+    XMPP.connection.disco.addFeature(Strophe.NS.XHTML_IM);
+    XMPP.connection.disco.addFeature(Strophe.NS.DISCO_INFO);
+    XMPP.connection.disco.addFeature(Strophe.NS.DISCO_ITEMS);
+    XMPP.connection.disco.addFeature(Strophe.NS.XEP0085);
+    XMPP.connection.disco.addFeature(Strophe.NS.XEP0203);
+  },
+  
+  onDisco: function (stanza) {
+    console.log(Strophe.serialize(stanza));
   }
   
 }

@@ -1,8 +1,6 @@
 'use strict';
 
-var App;
-
-App = {
+var App = {
   
   version: '009',
   connected: false,
@@ -14,9 +12,10 @@ App = {
     XMPP: {
       settings: {
         reconnect: false,
-        resource: 'LOQUI-' + ($$.environment().os ? $$.environment().os.name : 'PC')
+        resource: 'Loqui-' + ($$.environment().os ? $$.environment().os.name : 'PC'),
+        timeout: 300
       },
-      presence: { show: 'a', status: 'Using LOQUI on ' + ($$.environment().os ? $$.environment().os.name : 'my PC') },
+      presence: { show: 'a', status: 'Using Loqui on ' + ($$.environment().os ? $$.environment().os.name : 'my PC') },
       miniRoster: { },
       me: { }
     },

@@ -38,6 +38,7 @@ var Message = function (from, to, text, stamp) {
               Messenger.toSendQ(stIndex);
             }
 	        });
+          Messenger.chatPull(Messenger.chatIndex(this.to));
 	      } else {
 	        var contact = Lungo.Core.findByProperty(XMPP.miniRoster, 'jid', this.to);
 	        var chat = new Chat(this.to, contact ? contact.name : this.to);
@@ -93,6 +94,7 @@ var Message = function (from, to, text, stamp) {
             stIndex = [lastChunkIndex, chunk.length-1];
           }
         });
+        Messenger.chatPull(Messenger.chatIndex(this.from));
 	      App.audio('received');
 	    } else {
 	      var contact = Lungo.Core.findByProperty(XMPP.miniRoster, 'jid', this.from);
