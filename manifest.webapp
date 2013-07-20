@@ -6,7 +6,7 @@
 	},
 	"launch_path": "/index.htm",
 	"description": "LOQUI Instant Messenger is a mobile chat app that allows you to use your Hangouts™ or Jabber® account.",
-	"version": "009",
+	"version": "v0.0.10",
 	"icons": {
 		"128": "/img/icon-128.png"
 	},
