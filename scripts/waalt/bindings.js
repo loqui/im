@@ -179,6 +179,11 @@ document.addEventListener("visibilitychange", function() {
   }
 });
 
+$$('[data-var]').each(function () {
+  var key = $$(this).data('var');
+  var value = App[key];
+  $$(this).text(value);
+});
 
 /* This is a provisional workaround until misterious bug concerning text inputs is solved */
 

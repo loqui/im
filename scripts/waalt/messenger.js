@@ -357,11 +357,10 @@ var Messenger = {
 	  Messenger.chats.splice(index, 1);
 	  Messenger.chats.push(temp);
 	  Store.simple('mchats', Messenger.chats);
-		if (li) {
-		  console.log("Moviendo...");
+		if (li.length) {
 		  ul.prepend(li.outerHTML);
 		  li.remove();
-		} else console.log("No hay ná que mover...");
+    }
 	},
   
   chatDelete: function (jid) {

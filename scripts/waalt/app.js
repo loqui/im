@@ -2,7 +2,7 @@
 
 var App = {
   
-  version: '009',
+  version: 'v0.0.11',
   connected: false,
   
   default: {
