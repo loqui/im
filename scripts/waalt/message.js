@@ -1,174 +1,91 @@
 'use strict';
 
-var Message = function (from, to, text, stamp) {
-
-  return {
+var Message = function (account, core) {
   
-	  from: from,
-	  to: to,
-	  text: text,
-	  stamp: stamp,
-	  
-	  send: function (delayed, justSend) {
-	    var stIndex = [];
-      if (App.connected) {
-		    XMPP.connection.Messaging.send(this.to, this.text, delayed ? this.stamp : delayed);
-		  }
-      var chat = Messenger.chatFind(this.to);
-		  if (!justSend) {
-	      // Is there a chat for this contact?
-	      if (chat) {
-	        var lastChunkIndex = chat.msgChunks[chat.msgChunks.length-1];
-	        var msg = this;
-	        Store.recover(lastChunkIndex, function (chunk) {
-	          // Is last chunk full?
-	          if (chunk.length > App.default.Message.chunkSize) {
-	            // Create new chunk
-	            chunk = [msg];
-	            var newLastChunkIndex = Store.save(chunk);
-	            chat.msgChunks.push(newLastChunkIndex);
-	            stIndex = [newLastChunkIndex, 0];
-	          } else {
-	            // Update chunk
-	            chunk.push(msg);
-	            Store.update(lastChunkIndex, chunk);
-	            stIndex = [lastChunkIndex, chunk.length-1];
-	          }
-	          if (!App.connected) {
-              Messenger.toSendQ(stIndex);
-            }
-	        });
-          Messenger.chatPull(Messenger.chatIndex(this.to));
-	      } else {
-	        var contact = Lungo.Core.findByProperty(XMPP.miniRoster, 'jid', this.to);
-	        var chat = new Chat(this.to, contact ? contact.name : this.to);
-	        var msgChunk = [this];
-	        var msgChunkIndex = Store.save(msgChunk);
-	        stIndex = [msgChunkIndex, 0];
-	        chat.msgChunks.push(msgChunkIndex);
-	        Messenger.chats.push(chat);
-	        if (contact) {
-	          var curAvatar = $$('section#main > article#contacts li[data-jid=\'' + chat.jid + '\'] span.avatar img').attr('src');
-	        }
-	        var ul = $$('section#main > article#chats ul');
-	        if (!ul.children('li').length) {
-	           ul.empty();
-	        }
-          ul.prepend('<li data-jid= \'' + chat.jid + '\' data-unread=\'0\' class=\'person\'>'
-            + '<span class=\'avatar\'><img id=\'' + chat.jid + '\' ' + (curAvatar ? ('src=\'' + curAvatar + '\'') : '') + ' /></span>'
-            + '<span class=\'name\'>' + chat.title + '</span>'
-            + '<span class=\'show\'></span>'
-            + '<span class=\'last\'></span>'
-            + '<span class=\'unread\'></span>'
-          + '</li>');
-	        Messenger.render('presence');
-	        if (!App.connected) {
-            Messenger.toSendQ(stIndex);
-	        }
-	        $$('section#chat > article#chat > ul#messages').append('<li class=\'chunk\' data-chunk=\'' + stIndex + '\'></li>');
-          pType = null;
-	      }
-        this.render();
-        App.audio('sent');
-	    }
-      chat.last = '→ ' + this.text;
-      Messenger.render('last');
-      Store.simple('mchats', Messenger.chats);
-	  },
-	  
-	  process: function () {
-	    var stIndex = [];
-	    var chat = Messenger.chatFind(this.from);
-	    if (chat) {
-        var lastChunkIndex = chat.msgChunks[chat.msgChunks.length-1];
-        var msg = this;
-        Store.recover(lastChunkIndex, function (chunk) {
-          if (chunk.length > App.default.Message.chunkSize) {
-            chunk = [msg];
-            var newLastChunkIndex = Store.save(chunk);
-            chat.msgChunks.push(newLastChunkIndex);
-            stIndex = [newLastChunkIndex, 0];
-          } else {
-            chunk.push(msg);
-            Store.update(lastChunkIndex, chunk);
-            stIndex = [lastChunkIndex, chunk.length-1];
-          }
-        });
-        Messenger.chatPull(Messenger.chatIndex(this.from));
-	      App.audio('received');
-	    } else {
-	      var contact = Lungo.Core.findByProperty(XMPP.miniRoster, 'jid', this.from);
-	      var chat = new Chat(this.from, contact ? contact.name : this.from);
-	      var msgChunk = [this];
-        var msgChunkIndex = Store.save(msgChunk);
-        stIndex = [msgChunkIndex, 0];
-        chat.msgChunks.push(msgChunkIndex);
-        Messenger.chats.push(chat);
-        if (contact) {
-          var curAvatar = $$('section#main > article#contacts li[data-jid=\'' + chat.jid + '\'] span.avatar img').attr('src');
-        }
-        var ul = $$('section#main > article#chats ul');
-        if (!ul.children('li').length) {
-           ul.empty();
-        }
-        ul.prepend('<li data-jid= \'' + chat.jid + '\' data-unread=\'0\' class=\'person\'>'
-          + '<span class=\'avatar\'><img id=\'' + chat.jid + '\' ' + (curAvatar ? ('src=\'' + curAvatar + '\'') : '') + ' /></span>'
-          + '<span class=\'name\'>' + chat.title + '</span>'
-          + '<span class=\'show\'></span>'
-          + '<span class=\'last\'></span>'
-          + '<span class=\'unread\'></span>'
-        + '</li>');
-        Messenger.render('presence');
-        App.audio('newchat');
-	    }
-	    if(document.hidden && navigator.mozNotification){
-	      var from = this.from;
-	      var subject = chat ? chat.title : from;
-	      var text = this.text;
-				var pic = Messenger.avatars[from];
-				var callback = function () {
-				  Messenger.chatShow(from);
-				  App.toForeground();
-				}
-				if (pic) {
-				  Store.recover(pic, function (src) {
-            App.notify(subject, text, src, callback);
-				  });
-				} else {
-		      App.notify(subject, text, 'img/foovatar.png', callback);
-		    }
-			}
-			chat.last = '← ' + this.text;
-	    if ($$('section#chat').hasClass('show') && Messenger.lastChat == this.from) {
-  	    this.render();
-	    } else {
-	      chat.unread++;
-	    }
-      Messenger.render('last');
-	  },
-	  
-	  render: function () {
-      var ul = $$('section#chat > article#chat > ul#messages');
-      var li = ul.children('li.chunk').last();
-			li.append(this.preRender());
-			ul[0].scrollTop = ul[0].scrollHeight;
-	  },
-	  
-	  preRender: function () {
-	    var text = Tool.urlHL(this.text.replace(/&(?!\w+([;\s]|$))/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'));
-			var type = this.from == Strophe.getBareJidFromJid(XMPP.me.jid) ? 'out' : 'in';
-		  var contact = Lungo.Core.findByProperty(XMPP.miniRoster, 'jid', Strophe.getBareJidFromJid(this.from));
-		  var name = type == 'in' ? (contact ? (contact.name || contact.jid) : this.from) : 'Me';
-			var day = Tool.day(this.stamp);
-			var html = '<div data-type=\'' + type + '\' class=\'' + (type == pType ? 'same' : 'change') + '\' >'
-		  	+ '<span class=\'stamp\'>' + Tool.hour(this.stamp) + '</span>'
-			  + '<span class=\'text\'>' + text + '</span>'
-			+ '</div>';
-			pType = type;
-			return html;
-	  }
-	  
-	}
+  this.account = account;
+  this.core = core;
+  
+  // Try to send this message
+  this.send = function (delay, justSend) {
+    if (App.online && account.connector.connection.connected) {
+      account.connector.connection.Messaging.send(this.core.to, this.core.text, delay ? this.core.stamp : delay);
+    }
+    if (!justSend) {
+      var ci = this.account.chatFind(this.core.to);
+      if (ci >= 0) {
+        var chat = this.account.chats[ci];
+      } else {
+        // There is no chat for the receiver of the message
+        console.log('No chat for ', this.core.to, 'creating new one', this.account);
+        var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.to);
+        var chat = new Chat({
+          jid: this.core.to, 
+          title: contact ? contact.name || this.core.to : this.core.to,
+          chunks: []
+        }, this.account);
+      }
+      chat.messageAppend(this.core, (App.online && account.connector.connection.connected) ? false : true );
+      chat.save(ci, true);
+      var ul = $('section#chat ul#messages');
+      var li = ul.children('li:last-child');
+      li.append(this.preRender());
+      ul[0].scrollTop = ul[0].scrollHeight;
+    }
+  }
+  
+  // Receive this message, process and store it properly
+  this.receive = function () {
+    var message = this;
+    var ci = this.account.chatFind(this.core.from);
+    if (ci >= 0) {
+      var chat = this.account.chats[ci];
+    } else {
+      // There is no chat for the sender of the message
+      console.log('No chat for ', this.core.from, 'creating new one', this.account);
+      var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.from);
+      var chat = new Chat({
+        jid: this.core.from, 
+        title: contact ? contact.name || this.core.from : this.core.from,
+        chunks: []
+      }, this.account);
+    }
+    if (!($('section#chat').hasClass('show') && $('section#chat').data('jid') == this.core.from && !document.hidden)) {
+      chat.core.unread++;
+    }
+    chat.messageAppend(this.core);
+    chat.save(ci, true);
+    if ($('section#chat').data('jid') == this.core.from) {
+      var ul = $('section#chat ul#messages');
+      var li = ul.children('li:last-child');
+      li.append(this.preRender());
+      ul[0].scrollTop = ul[0].scrollHeight;
+    }
+    var pic = App.avatars[this.core.from];
+    var callback = function () {
+      chat.show();
+		  App.toForeground();
+    }
+    if (pic) {
+      Store.recover(pic, function (src) {
+        App.notify({ subject: chat.core.title, text: message.core.text, pic: src, callback: callback }, 'received');
+      });
+    } else {
+      App.notify({ subject: chat.core.title, text: message.core.text, pic: 'img/foovatar.png', callback: callback }, 'received');
+    }
+  }
+  
+  // Represent this message in HTML
+  this.preRender = function () {
+    var text = Tools.emojify(Tools.urlHL(Tools.HTMLescape(this.core.text)), EmojiList);
+  	var type = this.core.from == Strophe.getBareJidFromJid(this.account.core.user) ? 'out' : 'in';
+    var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', Strophe.getBareJidFromJid(this.core.from));
+    var name = type == 'in' ? (contact ? (contact.name || contact.jid) : this.from) : 'Me';
+    var day = Tools.day(this.core.stamp);
+    var div = $('<div/>').data('type', type);
+    var stampSpan = $('<span/>').addClass('stamp').html(Tools.convenientDate(this.core.stamp).join('<br/>'));
+    var textSpan = $('<span/>').addClass('text').html(text);
+    div.append(stampSpan).append(textSpan);
+  	return div;
+  }
+  
 }
-
-var pType;

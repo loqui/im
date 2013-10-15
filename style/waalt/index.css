@@ -1,0 +1,776 @@
+body{
+  background-color: #222;
+}
+button {
+  border-radius: .2rem!important;
+}
+button::-moz-focus-inner {
+  border: 0;
+}
+input {
+  pointer-events: auto!important;
+}
+small {
+  font-size: .9rem;
+  font-weight: 100;
+}
+article.form {
+  overflow: auto;
+}
+input[type='text'],
+input[type='password'] {
+  margin: 0 0 .5rem 0!important;
+  padding: .3rem!important;
+  border: .1rem solid #CCC!important;
+  border-radius: .3rem!important;
+}
+.buttongroup {
+  margin: 1.5rem 0;
+}
+.buttongroup > button {
+  margin-bottom: .4rem;
+  width: 100%;
+}
+article.form button[data-view-section='back'],
+article.form button[data-role='back'] {
+  width: 100%;
+  background-color: #DDD;
+  color: #666;
+}
+article.form button[data-role='submit'] {
+  width: 100%;
+}
+
+section > article.simple {
+  padding: 2rem;
+  color: #333;
+}
+section > article.simple > h1 {
+	position: relative;
+	width: 16rem;
+	font-size: 1.6rem;
+	line-height: 2rem;
+	margin: 0 0 1rem 0;
+	font-weight: 100;
+	color: #E95644;
+}
+section > article.simple > p{
+  font-weight: 100;
+}
+section#welcome {
+	color: #E95644;
+	text-align: center;
+}
+section#welcome > div {
+	margin: 5rem 2rem;
+}
+section#welcome img[src$='devised.svg'] {
+  position: absolute;
+  width: 10rem;
+  top: 1rem;
+  right: 1rem;
+}
+section#welcome img[src$='mascot.svg'] {
+  position: absolute;
+  width: 8rem;
+  top: calc(50% - 5.5rem);
+  left: calc(50% - 4rem);
+}
+section#welcome h1 {
+  position: absolute;
+	font-size: 1.5rem;
+	font-weight: 100;
+  top: calc(50% + 3rem);
+  text-align: center;
+  width: 100%;
+}
+section.setup img[src^='img/providers']{
+  position: absolute;
+  top: 2rem; right: 2rem;
+  width: 4rem;
+}
+section#success img#avatar {
+  position: relative;
+  width: 8rem;
+  left: calc(50% - 4rem);
+  padding: .2rem;
+  border: .1rem solid #DDD;
+  background-color: #FFF;
+  margin: 1rem 0 0 0;
+  border-radius: 50%;
+}
+section.fix {
+  position: fixed;
+  top: 0;
+}
+section.fix.head,
+section.fix.foot {
+  height: calc(100% - 1.5rem);
+}
+section.fix.head.foot {
+  height: calc(100% - 3rem);
+}
+section.fix > header {
+  height: 3rem;
+  line-height: 3rem;
+  font-size: 1rem;
+  margin-bottom: 0;
+  transition: all .5s;
+}
+section.fix > header > nav {
+  height: inherit;
+}
+section.fix > header > nav > * {
+  height: inherit;
+  width: 3rem;
+}
+section.fix > header > nav > *[data-icon="chevron-left"] {
+  width: 2rem;
+}
+section.fix > header > nav.on-right > button:not(.active) {
+  opacity: .4;
+}
+section.fix > header h1{
+  line-height: inherit;
+  font-size: 1.4em;
+  text-transform: uppercase;
+  text-align: left!important;
+  padding: 0 .7rem;
+}
+section.extended article {
+  top: 2.2rem;
+  height: calc(100% - 3.7rem)!important;
+}
+section nav[data-control="groupbar"] {
+  position: absolute;
+  top: 3rem;
+  height: 2.2rem!important;
+  background-color: #222;
+}
+section nav[data-control="groupbar"] a {
+  height: 2.2rem!important;
+  width: 33.3%;
+}
+[data-view-menu]:after {
+  content: none;
+}
+section.aside {
+  transform: translateX(5rem); 
+}
+section > nav[data-control="menu"] {
+  height: 4rem;
+}
+section > nav[data-control="menu"].show {
+  top: 3rem;
+}
+section > nav[data-control="menu"] a {
+  height: inherit;
+  width: 3.5rem!important;
+  font-size: .9rem;
+  font-weight: 300!important;
+  line-height: 1rem;
+  color: #FFF!important;
+  padding: .5rem 0!important;
+}
+section > nav[data-control="menu"] a .icon {
+  font-size: 1.8rem!important;
+}
+section#main article ul {
+  list-style-type: none;
+}
+section#main article ul li {
+  position: relative;
+  background-color: #F9F9F9;
+  border-bottom: .05rem solid #E6E6E6;
+  height: 4rem;
+  cursor: pointer;
+}
+section#main article ul li:active {
+  background-color: #DDD;
+}
+section#main article ul li span.name {
+  position: absolute;
+  left: 4.2rem;
+  top: .6rem;
+  color: #444;
+  max-width: calc(100% - 4.7rem);
+  max-height: 1.4em;
+  overflow: hidden;
+}
+section#main article ul li span.status,
+section#main article ul li span.lastMessage {
+  position: absolute;
+  left: 4.2rem;
+  top: 2rem;
+  color: #444;
+  font-weight: 100;
+  font-size: .8em;
+  max-width: calc(100% - 6.5rem);
+  max-height: 1.4em;
+  overflow: hidden;
+}
+section#main article ul li span.lastStamp {
+  position: absolute;
+  right: .5rem;
+  top: 2rem;
+  color: #999;
+  font-weight: 100;
+  line-height: .9em;
+  font-size: .65em;
+  max-width: calc(100% - 4.7rem);
+  text-align: right;
+}
+section#main article ul li .show {
+  display: block;
+  position: absolute;
+  left: 3rem;
+  top: .5rem;
+  width: 1rem;
+  height: 1rem;
+  border: .25rem solid #F9F9F9;
+  border-radius: 50%;
+}
+section#main article ul li:active .show {
+  border-color: #DDD;
+}
+section#main article ul li span.avatar {
+  position: absolute;
+  display: block;
+  height: 3.2rem;
+  width: 3.2rem;
+  top: .4rem;
+  left: .4rem;
+}
+section#main article ul li span.avatar img {
+  display: block;
+  width: inherit;
+  height: inherit;
+  border-radius: 50%;
+  overflow: hidden;
+}
+section#main article ul li span.avatar img:not([src]) {
+  height: 3.2rem;
+  width: 3.2rem;
+  background-image: url('../../img/foovatar.png');
+  background-size: 100%;
+  background-color: #D4D2C5;
+}
+section#main article ul li span.unread {
+  display: none;
+}
+section#main article ul li[data-unread="1"] span.unread {
+  display: block;
+  position: absolute;
+  top: .6rem;
+  right: .4rem;
+  background-color: #E74C3C;
+  color: #FFF;
+  padding: .4rem .5rem;
+  font-size: .6em;
+  line-height: .6em;
+  border-radius: .6rem;
+}
+section#main article ul li[data-unread="1"] span.name {
+  max-width: calc(100% - 6.8rem);
+}
+section#main > footer {
+  height: 3rem;
+}
+section#main > footer .address {
+  position: absolute;
+  top: 1.05rem;
+  left: 1.4rem;
+  line-height: 1em;
+  font-weight: 300;
+  font-size: .9rem;
+}
+section#main > footer .status {
+  display: block;
+  position: absolute;
+  left: .4rem;
+  top: 1.05rem;
+  width: .8rem;
+  height: .8rem;
+  border: .15rem solid #2F2F2F;
+  border-radius: 50%;
+}
+section#main > footer .avatar {
+  position: absolute;
+  width: 4rem;
+  height: 3.5rem;
+  overflow: hidden;
+  right: -.2rem;
+  bottom: 0rem;
+}
+section#main > footer .avatar img {
+  display: block;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+}
+section#main > footer .avatar img:not([src]) {
+  background-image: url('../../img/foovatar.png');
+  background-size: 100%;
+  background-color: #D4D2C5;
+}
+section#main .noChats {
+  position: absolute;
+  display: block;
+  text-align: center;
+  width: 16rem;
+  left: calc(50% - 8rem);
+  top: calc(50% - 2rem);
+}
+section#main .noChats strong {
+  color: #444;
+}
+section#main .noChats p {
+  color: #999;
+  font-size: .9em;
+}
+
+section#settings ul li {
+  padding: 1rem;
+  border-bottom: .1rem solid #CCC;
+  list-style-type: none;
+  cursor: pointer;
+}
+section#settings ul li span {
+  font-weight: 300;
+  font-size: .9em;
+}
+
+section#chat header .title {
+  position: absolute;
+  top: .5rem;
+  left: 2.2rem;
+  font-size: 1em;
+  line-height: 1em;
+  height: 1em;
+  overflow: hidden;
+  max-width: calc(100% - 7.5rem)
+}
+section#chat header .status {
+  position: absolute;
+  top: 1.5rem;
+  left: 2.2rem;
+  font-size: .9em;
+  line-height: 1.2em;
+  font-weight: 300;
+  height: 1.2em;
+  overflow: hidden;
+  max-width: calc(100% - 7rem)
+}
+section#chat header .show {
+  display: block;
+  position: absolute;
+  right: 3.8rem;
+  top: 0rem;
+  width: 1.3rem;
+  height: 1.3rem;
+  border: .3rem solid #444;
+  border-radius: 50%;
+}
+section#chat header .avatar {
+  position: absolute;
+  top: -.6rem;
+  right: .2rem;
+  width: 4.2rem;
+  height: 4.2rem;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #DDD;
+  box-shadow: 0 .3rem .3rem rgba(0, 0, 0, .2);
+  transition: all 1s;
+}
+section#chat header .avatar img {
+  width: 100%;
+}
+section#chat #footbox {
+	position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: .6rem;
+  background-color: #EBE9DD;
+  border-top: .05rem solid #D4D2C5;
+}
+section#chat #footbox #typing {
+  position: absolute;
+  top: -1.4rem;
+  left: 0;
+  height: 1.4rem;
+  padding: .2rem .7rem 0 .5rem;
+  border: .1rem solid #DDD;
+  border-bottom: none;
+  background-color: #EBE9DD;
+  font-size: .8rem;
+  font-weight: 300;
+  color: #999;
+  z-index: 1;
+  border-top-right-radius: .5rem;
+}
+section#chat #footbox button {
+  position: relative;
+  float: right;
+  top: 0.05rem;
+  font-size: .9rem;
+  line-height: 1.5rem;
+  padding: .1rem 1rem .2rem 1rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: 0;
+  margin-left: 0.5rem;
+  font-weight: bold;
+}
+section#chat #footbox button#say {
+  display: none;
+}
+section#chat #footbox div#text {
+  position: relative;
+  padding: .7rem .5rem .5rem .5rem;
+  min-height: 2.5rem;
+  max-height: 4rem;
+  background-color: #FFF;
+  border: .05rem solid #DDD;
+  border-radius: .2rem;
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.2rem;
+  color: #666;
+  outline: none;
+  overflow: auto;
+  transition: all .2s;
+}
+section#chat #footbox div#text:focus {
+  border: .05rem solid #BBB;
+}
+
+section#chat ul#messages {
+	position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  padding-top: .5rem;
+  bottom: 4rem;
+  overflow-x: hidden;
+  list-style-type: none;
+}
+section#chat ul#messages > li > div {
+  position: relative;
+  border: .1rem solid #DDD;
+  background-color: #FFF;
+  padding: .7rem;
+  margin: .5rem 0;
+  width: calc(100% - 3rem);
+  border-radius: .3rem .3rem 0 0;
+}
+section#chat ul#messages > li > div a{
+  color: #E95644;
+}
+section#chat ul#messages > li > div[data-type='out'] {
+  text-align: right;
+  margin-left: 2.5rem;
+  background-color: #F3F3F3;
+  color: #777;
+}
+section#chat ul#messages > li > div[data-type='in'] {
+  text-align: left;
+  margin-left: .5rem;
+  color: #333;
+}
+section#chat ul#messages > li > div[data-type='out'] + div[data-type='out'],
+section#chat ul#messages > li > div[data-type='in'] + div[data-type='in'] {
+  margin-top: -.6rem;
+  border-top: .1rem solid #E4E4E4;
+  border-radius: 0;
+}
+section#chat ul#messages > li > div span.stamp {
+  position: absolute;
+  font-size: .7rem;
+  font-weight: 300;
+  line-height: 1em;
+  color: #BBB;
+}
+section#chat ul#messages > li > div[data-type='out'] span.stamp {
+  top: .7rem;
+  left: -2rem;
+}
+section#chat ul#messages > li > div[data-type='in'] span.stamp {
+  top: .7rem;
+  right: -2rem;
+}
+section#chat ul#messages > li > div > span.text {
+  font-weight: 300;
+  font-size: .9em;
+}
+section#chat ul#messages > li:last-child {
+  margin-bottom: 3.5rem;
+}
+section#chat article#emoji {
+  padding: 1rem;
+}
+section#chat article#emoji h1 {
+  font-size: 1.2rem;
+  border-bottom: .1rem solid #AAA;
+  color: #444;
+}
+section#chat article#emoji ul {
+  height: calc(100% - 5.5rem);
+  margin-bottom: .8rem;
+  overflow: scroll;
+  list-style-type: none;
+}
+section#chat article#emoji ul li {
+  padding: 1rem;
+  float: left;
+  cursor: pointer;
+}
+section#chat article#emoji ul li img {
+  width: 2rem;
+  height: 2rem;
+}
+section#chat article#emoji button {
+  width: 100%;
+}
+
+section.profile div#card {
+  background-color: #222;
+  color: #FFF;
+  padding: 1.5rem 0 1rem .5rem;
+  min-height: 8rem;
+}
+section.profile div#card span.avatar {
+  position: absolute;
+  display: block;
+  height: 6.5rem;
+  width: 6.5rem;
+  top: .8rem;
+  left: .8rem;
+}
+section.profile div#card span.avatar img {
+  display: block;
+  width: inherit;
+  height: inherit;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 0 2rem black;
+}
+section.profile div#card span.name {
+  display: block;
+  margin-left: 8rem;
+  max-width: calc(100% - 9rem);
+  margin-bottom: .5rem;
+  font-size: 1.1rem;
+  line-height: 1rem;
+}
+section.profile div#card span.user {
+  display: block;
+  margin-left: 8rem;
+  max-width: calc(100% - 9rem);
+  margin-bottom: .5rem;
+  font-size: .9rem;
+  line-height: 1rem;
+  font-weight: 200;
+  word-break: break-all;
+}
+section.profile div#card span.provider {
+  display: block;
+  margin-left: 8rem;
+  max-width: calc(100% - 9rem);
+  margin-bottom: .5rem;
+  font-size: .9rem;
+  line-height: 1rem;
+  font-weight: 200;
+}
+section.profile div#card span.provider img {
+  height: 1rem;
+  margin-right: .3rem;
+}
+section#me.lacks_statusChange div#status {
+  display: none;
+}
+section#me div#status input {
+  width: 100%;
+  height: 2.4rem;
+  font-size: 1rem;
+}
+section.profile article > div:not(#card) {
+  padding: 1rem;
+  border-top: .1rem solid #CCC;
+}
+section.profile article > div:not(#card) h2 {
+  font-size: 1.1rem;
+  color: #444;
+  margin-bottom: .5rem;
+}
+section.profile article > div:not(#card) p {
+  font-weight: 200;
+  font-size: .9rem;
+}
+section.profile article > div:not(#card) .buttongroup {
+  margin: 0;
+}
+
+ul.mini {
+  margin-top: 1rem;
+  list-style-type: none;
+}
+ul.mini li {
+  border-bottom: .1rem solid #CCC;
+}
+ul.mini li:last-child {
+  border: none;
+}
+ul.mini li a {
+  display: block;
+  padding: .9rem .2rem .7rem .2rem;
+}
+ul.mini li img {
+  height: 1.3rem;
+  margin-right: .5rem;
+  margin-top: -.2rem;
+}
+
+aside#accounts {
+  width: 5rem;
+  height: calc(100% - .5rem);
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: #222;
+}
+aside#accounts li {
+  padding: 0;
+  opacity: .5;
+}
+aside#accounts li[data-connected="true"]:not([data-show="na"]) {
+  opacity: 1;
+}
+aside#accounts li .count{
+  display: block;
+  position: absolute;
+  top: 0;
+  left: .5rem;
+  height: 1.4rem;
+  background-color: #E74C3C;
+  color: #FFF;
+  padding: .2rem .5rem;
+  font-size: .8rem;
+  border-radius: .5rem 0 0 0;
+  animation: blink .5s infinite alternate!important;
+}
+aside#accounts button.account {
+  display: block;
+  width: 4rem;
+  height: 4rem;
+  margin: .5rem 0 0 .5rem;
+  border-radius: .5rem!important;
+  box-shadow: 0 .5rem .5rem #000;
+  background-color: #DDD;
+  overflow: hidden;
+  z-index: 0;
+}
+aside#accounts .account img {
+  width: inherit;
+  margin-left: -.1rem;
+  opacity: 1;
+}
+aside#accounts .indicator {
+  display: none;
+  position: absolute;
+  right: 0;
+	width: 0; 
+	height: 0; 
+	border-top: .8rem solid transparent;
+	border-bottom: .8rem solid transparent; 
+	border-right: .8rem solid #FFF;
+	transition: all .2s;
+}
+
+li[data-show=a] .backchange,
+li[data-show=chat] .backchange,
+section[data-show=a] header .backchange,
+section[data-show=chat] header .backchange,
+section[data-show=a] footer .backchange,
+section[data-show=chat] footer .backchange {
+  background-color: #2ECC71;
+}
+li[data-show=away] .backchange,
+section[data-show=away] header .backchange,
+section[data-show=away] footer .backchange {
+  background-color: #3498DF;
+}
+li[data-show=xa] .backchange,
+section[data-show=xa] header .backchange,
+section[data-show=xa] footer .backchange {
+  background-color: #F1C40F;
+}
+li[data-show=dnd] .backchange,
+section[data-show=dnd] header .backchange,
+section[data-show=dnd] footer .backchange {
+  background-color: #E95644;
+}
+li[data-show=na] .backchange,
+li:not([data-show]) .backchange,
+section[data-show=na] header .backchange,
+section:not([data-show]) header .backchange
+section[data-show=na] footer .backchange,
+section:not([data-show]) footer .backchange {
+  background-color: #BDC3C7;
+}
+
+.disHide section#main article#contacts li[data-show='na'] {
+	display: none;
+}
+
+div.switch {
+  position: relative;
+  float: right;
+  display: block;
+  width: 3rem;
+  height: 1.4rem;
+  border: .1rem solid #CCC;
+  border-radius: 1.4rem;
+  background-color: #E9E9E9;
+  transition: all .2s;
+}
+div.switch img.tick {
+  display: none;
+  position: absolute;
+  height: .9rem;
+  left: .4rem;
+  top: .2rem;
+  transition: all .2s;
+}
+div.switch div.ball {
+  position: absolute;
+  display: block;
+  top: .08rem;
+  left: .05rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  border: .1rem solid #CCC;
+  border-radius: 1rem;
+  background-color: #FFF;
+  transition: all .2s;
+}
+[data-value="true"] div.switch img.tick {
+  display: block;
+}
+[data-value="true"] div.switch {
+  background-color: #0CF;
+  border-color: #0BE;
+}
+[data-value="true"] div.switch div.ball {
+  left: 1.7rem;
+}
+/* KEYFRAMES */
+@keyframes blink {
+  from {
+    transform: scale(1.2);
+  }
+}
+/* PROVISIONAL. WE PROMISE! */
+a[data-icon="bolt"] {
+  display: none;
+}

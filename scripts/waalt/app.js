@@ -1,202 +1,240 @@
 'use strict';
 
 var App = {
+
+  name: 'Loqui IM',
+  shortName: 'Loqui',
+  version: 'v0.1.0',
+  connectors: [],
+  toSave: [],
+  accounts: [],
+  accountsCores: [],
+  settings: {},
+  avatars: {},
+  online: true,
+  lastNot: null,
   
-  version: 'v0.0.11',
-  connected: false,
-  
-  default: {
+  // Default values
+  defaults: {
     App: {
-      settings: { muted: false }
-    },
-    XMPP: {
       settings: {
-        reconnect: false,
-        resource: 'Loqui-' + ($$.environment().os ? $$.environment().os.name : 'PC'),
-        timeout: 300
+        reconnect: true,
+        sound: true,
+        disHide: true,
+        //boltGet: true,
+        csn: true,
+        //psychic: true
       },
-      presence: { show: 'a', status: 'Using Loqui on ' + ($$.environment().os ? $$.environment().os.name : 'my PC') },
-      miniRoster: { },
-      me: { }
+      online: true
     },
-    Messenger: {
-      chats: [],
-      avatars: { },
-      settings: { disHide: false },
-      sendQ: []
+    Account: {
+      core: {
+        resource: this.shortname + '-' + (Lungo.Core.environment().os ? Lungo.Core.environment().os.name : 'PC')
+      }
     },
-    Message: {
-      chunkSize: 20
+    Chat: {
+      chunkSize: 30
     },
-    host: {
-      "name": "LOQUI",
-      "domain": "loqui.im",
-      "country": "ES",
-      "bosh": "https://app.loqui.im/http-bind"
+    Connector: {
+      presence: { 
+        show: 'a'
+      }
     },
-    shows: {
-      chat: 'Talkative',
-      a: 'Available',
-      away: 'Away',
-      xa: 'Extended absence',
-      dnd: 'Do not disturb',
-      na: 'Not available' 
+    Provider: {
+      BOSH: {
+        timeout: 300
+      }
     }
   },
   
+  // This is the main procedure
   run: function () {
-    async.parallel([
-      function (callback) {
-        Store.init();
-        callback(null);
-      },
-      function (callback) {
-        App.load(callback);
-      }
-    ], function (err, results) {
+    // Initialize Store class
+    Store.init();
+    // Load settings and data from storage
+    App.load(function () {
+      // Log in or show wizard 
       App.start();
     });
   },
   
+  // Load settings and data from storage
   load: function (callback) {
     async.parallel([
-      function (callback){
-        asyncStorage.getItem('asettings', function (val){
-          App.settings = val ? JSON.parse(val) : App.default.App.settings;
+      function (callback) {
+        Store.get('accountsCores', function (val) {
+          App.accounts = [];
+          App.accountsCores = val || [];
+          if (App.accountsCores.length) {
+            // Inflate accounts
+            for (var i in App.accountsCores) {
+              var account = new Account(App.accountsCores[i]);
+              // Inflate chats
+              for (var j in account.core.chats) {
+                var chat = new Chat(account.core.chats[j], account);
+                account.chats.push(chat);
+              }
+              App.accounts.push(account);
+            }
+          }
           callback(null);
         });
       },
-      function (callback){
-        asyncStorage.getItem('xsettings', function (val){
-          XMPP.settings = val ? JSON.parse(val) : App.default.XMPP.settings;
+      function (callback) {
+        Store.get('settings', function (val) {
+          App.settings = val && val.length ? val : App.defaults.App.settings;
           callback(null);
         });
       },
-      function (callback){
-        asyncStorage.getItem('xpresence', function (val){
-          XMPP.presence = val ? JSON.parse(val) : App.default.XMPP.presence;
+      function (callback) {
+        Store.get('avatars', function (val) {
+          App.avatars = val || {};
           callback(null);
         });
-      },
-      function (callback){
-        asyncStorage.getItem('xroster', function (val){
-          XMPP.miniRoster = val ? JSON.parse(val) : App.default.XMPP.miniRoster;
-          callback(null);
-        });
-      },
-      function (callback){
-        asyncStorage.getItem('xme', function (val){
-          XMPP.me = val ? JSON.parse(val) : App.default.XMPP.me;
-          callback(null);
-        });
-      },
-      function (callback){
-        asyncStorage.getItem('mchats', function (val){
-          Messenger.chats = val ? JSON.parse(val) : App.default.Messenger.chats;
-          callback(null);
-        });
-      },
-      function (callback){
-        asyncStorage.getItem('mavatars', function (val){
-          Messenger.avatars = val ? JSON.parse(val) : App.default.Messenger.avatars;
-          callback(null);
-        });
-      },
-      function (callback){
-        asyncStorage.getItem('msendQ', function (val){
-          Messenger.sendQ = val?JSON.parse(val) : App.default.Messenger.sendQ;
-          callback(null);
-        });
-      },
-      function (callback){
-        asyncStorage.getItem('msettings', function (val){
-          Messenger.settings = val ? JSON.parse(val) : App.default.Messenger.settings;
-          callback(null);
-        });
-      },
+      }
     ], function (err, results) {
       callback(null);
     });
   },
   
+  // Bootstrap logins and so on
   start: function () {
-    if (XMPP.settings.jid) {
-      if (XMPP.settings.reconnect) {
-        App.light('na');
-        App.alarmSet({});
-        Messenger.render('chats');
-        Messenger.render('contacts');
-        Messenger.render('me');
-        Messenger.render('avatars');
-        XMPP.connect();
-        Lungo.Router.section('main');
-      }else {
-        Lungo.Router.section("login");
-      }
+    // If there is already a configured account
+    if (App.accounts.length) {
+      App.alarmSet({});
+      App.switchesRender();
+      App.emojiRender();
+      this.connect();
+      Menu.show('main');
     } else {
-      // FIRST RUN
-      setTimeout(function () {Lungo.Router.section("welcome");}, 1500);
+      // Show wizard
+      Menu.show('providers', null, 500);
     }
   },
   
-  light: function (show) {
-  	$$('body').attr('data-show', show);
-    $$('section header span.showbar').attr('data-show', show);
+  // Connect with every account
+  connect: function () {
+    for (var i in this.accounts) {
+      var account = this.accounts[i];
+      account.connect();
+    }
   },
   
+  // Disconnect from every account
+  disconnect: function () {
+    for (var i in this.accounts) {
+      var account = this.accounts[i];      
+      account.presenceRender();
+      account.connector.connection.disconnect();
+    }
+    $('section#main').attr('data-show', 'na');
+  },
+  
+  // Update an array and put it in storage
+  smartpush: function (key, value, callback) {
+    this[key].push(value);
+    console.log('SAVING ' + key);
+    Store.put(key, this[key], callback);
+  },
+  
+  // Update an object and put it in storage
+  smartupdate: function (key, callback) {
+    console.log('SAVING ' + key);
+    Store.put(key, this[key], callback);
+  },
+  
+  // Disconnect from every account
+  killAll: function () {
+    this.settings.reconnect = false;
+    for (var i in this.accounts) {
+      this.accounts[i].connector.disconnect();
+    }
+  },
+  
+  // Render settings switches
+  switchesRender: function () {
+    var ul = $('section#settings ul').empty();
+    var body = $('body');
+    for (var key in this.settings) {
+      var value = this.settings[key];
+      var li = $('<li><span></span><switch/></li>');
+      li.children('span').text(_('Set' + key));
+      var div = $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>')
+      li.children('switch').replaceWith(div);
+      li.data('key', key);
+      li.data('value', value);
+      li.bind('click', function () {
+        var key = this.dataset.key;
+        var newVal = this.dataset.value == "true" ? false : true;
+        this.dataset.value = newVal;
+        App.settings[key] = newVal;
+        if (newVal) {
+          body.addClass(key);
+        } else {
+          body.removeClass(key);
+        }
+        App.smartupdate('settings');
+      });
+      ul.append(li);
+      if (value) {
+        body.addClass(key);
+      } else {
+        body.removeClass(key);
+      }
+    }
+  },
+  
+  // Render emoticons
+  emojiRender: function () {
+    var ul = $('section#chat article#emoji ul').empty();
+    for (var i in EmojiList) {
+      var emoji = EmojiList[i];
+      var main = emoji[0];
+      var li = $('<li/>').append($('<img />').attr('src', 'img/emoji/'+main+'.png'))
+      li.data('emoji', main);
+      li.on('tap', function () {
+        Plus.emoji(this.dataset.emoji);
+      });
+      ul.append(li);
+    }
+  },
+  
+  // Display a system notification or play a sound accordingly
+  notify: function (core, altSound) {
+    console.log('Notifying '+altSound);
+    if (navigator.mozNotification && document.hidden) {
+      App.lastNot = navigator.mozNotification.createNotification(core.subject, core.text, core.pic);
+      App.lastNot.onclick = function () {
+        core.callback();
+      }
+      App.lastNot.show();
+    } else {
+      this.audio(altSound);
+    }
+  },
+  
+  // Play a sound
   audio: function (file) {
-    if (!(App.settings.muted || (document.hidden && navigator.mozNotification))) { 
-      $$('audio[src=\'audio/' + file + '.ogg\']')[0].play();
+    if (App.settings.sound) {
+      $('audio[src="audio/' + file + '.ogg"]')[0].play();
     }
   },
   
-  notify: function (subject, text, pic, callback) {
-    App.lastNot = navigator.mozNotification.createNotification(subject, text, pic);
-		App.lastNot.onclick = function(){
-      callback();
-	  }
-		App.lastNot.show();
+  // Set an alarm for 90 seconds later so that app automatically reopens
+  alarmSet: function (data) {
+    if (navigator.mozAlarms) {
+      var req = navigator.mozAlarms.add(new Date(Date.now()+90000), 'ignoreTimezone', data);
+      req.onsuccess = function () { }
+      req.onerror = function () { }
+    }
   },
   
+  // Bring app to foreground
   toForeground: function () {
     navigator.mozApps.getSelf().onsuccess = function (e) {
       var app = e.target.result;
-      app.launch('loqui');
+      app.launch('Loqui IM');
     };
-  },
-  
-  alarmSet: function (data) {
-    if (navigator.mozAlarms) {
-      var req = navigator.mozAlarms.add(new Date(Date.now()+60000), 'ignoreTimezone', data);
-      req.onsuccess = function () { }
-      req.onerror = function () { }
-    } else { }
-  },
-  
-  dialog: function (id) {
-    if($$('aside#options').hasClass('show'))Lungo.Router.aside('main', 'options');
-    Lungo.Router.section("dialog");
-    Lungo.Router.article(id, id);
-    Lungo.View.Article.title($$('section#dialog article#' + id).attr('data-title'));
-  },
-  
-  notNow: function (action) {
-  	alert('Sorry. You can\'t ' + (action || 'perform this operation') + ' while offline.');
-  },
-  
-  killall: function () {
-    asyncStorage.clear();
-    document.location.reload();
   }
-
+  
 }
-
-if (navigator.mozAlarms) {
-  navigator.mozSetMessageHandler("alarm", function (message) { 
-    App.alarmSet(message.data);
-  });
-}
-
-$$(document).ready(function () {
-  App.run();
-});

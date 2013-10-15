@@ -26,7 +26,7 @@ var Store = {
   
   save: function (value, callback) {
     var block = new Store.block(JSON.stringify(value));
-    block.index = Store.size++;
+    block.index = ++Store.size;
     Store.cache[block.index] = block.value;
     block.save(function (index) {
       delete Store.cache[index];
@@ -54,12 +54,22 @@ var Store = {
     block.save(callback);
   },
   
-  drop: function (index, callback) {
-    asyncStorage.removeItem(index, callback);
+  drop: function (key, callback) {
+    asyncStorage.removeItem(key, callback);
   },
   
-  simple: function (key, value, callback) {
+  blockDrop: function (index, callback) {
+    this.drop('b' + index, callback);
+  },
+  
+  put: function (key, value, callback) {
   	asyncStorage.setItem(key, JSON.stringify(value), callback);
+  },
+  
+  get: function (key, callback) {
+    asyncStorage.getItem(key, function (value) {
+      callback(JSON.parse(value));
+    });
   }
   
 }

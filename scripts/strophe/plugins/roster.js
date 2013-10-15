@@ -328,6 +328,7 @@ Strophe.addConnectionPlugin('roster',
         var jid = presence.getAttribute('from');
         var from = Strophe.getBareJidFromJid(jid);
         var item = this.findItem(from);
+        var to = Strophe.getBareJidFromJid(presence.getAttribute('to'));
         // not in roster
         if (!item)
         {
@@ -352,17 +353,17 @@ Strophe.addConnectionPlugin('roster',
             // Stanza is not a presence notification. (It's probably a subscription type stanza.)
             return true;
         }
-        this._call_backs(this.items, item);
+        this._call_backs(this.items, item, to);
         return true;
     },
     /** PrivateFunction: _call_backs
      *
      */
-    _call_backs : function(items, item)
+    _call_backs : function(items, item, to)
     {
-        for (var i = 0; i < this._callbacks.length; i++) // [].forEach my love ...
+        for (var i in this._callbacks)
         {
-            this._callbacks[i](items, item);
+            this._callbacks[i](items, item, to);
         }
     },
     /** PrivateFunction: _onReceiveIQ
@@ -386,6 +387,7 @@ Strophe.addConnectionPlugin('roster',
     _updateItems : function(iq)
     {
         var query = iq.getElementsByTagName('query');
+        var to = Strophe.getBareJidFromJid($(iq).attr('to'));
         if (query.length != 0)
         {
             this.ver = query.item(0).getAttribute('ver');
