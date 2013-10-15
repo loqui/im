@@ -110,7 +110,10 @@ var Account = function (core) {
         console.log('CONNECTED');
         var cb = function () {
           var realJid = Strophe.getBareJidFromJid(App.accounts[1].connector.connection.jid);
-          this.core.user = this.core.user == realJid ? this.core.user : realJid;
+          if (this.core.realJid != realJid) {
+            this.core.realJid = realJid;
+            this.save();
+          }
           App.audio('login');
           this.connector.presenceStart();
           this.sendQFlush();
