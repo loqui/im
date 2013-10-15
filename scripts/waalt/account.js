@@ -109,7 +109,7 @@ var Account = function (core) {
       case Strophe.Status.CONNECTED:
         console.log('CONNECTED');
         var cb = function () {
-          var realJid = Strophe.getBareJidFromJid(App.accounts[1].connector.connection.jid);
+          var realJid = Strophe.getBareJidFromJid(this.connector.connection.jid);
           if (this.core.realJid != realJid) {
             this.core.realJid = realJid;
             this.save();
