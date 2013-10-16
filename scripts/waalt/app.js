@@ -20,7 +20,7 @@ var App = {
       settings: {
         reconnect: true,
         sound: true,
-        disHide: true,
+        disHide: false,
         //boltGet: true,
         csn: true,
         //psychic: true
