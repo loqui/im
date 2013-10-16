@@ -47,8 +47,10 @@ var Account = function (core) {
                 var img = vcard.find('BINVAL').text();
                 var type = vcard.find('TYPE').text();
                 var avatar = 'data:'+type+';base64,'+img;
-                $('section#success img#avatar').attr('src', avatar);
+              } else {
+                  var avatar = 'img/foovatar.png';
               }
+              $('section#success img#avatar').attr('src', avatar);
               Lungo.Router.section('success');
             });
             break;
