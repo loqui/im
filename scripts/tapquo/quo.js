@@ -1052,7 +1052,9 @@
     };
     return _hold = function() {
       if (GESTURE.last && (Date.now() - GESTURE.last >= HOLD_DELAY)) {
-        _trigger("hold");
+        if (!_isSwipe()) {
+          _trigger("hold");
+        }
         return GESTURE.taps = 0;
       }
     };
