@@ -82,7 +82,7 @@ var App = {
       },
       function (callback) {
         Store.get('settings', function (val) {
-          App.settings = val && val.length ? val : App.defaults.App.settings;
+          App.settings = val && Object.keys(val).length ? val : App.defaults.App.settings;
           callback(null);
         });
       },
