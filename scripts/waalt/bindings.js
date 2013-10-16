@@ -72,7 +72,9 @@ $('section#chat article#main div#text').on('keydown', function (e) {
     $('section#chat article#main button#say').show();
     var ul = $('section#chat ul#messages');
     ul[0].scrollTop = ul[0].scrollHeight;
-    Messenger.csn('composing');
+    if ($(this).text().length == 0) {
+      Messenger.csn('composing');
+    }
   }
 }).on('tap', function (e) {
   $('section#chat nav#plus').removeClass('show');
