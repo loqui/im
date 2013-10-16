@@ -41,6 +41,7 @@ var Account = function (core) {
                 App.smartpush('accountsCores', account.core);
               }
               Lungo.Notification.hide();
+              $('section.setup#' + account.core.provider + ' input').val('');
               $('section#success span#imported').text(account.core.roster.length || 'No');
               var vcard = $(account.vcard);
               if (vcard.find('BINVAL').length) {
