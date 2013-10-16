@@ -201,7 +201,6 @@ var App = {
   
   // Display a system notification or play a sound accordingly
   notify: function (core, altSound) {
-    console.log('Notifying '+altSound);
     if (navigator.mozNotification && document.hidden) {
       App.lastNot = navigator.mozNotification.createNotification(core.subject, core.text, core.pic);
       App.lastNot.onclick = function () {

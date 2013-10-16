@@ -99,7 +99,6 @@ App.connectors['XMPP'] = function (account) {
         stamp: stamp
       });
       msg.receive();
-      console.log(msg);
     }
     if (account.supports('csn') && App.settings.csn) {
     	if(composing && from == $('section#chat').data('jid')){

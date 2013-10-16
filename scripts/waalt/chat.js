@@ -58,13 +58,11 @@ var Chat = function (core, account) {
           chat.core.chunks.push(blockIndex);
           // This helps to find the message if sent later
           storageIndex = [blockIndex, 0];
-          console.log('Chunk was full. Appending to new chunk.', storageIndex);
         } else {
           chunk.push(msg);
           blockIndex = chat.core.chunks[chunkListSize - 1];
           Store.update(blockIndex, chunk);
           storageIndex = [blockIndex, chunk.length-1];
-          console.log('Appending to existing chunk.', storageIndex);
         }
         if (delay) {
           chat.account.toSendQ(storageIndex);
@@ -76,7 +74,6 @@ var Chat = function (core, account) {
       chat.core.chunks.push(blockIndex);
       // This helps to find the message if sent later
       storageIndex = [blockIndex, 0];
-      console.log('There was no chunk. Appending to new chunk.', storageIndex);
       if (delay) {
         chat.account.toSendQ(storageIndex);
       }
