@@ -48,7 +48,7 @@ var Account = function (core) {
                 var type = vcard.find('TYPE').text();
                 var avatar = 'data:'+type+';base64,'+img;
               } else {
-                  var avatar = 'img/foovatar.png';
+                var avatar = 'img/foovatar.png';
               }
               $('section#success img#avatar').attr('src', avatar);
               Lungo.Router.section('success');
