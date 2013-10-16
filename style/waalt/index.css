@@ -330,12 +330,15 @@ section#main .noChats p {
 }
 
 section#settings ul li {
+  position: relative;
   padding: 1rem;
   border-bottom: .1rem solid #CCC;
   list-style-type: none;
   cursor: pointer;
 }
 section#settings ul li span {
+  display: block;
+  max-width: calc(100% - 4rem);
   font-weight: 300;
   font-size: .9em;
 }
@@ -724,8 +727,9 @@ section:not([data-show]) footer .backchange {
 }
 
 div.switch {
-  position: relative;
-  float: right;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
   display: block;
   width: 3rem;
   height: 1.4rem;
