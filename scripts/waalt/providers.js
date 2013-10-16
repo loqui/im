@@ -115,8 +115,8 @@ var Providers = {
       var article = section.children('article');
       article.append('<h1 style="color: ' + data.color + '" >' + _('SettingUp', { provider: data.longname }) + '</h1>'
         + '<img src="img/providers/' + provider + '.svg" />'
-        + '<label for="user">' + _(data.terms['user'], { provider: data.altname }) + '</label><input type="text" name="user" placeholder="' + (data.terms.placeholder || _(data.terms['user'], { provider: data.altname }) ) + '" required />'
-        + '<label for="pass">' + _(data.terms['pass']) + '</label><input type="password" name="pass" placeholder="******" required />'
+        + '<label for="user">' + _(data.terms['user'], { provider: data.altname }) + '</label><input type="text" name="user" placeholder="' + (data.terms.placeholder || _(data.terms['user'], { provider: data.altname }) ) + '" />'
+        + '<label for="pass">' + _(data.terms['pass']) + '</label><input type="password" name="pass" placeholder="******" />'
       );
       if (data.notice) {
         article.append('<small>' + _(provider + 'Notice') + '</small>');
