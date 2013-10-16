@@ -111,11 +111,6 @@ var Account = function (core) {
       case Strophe.Status.CONNECTED:
         console.log('CONNECTED');
         var cb = function () {
-          var realJid = Strophe.getBareJidFromJid(this.connector.connection.jid);
-          if (this.core.realJid != realJid) {
-            this.core.realJid = realJid;
-            this.save();
-          }
           App.audio('login');
           this.connector.presenceStart();
           this.sendQFlush();
@@ -143,6 +138,11 @@ var Account = function (core) {
   this.sync = function (callback) {
     var account = this;
     var connector = account.connector;
+    var realJid = Strophe.getBareJidFromJid(this.connector.connection.jid);
+    if (account.core.realJid != realJid) {
+      account.core.realJid = realJid;
+      account.save();
+    }
     var rosterCb = function (items, item, to) {
       if (to) {
         var sameOrigin = Strophe.getDomainFromJid(to) == Providers.data[account.core.provider].autodomain;
