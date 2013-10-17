@@ -4,7 +4,7 @@ var App = {
 
   name: 'Loqui IM',
   shortName: 'Loqui',
-  version: 'v0.1.0',
+  version: 'v0.1.2',
   connectors: [],
   toSave: [],
   accounts: [],
