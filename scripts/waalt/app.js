@@ -4,7 +4,7 @@ var App = {
 
   name: 'Loqui IM',
   shortName: 'Loqui',
-  version: 'v0.1.0',
+  version: 'v0.1.2',
   connectors: [],
   toSave: [],
   accounts: [],
@@ -20,7 +20,7 @@ var App = {
       settings: {
         reconnect: true,
         sound: true,
-        disHide: true,
+        disHide: false,
         //boltGet: true,
         csn: true,
         //psychic: true
@@ -82,7 +82,7 @@ var App = {
       },
       function (callback) {
         Store.get('settings', function (val) {
-          App.settings = val && val.length ? val : App.defaults.App.settings;
+          App.settings = val && Object.keys(val).length ? val : App.defaults.App.settings;
           callback(null);
         });
       },

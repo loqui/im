@@ -77,7 +77,7 @@ var Message = function (account, core) {
   // Represent this message in HTML
   this.preRender = function () {
     var text = Tools.emojify(Tools.urlHL(Tools.HTMLescape(this.core.text)), EmojiList);
-  	var type = (this.core.from == this.account.core.user || this.core.form == this.account.core.realJid) ? 'out' : 'in';
+  	var type = (this.core.from == this.account.core.user || this.core.from == this.account.core.realJid) ? 'out' : 'in';
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', Strophe.getBareJidFromJid(this.core.from));
     var name = type == 'in' ? (contact ? (contact.name || contact.jid) : this.from) : 'Me';
     var day = Tools.day(this.core.stamp);

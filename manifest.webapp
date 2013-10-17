@@ -6,7 +6,7 @@
 	},
 	"launch_path": "/index.html",
 	"description": "Loqui Instant Messenger allows you to have all your chat accounts in just one app.",
-	"version": "v0.1.0",
+	"version": "v0.1.2",
 	"icons": {
 	  "256": "/img/icon-128.png",
 	  "128": "/img/icon-128.png",

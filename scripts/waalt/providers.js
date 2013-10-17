@@ -109,21 +109,27 @@ var Providers = {
     var ul = $('section#providers ul');
     for (var provider in this.data) {
       var data = this.data[provider];
-      var li = $('<li><a data-view-section="' + provider + '"><img src="img/providers/' + provider + '.svg" />' + data.longname + '</a></li>');
+      var li = $('<li/>');
+      var a = $('<a/>').data('view-section', provider);
+      a.text(data.longname);
+      var img = $('<img/>').attr('src', 'img/providers/' + provider + '.svg');
+      a.prepend(img);
+      li.append(a);
       ul.append(li);
-      var section = $('<section id="' + provider + '" class="setup" data-transition="slide"><article class="simple form"></article></section>');
-      var article = section.children('article');
-      article.append('<h1 style="color: ' + data.color + '" >' + _('SettingUp', { provider: data.longname }) + '</h1>'
-        + '<img src="img/providers/' + provider + '.svg" />'
-        + '<label for="user">' + _(data.terms['user'], { provider: data.altname }) + '</label><input type="text" name="user" placeholder="' + (data.terms.placeholder || _(data.terms['user'], { provider: data.altname }) ) + '" required />'
-        + '<label for="pass">' + _(data.terms['pass']) + '</label><input type="password" name="pass" placeholder="******" required />'
-      );
+      var section = $('<section/>').attr('id', provider).addClass('setup').data('transition', 'slide');
+      var article = $('<article/>').addClass('simple form')
+        .append($('<h1/>').style('color', data.color).html(_('SettingUp', { provider: data.longname })))
+        .append($('<img/>').attr('src', 'img/providers/' + provider + '.svg'))
+        .append($('<label/>').attr('for', 'user').text(_(data.terms['user'], { provider: data.altname })))
+        .append($('<input/>').attr('type', 'text').attr('name', 'user').attr('placeholder', (data.terms.placeholder || _(data.terms['user'], { provider: data.altname }) )))
+        .append($('<label/>').attr('for', 'pass').text(_(data.terms['pass'])))
+        .append($('<input/>').attr('type', 'password').attr('name', 'pass').attr('placeholder', '******'))
       if (data.notice) {
-        article.append('<small>' + _(provider + 'Notice') + '</small>');
+        article.append($('<small/>').text(_(provider + 'Notice')));
       }
-      var buttongroup = $('<div class="buttongroup"></div>');
-      var back = $('<button data-view-section="back">' + _('GoBack') + '</button>');
-      var submit = $('<button data-role="submit" style="background-color: ' + data.color + '">' + _('LogIn') + '</button>');
+      var buttongroup = $('<div/>').addClass('buttongroup');
+      var submit = $('<button/>').data('role', 'submit').style('background-color', data.color).text(_('LogIn'));
+      var back = $('<button/>').data('view-section', 'back').text(_('GoBack'));
       submit.bind('click', function () {
         var article = this.parentNode.parentNode;
         var provider = article.parentNode.id;
@@ -141,8 +147,9 @@ var Providers = {
           account.test();
         }
       });
-      buttongroup.append(back).append(submit);
+      buttongroup.append(submit).append(back);
       article.append(buttongroup);
+      section.append(article);
       $('body').append(section);
     }
   },

@@ -41,6 +41,7 @@ var Account = function (core) {
                 App.smartpush('accountsCores', account.core);
               }
               Lungo.Notification.hide();
+              $('section.setup#' + account.core.provider + ' input').val('');
               $('section#success span#imported').text(account.core.roster.length || 'No');
               var vcard = $(account.vcard);
               if (vcard.find('BINVAL').length) {
@@ -111,11 +112,6 @@ var Account = function (core) {
       case Strophe.Status.CONNECTED:
         console.log('CONNECTED');
         var cb = function () {
-          var realJid = Strophe.getBareJidFromJid(this.connector.connection.jid);
-          if (this.core.realJid != realJid) {
-            this.core.realJid = realJid;
-            this.save();
-          }
           App.audio('login');
           this.connector.presenceStart();
           this.sendQFlush();
@@ -143,6 +139,11 @@ var Account = function (core) {
   this.sync = function (callback) {
     var account = this;
     var connector = account.connector;
+    var realJid = Strophe.getBareJidFromJid(this.connector.connection.jid);
+    if (account.core.realJid != realJid) {
+      account.core.realJid = realJid;
+      account.save();
+    }
     var rosterCb = function (items, item, to) {
       if (to) {
         var sameOrigin = Strophe.getDomainFromJid(to) == Providers.data[account.core.provider].autodomain;
@@ -485,7 +486,10 @@ var Accounts = {
       var account = App.accounts[i];
       var li = $('<li/>').data('user', account.core.user).data('provider', account.core.provider);
       var button = $('<button/>').addClass('account').on('click', function () {
-        App.accounts[Accounts.find(this.parentNode.dataset.user, this.parentNode.dataset.provider)].show();
+        var index = Accounts.find(this.parentNode.dataset.user, this.parentNode.dataset.provider);
+        if (index) {
+          App.accounts[index].show();
+        }
       });
       var img = $('<img/>').attr('src', 'img/providers/squares/' + account.core.provider + '.svg');
       ul.append(li.append(button.append(img)));
