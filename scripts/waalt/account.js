@@ -486,7 +486,10 @@ var Accounts = {
       var account = App.accounts[i];
       var li = $('<li/>').data('user', account.core.user).data('provider', account.core.provider);
       var button = $('<button/>').addClass('account').on('click', function () {
-        App.accounts[Accounts.find(this.parentNode.dataset.user, this.parentNode.dataset.provider)].show();
+        var index = Accounts.find(this.parentNode.dataset.user, this.parentNode.dataset.provider);
+        if (index) {
+          App.accounts[index].show();
+        }
       });
       var img = $('<img/>').attr('src', 'img/providers/squares/' + account.core.provider + '.svg');
       ul.append(li.append(button.append(img)));
