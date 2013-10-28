@@ -48,6 +48,9 @@ var Menu = {
     emoji: function () {
       $('section#chat nav#plus').removeClass('show');
       Lungo.Router.article('chat', 'emoji');
+    },
+    poweroff: function () {
+      window.close();
     }
   },
   
