@@ -50,7 +50,15 @@ var Menu = {
       Lungo.Router.article('chat', 'emoji');
     },
     poweroff: function () {
-      window.close();
+      var req = navigator.mozAlarms.getAll();
+      req.onsuccess = function () {
+      this.result.forEach(function (alarm) {
+        navigator.mozAlarms.remove(alarm.id);
+        window.close();
+        console.log('Loqui is closed');
+        });
+      }
+      req.onerror = function () { }
     }
   },
   
