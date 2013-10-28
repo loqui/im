@@ -70,7 +70,7 @@ var Message = function (account, core) {
         App.notify({ subject: chat.core.title, text: message.core.text, pic: src, callback: callback }, 'received');
       });
     } else {
-      App.notify({ subject: chat.core.title, text: message.core.text, pic: 'img/foovatar.png', callback: callback }, 'received');
+      App.notify({ subject: chat.core.title, text: message.core.text, pic: 'https://raw.github.com/waalt/loqui/master/img/foovatar.png', callback: callback }, 'received');
     }
   }
   
