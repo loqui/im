@@ -125,7 +125,7 @@ var Providers = {
         .append($('<label/>').attr('for', 'pass').text(_(data.terms['pass'])))
         .append($('<input/>').attr('type', 'password').attr('name', 'pass').attr('placeholder', '******'))
       if (data.notice) {
-        article.append($('<small/>').text(_(provider + 'Notice')));
+        article.append($('<small/>').html(_(provider + 'Notice')));
       }
       var buttongroup = $('<div/>').addClass('buttongroup');
       var submit = $('<button/>').data('role', 'submit').style('background-color', data.color).text(_('LogIn'));
