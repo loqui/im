@@ -28,7 +28,7 @@ We would like to thank:
  * Jack Moffitt and everyone who contributed to create Strophe.js and its plugins.
  * Javi Jimenez and Ignacio Olalde from Tapquo for creating Lungo, the framework supporting the UI.
  * Alastair Cameron (CameronMusic) for composing the notification sounds.
- * Fabien Cazenave for creating l10n.js library, that helps to have Loqui in different languages.
+ * Fabien Cazenave for creating l10n.js, the library that helps to have Loqui in different languages.
  * Telefónica I+D for their promotion and support in addition to provide us the awesome Firefox OS Developer Preview devices from Geeksphone.
  * Everyone who has kindly reported issues or made pull requests.
  * You for being about to stargaze or fork this project on GitHub ;)
