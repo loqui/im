@@ -1,30 +1,32 @@
 {
-	"name": "Loqui IM",
-	"developer": {
-		"name": "Waalt Communications",
-		"url": "http://waalt.com"
-	},
-	"launch_path": "/index.html",
-	"description": "Loqui Instant Messenger allows you to have all your chat accounts in just one app.",
-	"version": "v0.1.3",
-	"icons": {
-	  "256": "/img/icon-128.png",
-	  "128": "/img/icon-128.png",
-	  "120": "/img/icon-120.png",
-	  "90": "/img/icon-90.png",
-		"60": "/img/icon-60.png",
-		"32": "/img/icon-32.png"
-	},
-	"default_locale": "en",
-	"messages": [
-		{ "alarm": "/index.html" }
-	],
-	"permissions": {
-		"alarms": {
-			"description": "Required for keeping the app always connected to server."
-		},
-		"desktop-notification": {
-			"description": "Required for displaying alerts when app is on background."
-		}
-	}
+  "name": "Loqui IM Halloween Edition",
+  "developer": {
+    "name": "Waalt Communications",
+    "url": "http://waalt.com"
+  },
+  "launch_path": "/index.html",
+  "description": "Loqui Instant Messenger allows you to have all your chat accounts in just one app.",
+  "version": "v0.1.3",
+  "icons": {
+    "32": "/img/icon-32.png",
+    "60": "/img/icon-60.png",
+    "90": "/img/icon-90.png",
+    "120": "/img/icon-120.png",
+    "128": "/img/icon-128.png",
+    "256": "/img/icon-256.png"
+  },
+  "default_locale": "en",
+  "messages": [
+    {
+      "alarm": "/index.html"
+    }
+  ],
+  "permissions": {
+    "alarms": {
+      "description": "Required for keeping the app always connected to server."
+    },
+    "desktop-notification": {
+      "description": "Required for displaying alerts when app is on background."
+    }
+  }
 }

@@ -49,16 +49,23 @@ var Menu = {
       $('section#chat nav#plus').removeClass('show');
       Lungo.Router.article('chat', 'emoji');
     },
-    poweroff: function () {
-      var req = navigator.mozAlarms.getAll();
-      req.onsuccess = function () {
-      this.result.forEach(function (alarm) {
-        navigator.mozAlarms.remove(alarm.id);
-        window.close();
-        console.log('Loqui is closed');
-        });
+    powerOff: function () {
+      var will = confirm(_('ConfirmClose'));
+      if (will) {
+        Lungo.Notification.success(_('Closing'), _('AppWillClose'), 'signout', 3);
+        var req = navigator.mozAlarms.getAll();
+        req.onsuccess = function () {
+          this.result.forEach(function (alarm) {
+            navigator.mozAlarms.remove(alarm.id);
+          });
+          App.killAll();
+          setTimeout(function () {
+            console.log(App.name + ' has been closed');
+            window.close();
+          }, 3000);
+        }
+        req.onerror = function () { }
       }
-      req.onerror = function () { }
     }
   },
   
