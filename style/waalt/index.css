@@ -54,8 +54,12 @@ section > article.simple > h1 {
 	font-weight: 100;
 	color: #E95644;
 }
-section > article.simple > p{
+section > article.simple > p {
   font-weight: 100;
+}
+section > article.simple > p > a,
+section > article.simple > small > a {
+  color: #E95644;
 }
 section#welcome {
 	color: #E95644;
