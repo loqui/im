@@ -49,7 +49,7 @@ var Message = function (account, core) {
         chunks: []
       }, this.account);
     }
-    if (!($('section#chat').hasClass('show') && $('section#chat').data('jid') == this.core.from && !document.hidden)) {
+    if (!$('section#chat').hasClass('show') || $('section#chat').data('jid') != this.core.from) {
       chat.core.unread++;
     }
     chat.messageAppend(this.core);
