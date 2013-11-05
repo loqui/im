@@ -1,12 +1,12 @@
 {
-  "name": "Loqui IM Halloween Edition",
+  "name": "Loqui IM",
   "developer": {
     "name": "Waalt Communications",
     "url": "http://waalt.com"
   },
   "launch_path": "/index.html",
   "description": "Loqui Instant Messenger allows you to have all your chat accounts in just one app.",
-  "version": "v0.1.3",
+  "version": "v0.1.4",
   "icons": {
     "32": "/img/icon-32.png",
     "60": "/img/icon-60.png",

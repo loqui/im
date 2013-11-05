@@ -4,6 +4,23 @@ var Providers = {
 
   // Providers data
   data: {
+    'facebook': {
+      longname: 'Facebook Chat',
+      altname: 'Facebook',
+      BOSH: {
+        host: 'https://app.loqui.im/http-bind/',
+        timeout: 300
+      },
+      autodomain: 'chat.facebook.com',
+      lacks: ['multi', 'avatarChange', 'statusChange', 'attention', 'rosterMgmt'],
+      color: '#3D539F',
+      terms: {
+        user: 'ProviderUsername',
+        pass: 'Password',
+      },
+      notice: true,
+      connector: 'XMPP'
+    },
     'hangouts': {
       longname: 'Google Hangouts',
       altname: 'Gmail',
@@ -22,19 +39,19 @@ var Providers = {
       notice: true,
       connector: 'XMPP'
     },
-    'facebook': {
-      longname: 'Facebook Chat',
-      altname: 'Facebook',
+    'gapps': {
+      longname: 'Google Apps',
       BOSH: {
         host: 'https://app.loqui.im/http-bind/',
         timeout: 300
       },
-      autodomain: 'chat.facebook.com',
-      lacks: ['multi', 'avatarChange', 'statusChange', 'attention', 'rosterMgmt'],
-      color: '#3D539F',
+      autodomain: false,
+      lacks: ['avatarChange'],
+      color: '#4EA43B',
       terms: {
-        user: 'ProviderUsername',
+        user: 'ProviderAddress',
         pass: 'Password',
+        placeholder: 'username@domain.com'
       },
       notice: true,
       connector: 'XMPP'
@@ -120,7 +137,7 @@ var Providers = {
       var article = $('<article/>').addClass('simple form')
         .append($('<h1/>').style('color', data.color).html(_('SettingUp', { provider: data.longname })))
         .append($('<img/>').attr('src', 'img/providers/' + provider + '.svg'))
-        .append($('<label/>').attr('for', 'user').text(_(data.terms['user'], { provider: data.altname })))
+        .append($('<label/>').attr('for', 'user').text(_(data.terms['user'], { provider: data.altname || data.longname })))
         .append($('<input/>').attr('type', 'text').attr('name', 'user').attr('placeholder', (data.terms.placeholder || _(data.terms['user'], { provider: data.altname }) )))
         .append($('<label/>').attr('for', 'pass').text(_(data.terms['pass'])))
         .append($('<input/>').attr('type', 'password').attr('name', 'pass').attr('placeholder', '******'))
