@@ -39,6 +39,7 @@ var Providers = {
       notice: true,
       connector: 'XMPP'
     },
+/*
     'gapps': {
       longname: 'Google Apps',
       BOSH: {
@@ -56,6 +57,7 @@ var Providers = {
       notice: true,
       connector: 'XMPP'
     },
+*/
     'nimbuzz': {
       longname: 'Nimbuzz',
       BOSH: {
