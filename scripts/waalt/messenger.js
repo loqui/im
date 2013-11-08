@@ -32,11 +32,11 @@ var Messenger = {
         stamp: localstamp
       });
       msg.send();
-      $$("section#chat div#text").empty();
+      $$("section#chat div#text").empty().focus();
       App.audio('sent');
     }
     $('section#chat article#main button#plus').show();
-    $('section#chat article#main button#say').hide();
+    $('section#chat article#main button#say').hide().focus();
   },
   
   csn: function (state) {

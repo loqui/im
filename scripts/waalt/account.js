@@ -191,6 +191,9 @@ var Account = function (core) {
   }
   
   // Bring account to foreground
+  this.focus = function () {
+    $("section#chat div#text").focus();
+  }
   this.show = function () {
     $('section#main').data('user', this.core.user);
     $('section#main').data('provider', this.core.provider);
