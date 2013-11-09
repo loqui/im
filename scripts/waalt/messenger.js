@@ -11,7 +11,6 @@ var Messenger = {
     var to = $('section#chat').data('jid');
     var account = this.account();
     var text = text || $("section#chat div#text").text();
-    var date = new Date();
     if (text.length) {
       var msg = new Message(account, {
         from: Strophe.getBareJidFromJid(account.connector.connection.jid),
