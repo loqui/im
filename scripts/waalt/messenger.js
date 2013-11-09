@@ -12,24 +12,12 @@ var Messenger = {
     var account = this.account();
     var text = text || $("section#chat div#text").text();
     var date = new Date();
-  	var stamp = date.getUTCFullYear()+"-"
-  	  +("0"+(date.getUTCMonth()+1)).slice(-2)+"-"
-  	  +("0"+(date.getUTCDate())).slice(-2)+"T"
-  	  +("0"+(date.getUTCHours())).slice(-2)+":"
-  	  +("0"+(date.getUTCMinutes())).slice(-2)+":"
-  	  +("0"+(date.getUTCSeconds())).slice(-2)+"Z";
-    var localstamp = date.getFullYear()+"-"
-      +("0"+(date.getMonth()+1)).slice(-2)+"-"
-      +("0"+(date.getDate())).slice(-2)+"T"
-      +("0"+(date.getHours())).slice(-2)+":"
-      +("0"+(date.getMinutes())).slice(-2)+":"
-      +("0"+(date.getSeconds())).slice(-2)+"Z";
     if (text.length) {
       var msg = new Message(account, {
         from: Strophe.getBareJidFromJid(account.connector.connection.jid),
         to: to,
         text: text,
-        stamp: localstamp
+        stamp: Tools.localize(Tools.stamp());
       });
       msg.send();
       $$("section#chat div#text").empty();
