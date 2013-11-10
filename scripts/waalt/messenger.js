@@ -16,7 +16,7 @@ var Messenger = {
         from: Strophe.getBareJidFromJid(account.connector.connection.jid),
         to: to,
         text: text,
-        stamp: Tools.localize(Tools.stamp());
+        stamp: Tools.localize(Tools.stamp())
       });
       msg.send();
       $$("section#chat div#text").empty().focus();
