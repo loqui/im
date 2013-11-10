@@ -19,7 +19,7 @@ var Messenger = {
         stamp: Tools.localize(Tools.stamp())
       });
       msg.send();
-      $$("section#chat div#text").empty().focus();
+      $("section#chat div#text").empty();
       App.audio('sent');
     }
     $('section#chat article#main button#plus').show();
