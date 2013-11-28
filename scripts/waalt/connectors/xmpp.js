@@ -181,6 +181,12 @@ App.connectors['XMPP'] = function (account) {
       this.connection.Messaging.csnSend(to, state);
   }
   
+  this.emojiRender = function (img, emoji) {
+    img
+      .attr('src', '/img/emoji' + emoji[0] + '.png')
+      .data('emoji', emoji[0]);
+  }.bind(this);
+  
   this.handlers.init = function () {
     if (!this.handlers.onMessage) {
       this.handlers.onMessage = this.connection.addHandler(this.events.onMessage, null, 'message', 'chat', null, null);
