@@ -183,7 +183,7 @@ App.connectors['XMPP'] = function (account) {
   
   this.emojiRender = function (img, emoji) {
     img
-      .attr('src', '/img/emoji' + emoji[0] + '.png')
+      .attr('src', '/img/emoji/' + emoji[0] + '.png')
       .data('emoji', emoji[0]);
   }.bind(this);
   

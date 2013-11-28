@@ -223,6 +223,10 @@ section#main article ul li span.lastMessage {
   max-height: 1.4em;
   overflow: hidden;
 }
+section#main article ul li span.status img,
+section#main article ul li span.lastMessage img {
+  height: 1.2rem!important;
+}
 section#main article ul li span.lastStamp {
   position: absolute;
   right: .5rem;
