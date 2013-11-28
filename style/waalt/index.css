@@ -725,6 +725,17 @@ section.profile article > div:not(#card) p {
 section.profile article > div:not(#card) .buttongroup {
   margin: 0;
 }
+section.profile article > div:not(#card) ul li {
+  list-style: none;
+  padding: .5rem;
+  border-bottom: .05rem solid #CCC;
+  font-weight: 300;
+  font-size: .9em;
+  color: #666;
+}
+section.profile article > div:not(#card) ul li:last-child {
+  border: none;
+}
 
 ul.mini {
   margin-top: 1rem;

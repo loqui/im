@@ -117,8 +117,15 @@ var Messenger = {
       var chat = account.chats[ci];
       var section = $('section#muc');
       section.data('jid', jid);
-      section.find('#card .name').text(chat.core.title);
+      section.find('#card .name').html(App.emoji[Providers.data[account.core.provider].emoji].fy(chat.core.title));
       section.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/' + account.core.provider + '.svg')).append(Providers.data[account.core.provider].longName);
+      section.find('#participants h2').text(_('NumParticipants', {number: chat.core.participants.length}));
+      var partUl = section.find('#participants ul').empty();
+      for (var i in chat.core.participants) {
+        var jid = chat.core.participants[i];
+        var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
+        partUl.append($('<li/>').text(contact ? contact.name : jid.split('@')[0]));
+      }
     }
     if (App.avatars[jid]) {
       Store.recover(App.avatars[jid], function (val) {

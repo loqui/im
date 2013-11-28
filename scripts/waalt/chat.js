@@ -88,7 +88,7 @@ var Chat = function (core, account) {
     section.data('jid', this.core.jid);
     section.data('lacks', $('section#main').data('lacks'));
     section.data('muc', this.core.muc || false);
-    header.children('.title').text(this.core.title);
+    header.children('.title').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(this.core.title));
     if (this.core.muc) {
       if (this.core.participants) {
         header.children('.status').text(_('NumParticipants', {number: this.core.participants.length}));
