@@ -3186,25 +3186,40 @@ CoSeMe.namespace('common', (function(){
   }
 
   function stringify(obj) {
+    var string;
+
     // Already a string
     if (typeof obj === 'string') {
-      return obj;
+      string = obj;
 
     // An exception
     } else if (obj instanceof Error) {
       var stack = obj.stack || '';
-      var sanitizedStack = stack.substring(1, stack.length-1)
-        .replace(/\n/g, ' > ');
-      return obj.name + ': "' + obj.message + '" at ' + sanitizedStack;
+      var sanitizedStack = stack.replace(/\n/g, ' > ');
+      string = obj.name + ': "' + obj.message + '" at ' + sanitizedStack;
 
     // A date or regular expression
     } else if (obj instanceof Date || obj instanceof RegExp) {
-      return obj.toString();
+      string = obj.toString();
 
     // Stringify by default
     } else {
-      return JSON.stringify(obj);
+      string = JSON.stringify(obj);
     }
+
+    // Deeper exploration
+    if (string === '{}') {
+
+      // An event
+      if (obj.target && obj.type) {
+        var data = stringify(obj.data ? obj.data : undefined);
+        var obj = stringify(obj.target);
+        string = stringify({ type: obj.type, target: obj.target, data: data});
+      }
+
+    }
+
+    return string;
   }
 
   function putMessage(kind, message) {
@@ -3883,12 +3898,6 @@ CoSeMe.namespace('protocol', (function(){
    */
   function BinaryWriter(connection) {
     this._socket = connection.socket; // an opened socket in binary mode
-    this._socket.onerror = function _onError(evt) {
-      logger.log('Connection lost!', evt.data);
-    };
-    this._socket.onclose = function _onClose(evt) {
-      logger.error('Connection closed by the server!', evt.data);
-    };
     this.outputKey = undefined;
   }
 
@@ -3931,7 +3940,7 @@ CoSeMe.namespace('protocol', (function(){
   }
 
   /**
-   * Spawn a new BinaryWriter in charge of sends the tree via socket.
+   * Spawn a new BinaryWriter in charge of sending the tree via socket.
    */
   BinaryWriter.prototype.write = function(tree, callback) {
     var writerTask = this.newWriteTask(callback);
@@ -4344,49 +4353,88 @@ CoSeMe.namespace('protocol', (function(){
    * onTree(err, tree) when receiving a tree.
    */
   BinaryReader.prototype.startListening = function(connection) {
-    this._socket = connection.socket;
-    this._isStreamStartRead = false;
+    this.socket = connection.socket;
+    this.isStreamStartRead = false;
 
     var self = this;
-    this._socket.ondata = function(evt) {
-     self._onSocketData(evt.data);
+    this.socket.ondata = function(evt) {
+     self.onSocketData(evt.data);
     };
   };
 
   /**
    * Adds the new data to the current chunks and try for parsing a tree.
    */
-  BinaryReader.prototype._onSocketData = function(rawData) {
+  BinaryReader.prototype.onSocketData = function(rawData) {
     logger.log('Received socket data:', rawData.byteLength, 'bytes!')
     rawData && this.addDataChunk(rawData);
-    this._checkForAnotherTree();
+    setTimeout(this.checkForAnotherTree.bind(this));
   };
 
   /**
-   * Check if there is enought available data to parse another tree.
+   * Check if there is enought available data to parse another tree. If so,
+   * consumes the message and reprogram itself to continue checking if there
+   * are more trees.
    */
-  BinaryReader.prototype._checkForAnotherTree = function() {
+  BinaryReader.prototype.checkForAnotherTree = function() {
     if (this.waitingForMessage()) return;
 
-    if (!this._isStreamStartRead) {
-      this._readStreamStart();
-      this._isStreamStartRead = true;
+    if (!this.isStreamStartRead) {
+      this.readStreamStart();
+      this.isStreamStartRead = true;
     } else {
-      this._readNextTree();
+      this.readNextTree();
     }
+
+    setTimeout(this.checkForAnotherTree.bind(this));
   }
+
+  /**
+   * Enqueue a task to read the start of the stream, then call to
+   * onStreamStart() callback.
+   */
+  BinaryReader.prototype.readStreamStart = function() {
+    var readerTask = this.newReaderTask(this.onStreamStart);
+    setTimeout(function() {
+      readerTask._readStreamStart();
+    });
+  };
+
+  /**
+   * Enqueue a task to read a tree, then call to onTree() callback.
+   */
+  BinaryReader.prototype.readNextTree = function() {
+    var readerTask = this.newReaderTask(this.onTree);
+    setTimeout(function() {
+      readerTask._readNextTree();
+    });
+  };
+
+  /**
+   * Creates a task as a specialization of the main BinaryReader unable to spawn
+   * new taskes with the mission of read a given tree.
+   */
+  BinaryReader.prototype.newReaderTask = function(callback) {
+    var task = Object.create(this);
+
+    this.readStanza();
+    task.newReaderTask = undefined;
+    task.mac = this.mac;
+    task.message = this.message;
+    task.stanzaSize = this.stanzaSize;
+    task.isEncrypted = this.isEncrypted;
+    task.callback = callback;
+    this.finishReading();
+
+    return task;
+  };
 
   /**
    * Parses the start of the protocol. If all goes well, call onStreamStart()
    * with null as error. It can return an Error with 'Expecting STREAM_START'
    * if the start of the stream is not correctly parsed.
    */
-  BinaryReader.prototype._readStreamStart = function(rawData) {
-    rawData && this.addDataChunk(rawData);
-    if (this.waitingForMessage())
-      return undefined;
-
-    this.readStanza();
+  BinaryReader.prototype._readStreamStart = function() {
     var listMark = this.message.read();
     var listSize = this.readListSize(listMark);
     var tag = this.message.read();
@@ -4394,9 +4442,6 @@ CoSeMe.namespace('protocol', (function(){
     if (tag === STREAM_START) {
       var attributeCount = (listSize - 2 + listSize % 2) / 2;
       this.readAttributes(attributeCount);
-      this.finishReading();
-
-      setTimeout(this._checkForAnotherTree.bind(this));
 
     // Bad stanza
     } else {
@@ -4404,8 +4449,8 @@ CoSeMe.namespace('protocol', (function(){
       logger.error(err);
     }
 
-    if (typeof this.onStreamStart === 'function') {
-      this.onStreamStart(err);
+    if (typeof this.callback === 'function') {
+      this.callback(err);
     }
   };
 
@@ -4413,19 +4458,11 @@ CoSeMe.namespace('protocol', (function(){
    * Parses a tree and calls onTree(err, tree) with null as error and the
    * parsed tree if all goes well or with err set to a SyntaxError if not.
    */
-  BinaryReader.prototype._readNextTree = function(rawData) {
-    rawData && this.addDataChunk(rawData);
-    if (this.waitingForMessage())
-      return undefined;
-
+  BinaryReader.prototype._readNextTree = function() {
     var err = null, tree;
     try {
-      this.readStanza();
       tree = this.readTree();
       logger.log(tree.toString());
-      this.finishReading();
-
-      setTimeout(this._checkForAnotherTree.bind(this));
 
     // Catch malformed tree errors
     } catch (e) {
@@ -4435,8 +4472,8 @@ CoSeMe.namespace('protocol', (function(){
       logger.error(e);
     }
 
-    if (typeof this.onTree === 'function') {
-      this.onTree(err, tree);
+    if (typeof this.callback === 'function') {
+      this.callback(err, tree);
     }
   };
 
@@ -4531,7 +4568,7 @@ CoSeMe.namespace('protocol', (function(){
     byteIndex++;
     if (byteIndex === currentChunk.length) {
 
-      // Before changing to the nex chunk. Check if there is partially
+      // Before changing to the next chunk. Check if there is partially
       // consumed data here. If so, adjust the chunk so freeIncoming()
       // behaves properly.
       if (this.partialConsumed) {
@@ -5425,101 +5462,49 @@ CoSeMe.namespace('contacts', (function(){
 CoSeMe.namespace('connection', (function() {
   'use strict';
 
-  var _instance = null;
+  var _connection;
 
-  function init() {
-    var _socket;
-    var _reader;
-    var _writer;
-    var _jid = '';
-    var returnedValue;
-    var _accountKind;
-    var _expireDate;
-    var _user;
-    var TCPSocket;
-
-    var logger = new CoSeMe.common.Logger('connection');
-
-    function connect(aHost, aPort, aOptions, aOnOpen, aOnError) {
-      _socket = TCPSocket.open(aHost, aPort, aOptions);
-      _socket.onopen = aOnOpen;
-      _socket.onerror = aOnError;
-      // We can't do this until the socket is created
-      _reader = new CoSeMe.protocol.BinaryReader(this);
-      _writer = new CoSeMe.protocol.BinaryWriter(this);
-
-    };
-
-    function createSocket() {
-      TCPSocket = navigator.mozTCPSocket;
-      if (!TCPSocket) {
-        logger.error('navigator.mozTCPSocket is not available');
-        return;
-      }
+  function Connection() {
+    if (!_connection) {
+      _connection = Object.create(Connection.prototype);
     }
-
-    returnedValue = {
-
-      get reader() {
-        return _reader;
-      },
-
-      get writer() {
-        return _writer;
-      },
-
-      get socket() {
-        return _socket;
-      },
-
-      set jid(aValue) {
-        _jid = aValue;
-      },
-
-      get jid() {
-        return _jid;
-      },
-
-      get accountKind() {
-        return _accountKind;
-      },
-
-      set accountKind(ak) {
-        _accountKind = ak;
-      },
-
-      get expireDate() {
-        return _expireDate;
-      },
-
-      set expireDate(ed) {
-        _expireDate = ed;
-      },
-
-      get user() {
-        return _user;
-      },
-
-      set user(us) {
-        _user = us;
-      },
-
-    };
-
-    createSocket();
-    returnedValue.connect = connect.bind(returnedValue);
-
-    _instance = returnedValue;
+    return _connection;
   }
 
-  return {
-    get instance() {
-      if (!_instance){
-        init();
-      }
-      return _instance;
-    }
+  Connection.prototype.connect = function(host, port, options,
+                                          onSuccess, onError) {
+
+    var socket = navigator.mozTCPSocket.open(host, port, options);
+    socket.onerror = onError;
+    socket.onopen = function _connectionSuccess() {
+      _connection.socket = socket;
+      setErrorHandlers();
+      setBinaryStreams();
+      onSuccess.apply(this, arguments);
+    };
   };
+
+  function setErrorHandlers() {
+    _connection.socket.onerror = fire('onconnectionlost');
+    _connection.socket.onclose = fire('onconnectionclosed');
+  }
+
+  function fire(event) {
+    return function() {
+      var handler = _connection[event];
+      if (typeof handler === 'function') {
+        handler.apply(this, arguments);
+      }
+    };
+  }
+
+  function setBinaryStreams() {
+    _connection.reader = new CoSeMe.protocol.BinaryReader(_connection);
+    _connection.writer = new CoSeMe.protocol.BinaryWriter(_connection);
+  }
+
+  return Connection;
+
 }()));
 CoSeMe.namespace('time', (function(){
   'use strict';
@@ -5854,7 +5839,7 @@ function hex2Str(hex) {
       }
     }
 
-    connection = CoSeMe.connection.instance;
+    connection = new CoSeMe.connection.Connection();
     var host = CoSeMe.config.auth.host;
     var port = CoSeMe.config.auth.port;
     logger.log('Connecting to:', host + ':' + port);
@@ -6109,20 +6094,9 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
   };
 
   function onError(evt) {
-    var err = evt.data;
-    var wrapperErr;
-    if (err && typeof(err) === 'object') {
-      wrapperErr = {
-        name: err.name,
-        type: err.type,
-        message: err.message
-      };
-    } else {
-      wrapperErr = err;
-    }
-    logger.error("Socket error!", wrapperErr);
-// What to do here?
-//    aCallback(null);
+    var reason = evt.data;
+    logger.error('Socket error due to:', reason, '!');
+    _signalInterface.send('disconnected', [reason]);
   }
 
   /**
@@ -6802,14 +6776,14 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
       if (aSocket) {
         _connection = aSocket;
         _connection.reader.onTree = handleNode;
-        _connection.socket.onerror = onError;
+        _connection.onconnectionclosed = onError;
         _connection.socket.resume();
         alive = true;
         pingId = setInterval(sendPings, 1000 * _pingInterval);
       } else {
         // Should we fire something here?
         _connection.reader.onTree = undefined;
-        _connection.socket.onerror = null;
+        _connection.onconnectionclosed = undefined;
         _connection = aSocket;
         alive = false;
         clearInterval(pingId);
@@ -6865,8 +6839,8 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
       throw 'NOT IMPLEMENTED!';
     },
 
-    sendDisconnected: function() {
-      logger.log('FIXME! NOT IMPLEMENTED');
+    sendDisconnected: function(reason) {
+      _signalInterface.send('disconnected', [reason]);
     }
   };
 }()));

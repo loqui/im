@@ -26,6 +26,9 @@ var Menu = {
     contact: function () {
       Messenger.contactProfile();
     },
+    muc: function () {
+      Messenger.mucProfile();
+    },
     contactAdd: function (obj) {
       var account = Messenger.account();
       var selfDomain = Strophe.getDomainFromJid(account.core.user);
@@ -40,6 +43,10 @@ var Menu = {
     chatRemove: function(obj) {
       var jid = $(obj).closest('section').data('jid');
       Messenger.chatRemove(jid);
+    },
+    chatInfo: function (obj) {
+      var muc = ($(obj).closest('section').data('muc') == 'true') ? true : false;
+      Menu.show(muc ? 'muc' : 'contact');
     },
     accountRemove: function(obj) {
       var jid = $(obj).closest('section').data('jid');

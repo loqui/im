@@ -18,7 +18,7 @@ $('document').ready(function(){
     $('[data-menu-onclick]').each(function () {
       var menu = $(this).data('menu-onclick');
       $(this).on('click', function () {
-        Menu.show(menu, this[0]);
+        Menu.show(menu, this);
       });
     });
     App.defaults.Connector.presence.status = _('DefaultStatus', {

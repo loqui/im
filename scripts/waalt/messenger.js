@@ -109,6 +109,27 @@ var Messenger = {
     Lungo.Router.section('contact');
   },
   
+  mucProfile: function (jid) {
+    var account = this.account();
+    var jid = jid || $('section#chat').data('jid');
+    var ci = account.chatFind(jid);
+    if (ci >= 0) {
+      var chat = account.chats[ci];
+      var section = $('section#muc');
+      section.data('jid', jid);
+      section.find('#card .name').text(chat.core.title);
+      section.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/' + account.core.provider + '.svg')).append(Providers.data[account.core.provider].longName);
+    }
+    if (App.avatars[jid]) {
+      Store.recover(App.avatars[jid], function (val) {
+        section.find('#card .avatar').children('img').attr('src', val);
+      });
+    } else {
+      section.find('#card .avatar').children('img').attr('src', 'img/foovatar.png');
+    }
+    Lungo.Router.section('muc');
+  },
+  
   contactAdd: function () {
     var account = Messenger.account();
     if (App.online && account.connector.connection.connected) {

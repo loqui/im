@@ -142,6 +142,31 @@
       </div>
     </article>
   </section>
+  <section id='muc' data-transition='slide' class='fix head profile'>
+    <header data-title='Group Info' data-l10n-title='GroupInfo'>
+      <nav class='on-left'>
+        <button data-view-section='back' data-icon='chevron-left' class='left'></button>
+      </nav>
+    </header>
+    <article id='main' class='scroll'>
+      <div id='card'>
+        <span class='avatar'><img/></span>
+        <span class='name'></span>
+        <span class='provider'></span>
+      </div>
+      <div id='participants'>
+        <h2 data-l10n-id='Participants'>Participants</h2>
+        <ul></ul>
+      </div>
+      <!--<div id='actions'>
+        <h2 data-l10n-id='Actions'>Actions</h2>
+        <div class='buttongroup'>
+          <button class='' data-l10n-id='ChatRemove' data-menu-onclick='chatRemove'>Clear chats with this contact</button>
+          <button data-l10n-id='ContactRemove' data-menu-onclick='contactRemove'>Remove this contact</button>
+        </div>
+      </div>-->
+    </article>
+  </section>
   <section id='contactAdd' data-transition='slide' class='fix head'>
     <header data-title='New contact' data-l10n-title='NewContact'>
       <nav class='on-left'>
@@ -166,7 +191,7 @@
       <span class='totalUnread'></span>
       <span class='title'></span>
       <span class='status'></span>
-      <span class='avatar' data-menu-onclick='contact'><img/></span>
+      <span class='avatar' data-menu-onclick='chatInfo'><img/></span>
       <span class='show backchange'></span>
     </header>
     <article id='main'>
