@@ -882,12 +882,3 @@ div.switch div.ball {
     transform: scale(1.2);
   }
 }
-
-
-progress {
-  display: block;
-  position: fixed;
-  z-index: 1000;
-  top: 1rem;
-  left: 1rem;
-}
