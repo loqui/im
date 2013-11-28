@@ -129,14 +129,12 @@ App.connectors['XMPP'] = function (account) {
   }.bind(this);
   
   this.presence.set = function (show, status) {
-    console.log(this);
     this.presence.show = show || this.presence.show;
     this.presence.status = status || this.presence.status;
     this.presence.send();
   }.bind(this);
   
   this.presence.send = function (show, status, priority) {
-    console.log(this);
     var show = show || this.presence.show;
     var status = status || this.presence.status;
     var priority = priority || '127';

@@ -93,10 +93,25 @@ App.connectors['coseme'] = function (account) {
   }.bind(this);
   
   this.presence.set = function (show, status) {
-    console.log('PRESENCE SET');
+    this.presence.show = show || this.presence.show;
+    this.presence.status = status || this.presence.status;
+    this.presence.send();
   }.bind(this);
   
   this.presence.send = function (show, status, priority) {
+    var show = show || this.presence.show;
+    var status = status || this.presence.status;
+    var priority = priority || '127';
+    if (App.online) {
+      var method = {
+        a: 'presence_sendAvailable',
+        away: 'presence_sendUnavailable',
+        xa: 'presence_sendUnavailable',
+        dnd: 'presence_sendUnavailable',
+        chat: 'presence_sendAvailableForChat'
+      };
+      MI.call(method[show], []);
+    }
   }.bind(this);
   
   this.send = function (to, text, delay) {
