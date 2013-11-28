@@ -4,8 +4,10 @@ var App = {
 
   name: 'Loqui IM',
   shortName: 'Loqui',
-  version: 'v0.1.4',
+  version: 'v0.2.0',
   connectors: [],
+  logForms: [],
+  emoji: [],
   toSave: [],
   accounts: [],
   accountsCores: [],
@@ -29,7 +31,7 @@ var App = {
     },
     Account: {
       core: {
-        resource: this.shortname + '-' + (Lungo.Core.environment().os ? Lungo.Core.environment().os.name : 'PC')
+        resource: 'Loqui' + '-' + (Lungo.Core.environment().os ? Lungo.Core.environment().os.name : 'PC')
       }
     },
     Chat: {
@@ -103,7 +105,6 @@ var App = {
     if (App.accounts.length) {
       App.alarmSet({});
       App.switchesRender();
-      App.emojiRender();
       this.connect();
       Menu.show('main');
     } else {
@@ -125,7 +126,7 @@ var App = {
     for (var i in this.accounts) {
       var account = this.accounts[i];      
       account.presenceRender();
-      account.connector.connection.disconnect();
+      account.connector.disconnect();
     }
     $('section#main').attr('data-show', 'na');
   },
@@ -181,21 +182,6 @@ var App = {
       } else {
         body.removeClass(key);
       }
-    }
-  },
-  
-  // Render emoticons
-  emojiRender: function () {
-    var ul = $('section#chat article#emoji ul').empty();
-    for (var i in EmojiList) {
-      var emoji = EmojiList[i];
-      var main = emoji[0];
-      var li = $('<li/>').append($('<img />').attr('src', 'img/emoji/'+main+'.png'))
-      li.data('emoji', main);
-      li.on('tap', function () {
-        Plus.emoji(this.dataset.emoji);
-      });
-      ul.append(li);
     }
   },
   

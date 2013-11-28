@@ -46,8 +46,37 @@ var Menu = {
       Messenger.accountRemove(jid);
     },
     emoji: function () {
+      var account = Messenger.account();
       $('section#chat nav#plus').removeClass('show');
+      var ul = $('section#chat article#emoji ul');
+      var emojiList = App.emoji[Providers.data[account.core.provider].emoji].map;
+      if (ul.children('li').length != emojiList.length) {
+        Lungo.Notification.show('heart', _('Loading...'));
+        ul.empty();
+        for (var i in emojiList) {
+          var emoji = emojiList[i];
+          var li = $('<li/>')
+            .on('tap', function () {
+              Plus.emoji($(this).children('img').data('emoji'));
+            });
+          var img = $('<img/>');
+          account.connector.emojiRender(img, emoji);
+          li.append(img);
+          ul.append(li);
+        }
+        Lungo.Notification.hide();
+      }
       Lungo.Router.article('chat', 'emoji');
+    },
+    call: function () {
+      $('section#chat nav#plus').removeClass('show');
+      Lungo.Router.article('chat', 'call');
+      Plus.rtc({audio: true, video: false});
+    },
+    videocall: function () {
+      $('section#chat nav#plus').removeClass('show');
+      Lungo.Router.article('chat', 'videocall');
+      Plus.rtc({audio: true, video: true});
     },
     powerOff: function () {
       var will = confirm(_('ConfirmClose'));

@@ -960,9 +960,9 @@
       diff = parseInt(GESTURE.initial_angle - angle, 10);
       if (Math.abs(diff) > 20 || GESTURE.angle_difference !== 0) {
         i = 0;
-        symbol = GESTURE.angle_difference < 0 ? "-" : "+";
+        symbol = GESTURE.angle_difference < 0 ? -1 : 1;
         while (Math.abs(diff - GESTURE.angle_difference) > 90 && i++ < 10) {
-          eval("diff " + symbol + "= 180;");
+          diff += 180 * symbol;
         }
         GESTURE.angle_difference = parseInt(diff, 10);
         return _trigger("rotating", {
@@ -1070,7 +1070,9 @@
           return this.textContent = value;
         });
       } else {
-        return this[0].textContent;
+        if (this.length) {
+          return this[0].textContent;
+        }
       }
     };
     $$.fn.html = function(value) {

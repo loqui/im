@@ -70,6 +70,59 @@ var Store = {
     asyncStorage.getItem(key, function (value) {
       callback(JSON.parse(value));
     });
+  },
+  
+  SD: {
+    
+    card: 'getDeviceStorage' in navigator ? navigator.getDeviceStorage('sdcard') : null,
+    
+    save: function (path, type, content, onsuccess, onerror) {
+      if ('getDeviceStorage' in navigator) {
+        console.log('DS IS SUPPORTED');
+        var file = new Blob(content, {type: type});
+        var req = this.card.addNamed(file, path);
+        req.onsuccess = function () {
+          if (onsuccess) {
+            onsuccess(this.result);
+          }
+        }
+        req.onerror = function () {
+          if (onerror) {
+            onerror(this.error);
+          }
+        }      
+      } else {
+        console.log('DS IS NOT SUPPORTED');
+        Store.put('fakesdcard_' + path, {content: content, type: type}, onsuccess);
+      }
+    },
+    
+    recover: function (path, onsuccess, onerror) {
+      if ('getDeviceStorage' in navigator) {
+        console.log('DS IS SUPPORTED');
+        var req = this.card.get(path);
+        req.onsuccess = function () {
+            onsuccess(this.result);
+        }
+        req.onerror = function () {
+          if (onerror) {
+            onerror(this.error);
+          }
+        }
+      } else {
+        console.log('DS IS NOT SUPPORTED');
+        Store.get('fakesdcard_' + path, function (value) {
+          if (value) {
+            onsuccess(new Blob(value.content, {type: value.type}));
+          } else {
+            if (onerror) {
+              onerror();
+            }
+          }
+        });
+      }
+    }
+    
   }
   
 }

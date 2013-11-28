@@ -5,226 +5,96 @@ var Account = function (core) {
   // Holds only account data and no functions
   this.core = core;
   this.core.sendQ = this.core.sendQ || [];
-  this.connector = new App.connectors[Providers.data[this.core.provider].connector](this);
+  this.connector = new App.connectors[Providers.data[this.core.provider].connector.type](this);
   this.chats = [];
   
   // Test account
   this.test = function () {
-    var account = this;
-    var sameProvider = Lungo.Core.findByProperty(App.accountsCores, 'provider', this.core.provider);
-    if (account.supports('multi') || !sameProvider) {
-      this.connector.connect(this.core.user, this.core.pass, function (status) {
-        switch (status) {
-          case Strophe.Status.CONNECTING:
-            console.log('CONNECTING');
-            Lungo.Notification.show('globe', _('Connecting'));
-            break;
-          case Strophe.Status.CONNFAIL:
-            console.log('CONNFAIL');
-            Lungo.Notification.error(_('Connfail'), _('ConnCheck', 'exclamation-sign'));
-            break;
-          case Strophe.Status.AUTHENTICATING:
-            console.log('AUTHENTICATING');
-            Lungo.Notification.show('key', _('Authenticating'));
-            break;
-          case Strophe.Status.AUTHFAIL:
-            console.log('AUTHFAIL');
-            Lungo.Notification.error(_('Authfail'), _('DataCheck', 'exclamation-sign'));
-            break;
-          case Strophe.Status.CONNECTED:
-            console.log('CONNECTED');
-            Lungo.Notification.show('download', _('Synchronizing'));
-            account.sync(function () {
-              // Don't add an account if already set up
-              if (Accounts.find(account.core.user, account.core.provider) < 0) { 
-                App.accounts.push(account);
-                App.smartpush('accountsCores', account.core);
-              }
-              Lungo.Notification.hide();
-              $('section.setup#' + account.core.provider + ' input').val('');
-              $('section#success span#imported').text(account.core.roster.length || 'No');
-              var vcard = $(account.vcard);
-              if (vcard.find('BINVAL').length) {
-                var img = vcard.find('BINVAL').text();
-                var type = vcard.find('TYPE').text();
-                var avatar = 'data:'+type+';base64,'+img;
-              } else {
-                var avatar = 'img/foovatar.png';
-              }
-              $('section#success img#avatar').attr('src', avatar);
-              Lungo.Router.section('success');
-            });
-            break;
-          case Strophe.Status.DISCONNECTING:
-            console.log('DISCONNECTING');
-            break;
-          case Strophe.Status.DISCONNECTED:
-            console.log('DISCONNECTED');
-            break;
+    this.connector.connect({
+      connecting: function () {
+        Lungo.Notification.show('globe', _('Connecting'));
+      },
+      authenticating: function () {
+        Lungo.Notification.show('key', _('SMSsending'));
+      },
+      connected: function () {
+        Lungo.Notification.show('download', _('Synchronizing'));
+        var cb = function () {
+          // Don't add an account if already set up
+          if (Accounts.find(this.core.fullJid || this.core.user) < 0) {
+            App.accounts.push(this);
+            App.smartpush('accountsCores', this.core);
+          }
+          Lungo.Notification.hide();
+          $('section.setup#' + this.core.provider + ' input').val('');
+          $('section#success span#imported').text(_('Imported', {number: (this.core.roster && this.core.roster.length) ? this.core.roster.length : 0}));
+          this.connector.avatar(function (avatar) {
+            $('section#success img#avatar').attr('src', avatar);
+          });
+          Lungo.Router.section('success');
         }
-      });
-    } else {
-      Lungo.Notification.error(_('NoMulti'), _('NoMultiExplanation', 'exclamation-sign'));
-    }
+        this.sync(cb.bind(this));
+      }.bind(this),
+      authfail: function () {
+      }
+    });
   }
   
   // Connect
   this.connect = function () {
-    var account = this;
-    if (account.connector.connection && account.connector.connection.connected) {
-      account.connector.presenceStart();
-      account.sendQFlush();
-      account.allRender();
+    if (this.connector.isConnected()) {
+      this.connector.start();
+      this.sendQFlush();
+      this.allRender();
     } else {
-      account.connector.connection = new Strophe.Connection(account.connector.provider.BOSH.host);
       if (navigator.onLine){
-        console.log('Trying to connect to ' + account.connector.provider.BOSH.host);
-        if (account.core.user && account.core.pass) {
-          account.connector.connection.connect(
-            account.core.user + '/' + (account.core.resource || App.defaults.Account.core.resource), 
-            account.core.pass, 
-            account.connectionHandler.bind(account), 
-            account.connector.provider.BOSH.timeout || App.defaults.Provider.BOSH.timeout
-          );
-        }
+        this.connector.connect({
+          connected: function () {
+            var cb = function () {
+              App.audio('login');
+              this.connector.start();
+              this.sendQFlush();
+              this.allRender();
+            }
+            this.sync(cb.bind(this));
+          }.bind(this),
+          authfail: function () {
+            
+          }
+        });
       }
-    }
-  }
-  
-  this.connectionHandler = function (status) {
-    var account = this;
-    switch (status) {
-      case Strophe.Status.CONNECTING:
-        console.log('CONNECTING');
-        break;
-      case Strophe.Status.CONNFAIL:
-        console.log('CONNFAIL');
-        this.accountRender();
-        break;
-      case Strophe.Status.AUTHENTICATING:
-        console.log('AUTHENTICATING');
-        break;
-      case Strophe.Status.AUTHFAIL:
-        console.log('AUTHFAIL');
-        Lungo.Notification.error(_('Authfail'), _('DataCheck', 'exclamation-sign'));
-        this.accountRender();
-        break;
-      case Strophe.Status.CONNECTED:
-        console.log('CONNECTED');
-        var cb = function () {
-          App.audio('login');
-          this.connector.presenceStart();
-          this.sendQFlush();
-          this.allRender();
-        };
-        this.sync(cb.bind(account));
-        break;
-      case Strophe.Status.DISCONNECTING:
-        console.log('DISCONNECTING');
-        break;
-      case Strophe.Status.DISCONNECTED:
-        console.log('DISCONNECTED');
-        this.connector.connection.reset();
-        App.audio('logout');
-        this.accountRender();
-        this.presenceRender();
-        if (App.settings.reconnect) {
-          this.connect();
-        }
-        break;
     }
   }
   
   // Download roster and register callbacks for roster updates handling
   this.sync = function (callback) {
-    var account = this;
-    var connector = account.connector;
-    var realJid = Strophe.getBareJidFromJid(this.connector.connection.jid);
-    if (account.core.realJid != realJid) {
-      account.core.realJid = realJid;
-      account.save();
-    }
-    var rosterCb = function (items, item, to) {
-      if (to) {
-        var sameOrigin = Strophe.getDomainFromJid(to) == Providers.data[account.core.provider].autodomain;
-        var noMulti = !account.supports('multi');
-        if (to == account.core.user || (noMulti && sameOrigin)) {
-          connector.roster = items;
-          connector.roster.sort(function (a,b) {
-            var aname = a.name ? a.name : a.jid;
-            var bname = b.name ? b.name : b.jid;
-            return aname > bname;
-          });
-          var map = function (entry, cb) {
-            var show, status;
-            for (var j in entry.resources) {
-              show = entry.resources[Object.keys(entry.resources)[0]].show || 'a';
-              status = entry.resources[Object.keys(entry.resources)[0]].status || _('show' + show);
-              break;
-            }
-            cb(null, {
-              jid: entry.jid,
-              name: entry.name,
-              show: show,
-              status: status
-            });
-          }
-          async.map(connector.roster, map.bind(account), function (err, result) {
-            account.core.roster = result;
-            account.presenceRender();
-          });
-        }
-      }
-    }
-    connector.connection.roster.registerCallback(rosterCb.bind(account));
-    connector.connection.roster.get( function (ret) {
-      rosterCb(ret, null, account.core.user);
-      if (account.supports('vcard')) {
-        connector.connection.vcard.get( function (data) {
-          account.vcard = $(data).find('vCard').get(0);
-          callback();
-        });
-      } else {
-        callback();
-      }
-    });
+    this.connector.sync(callback);
   }
   
   // Bring account to foreground
-  this.focus = function () {
-    $("section#chat div#text").focus();
-  }
   this.show = function () {
-    $('section#main').data('user', this.core.user);
-    $('section#main').data('provider', this.core.provider);
+    $('section#main').data('jid', this.core.fullJid || this.core.user);
     $('section#main header').style('background', this.connector.provider.color);
-    var vCard = $(this.vcard);
+    var vCard = $(this.connector.vcard);
     var address = ( vCard.length && vCard.find('FN').length ) ? vCard.find('FN').text() : this.core.user;
-    $('section#main footer').data('jid', this.core.user);
     $('section#main footer .address').text(address);
-    if (vCard.find('BINVAL').length) {
-      var img = vCard.find('BINVAL').text();
-      var type = vCard.find('TYPE').text();
-      var avatar = 'data:'+type+';base64,'+img;
-    } else {
-      var avatar = 'img/providers/squares/' + this.core.provider + '.svg';
-    }
-    $('section#main footer .avatar img').attr('src', avatar);
-    $('section#me .avatar img').attr('src', avatar);
+    /*this.connector.avatar(function (avatar) {
+      $('section#main footer .avatar img').attr('src', avatar);
+      $('section#me .avatar img').attr('src', avatar);
+    });*/
     $('section#main article ul[data-provider="' + this.core.provider + '"][data-user="' + this.core.user + '"]').show().siblings('ul').hide();
-    var index = Accounts.find(this.core.user, this.core.provider);
+    var index = Accounts.find(this.core.fullJid || this.core.user);
     $('aside#accounts .indicator').style('top', (6.25+4.5*index)+'rem').show();
     Lungo.Element.count('section#main header nav button[data-view-article="chats"]', this.unread);
     var lacks = Providers.data[this.core.provider].lacks;
-    var meSection = $('section#me').removeClass().addClass('fix head profile');
-    for (var i in lacks) {
-      var lack = lacks[i];
-      meSection.addClass('lacks_' + lack);
-    }
+    var meSection = $('section#me');
+    var mainSection = $('section#main');
+    meSection.data('lacks', lacks.join(' '));
+    mainSection.data('lacks', lacks.join(' '));
     meSection.find('#status input').val(this.connector.presence.status);
     meSection.find('#card .name').text(address == this.core.user ? '' : address);
     meSection.find('#card .user').text(this.core.user);
-    meSection.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/' + this.core.provider + '.svg')).append(Providers.data[this.core.provider].longname);
+    meSection.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/' + this.core.provider + '.svg')).append(Providers.data[this.core.provider].longName);
   }
   
   // Render everything for this account
@@ -238,10 +108,10 @@ var Account = function (core) {
     }
   }
   
-  // Changes some styles based on presence and connection
+  // Changes some styles based on presence and connection status
   this.accountRender = function () {
-    var li = $('aside#accounts li[data-provider="' + this.core.provider + '"][data-user="' + this.core.user + '"]');
-    li.data('connected', this.connector.connection && this.connector.connection.connected);
+    var li = $('aside#accounts li[data-jid="' + (this.core.fullJid || this.core.user) + '"]');
+    li.data('connected', this.connector.isConnected());
     li.data('show', this.connector.presence.show);
   }
   
@@ -254,17 +124,16 @@ var Account = function (core) {
     ul.data('user', account.core.user);
     ul.attr('style', oldUl.attr('style'));
     var totalUnread = 0;
-    if (this.core.chats.length) {
+    if (this.core.chats && this.core.chats.length) {
       for (var i in this.core.chats) {
         var chat = this.core.chats[i];
-        var contact = Lungo.Core.findByProperty(this.core.roster, 'jid', chat.jid);
-        var title = contact.name || contact.jid;
-        var lastMsg = chat.last.text ? chat.last.text : '';
+        var title = App.emoji[Providers.data[this.core.provider].emoji].fy(chat.title);
+        var lastMsg = chat.last.text ? App.emoji[Providers.data[account.core.provider].emoji].fy(chat.last.text) : '';
         var lastStamp = chat.last.stamp ? Tools.convenientDate(chat.last.stamp).join('<br />') : '';
-        var li = $('<li/>').data('jid', contact.jid);
+        var li = $('<li/>').data('jid', chat.jid);
         li.append($('<span/>').addClass('avatar').append('<img/>'));
-        li.append($('<span/>').addClass('name').text(title));
-        li.append($('<span/>').addClass('lastMessage').text(lastMsg));
+        li.append($('<span/>').addClass('name').html(title));
+        li.append($('<span/>').addClass('lastMessage').html(lastMsg));
         li.append($('<span/>').addClass('lastStamp').html(lastStamp));
         li.append($('<span/>').addClass('show').addClass('backchange'));
         li.append($('<span/>').addClass('unread').text(chat.unread));
@@ -345,7 +214,7 @@ var Account = function (core) {
   
   // Render presence for every contact
   this.presenceRender = function () {
-    if (App.online && this.connector.connection.connected) {
+    if (this.connector.isConnected() && this.supports('presence')) {
       for (var i in this.core.roster) {
         var contact = this.core.roster[i];
         var li = $('section#main article ul li[data-jid="'+contact.jid+'"]');
@@ -376,38 +245,33 @@ var Account = function (core) {
             $(el).attr('src', val);
           }
         });
-      } else if (navigator.onLine && account.connector.connection.connected) {
-        account.connector.connection.vcard.get(function (data) {
-          var vCard = $(data).find('vCard');
-          if (vCard.find('BINVAL').length) {
-            var img = vCard.find('BINVAL').text();
-            var type = vCard.find('TYPE').text();
-            var avatar = 'data:'+type+';base64,'+img;
+      } else if (account.connector.isConnected() && account.supports('easyAvatars')) {
+        account.connector.avatar(function (avatar) {
+          if (avatar) {
             $(el).attr('src', avatar);
-            avatars[jid] = Store.save(avatar, function (index) {
+            avatars[jid] = Store.save(avatar, function () {
               Store.put('avatars', avatars);
             });
           }
         }, jid);
       }
     });
-    var vCard = $(this.vcard);
+    
+    
+    /*
+    var vCard = $(this.connector.vcard);
     if ($('section#main').data('provider') == account.core.provider && $('section#main').data('user') == account.core.user) {
-      if (vCard.find('BINVAL').length) {
-        var img = vCard.find('BINVAL').text();
-        var type = vCard.find('TYPE').text();
-        var avatar = 'data:'+type+';base64,'+img;
-      } else {
-        var avatar = 'img/providers/squares/' + this.core.provider + '.svg';
-      }
-      $('section#main footer .avatar img').attr('src', avatar);
-      $('section#me .avatar img').attr('src', avatar);
+      account.connector.avatar(function (avatar) {
+        $('section#main footer .avatar img').attr('src', avatar);
+        $('section#me .avatar img').attr('src', avatar);
+      });
       var address = ( vCard.length && vCard.find('FN').length ) ? vCard.find('FN').text() : this.core.user;
       $('section#main footer .address').text(address);
       $('section#me #card .name').text(address == this.core.user ? '' : address);
-    }
+    }*/
+    
   }
-  
+    
   // Push message to sendQ
   this.toSendQ = function (storageIndex) {
     if (!this.core.sendQ) {
@@ -459,7 +323,7 @@ var Account = function (core) {
   
   // Save to store
   this.save = function () {
-    var index = Accounts.find(this.core.user, this.core.provider);
+    var index = Accounts.find(this.core.fullJid || this.core.user);
     App.accountsCores[index] = this.core;
     App.smartupdate('accountsCores');
   }
@@ -469,11 +333,11 @@ var Account = function (core) {
 var Accounts = {
 
   // Find the index of an account
-  find: function (user, provider) {
+  find: function (jid) {
     var index = -1;
     for (var i in App.accountsCores) {
       var account = App.accountsCores[i];
-      if (account.user == user && account.provider == provider) {
+      if (account.fullJid ? (account.fullJid == jid) : (account.user == jid)) {
         index = i;
         break;
       }
@@ -487,9 +351,10 @@ var Accounts = {
     ul.empty();
     for (var i in App.accounts) {
       var account = App.accounts[i];
-      var li = $('<li/>').data('user', account.core.user).data('provider', account.core.provider);
+      var li = $('<li/>').data('jid', account.core.fullJid || account.core.user);
       var button = $('<button/>').addClass('account').on('click', function () {
-        var index = Accounts.find(this.parentNode.dataset.user, this.parentNode.dataset.provider);
+        var index = Accounts.find(this.parentNode.dataset.jid);
+        console.log('SWITCHING TO ACCOUNT', index, this.parentNode.dataset.jid);
         if (index) {
           App.accounts[index].show();
         }

@@ -3,7 +3,7 @@
 var Messenger = {
 
   account: function () {
-    var index = Accounts.find($('section#main').data('user'), $('section#main').data('provider'));
+    var index = Accounts.find($('section#main').data('jid'));
     return App.accounts[index];
   },
 
@@ -11,26 +11,39 @@ var Messenger = {
     var to = $('section#chat').data('jid');
     var account = this.account();
     var text = text || $("section#chat div#text").text();
+    var date = new Date();
+  	var stamp = date.getUTCFullYear()+"-"
+  	  +("0"+(date.getUTCMonth()+1)).slice(-2)+"-"
+  	  +("0"+(date.getUTCDate())).slice(-2)+"T"
+  	  +("0"+(date.getUTCHours())).slice(-2)+":"
+  	  +("0"+(date.getUTCMinutes())).slice(-2)+":"
+  	  +("0"+(date.getUTCSeconds())).slice(-2)+"Z";
+    var localstamp = date.getFullYear()+"-"
+      +("0"+(date.getMonth()+1)).slice(-2)+"-"
+      +("0"+(date.getDate())).slice(-2)+"T"
+      +("0"+(date.getHours())).slice(-2)+":"
+      +("0"+(date.getMinutes())).slice(-2)+":"
+      +("0"+(date.getSeconds())).slice(-2)+"Z";
     if (text.length) {
       var msg = new Message(account, {
-        from: Strophe.getBareJidFromJid(account.connector.connection.jid),
+        from: account.core.user,
         to: to,
         text: text,
-        stamp: Tools.localize(Tools.stamp())
+        stamp: localstamp
       });
       msg.send();
-      $("section#chat div#text").empty();
+      $$("section#chat div#text").empty();
       App.audio('sent');
     }
     $('section#chat article#main button#plus').show();
-    $('section#chat article#main button#say').hide().focus();
+    $('section#chat article#main button#say').hide();
   },
   
   csn: function (state) {
     var to = $('section#chat').data('jid');
     var account = this.account();
     if (account.supports('csn') && App.settings.csn) {
-      account.connector.connection.Messaging.csnSend(to, state);
+      account.connector.csnSend(to, state);
     }
   },
   
@@ -84,7 +97,7 @@ var Messenger = {
     section.data('jid', jid);
     section.find('#card .name').text(name == jid ? ' ' : name);
     section.find('#card .user').text(jid);
-    section.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/' + account.core.provider + '.svg')).append(Providers.data[account.core.provider].longname);
+    section.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/' + account.core.provider + '.svg')).append(Providers.data[account.core.provider].longName);
     section.find('#status p').text(contact.status || _('showna'));
     if (App.avatars[jid]) {
       Store.recover(App.avatars[jid], function (val) {

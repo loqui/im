@@ -18,11 +18,17 @@ article.form {
   overflow: auto;
 }
 input[type='text'],
-input[type='password'] {
-  margin: 0 0 .5rem 0!important;
+input[type='password'],
+input[type='number'],
+select {
+  margin-top: 0!important;
+  margin-bottom: .5!important;
   padding: .3rem!important;
   border: .1rem solid #CCC!important;
   border-radius: .3rem!important;
+}
+.spaced {
+  margin-right: .5rem!important;
 }
 .buttongroup {
   margin: 1.5rem 0;
@@ -40,6 +46,9 @@ article.form button[data-role='back'] {
 article.form button[data-role='submit'] {
   width: 100%;
 }
+article.form label {
+  width: 100%;
+}
 
 section > article.simple {
   padding: 2rem;
@@ -47,7 +56,7 @@ section > article.simple {
 }
 section > article.simple > h1 {
 	position: relative;
-	width: 16rem;
+	width: 11rem;
 	font-size: 1.6rem;
 	line-height: 2rem;
 	margin: 0 0 1rem 0;
@@ -57,9 +66,10 @@ section > article.simple > h1 {
 section > article.simple > p {
   font-weight: 100;
 }
-section > article.simple > p > a,
-section > article.simple > small > a {
-  color: #E95644;
+section > article.simple > div > p {
+  font-weight: 300;
+  font-size: 1em;
+  margin-bottom: .5rem;
 }
 section#welcome {
 	color: #E95644;
@@ -501,16 +511,50 @@ section#chat ul#messages > li > div span.stamp {
   color: #BBB;
 }
 section#chat ul#messages > li > div[data-type='out'] span.stamp {
-  top: .7rem;
+  top: 1rem;
   left: -2rem;
 }
 section#chat ul#messages > li > div[data-type='in'] span.stamp {
-  top: .7rem;
+  top: 1rem;
   right: -2rem;
+}
+section#chat ul#messages > li > div > span.name {
+  display: block;
+  margin-bottom: .2rem;
+  border-bottom: .05rem solid #DDD;
+  font-size: .8em;
+  font-weight: 200;
+  color: #AAA;
+}
+section#chat:not([data-muc='true']) ul#messages > li > div > span.name {
+  display: none!important;
 }
 section#chat ul#messages > li > div > span.text {
   font-weight: 300;
   font-size: .9em;
+}
+section#chat ul#messages > li > div[data-type='out'][data-receipt='sent']:after {
+  content: "";
+  display: block;
+  width: .5rem;
+  height: .5rem;
+  border-radius: 50%;
+  background-color: #3498DF;
+  position: absolute;
+  top: .3rem;
+  left: -.9rem;
+  opacity: .3;
+}
+section#chat ul#messages > li > div[data-type='out'][data-receipt='delivered']:after {
+  content: "";
+  display: block;
+  width: .5rem;
+  height: .5rem;
+  border-radius: 50%;
+  background-color: #2ECC71;
+  position: absolute;
+  top: .3rem;
+  left: -.9rem;
 }
 section#chat ul#messages > li:last-child {
   margin-bottom: 3.5rem;
@@ -540,6 +584,64 @@ section#chat article#emoji ul li img {
 }
 section#chat article#emoji button {
   width: 100%;
+}
+
+section#chat article#call {
+  padding: 1rem;
+}
+section#chat article#call h1 {
+  font-size: 1.2rem;
+  border-bottom: .1rem solid #AAA;
+  color: #444;
+}
+section#chat article#call ul {
+  height: calc(100% - 5.5rem);
+  margin-bottom: .8rem;
+  overflow: scroll;
+  list-style-type: none;
+}
+section#chat article#call ul li {
+  padding: 1rem;
+  float: left;
+  cursor: pointer;
+}
+section#chat article#call ul li img {
+  width: 2rem;
+  height: 2rem;
+}
+section#chat article#call button {
+  width: 100%;
+}
+
+section#chat article#videocall {
+  padding: 1rem;
+}
+section#chat article#videocall h1 {
+  font-size: 1.2rem;
+  border-bottom: .1rem solid #AAA;
+  color: #444;
+}
+section#chat article#videocall ul {
+  height: calc(100% - 5.5rem);
+  margin-bottom: .8rem;
+  overflow: scroll;
+  list-style-type: none;
+}
+section#chat article#videocall ul li {
+  padding: 1rem;
+  float: left;
+  cursor: pointer;
+}
+section#chat article#videocall ul li img {
+  width: 2rem;
+  height: 2rem;
+}
+section#chat article#videocall button {
+  width: 100%;
+}
+
+section[data-lacks~=presence] span.show {
+  display: none!important;
 }
 
 section.profile div#card {
@@ -595,7 +697,7 @@ section.profile div#card span.provider img {
   height: 1rem;
   margin-right: .3rem;
 }
-section#me.lacks_statusChange div#status {
+section#me[lacks~=statusChange] div#status {
   display: none;
 }
 section#me div#status input {
@@ -672,6 +774,7 @@ aside#accounts button.account {
   width: 4rem;
   height: 4rem;
   margin: .5rem 0 0 .5rem;
+  padding: 0!important;
   border-radius: .5rem!important;
   box-shadow: 0 .5rem .5rem #000;
   background-color: #DDD;
@@ -779,7 +882,12 @@ div.switch div.ball {
     transform: scale(1.2);
   }
 }
-/* PROVISIONAL. WE PROMISE! */
-a[data-icon="bolt"] {
-  display: none;
+
+
+progress {
+  display: block;
+  position: fixed;
+  z-index: 1000;
+  top: 1rem;
+  left: 1rem;
 }

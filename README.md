@@ -1,11 +1,12 @@
 LOQUI Instant Messenger
 =====
-LOQUI Instant Messenger is a mobile chat app for Firefox OS that allows you to have all your chat accounts
-in just one FirefoxOS app. https://loqui.im
+Loqui Instant Messenger unifies all your chat accounts in just one FirefoxOS app
+https://loqui.im
 
 Providers support
 ===
 At the moment it supports accounts from:
+ * WhatsApp
  * Google Hangouts
  * Facebook Chat
  * Nimbuzz

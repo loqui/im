@@ -4,9 +4,10 @@
     "name": "Waalt Communications",
     "url": "http://waalt.com"
   },
+  "type": "privileged",
   "launch_path": "/index.html",
-  "description": "Loqui Instant Messenger allows you to have all your chat accounts in just one app.",
-  "version": "v0.1.4",
+  "description": "Loqui Instant Messenger allows you to unify all your chat accounts in just one app.",
+  "version": "v0.2.0",
   "icons": {
     "32": "/img/icon-32.png",
     "60": "/img/icon-60.png",
@@ -27,6 +28,20 @@
     },
     "desktop-notification": {
       "description": "Required for displaying alerts when app is on background."
+    },
+    "tcp-socket": {
+      "description": "CoSeMe requires TCP for connecting to server."
+    },
+    "systemXHR": {
+      "description": "CoSeMe requires XHR for some secondary operations."
+    },
+    "contacts": {
+      "description": "Required for looking for new contacts.",
+      "access": "readonly"
+    },
+    "device-storage:sdcard": {
+      "description": "Required for file handling",
+      "access": "readwrite"
     }
   }
 }

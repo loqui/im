@@ -86,13 +86,15 @@ var Chat = function (core, account) {
     var section = $('section#chat');
     var header = section.children('header');
     section.data('jid', this.core.jid);
+    section.data('lacks', $('section#main').data('lacks'));
+    section.data('muc', this.core.muc || false);
     header.children('.title').text(this.core.title);
     if (this.core.muc) {
-    
+      header.children('.status').text('');
     } else {
       var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.jid);
-      var show = contact.show || 'na';
-      var status = contact.status || _('show' + show);
+      var show = contact ? (contact.show || 'na') : 'na';
+      var status = contact ? (contact.status || _('show' + show)) : '';
       header.children('.status').text(status);
       section.data('show', show);
     }
@@ -102,6 +104,12 @@ var Chat = function (core, account) {
       });
     } else {
       header.children('.avatar').children('img').attr('src', 'img/foovatar.png');
+      var method = this.core.muc ? this.account.connector.groupAvatar : this.account.connector.avatar;
+      method(function (data) {
+        if (data) {
+          header.children('.avatar').children('img').attr('src', data);
+        }
+      }, this.core.jid);
     }
     $('section#chat nav#plus').removeClass('show');
     $('section#chat #typing').hide();

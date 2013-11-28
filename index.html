@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset='utf-8'>
-    <title>Loqui</title>
+    <title>Loqui IM</title>
     <meta name='description' content=''>
     <meta name='author' content='Waalt Communications (@waaltcom)'>
     <meta name='HandheldFriendly' content='True'>
@@ -20,7 +20,7 @@
 </head>
 <body class='app'>
   <section id='welcome' data-transition='slide'>
-    <article id='main' class='scroll' onclick='Menu.show("providers")'>
+    <article id='main' class='scroll'>
 		  <img src='img/devised.svg' alt='devised by Waaltcom'/>
 		  <img src='img/mascot.svg' alt='Loqui' />
 			<h1 data-l10n-id='WelcomeTo' data-l10n-args='{ "app": "Loqui" }'>Welcome to Loqui</h1>
@@ -40,11 +40,11 @@
     <article id='main' class='simple form'>
       <h1 data-l10n-id='Congrats'>Congratulations!</h1>
       <p data-l10n-id='CongratsLong'>You have successfully set up your account.</p>
-      <p><span id='imported'></span> <span data-l10n-id='Imported'>contacts were imported.</span></p>
+      <p><span id='imported'></span></p>
       <img id='avatar' />
       <div class='buttongroup'>
-        <button onclick='App.start()' data-l10n-id='StartNow'>Start using this account</button>
-        <button data-role='back' onclick='Menu.show("providers")' data-l10n-id='ConfigOther'>Set up another account</button>
+        <button class='start' data-l10n-id='StartNow'>Start using this account</button>
+        <button class='back' data-role='back' data-menu-onclick='providers' data-l10n-id='ConfigOther'>Set up another account</button>
       </div>
     </article>
   </section>
@@ -62,7 +62,7 @@
     </article>
     <article id='contacts' class='scroll'>
     </article>
-    <footer onclick='Menu.show("me")'>
+    <footer data-menu-onclick='me'>
       <span class='avatar'><img /></span>
       <span class='status backchange'></span>
       <span class='address'></span>
@@ -85,7 +85,7 @@
       System
     </article>
     <article id='info' class='simple scroll'>
-      <h1><span data-var="name"></span> <span data-var="version"></span></h1>
+      <h1><span data-var='name'></span> <span data-var='version'></span></h1>
       <p data-l10n-id='Copyright'>© 2013 Waaltcom. Some rights reserved.</p><br />
       <small data-l10n-id='FreeSoftware'>This program is free software; you may redistribute and/or modify it under the terms of the GNU Affero General Public License (AGPL 3) as published by the Free Software Foundation.</small>
     </article>
@@ -97,21 +97,21 @@
       </nav>
     </header>
     <article id='main' class='scroll'>
-      <div id="card">
-        <span class="avatar"><img/></span>
-        <span class="name"></span>
-        <span class="user"></span>
-        <span class="provider"></span>
+      <div id='card'>
+        <span class='avatar'><img/></span>
+        <span class='name'></span>
+        <span class='user'></span>
+        <span class='provider'></span>
       </div>
-      <div id="status">
-        <h2 data-l10n-id="StatusMessage">Status message</h2>
+      <div id='status'>
+        <h2 data-l10n-id='StatusMessage'>Status message</h2>
         <input type='text' name='status' id='status' />
       </div>
-      <div id="actions">
-        <h2 data-l10n-id="Actions">Actions</h2>
+      <div id='actions'>
+        <h2 data-l10n-id='Actions'>Actions</h2>
         <div class='buttongroup'>
-          <button data-l10n-id='ContactAdd' onclick='Menu.show("contactAdd", this)' >Add a new contact</button>
-          <button data-l10n-id='AccountRemove' onclick='Menu.show("accountRemove", this)'>Remove this account</button>
+          <button class='contactAdd' data-l10n-id='ContactAdd' data-menu-onclick='contactAdd' >Add a new contact</button>
+          <button class='accountRemove' data-l10n-id='AccountRemove' data-menu-onclick='accountRemove'>Remove this account</button>
         </div>
       </div>
     </article>
@@ -123,21 +123,21 @@
       </nav>
     </header>
     <article id='main' class='scroll'>
-      <div id="card">
-        <span class="avatar"><img/></span>
-        <span class="name"></span>
-        <span class="user"></span>
-        <span class="provider"></span>
+      <div id='card'>
+        <span class='avatar'><img/></span>
+        <span class='name'></span>
+        <span class='user'></span>
+        <span class='provider'></span>
       </div>
-      <div id="status">
-        <h2 data-l10n-id="StatusMessage">Status message</h2>
-        <pid='status'></p>
+      <div id='status'>
+        <h2 data-l10n-id='StatusMessage'>Status message</h2>
+        <p id='status'></p>
       </div>
-      <div id="actions">
-        <h2 data-l10n-id="Actions">Actions</h2>
+      <div id='actions'>
+        <h2 data-l10n-id='Actions'>Actions</h2>
         <div class='buttongroup'>
-          <button data-l10n-id='ChatRemove' onclick='Menu.show("chatRemove", this)'>Clear chats with this contact</button>
-          <button data-l10n-id='ContactRemove' onclick='Menu.show("contactRemove", this)'>Remove this contact</button>
+          <button class='' data-l10n-id='ChatRemove' data-menu-onclick='chatRemove'>Clear chats with this contact</button>
+          <button data-l10n-id='ContactRemove' data-menu-onclick='contactRemove'>Remove this contact</button>
         </div>
       </div>
     </article>
@@ -154,7 +154,7 @@
       <label for='name' data-l10n-id='Nickname'>Nickname</label>
       <input type='text' name='name' data-l10n-placeholder='JohnDoe' placeholder='John Doe'/>
       <div class='buttongroup'>
-        <button onclick='Messenger.contactAdd()' data-l10n-id='Add'>Add</button>
+        <button class='add' data-l10n-id='Add'>Add</button>
       </div>
     </article>
   </section>
@@ -166,15 +166,15 @@
       <span class='totalUnread'></span>
       <span class='title'></span>
       <span class='status'></span>
-      <span class='avatar' onclick='Menu.show("contact")'><img/></span>
+      <span class='avatar' data-menu-onclick='contact'><img/></span>
       <span class='show backchange'></span>
     </header>
     <article id='main'>
       <ul id='messages' class='scroll paper'></ul>
       <div id='footbox'>
-        <div id='typing' data-l10n-id="Typing">Typing...</div>
+        <div id='typing' data-l10n-id='Typing'>Typing...</div>
         <button id='plus' class='recommend' type='options' data-icon='plus' data-view-menu='plus' ></button>
-        <button id='say' class='recommend' type='send' data-icon='comments' onclick='Messenger.say()'></button>
+        <button id='say' class='recommend' type='send' data-icon='comments'></button>
         <div id='text' contenteditable></div>
       </div>
     </article>
@@ -185,20 +185,36 @@
         <button data-role='back' data-view-article='main' data-l10n-id='Cancel'>Cancel</button>
       </div>
     </article>
+    <article id='call'>
+      <h1 data-l10n-id='Call'>Call</h1>
+      <ul></ul>
+      <div class='buttongroup'>
+        <button data-role='back' data-view-article='main' data-l10n-id='Cancel'>Cancel</button>
+      </div>
+    </article>
+    <article id='videocall'>
+      <h1 data-l10n-id='VideoCall'>VideoCall</h1>
+      <ul></ul>
+      <div class='buttongroup'>
+        <button data-role='back' data-view-article='main' data-l10n-id='Cancel'>Cancel</button>
+      </div>
+    </article>
     <nav id='plus' data-control='menu' class='icons'>
-        <a onclick='$(this).parent().removeClass("show")' data-icon='remove-circle' data-l10n-id='Cancel'>Cancel</a>
-        <a onclick='Plus.bolt();' data-icon='bolt' data-l10n-id='Bolt'>Bolt</a>
-        <a onclick='Menu.show("emoji")' data-icon='star' data-l10n-id='Emoji'>Emoji</a>
+        <a class='cancel' data-icon='remove-circle' data-l10n-id='Cancel'>Cancel</a>
+        <a class='emoji' data-menu-onclick='emoji' data-icon='star' data-l10n-id='Emoji'>Emoji</a>
+        <!--<a class='bolt' data-icon='bolt' data-l10n-id='Bolt'>Bolt</a>
+        <a class='call' data-menu-onclick='call' data-icon='mobile-phone' data-l10n-id='Call'>Call</a>
+        <a class='videocall' data-menu-onclick='videocall' data-icon='video' data-l10n-id='VideoCall'>VideoCall</a>-->
     </nav>
   </section>
   <aside id='accounts'>
     <article id='chats' class='active list'>
-      <button onclick='Menu.show("settings")' class='settings account' data-image='img/providers/squares/settings.svg'></button>
+      <button data-menu-onclick='settings' class='settings account' data-image='img/providers/squares/settings.svg'></button>
       <ul>
       </ul>
-      <button onclick='Menu.show("providers")' class='add account' data-image='img/providers/squares/add.svg'></button>
-      <button onclick='Menu.show("powerOff")' class='power-off account' data-image='img/providers/squares/close.svg'></button>
-      <span class="indicator"></span>
+      <button data-menu-onclick='providers' class='add account' data-image='img/providers/squares/add.svg'></button>
+      <button data-menu-onclick='powerOff' class='powerOff account' data-image='img/providers/squares/close.svg'></button>
+      <span class='indicator'></span>
     </article>
   </aside>
   <audio src='audio/login.ogg' preload></audio>
@@ -221,6 +237,7 @@
   <script type='text/javascript' src='scripts/strophe/plugins/roster.js'></script>
   <script type='text/javascript' src='scripts/strophe/plugins/vcard.js'></script>
   <script type='text/javascript' src='scripts/strophe/plugins/attention.js'></script>
+  <script type='text/javascript' src='scripts/anonymous/coseme.js'></script>
   <script type='text/javascript' src='scripts/waalt/store.js'></script>
   <script type='text/javascript' src='scripts/waalt/app.js'></script>
   <script type='text/javascript' src='scripts/waalt/menu.js'></script>
@@ -233,13 +250,6 @@
   <script type='text/javascript' src='scripts/waalt/bindings.js'></script>
   <script type='text/javascript' src='scripts/waalt/tools.js'></script>
   <script type='text/javascript' src='scripts/waalt/connectors/xmpp.js'></script>
-  <script>
-    Lungo.init({
-      name: 'Loqui'
-    });
-    $(document).ready(function () {
-      App.run();
-    });
-  </script>
+  <script type='text/javascript' src='scripts/waalt/connectors/coseme.js'></script>
 </body>
 </html>

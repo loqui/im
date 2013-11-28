@@ -154,9 +154,9 @@ body > section > article.splash .copyright{position:absolute;width:100%;bottom:8
 .button,button{display:inline-block;border:none;cursor:pointer;font-family:inherit;font-weight:inherit;text-align:center;text-decoration:none;outline:none;background:none;font-size:inherit;}
 header .button > abbr,header button > abbr{font-size:.9em}
 header .button .icon + abbr,header button .icon + abbr{position:relative;left:.3em;top:.5em;float:right}
-article .button,article button{line-height:2.5em;}
+article .button,article button{line-height:1.2em;}
 article .button.icon,article button.icon{padding:0 .65em}
-article .button:not(.icon),article button:not(.icon){padding:0 1em;}
+article .button:not(.icon),article button:not(.icon){padding:.7em;}
 article .button:not(.icon) .icon + abbr,article button:not(.icon) .icon + abbr{margin-left:.5em}
 article .button.large,article button.large{font-size:1.4em}
 article .button.small,article button.small{font-size:.9em;line-height:2.25em}

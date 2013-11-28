@@ -30,8 +30,8 @@ var Tools = {
     return day;
   },
   
-  stamp: function () {
-    var date = new Date();
+  stamp: function (date) {
+    var date = date ? new Date(parseInt(date)) : new Date();
     return date.getUTCFullYear()+"-"
   	  +("0"+(date.getUTCMonth()+1)).slice(-2)+"-"
   	  +("0"+(date.getUTCDate())).slice(-2)+"T"
@@ -67,22 +67,46 @@ var Tools = {
     return div.innerHTML;
   },
   
-  emojify: function (text, map) {
-    var mapped = text;
-    if (map.length != undefined) {
-      for (var i in map) {
-        var original = map[i][0];
-        for (var j in map[i]) {
-          var token = map[i][j].replace(/([\(\)\[\]\\\$])/g, '\\$1');
-          var rexp = new RegExp('('+token+')', 'g');
-          mapped = mapped.replace(rexp, '<img src="img/emoji/'+original+'.png" alt="$1" />');
-          if (mapped != text) {
-            return mapped;
-          }
-        }
+  numSanitize: function (num) {
+    return num.replace(/[\s\-\+]/g, '');
+  },
+  
+  countries: function () {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'scripts/goles/countries.json', false);
+    xhr.send();
+    var countries = JSON.parse(xhr.responseText) || {};
+    return countries;
+  },
+  
+  textBlob: function (text) {
+    return new Blob([text], {type: 'text/plain'});
+  },
+  
+  textUnblob: function (blob, cb) {
+    var fr = new FileReader;
+    fr.addEventListener('loadend', function () {
+      var text = fr.result;
+      cb(text);
+    });
+    fr.readAsText(blob);
+  },
+  
+  picUnblob: function (blob, width, height, callback) {
+    var reader = new FileReader();
+    reader.onload = function (event) {
+      var img = new Image();
+      img.onload = function () {
+        var canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, 96, 96);
+        var url = canvas.toDataURL();
+        callback(url);
       }
+      img.src = event.target.result;
     }
-    return text;
+    reader.readAsDataURL(blob);
   }
 
 }
