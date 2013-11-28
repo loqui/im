@@ -152,7 +152,11 @@ var Account = function (core) {
           chat.show();
         }).bind('hold', function () {
           window.navigator.vibrate([100]);
-          Messenger.contactProfile(this.dataset.jid);
+          if (this.dataset.jid.match(/\-/)) {
+            Messenger.mucProfile(this.dataset.jid);
+          } else {
+            Messenger.contactProfile(this.dataset.jid);
+          }
         });
         totalUnread += chat.unread;
         ul.prepend(li);
