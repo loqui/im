@@ -156,6 +156,11 @@ App.connectors['coseme'] = function (account) {
     MI.call(method, [jid]);
   }
   
+  this.contactPresenceGet = function (jid) {
+    var method = 'presence_request';
+    MI.call(method, [jid]);
+  }
+  
   this.handlers.init = function () {
     console.log('HANDLERS INIT');
     var signals = {
@@ -173,7 +178,7 @@ App.connectors['coseme'] = function (account) {
       receipt_visible: this.events.onMessageVisible,
       receipt_broadcastSent: null,
       status_dirty: null,
-      presence_updated: null,
+      presence_updated: this.events.onPresenceUpdated,
       presence_available: null,
       presence_unavailable: null,
       group_subjectReceived: null,
@@ -360,6 +365,12 @@ App.connectors['coseme'] = function (account) {
       this.ack(msgId, to);
     }
     return true;
+  }
+  
+  this.events.onPresenceUpdated = function (jid, lastSeen) {
+    var account = this.account;
+    var time = Tools.convenientDate(Tools.stamp( Math.floor((new Date).valueOf()/1000) - parseInt(lastSeen) ));
+    $('section#chat[data-jid="' + jid + '"] header .status').text(_('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})}));
   }
     
 }

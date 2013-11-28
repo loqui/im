@@ -701,8 +701,11 @@ section.profile div#card span.provider img {
   height: 1rem;
   margin-right: .3rem;
 }
-section#me[lacks~=statusChange] div#status {
-  display: none;
+section#me[data-lacks~=statusChange] div#status {
+  display: none!important;
+}
+section#me[data-lacks~=rosterMgmt] button.contactAdd {
+  display: none!important;
 }
 section#me div#status input {
   width: 100%;

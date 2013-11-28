@@ -260,20 +260,12 @@ var Account = function (core) {
         }, jid);
       }
     });
-    
-    
-    /*
-    var vCard = $(this.connector.vcard);
-    if ($('section#main').data('provider') == account.core.provider && $('section#main').data('user') == account.core.user) {
-      account.connector.avatar(function (avatar) {
-        $('section#main footer .avatar img').attr('src', avatar);
-        $('section#me .avatar img').attr('src', avatar);
+    if ($('section#main').data('jid') == account.core.fullJid) {
+      Store.recover(avatars[account.core.fullJid], function (src) {
+        $('section#main footer .avatar img').attr('src', src);
+        $('section#me .avatar img').attr('src', src);
       });
-      var address = ( vCard.length && vCard.find('FN').length ) ? vCard.find('FN').text() : this.core.user;
-      $('section#main footer .address').text(address);
-      $('section#me #card .name').text(address == this.core.user ? '' : address);
-    }*/
-    
+    }
   }
     
   // Push message to sendQ
