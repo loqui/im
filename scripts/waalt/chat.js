@@ -90,7 +90,12 @@ var Chat = function (core, account) {
     section.data('muc', this.core.muc || false);
     header.children('.title').text(this.core.title);
     if (this.core.muc) {
-      header.children('.status').text('');
+      if (this.core.participants) {
+        header.children('.status').text(_('NumParticipants', {number: this.core.participants.length}));
+      } else {
+        this.account.connector.groupParticipantsGet(this.core.jid);
+        header.children('.status').text(' ');
+      }
     } else {
       var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.jid);
       var show = contact ? (contact.show || 'na') : 'na';

@@ -151,6 +151,11 @@ App.connectors['coseme'] = function (account) {
     MI.call(method, [type]);
   }
   
+  this.groupParticipantsGet = function (jid) {
+    var method = 'group_getParticipants';
+    MI.call(method, [jid]);
+  }
+  
   this.handlers.init = function () {
     console.log('HANDLERS INIT');
     var signals = {
@@ -175,11 +180,11 @@ App.connectors['coseme'] = function (account) {
       group_createSuccess: null,
       group_createFail: null,
       group_endSuccess: null,
-      group_gotInfo: this.events.onGotGroupInfo,
+      group_gotInfo: this.events.onGroupGotInfo,
       group_infoError: null,
       group_addParticipantsSuccess: null,
       group_removeParticipantsSuccess: null,
-      group_gotParticipants: null,
+      group_gotParticipants: this.events.onGroupGotParticipants,
       group_setSubjectSuccess: null,
       group_messageReceived: this.events.onGroupMessage,
       group_imageReceived: null,
@@ -189,7 +194,7 @@ App.connectors['coseme'] = function (account) {
       group_locationReceived: null,
       group_setPictureSuccess: null,
       group_setPictureError: null,
-      group_gotPicture: this.events.onGotGroupPicture,
+      group_gotPicture: this.events.onGroupGotPicture,
       group_gotGroups: null,
       notification_contactProfilePictureUpdated: null,
       notification_contactProfilePictureRemoved: null,
@@ -286,7 +291,7 @@ App.connectors['coseme'] = function (account) {
     $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"]').data('receipt', 'visible');
   }
   
-  this.events.onGotGroupInfo = function (jid, owner, subject, subjectOwner, subjectTime, creation) {
+  this.events.onGroupGotInfo = function (jid, owner, subject, subjectOwner, subjectTime, creation) {
     var account = this.account;
     var ci = account.chatFind(jid);
     if (ci >= 0) {
@@ -309,7 +314,7 @@ App.connectors['coseme'] = function (account) {
     }
   }
   
-  this.events.onGotGroupPicture = function (jid, picId, blob) {
+  this.events.onGroupGotPicture = function (jid, picId, blob) {
     var account = this.account;
     Tools.picUnblob(blob, 96, 96, function (url) {
       $('ul[data-provider="' + account.core.provider + '"][data-user="' + account.core.user + '"] [data-jid="' + jid + '"] span.avatar img').attr('src', url);
@@ -318,6 +323,20 @@ App.connectors['coseme'] = function (account) {
         Store.put('avatars', App.avatars);
       });
     });
+  }
+  
+  this.events.onGroupGotParticipants = function (jid, participants) {
+    var account = this.account;
+    var ci = account.chatFind(jid);
+    if (ci >= 0) {
+      var chat = account.chats[ci];
+      console.log('RECEIVED PARTICIPANTS FOR', jid, chat, participants);
+      if (!chat.core.participants || (JSON.stringify(chat.core.participants) != JSON.stringify(participants))) {
+        chat.core.participants = participants;
+        chat.save(ci);
+        $('section#chat[data-jid="' + chat.core.jid + '"] header .status').text(_('NumParticipants', {number: chat.core.participants.length}));
+      }
+    }
   }
   
   this.events.onGroupMessage = function (msgId, from, author, data, stamp, wantsReceipt, pushName) {

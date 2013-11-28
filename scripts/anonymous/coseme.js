@@ -6692,7 +6692,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
     var child, jabberIds = []
     for (var i = 0, l = children.length; i < l; i++) {
       child = children[i];
-      jabberIds.append(child.getAttributeValue("jid"))
+      jabberIds.push(child.getAttributeValue("jid"))
     }
     _signalInterface.send("group_gotParticipants", [jabberId, jabberIds]);
   }
