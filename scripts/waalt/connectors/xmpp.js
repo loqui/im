@@ -162,10 +162,12 @@ App.connectors['XMPP'] = function (account) {
         var img = vcard.find('BINVAL').text();
         var type = vcard.find('TYPE').text();
         var avatar = 'data:' + type + ';base64,' + img;
-        if (callback) {
-          callback(avatar || 'img/foovatar.png');
-        } 
+      } else {
+        var avatar = 'img/foovatar.png';
       }
+      if (callback) {
+        callback(avatar || 'img/foovatar.png');
+      } 
     }
     if (jid) {
       this.connection.vcard.get(function(data) {
