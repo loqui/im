@@ -162,10 +162,12 @@ App.connectors['XMPP'] = function (account) {
         var img = vcard.find('BINVAL').text();
         var type = vcard.find('TYPE').text();
         var avatar = 'data:' + type + ';base64,' + img;
-        if (callback) {
-          callback(avatar || 'img/foovatar.png');
-        } 
+      } else {
+        var avatar = 'img/foovatar.png';
       }
+      if (callback) {
+        callback(avatar || 'img/foovatar.png');
+      } 
     }
     if (jid) {
       this.connection.vcard.get(function(data) {
@@ -323,7 +325,7 @@ App.emoji['XMPP'] = {
     [':yes:'],
     [':no:']
   ],
-  
+
   fy: function (text) {
     var mapped = text;
     var map = this.map;
@@ -333,7 +335,51 @@ App.emoji['XMPP'] = {
         for (var j in map[i]) {
           var token = map[i][j].replace(/([\(\)\[\]\\\$])/g, '\\$1');
           var rexp = new RegExp('('+token+')', 'g');
-          mapped = mapped.replace(rexp, '<img src="img/emoji/'+original+'.png" alt="$1" />');
+          mapped = mapped.replace(rexp, '<img src="img/emoji/xmpp/'+original+'.png" alt="$1" />');
+          if (mapped != text) {
+            return mapped;
+          }
+        }
+      }
+    }
+    return text;
+  }
+  
+}
+
+App.emoji['FB'] = {
+  
+  map: [
+    [':)'],
+    [':('],
+    [':P'],
+    [':D'],
+    [':O'],
+    [':3'],
+    ['8)'],
+    ['8|'],
+    ['>:('],
+    [':\\', ':/'],
+    [':\'('],
+    ['3:)'],
+    [':*'],
+    ['<3'],
+    ['O.o','o.O'],
+    ['>:O','>:o'],
+    [':v'],
+    [':poop:']
+  ],
+
+  fy: function (text) {
+    var mapped = text;
+    var map = this.map;
+    if (map.length != undefined) {
+      for (var i in map) {
+        var original = map[i][0];
+        for (var j in map[i]) {
+          var token = map[i][j].replace(/([\(\)\[\]\\\$])/g, '\\$1');
+          var rexp = new RegExp('('+token+')', 'g');
+          mapped = mapped.replace(rexp, '<img src="img/emoji/fb/'+original+'.png" alt="$1" />');
           if (mapped != text) {
             return mapped;
           }

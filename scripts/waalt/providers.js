@@ -34,7 +34,7 @@ var Providers = {
         pass: 'Password',
       },
       notice: true,
-      emoji: 'XMPP'
+      emoji: 'FB'
     },
     'hangouts': {
       longName: 'Google Hangouts',
