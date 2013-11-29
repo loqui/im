@@ -347,7 +347,6 @@ App.emoji['XMPP'] = {
   
 }
 
-=======
 App.emoji['FB'] = {
   
   map: [
