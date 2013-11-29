@@ -333,7 +333,7 @@ App.emoji['XMPP'] = {
       for (var i in map) {
         var original = map[i][0];
         for (var j in map[i]) {
-          var token = map[i][j].replace(/([\(\)\[\]\\\$])/g, '\\$1');
+          var token = map[i][j].replace(/([\*\|\(\)\[\]\\\$])/g, '\\$1');
           var rexp = new RegExp('('+token+')', 'g');
           mapped = mapped.replace(rexp, '<img src="img/emoji/xmpp/'+original+'.png" alt="$1" />');
           if (mapped != text) {
@@ -357,12 +357,12 @@ App.emoji['FB'] = {
     [':O'],
     [':3'],
     ['8)'],
-    ['8|'],
+    ['8\|'],
     ['>:('],
     [':\\', ':/'],
     [':\'('],
     ['3:)'],
-    [':*'],
+    [':\*'],
     ['<3'],
     ['O.o','o.O'],
     ['>:O','>:o'],
@@ -377,7 +377,7 @@ App.emoji['FB'] = {
       for (var i in map) {
         var original = map[i][0];
         for (var j in map[i]) {
-          var token = map[i][j].replace(/([\(\)\[\]\\\$])/g, '\\$1');
+          var token = map[i][j].replace(/([\*\|\(\)\[\]\\\$])/g, '\\$1');
           var rexp = new RegExp('('+token+')', 'g');
           mapped = mapped.replace(rexp, '<img src="img/emoji/fb/'+original+'.png" alt="$1" />');
           if (mapped != text) {
