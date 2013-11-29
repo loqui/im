@@ -128,6 +128,7 @@ App.connectors['coseme'] = function (account) {
     var method = 'contact_getProfilePicture';
     var params = id ? [id] : [this.account.core.fullJid];
     MI.call(method, params);
+    callback('img/foovatar.png');
   }.bind(this);
   
   this.groupAvatar = function (callback, id) {
@@ -259,6 +260,7 @@ App.connectors['coseme'] = function (account) {
   
   this.events.onAvatar = function (jid, picId, blob) {
     var account = this.account;
+    console.log(jid, picId, blob);
     if (jid == this.account.core.fullJid) {
       Tools.picUnblob(blob, 96, 96, function (url) {
         $('section#main[data-jid="' + jid + '"] footer span.avatar img').attr('src', url);

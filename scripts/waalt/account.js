@@ -73,15 +73,12 @@ var Account = function (core) {
   
   // Bring account to foreground
   this.show = function () {
+    var account = this;
     $('section#main').data('jid', this.core.fullJid || this.core.user);
     $('section#main header').style('background', this.connector.provider.color);
     var vCard = $(this.connector.vcard);
     var address = ( vCard.length && vCard.find('FN').length ) ? vCard.find('FN').text() : this.core.user;
     $('section#main footer .address').text(address);
-    /*this.connector.avatar(function (avatar) {
-      $('section#main footer .avatar img').attr('src', avatar);
-      $('section#me .avatar img').attr('src', avatar);
-    });*/
     $('section#main article ul[data-provider="' + this.core.provider + '"][data-user="' + this.core.user + '"]').show().siblings('ul').hide();
     var index = Accounts.find(this.core.fullJid || this.core.user);
     $('aside#accounts .indicator').style('top', (6.25+4.5*index)+'rem').show();
@@ -95,6 +92,19 @@ var Account = function (core) {
     meSection.find('#card .name').text(address == this.core.user ? '' : address);
     meSection.find('#card .user').text(this.core.user);
     meSection.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/' + this.core.provider + '.svg')).append(Providers.data[this.core.provider].longName);
+    Store.recover(App.avatars[account.core.fullJid], function (src) {
+      var show = function (src) {
+        $('section#main footer .avatar img').attr('src', src);
+        $('section#me .avatar img').attr('src', src);        
+      }
+      if (src) {
+        show(src);
+      } else {
+        account.connector.avatar(function (src) {
+          show(src);
+        });
+      }
+    });
   }
   
   // Render everything for this account
@@ -262,8 +272,17 @@ var Account = function (core) {
     });
     if ($('section#main').data('jid') == account.core.fullJid) {
       Store.recover(avatars[account.core.fullJid], function (src) {
-        $('section#main footer .avatar img').attr('src', src);
-        $('section#me .avatar img').attr('src', src);
+        var show = function (src) {
+          $('section#main footer .avatar img').attr('src', src);
+          $('section#me .avatar img').attr('src', src);        
+        }
+        if (src) {
+          show(src);
+        } else {
+          account.connector.avatar(function (src) {
+            show(src);
+          });
+        }
       });
     }
   }
