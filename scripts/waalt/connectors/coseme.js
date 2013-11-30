@@ -60,7 +60,18 @@ App.connectors['coseme'] = function (account) {
       allContacts.onsuccess = function (event) {
         if (allContacts.result) {
           var result = allContacts.result;
-          var fullname = result.givenName[0] ? result.givenName[0] + ' ' + (result.familyName ? result.familyName[0] : '') : (result.familyName ? result.familyName[0] : (result.tel ? result.tel[0] : ''));
+          var fullname = result.givenName[0] 
+            ? result.givenName[0] + ' ' + (result.familyName 
+              ? (result.familyName[0] || '') : 
+              ''
+            ) 
+            : (result.familyName ? 
+                result.familyName[0] 
+              : (result.tel 
+                ? result.tel[0] 
+                : ''
+              )
+            );
           var number = result.tel ? (result.tel[0] ? Tools.numSanitize(result.tel[0].value) : null) : null;
           if (number && fullname) {
             var add = function (fullname, number) {
