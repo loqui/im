@@ -434,7 +434,9 @@ App.logForms['coseme'] = function (article, provider, data) {
     })
     .text(_('Back'));
   var validate = $('<button/>').data('role', 'submit').style('backgroundColor', data.color).text(_('CodeValidate'));
+  var back = $('<button/>').data('view-section', 'back').text(_('GoBack'));
   codeButtons.append(validate);
+  codeButtons.append(back);
   codeButtons.append(retry);
   code.append(codeButtons);
   var progress = $('<div/>').addClass('progress hidden')
