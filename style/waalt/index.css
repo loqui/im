@@ -20,12 +20,17 @@ article.form {
 input[type='text'],
 input[type='password'],
 input[type='number'],
+input[type='search'],
 select {
   margin-top: 0!important;
   margin-bottom: .5!important;
   padding: .3rem!important;
   border: .1rem solid #CCC!important;
   border-radius: .3rem!important;
+}
+input[type='search'] {
+  width: 100%;
+  border-radius: .0rem!important;
 }
 .spaced {
   margin-right: .5rem!important;
