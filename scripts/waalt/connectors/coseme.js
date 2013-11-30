@@ -56,13 +56,6 @@ App.connectors['coseme'] = function (account) {
     }.bind(this);
     if (!('roster' in this.account.core)) {
       this.account.core.roster = [];
-      var total = 0;
-      var current = 0;
-      var progress = $('#whatsapp .progress');
-      var numContacts = navigator.mozContacts.getCount();
-      numContacts.onsuccess = function () {
-        total = numContacts.result;
-      }
       var allContacts = navigator.mozContacts.getAll({sortBy: 'givenName', sortOrder: 'ascending'});
       allContacts.onsuccess = function (event) {
         if (allContacts.result) {
@@ -71,7 +64,6 @@ App.connectors['coseme'] = function (account) {
           var number = result.tel ? (result.tel[0] ? Tools.numSanitize(result.tel[0].value) : null) : null;
           if (number && fullname) {
             var add = function (fullname, number) {
-              console.log(fullname, number, current, total);
               var contact = {
                 jid: number + '@' + CoSeMe.config.domain,
                 name: fullname
@@ -80,8 +72,6 @@ App.connectors['coseme'] = function (account) {
             }.bind(this);
             add(fullname, this.account.core.cc + number);
           }
-          progress.find('progress').attr('value', current);
-          current++;
           allContacts.continue();
         }else {
           cb();
