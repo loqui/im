@@ -412,8 +412,11 @@ App.logForms['coseme'] = function (article, provider, data) {
   });
   var smsButtons = $('<div/>').addClass('buttongroup');
   var smsReq = $('<button/>').data('role', 'submit').style('backgroundColor', data.color).text(_('SMSRequest'));
+  var confirmCode = $('<button/>').data('role', 'submit').style('backgroundColor', data.color).text(_('ReConfirmCode'));
   var back = $('<button/>').data('view-section', 'back').text(_('GoBack'));
   smsButtons.append(smsReq).append(back);
+  sms.append(smsButtons);
+  smsButtons.append(confirmCode).append(back);
   sms.append(smsButtons);
   var code = $('<div/>').addClass('code hidden')
     .append('<p>Enter the 6-digits code you have received by SMS.</p>')
@@ -494,6 +497,12 @@ App.logForms['coseme'] = function (article, provider, data) {
       Store.SD.recover('.coseme.id', onhasid, onneedsid);
     }
   });
+
+  confirmCode.bind('click', function () {
+    sms.addClass('hidden');
+    code.removeClass('hidden');
+  });
+
   validate.bind('click', function () {
     var article = this.parentNode.parentNode.parentNode;
     var provider = article.parentNode.id;
