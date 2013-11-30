@@ -191,7 +191,7 @@ var Account = function (core) {
   // List all contacts for this account
   this.contactsRender = function () {
     if (document.getElementById('searchForm') == null) {
-        var searchForm = $('<fieldset id=\'searchForm\'><input type=\'search\' data-l10n-placeholder=\'Searchbar\'></fieldset>');
+        var searchForm = $('<fieldset id=\'searchForm\'><input type=\'search\' data-l10n-placeholder=\'Searchbar\' placeholder=\'Search...\'></fieldset>');
         var searchFormOnKeyUp = function (event) {
             var target = $(event.target);
             var key = target.val().toUpperCase();
