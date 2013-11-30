@@ -187,9 +187,31 @@ var Account = function (core) {
     }
     this.unread = totalUnread;
   }
-  
+
   // List all contacts for this account
   this.contactsRender = function () {
+    if (document.getElementById('searchForm') == null) {
+        var searchForm = $('<fieldset id=\'searchForm\'><input type="search" placeholder="search"></fieldset>');
+        var searchFormOnKeyUp = function (event) {
+            var target = $(event.target);
+            var key = target.val().toUpperCase();
+            var contactList = document.getElementById('contacts').getElementsByTagName('li');
+            var matchContact = function (contact) {
+                var name = contact.getElementsByClassName('name').item(0).innerHTML.toUpperCase();
+                if (name.indexOf(key) == 0) {
+                    $(contact).removeClass('hidden');
+                } else {
+                    $(contact).addClass('hidden');
+                }
+            }
+            for (i = 0; i < contactList.length; i++) {
+                matchContact(contactList[i]);
+            }
+        }
+        searchForm.bind('keyup', searchFormOnKeyUp);
+        $('section#main article#contacts').prepend(searchForm);
+    }
+
     var account = this;
     var oldUl = $('section#main article#contacts ul[data-provider="' + this.core.provider + '"][data-user="' + this.core.user + '"]');
     var ul = $("<ul />");
