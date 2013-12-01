@@ -181,7 +181,7 @@ var Account = function (core) {
       ul.prepend(span);
     }
     oldUl.replaceWith(ul);
-    Lungo.Element.count('aside li[data-provider="' + this.core.provider + '"][data-user="' + this.core.user + '"]', totalUnread);
+    Lungo.Element.count('aside li[data-jid="' + this.core.fullJid + '"]', totalUnread);
     if (ul.style('display') == 'block') {
       Lungo.Element.count('section#main header nav button[data-view-article="chats"]', totalUnread);
     }
