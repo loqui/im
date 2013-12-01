@@ -138,9 +138,7 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.emojiRender = function (img, emoji) {
-    img
-      .attr('src', 'data:image/gif;base64,' + emoji[2])
-      .data('emoji', String.fromCharCode(parseInt(emoji[0], 16)));
+    App.emoji[Providers.data[this.account.core.provider].emoji].render(img, emoji);
   }.bind(this);
   
   this.csnSend = function (to, state) {
@@ -1036,6 +1034,12 @@ App.emoji['coseme'] = {
       }
     }
     return text;
+  },
+  
+  render: function (img, emoji) {
+    img
+      .attr('src', 'data:image/gif;base64,' + emoji[2])
+      .data('emoji', String.fromCharCode(parseInt(emoji[0], 16)));
   }
   
 }

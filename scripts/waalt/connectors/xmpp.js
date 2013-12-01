@@ -184,9 +184,7 @@ App.connectors['XMPP'] = function (account) {
   }
   
   this.emojiRender = function (img, emoji) {
-    img
-      .attr('src', '/img/emoji/' + emoji[0] + '.png')
-      .data('emoji', emoji[0]);
+    App.emoji[Providers.data[this.account.core.provider].emoji].render(img, emoji);
   }.bind(this);
   
   this.handlers.init = function () {
@@ -343,6 +341,12 @@ App.emoji['XMPP'] = {
       }
     }
     return text;
+  },
+  
+  render: function (img, emoji) {
+    img
+      .attr('src', '/img/emoji/xmpp/' + emoji[0] + '.png')
+      .data('emoji', emoji[0]);
   }
   
 }
@@ -387,6 +391,12 @@ App.emoji['FB'] = {
       }
     }
     return text;
+  },
+  
+  render: function (img, emoji) {
+    img
+      .attr('src', '/img/emoji/fb/' + emoji[0] + '.png')
+      .data('emoji', emoji[0]);
   }
   
 }
