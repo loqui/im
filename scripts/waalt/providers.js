@@ -27,7 +27,7 @@ var Providers = {
         timeout: 300
       },
       autodomain: 'chat.facebook.com',
-      lacks: ['multi', 'avatarChange', 'statusChange', 'attention', 'rosterMgmt', 'receipts'],
+      lacks: ['multi', 'avatarChange', 'statusChange', 'attention', 'rosterMgmt', 'receipts', 'localContacts'],
       color: '#3D539F',
       terms: {
         user: 'ProviderUsername',
@@ -45,7 +45,7 @@ var Providers = {
         timeout: 300
       },
       autodomain: 'gmail.com',
-      lacks: ['avatarChange', 'receipts'],
+      lacks: ['avatarChange', 'receipts', 'localContacts'],
       color: '#4EA43B',
       terms: {
         user: 'ProviderAddress',
@@ -63,7 +63,7 @@ var Providers = {
         timeout: 300
       },
       autodomain: 'nimbuzz.com',
-      lacks: ['vcard', 'avatarChange', 'attention', 'receipts'],
+      lacks: ['vcard', 'avatarChange', 'attention', 'receipts', 'localContacts'],
       color: '#FF8702',
       terms: {
         user: 'Username',
@@ -80,7 +80,7 @@ var Providers = {
         timeout: 300
       },
       autodomain: 'chat.ovi.com',
-      lacks: ['avatarChange', 'attention', 'receipts'],
+      lacks: ['avatarChange', 'attention', 'receipts', 'localContacts'],
       color: '#39B006',
       terms: {
         user: 'Username',
@@ -97,7 +97,7 @@ var Providers = {
         timeout: 300
       },
       autodomain: false,
-      lacks: ['avatarChange', 'attention', 'receipts'],
+      lacks: ['avatarChange', 'attention', 'receipts', 'localContacts'],
       color: '#0071C5',
       terms: {
         user: 'ProviderAddress',
@@ -114,7 +114,7 @@ var Providers = {
         timeout: 300
       },
       autodomain: false,
-      lacks: ['receipts'],
+      lacks: ['receipts', 'localContacts'],
       color: '#149ED2',
       terms: {
         user: 'FullJID',

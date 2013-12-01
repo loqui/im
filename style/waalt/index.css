@@ -60,13 +60,13 @@ section > article.simple {
   color: #333;
 }
 section > article.simple > h1 {
-	position: relative;
-	width: 11rem;
-	font-size: 1.6rem;
-	line-height: 2rem;
-	margin: 0 0 1rem 0;
-	font-weight: 100;
-	color: #E95644;
+  position: relative;
+  width: 11rem;
+  font-size: 1.6rem;
+  line-height: 2rem;
+  margin: 0 0 1rem 0;
+  font-weight: 100;
+  color: #E95644;
 }
 section > article.simple > p {
   font-weight: 100;
@@ -77,11 +77,11 @@ section > article.simple > div > p {
   margin-bottom: .5rem;
 }
 section#welcome {
-	color: #E95644;
-	text-align: center;
+  color: #E95644;
+  text-align: center;
 }
 section#welcome > div {
-	margin: 5rem 2rem;
+  margin: 5rem 2rem;
 }
 section#welcome img[src$='devised.svg'] {
   position: absolute;
@@ -97,8 +97,8 @@ section#welcome img[src$='mascot.svg'] {
 }
 section#welcome h1 {
   position: absolute;
-	font-size: 1.5rem;
-	font-weight: 100;
+  font-size: 1.5rem;
+  font-weight: 100;
   top: calc(50% + 3rem);
   text-align: center;
   width: 100%;
@@ -355,21 +355,42 @@ section#main .noChats p {
 section#main fieldset#searchForm {
   padding: .3rem .25rem;
   background-color: #555;
+  height: 2.6rem;
 }
 section#main fieldset#searchForm input {
+  position: absolute;
   font-size: 1rem;
   border-radius: .2rem!important;
+  width: calc(100% - .5rem);
+}
+section#main:not([data-lacks~='localContacts']) fieldset#searchForm input {
+  width: calc(100% - 2rem);
+}
+section#main fieldset#searchForm span.sync {
+  display; block;
+  color: #FFF;
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: .5rem .4rem .5rem .4rem;
+}
+section#main[data-lacks~='localContacts'] fieldset#searchForm span.sync {
+  display: none;
 }
 section#main fieldset#searchForm span.clear {
   position: absolute;
   display: none;
-  padding: .3rem .8rem;
+  padding: .3rem .6rem;
   top: 0;
-  right: 0;
+  right: .4rem;
   text-align: center;
   color: #CCC;
   font-size: 1.4rem;
 }
+section#main:not([data-lacks~='localContacts']) fieldset#searchForm span.clear {
+  right: 1.8rem;
+}
+
 
 section#settings ul li {
   position: relative;
@@ -432,7 +453,7 @@ section#chat header .avatar img {
   width: 100%;
 }
 section#chat #footbox {
-	position: absolute;
+  position: absolute;
   right: 0;
   bottom: 0;
   left: 0;
@@ -493,7 +514,7 @@ section#chat #footbox div#text:focus {
 }
 
 section#chat ul#messages {
-	position: absolute;
+  position: absolute;
   top: 0;
   right: 0;
   left: 0;
@@ -832,12 +853,12 @@ aside#accounts .indicator {
   display: none;
   position: absolute;
   right: 0;
-	width: 0; 
-	height: 0; 
-	border-top: .8rem solid transparent;
-	border-bottom: .8rem solid transparent; 
-	border-right: .8rem solid #FFF;
-	transition: all .2s;
+  width: 0; 
+  height: 0; 
+  border-top: .8rem solid transparent;
+  border-bottom: .8rem solid transparent; 
+  border-right: .8rem solid #FFF;
+  transition: all .2s;
 }
 
 li[data-show=a] .backchange,
@@ -873,7 +894,7 @@ section:not([data-show]) footer .backchange {
 }
 
 .disHide section#main article#contacts li[data-show='na'] {
-	display: none;
+  display: none;
 }
 
 div.switch {

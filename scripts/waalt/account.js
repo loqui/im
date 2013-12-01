@@ -200,8 +200,11 @@ var Account = function (core) {
         );
       var clear = $('<span/>')
         .addClass('clear')
-        .text('✖')
-      searchForm.append(clear);
+        .text('✖');
+      var sync = $('<span/>')
+        .addClass('sync')
+        .text('↻');
+      searchForm.append(clear).append(sync);
       var searchFormOnKeyUp = function (event) {
         var target = $(event.target);
         var key = target.val().toUpperCase();
@@ -229,8 +232,15 @@ var Account = function (core) {
       var clearOnClick = function (event) {
         $('section#main fieldset#searchForm input').val('').trigger('keyup');
       }
+      var syncOnClick = function (event) {
+        this.connector.contactsSync(function () {
+          this.save();
+          this.allRender();
+        }.bind(this));
+      }.bind(this);
       searchForm.bind('keyup', searchFormOnKeyUp);
       clear.bind('click', clearOnClick);
+      sync.bind('click', syncOnClick);
       $('section#main article#contacts').prepend(searchForm);
     }
 
