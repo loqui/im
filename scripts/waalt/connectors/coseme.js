@@ -72,7 +72,7 @@ App.connectors['coseme'] = function (account) {
                 : ''
               )
             );
-          var number = result.tel ? (result.tel[0] ? Tools.numSanitize(result.tel[0].value) : null) : null;
+          var number = result.tel ? (result.tel[0] ? Tools.numSanitize(result.tel[0].value, this.account.core.cc) : null) : null;
           if (number && fullname) {
             var add = function (fullname, number) {
               var contact = {

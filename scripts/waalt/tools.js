@@ -66,9 +66,22 @@ var Tools = {
     div.appendChild(document.createTextNode(str));
     return div.innerHTML;
   },
-  
-  numSanitize: function (num) {
-    return num.replace(/[\s\-\+]/g, '');
+
+    /**
+     *
+     * @param num
+     * @param cc country code
+     * @returns {string|void}
+     */
+  numSanitize: function (num, cc) {
+        num = num.replace(/[\s\-\+]/g, '');
+        if (cc != undefined ) {
+            cc = cc.toString();
+            if (num.indexOf(cc) == 0) {
+                num = num.substr(cc.length);
+            }
+        }
+        return num;
   },
   
   countries: function () {
