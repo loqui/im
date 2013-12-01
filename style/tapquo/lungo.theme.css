@@ -16,9 +16,9 @@
     font-size: 5vh!important;
   }
 }
-@media only screen and (min-resolution: 90dpi) and (min-width: 960px){
+@media only screen and (min-resolution: 90dpi) and (min-width: 480px) {
   html{
-    font-size: 150%!important;
+    font-size: 3vw!important;
   }
 }
 @font-face {
