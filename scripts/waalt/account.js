@@ -190,26 +190,48 @@ var Account = function (core) {
 
   // List all contacts for this account
   this.contactsRender = function () {
-    if (document.getElementById('searchForm') == null) {
-        var searchForm = $('<fieldset id=\'searchForm\'><input type=\'search\' data-l10n-placeholder=\'Searchbar\' placeholder=\'Search...\'></fieldset>');
-        var searchFormOnKeyUp = function (event) {
-            var target = $(event.target);
-            var key = target.val().toUpperCase();
-            var contactList = document.getElementById('contacts').getElementsByTagName('li');
-            var matchContact = function (contact) {
-                var name = contact.getElementsByClassName('name').item(0).innerHTML.toUpperCase();
-                if (name.indexOf(key) == 0) {
-                    $(contact).removeClass('hidden');
-                } else {
-                    $(contact).addClass('hidden');
-                }
+    if (!document.getElementById('searchForm')) {
+      var searchForm = $('<fieldset/>')
+        .attr('id', 'searchForm')
+        .append(
+          $('<input/>')
+            .attr('type', 'search')
+            .attr('placeholder', _('Searchbar'))
+        );
+      var clear = $('<span/>')
+        .addClass('clear')
+        .text('✖')
+      searchForm.append(clear);
+      var searchFormOnKeyUp = function (event) {
+        var target = $(event.target);
+        var key = target.val().toUpperCase();
+        var contactList = document.getElementById('contacts').getElementsByTagName('li');
+        var matchContact = function (contact) {
+          if (contact.localName == 'li') {
+            var name = contact.getElementsByClassName('name').item(0).innerHTML.toUpperCase();
+            if (name.indexOf(key) == 0) {
+                $(contact).removeClass('hidden');
+            } else {
+                $(contact).addClass('hidden');
             }
-            for (i = 0; i < contactList.length; i++) {
-                matchContact(contactList[i]);
-            }
+          }
         }
-        searchForm.bind('keyup', searchFormOnKeyUp);
-        $('section#main article#contacts').prepend(searchForm);
+        for (var i in contactList) {
+          matchContact(contactList[i]);
+        }
+        var clear = $('section#main fieldset#searchForm .clear');
+        if (target.val().length) {
+          clear.show();
+        } else {
+          clear.hide();
+        }
+      }
+      var clearOnClick = function (event) {
+        $('section#main fieldset#searchForm input').val('').trigger('keyup');
+      }
+      searchForm.bind('keyup', searchFormOnKeyUp);
+      clear.bind('click', clearOnClick);
+      $('section#main article#contacts').prepend(searchForm);
     }
 
     var account = this;

@@ -352,6 +352,25 @@ section#main .noChats p {
   font-size: .9em;
 }
 
+section#main fieldset#searchForm {
+  padding: .3rem .25rem;
+  background-color: #555;
+}
+section#main fieldset#searchForm input {
+  font-size: 1rem;
+  border-radius: .2rem!important;
+}
+section#main fieldset#searchForm span.clear {
+  position: absolute;
+  display: none;
+  padding: .3rem .8rem;
+  top: 0;
+  right: 0;
+  text-align: center;
+  color: #CCC;
+  font-size: 1.4rem;
+}
+
 section#settings ul li {
   position: relative;
   padding: 1rem;
