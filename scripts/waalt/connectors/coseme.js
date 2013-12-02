@@ -283,7 +283,7 @@ App.connectors['coseme'] = function (account) {
       var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
       if (contact) {
         Tools.picUnblob(blob, 96, 96, function (url) {
-          $('ul[data-provider="' + account.core.provider + '"][data-user="' + account.core.user + '"] [data-jid="' + jid + '"] span.avatar img').attr('src', url);
+          $('ul[data-jid="' + account.core.fullJid + '"] [data-jid="' + jid + '"] span.avatar img').attr('src', url);
           $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', url);
           App.avatars[jid] = Store.save(url, function () {
             Store.put('avatars', App.avatars);
