@@ -424,9 +424,7 @@ App.logForms['coseme'] = function (article, provider, data) {
   var smsReq = $('<button/>').data('role', 'submit').style('backgroundColor', data.color).text(_('SMSRequest'));
   var confirmCode = $('<button/>').data('role', 'submit').style('backgroundColor', data.color).text(_('ReConfirmCode'));
   var back = $('<button/>').data('view-section', 'back').text(_('GoBack'));
-  smsButtons.append(smsReq).append(back);
-  sms.append(smsButtons);
-  smsButtons.append(confirmCode).append(back);
+  smsButtons.append(smsReq).append(confirmCode).append(back);
   sms.append(smsButtons);
   var code = $('<div/>').addClass('code hidden')
     .append('<p>Enter the 6-digits code you have received by SMS.</p>')
@@ -482,7 +480,10 @@ App.logForms['coseme'] = function (article, provider, data) {
                   resource: App.defaults.Account.core.resource,
                   chats: []
                 }); 
-                account.test();    
+                account.test(); 
+                var deviceId = Math.random().toString(36).substring(2);
+                  Store.SD.save('.coseme.id', 'text/plain', [deviceId]);
+                  codeGet(deviceId);   
             } else {
               console.log('Not valid', 'Reason:', data.reason, 'with DID', deviceId);
               Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
@@ -506,7 +507,7 @@ App.logForms['coseme'] = function (article, provider, data) {
         Store.SD.save('.coseme.id', 'text/plain', [deviceId]);
         codeGet(deviceId);
       }
-      Store.SD.recover('.coseme.id', onhasid, onneedsid);
+      Store.SD.recover('.coseme.id', onhasid, onneedsid, codeGet);
     }
   });
 
@@ -543,7 +544,7 @@ App.logForms['coseme'] = function (article, provider, data) {
       var onerror = function (error) {}
       Lungo.Notification.show('copy', _('CodeValidating'));
       CoSeMe.registration.register(cc, user, rCode, onready, onerror, deviceId);
-    }
+    } 
   });
 }
 
