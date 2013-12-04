@@ -480,10 +480,7 @@ App.logForms['coseme'] = function (article, provider, data) {
                   resource: App.defaults.Account.core.resource,
                   chats: []
                 }); 
-                account.test(); 
-                var deviceId = Math.random().toString(36).substring(2);
-                  Store.SD.save('.coseme.id', 'text/plain', [deviceId]);
-                  codeGet(deviceId);   
+                account.test();  
             } else {
               console.log('Not valid', 'Reason:', data.reason, 'with DID', deviceId);
               Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
@@ -507,7 +504,7 @@ App.logForms['coseme'] = function (article, provider, data) {
         Store.SD.save('.coseme.id', 'text/plain', [deviceId]);
         codeGet(deviceId);
       }
-      Store.SD.recover('.coseme.id', onhasid, onneedsid, codeGet);
+      Store.SD.recover('.coseme.id', onhasid, onneedsid);
     }
   });
 
