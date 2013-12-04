@@ -62,6 +62,18 @@ App.connectors['coseme'] = function (account) {
   this.contactsSync = function (cb) {
     var allContacts = navigator.mozContacts.getAll({sortBy: 'givenName', sortOrder: 'ascending'});
     allContacts.onsuccess = function (event) {
+      var add = function (jid, name) {
+        var contact = {
+          jid: jid,
+          name: fullname
+        }
+        this.account.core.roster.push(contact);
+        console.log(name, 'did not exist, appending', contact);
+      }.bind(this);
+      var update = function (existing, jid, name) {
+        existing.name = name;
+        console.log(name, 'already existed, updating to', existing);
+      }.bind(this);
       if (allContacts.result) {
         var result = allContacts.result;
         var fullname = (result.givenName[0] 
@@ -76,26 +88,16 @@ App.connectors['coseme'] = function (account) {
               : ''
             )
           )).trim();
-        var number = result.tel ? (result.tel[0] ? Tools.numSanitize(result.tel[0].value, this.account.core.cc) : null) : null;
-        if (number && fullname) {
-          var add = function (jid, name) {
-            var contact = {
-              jid: jid,
-              name: fullname
+        if (result.tel) {
+          for (var i in result.tel) {
+            var number = result.tel[i] ? Tools.numSanitize(result.tel[i].value, this.account.core.cc) : null;
+            var jid = this.account.core.cc + number + '@' + CoSeMe.config.domain;
+            var existing = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
+            if (existing) {
+              update(existing, jid, fullname);
+            } else {
+              add(jid, fullname);
             }
-            this.account.core.roster.push(contact);
-            console.log(name, 'did not exist, appending', contact);
-          }.bind(this);
-          var update = function (existing, jid, name) {
-            existing.name = name;
-            console.log(name, 'already existed, updating to', existing);
-          }.bind(this);
-          var jid = this.account.core.cc + number + '@' + CoSeMe.config.domain;
-          var existing = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
-          if (existing) {
-            update(existing, jid, fullname);
-          } else {
-            add(jid, fullname);
           }
         }
         allContacts.continue();
