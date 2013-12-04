@@ -7,36 +7,12 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
    width="40"
    height="40"
-   id="svg4676"
-   version="1.1"
-   inkscape:version="0.48.4 r9939"
-   sodipodi:docname="add.svg">
+   id="svg4676">
   <defs
      id="defs4678" />
-  <sodipodi:namedview
-     id="base"
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageopacity="0.0"
-     inkscape:pageshadow="2"
-     inkscape:zoom="1.22"
-     inkscape:cx="15.842386"
-     inkscape:cy="18.970533"
-     inkscape:document-units="px"
-     inkscape:current-layer="layer1"
-     showgrid="false"
-     borderlayer="true"
-     inkscape:showpageshadow="false"
-     inkscape:window-width="2560"
-     inkscape:window-height="1391"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
-     inkscape:window-maximized="1" />
   <metadata
      id="metadata4681">
     <rdf:RDF>
@@ -50,19 +26,16 @@
     </rdf:RDF>
   </metadata>
   <g
-     inkscape:label="Capa 1"
-     inkscape:groupmode="layer"
-     id="layer1"
-     transform="translate(0,-1012.3622)">
+     transform="translate(0,-1012.3622)"
+     id="layer1">
     <g
        transform="matrix(0.36803065,0,0,0.36803065,-116.94739,906.52102)"
        id="layer1-1"
        style="fill:#b3b3b3;fill-opacity:1">
       <path
          d="m 399.28,314.12 -9.125,7.25 c -4.799,-4.0243 -10.962,-6.4688 -17.656,-6.4688 -15.129,0 -27.562,12.434 -27.562,27.562 0,15.129 12.434,27.281 27.562,27.281 11.86,0 22.052,-7.4546 25.906,-17.969 l -9.875,-2.4062 c -2.6427,6.2319 -8.7668,10.531 -16.031,10.531 -9.7241,0 -17.438,-7.7134 -17.438,-17.438 0,-9.7241 7.7134,-17.719 17.438,-17.719 3.6079,0 6.923,1.1171 9.6875,3 l -9.0312,7.1875 26.125,4.8438 v -25.656 z"
-         style="text-indent:0;text-transform:none;block-progression:tb;color:#000000;fill:#b3b3b3;fill-opacity:1"
          id="path3768"
-         inkscape:connector-curvature="0" />
+         style="text-indent:0;text-transform:none;block-progression:tb;color:#000000;fill:#b3b3b3;fill-opacity:1" />
     </g>
   </g>
 </svg>
