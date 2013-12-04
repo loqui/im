@@ -36,7 +36,7 @@ var Account = function (core) {
         this.sync(cb.bind(this));
       }.bind(this),
       authfail: function () {
-          Lungo.Notification.error(_('Timeout'), _('TimeoutNotice'), 'signout', 5);
+          Lungo.Notification.error(_('NoAuth'), _('NoAuthNotice'), 'signout', 5);
       }
     });
   }
