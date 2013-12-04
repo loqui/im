@@ -21,37 +21,44 @@ App.connectors['XMPP'] = function (account) {
     var handler = function (status) {
      switch (status) {
         case Strophe.Status.CONNECTING:
+          console.log('Connecting');
           if (callback.connecting) {
             callback.connecting();
           }
           break;
         case Strophe.Status.CONNFAIL:
+          console.log('Connection failed');
           if (callback.connfail) {
             callback.connfail();
           }
           break;
         case Strophe.Status.AUTHENTICATING:
+          console.log('Authenticating');
           if (callback.authenticating) {
             callback.authenticating();
           }
           break;
         case Strophe.Status.AUTHFAIL:
+          console.log('Authentication failed');
           if (callback.authfail) {
             callback.authfail();
           }
           break;
         case Strophe.Status.CONNECTED:
+          console.log('Connected');
           this.connected = true;
           if (callback.connected) {
             callback.connected();
           }
           break;
         case Strophe.Status.DISCONNECTING:
+          console.log('Disconnecting');
           if (callback.disconnecting) {
             callback.disconnecting();
           }
           break;
         case Strophe.Status.DISCONNECTED:
+          console.log('Disconnected');
           if (callback.disconnected) {
             callback.disconnected();
           }
