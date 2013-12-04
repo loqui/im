@@ -102,6 +102,18 @@ var Menu = {
         }
         req.onerror = function () { }
       }
+    },
+
+    reloadApp: function () {
+      var sure = confirm(_('ConfirmReload'));
+      if (sure) {
+        Lungo.Notification.success(_('Reloading'), _('AppWillReload'), 'signout', 3);
+        App.disconnect();
+        App.run();
+        console.log(App.name + ' has been reloaded')
+      } else {
+        console.log('Upps...');
+      }
     }
   },
   
