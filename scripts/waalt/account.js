@@ -36,10 +36,7 @@ var Account = function (core) {
         this.sync(cb.bind(this));
       }.bind(this),
       authfail: function () {
-        setTimeout(function () {
-          console.log('Sorry, the connection is taking more than 15 seconds to get connected :(');
           Lungo.Notification.success(_('Timeout'), _('TimeoutNotice'), 'signout', 5);
-        }, 15000);
       }
     });
   }
