@@ -13,10 +13,6 @@ var Account = function (core) {
     this.connector.connect({
       connecting: function () {
         Lungo.Notification.show('globe', _('Connecting'));
-        setTimeout(function () {
-          console.log('Sorry, the connection is taking more than 15 seconds to get connected :(');
-          Lungo.Notification.success(_('Timeout'), _('TimeoutNotice'), 'signout', 5);
-        }, 15000);
       },
       authenticating: function () {
         Lungo.Notification.show('key', _('SMSsending'));
@@ -40,6 +36,10 @@ var Account = function (core) {
         this.sync(cb.bind(this));
       }.bind(this),
       authfail: function () {
+        setTimeout(function () {
+          console.log('Sorry, the connection is taking more than 15 seconds to get connected :(');
+          Lungo.Notification.success(_('Timeout'), _('TimeoutNotice'), 'signout', 5);
+        }, 15000);
       }
     });
   }
@@ -63,7 +63,6 @@ var Account = function (core) {
             this.sync(cb.bind(this));
           }.bind(this),
           authfail: function () {
-            
           }
         });
       }
