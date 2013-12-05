@@ -94,12 +94,14 @@ App.connectors['coseme'] = function (account) {
           }
           for (var i = 0; i < result.tel.length; i++) {
             var number = result.tel[i] ? Tools.numSanitize(result.tel[i].value, account.core.cc) : null;
-            var jid = account.core.cc + number + '@' + CoSeMe.config.domain;
-            var existing = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
-            if (existing) {
-              update(existing, jid, fullname);
-            } else {
-              add(jid, fullname);
+            if (number) {
+              var jid = number + '@' + CoSeMe.config.domain;
+              var existing = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
+              if (existing) {
+                update(existing, jid, fullname);
+              } else {
+                add(jid, fullname);
+              }
             }
           }   
         }
