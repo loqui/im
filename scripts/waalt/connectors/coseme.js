@@ -60,22 +60,11 @@ App.connectors['coseme'] = function (account) {
   }.bind(this);
   
   this.contactsSync = function (cb) {
+    var account = this.account;
     var allContacts = navigator.mozContacts.getAll({sortBy: 'givenName', sortOrder: 'ascending'});
     allContacts.onsuccess = function (event) {
-      var add = function (jid, name) {
-        var contact = {
-          jid: jid,
-          name: fullname
-        }
-        this.account.core.roster.push(contact);
-        console.log(name, 'did not exist, appending', contact);
-      }.bind(this);
-      var update = function (existing, jid, name) {
-        existing.name = name;
-        console.log(name, 'already existed, updating to', existing);
-      }.bind(this);
-      if (allContacts.result) {
-        var result = allContacts.result;
+      if (this.result) {
+        var result = this.result;
         var fullname = (result.givenName[0] 
           ? result.givenName[0] + ' ' + (result.familyName 
             ? (result.familyName[0] || '') : 
@@ -89,23 +78,44 @@ App.connectors['coseme'] = function (account) {
             )
           )).trim();
         if (result.tel) {
-          for (var i in result.tel) {
-            var number = result.tel[i] ? Tools.numSanitize(result.tel[i].value, this.account.core.cc) : null;
-            var jid = this.account.core.cc + number + '@' + CoSeMe.config.domain;
-            var existing = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
+          var add = function (jid, name) {
+            var contact = {
+              jid: jid,
+              name: fullname
+            }
+            account.core.roster.push(contact);
+            console.log(name, 'did not exist, appending', contact);
+          }
+          var update = function (existing, jid, name) {
+            existing.name = name;
+            console.log(name, 'already existed, updating to', existing);
+          }
+          for (var i = 0; i < result.tel.length; i++) {
+            var number = result.tel[i] ? Tools.numSanitize(result.tel[i].value, account.core.cc) : null;
+            var jid = account.core.cc + number + '@' + CoSeMe.config.domain;
+            var existing = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
             if (existing) {
               update(existing, jid, fullname);
             } else {
               add(jid, fullname);
             }
-          }
+          }   
         }
-        allContacts.continue();
-      }else if (cb){
+        this.continue();
+      } else if (cb){
         cb();
       }
-    }.bind(this);
+    }
   }.bind(this);
+  
+  this.contactsSort = function (cb) {
+    this.account.core.roster.sort(function (a,b) {
+      var aname = a.name ? a.name : a.jid;
+      var bname = b.name ? b.name : b.jid;
+      return aname > bname;
+    });
+    cb();
+  }
   
   this.presence.set = function (show, status) {
     this.presence.show = show || this.presence.show;

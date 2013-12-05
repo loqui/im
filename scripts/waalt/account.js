@@ -233,8 +233,10 @@ var Account = function (core) {
       }
       var syncOnClick = function (event) {
         this.connector.contactsSync(function () {
-          this.save();
-          this.allRender();
+          this.connector.contactsSort(function () {
+            this.save();
+            this.allRender();
+          }.bind(this));
         }.bind(this));
       }.bind(this);
       searchForm.bind('keyup', searchFormOnKeyUp);
