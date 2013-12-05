@@ -240,7 +240,7 @@ App.connectors['coseme'] = function (account) {
       profile_setStatusSuccess: null,
       ping: this.events.onPing,
       pong: null,
-      disconnected: null,
+      disconnected: this.events.onDisconnected,
       media_uploadRequestSuccess: null,
       media_uploadRequestFailed: null,
       media_uploadRequestDuplicate: null,
@@ -258,6 +258,10 @@ App.connectors['coseme'] = function (account) {
   this.events.onPing = function (idx) {
     var method = 'pong';
     MI.call(method, [idx]);
+  }
+  
+  this.events.onDisconnected = function () {
+    this.account.connect();
   }
   
   this.events.onMessage = function (id, from, body, stamp, e, nick, g) {
