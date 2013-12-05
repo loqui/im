@@ -24,12 +24,13 @@ var Message = function (account, core) {
           chunks: []
         }, this.account);
       }
-      chat.messageAppend(this.core, false);
-      chat.save(ci, true);
-      var ul = $('section#chat ul#messages');
-      var li = ul.children('li:last-child');
-      li.append(this.preRender());
-      ul[0].scrollTop = ul[0].scrollHeight;
+      chat.messageAppend.push({msg: this.core}, function (err) {
+        chat.save(ci, true);
+        var ul = $('section#chat ul#messages');
+        var li = ul.children('li:last-child');
+        li.append(this.preRender());
+        ul[0].scrollTop = ul[0].scrollHeight;
+      }.bind(this));
     }
   }
   
