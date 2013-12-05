@@ -67,21 +67,32 @@ var Tools = {
     return div.innerHTML;
   },
 
-    /**
-     *
-     * @param num
-     * @param cc country code
-     * @returns {string|void}
-     */
+  /**
+   *
+   * @param num
+   * @param cc country code
+   * @returns {string|void}
+   */
   numSanitize: function (num, cc) {
-        num = num.replace(/[\s\-\+]/g, '');
-        if (cc != undefined ) {
-            cc = cc.toString();
-            if (num.indexOf(cc) == 0) {
-                num = num.substr(cc.length);
-            }
-        }
-        return num;
+    var region =  PHONE_NUMBER_META_DATA[cc] instanceof Array
+                  ? (
+                    PHONE_NUMBER_META_DATA[cc][0] instanceof Object
+                    ? 
+                      PHONE_NUMBER_META_DATA[cc][0].region
+                    :
+                      PHONE_NUMBER_META_DATA[cc][0].slice(2, 4)
+                    )
+                  : (
+                    PHONE_NUMBER_META_DATA[cc] instanceof Object
+                    ?
+                      PHONE_NUMBER_META_DATA[cc].region
+                    :
+                      PHONE_NUMBER_META_DATA[cc].slice(2, 4)
+                    );
+                      
+    var parsed = PhoneNumber.Parse(num.replace(/[\s\-\+]/g, ''), region);
+    console.log(num.replace(/[\s\-\+]/g, ''), cc, region, parsed);
+    return parsed ? parsed.internationalFormat.replace(/[\ \+]/g, '') : null;
   },
   
   countries: function () {
