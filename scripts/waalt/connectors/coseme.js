@@ -36,7 +36,9 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.disconnect = function () {
-    this.connected = false;
+    if (App.online) {
+      this.connected = false;
+    }
   }
   
   this.isConnected = function () {
