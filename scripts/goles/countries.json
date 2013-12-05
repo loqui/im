@@ -1,5 +1,5 @@
 [
-  {"name":"Argentina","dial":"549","code":"AR"},
+  {"name":"Argentina","dial":"54","code":"AR"},
   {"name":"Brasil","dial":"55","code":"BR"},
   {"name":"Colombia","dial":"57","code":"CO"},
   {"name":"Deutschland","dial":"49","code":"DE"},
@@ -7,7 +7,7 @@
   {"name":"Ελλάδα","dial":"30","code":"GR"},
   {"name":"Magyarország","dial":"36","code":"HU"},
   {"name":"Црна Гора","dial":"382","code":"ME"},
-  {"name":"Mexico","dial":"521","code":"MX"},
+  {"name":"Mexico","dial":"52","code":"MX"},
   {"name":"Peru","dial":"51","code":"PE"},
   {"name":"Polska","dial":"48","code":"PL"},
   {"name":"Србија","dial":"381","code":"RS"},
