@@ -30,9 +30,9 @@ var Store = {
     Store.cache[block.index] = block.value;
     block.save(function (index) {
       delete Store.cache[index];
-        if (callback) {
-        	callback(index);
-        }
+      if (callback) {
+      	callback(index);
+      }
     });
     Store.update(0, Store.size);
     return block.index;
@@ -51,7 +51,14 @@ var Store = {
   update: function (index, value, callback) {
     var block = new Store.block(JSON.stringify(value));
     block.index = index;
-    block.save(callback);
+    Store.cache[block.index] = block.value;
+    block.save(function (index) {
+      delete Store.cache[index];
+      if (callback) {
+      	callback(index);
+      }
+    });
+    return block.index;
   },
   
   drop: function (key, callback) {
