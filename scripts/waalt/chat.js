@@ -44,8 +44,10 @@ var Chat = function (core, account) {
     }
   }
   
-  // Add a new message to this chat
-  this.messageAppend = function (msg, delay) {
+  // Push messages to this queue to append them to this chat
+  this.messageAppend = async.queue(function (task, callback) {
+    var msg = task.msg;
+    var delay = task.delay;
     var chat = this;
     var chunkListSize = this.core.chunks.length;
     var blockIndex = this.core.chunks[chunkListSize - 1];
@@ -55,13 +57,12 @@ var Chat = function (core, account) {
         if (chunk.length > App.defaults.Chat.chunkSize) {
           var chunk = [msg];
           blockIndex = Store.save(chunk);
-          chat.core.chunks.push(blockIndex);
-          // This helps to find the message if sent later
+          chat.core.chunks.push(blockIndex, callback);
           storageIndex = [blockIndex, 0];
         } else {
           chunk.push(msg);
           blockIndex = chat.core.chunks[chunkListSize - 1];
-          Store.update(blockIndex, chunk);
+          Store.update(blockIndex, chunk, callback);
           storageIndex = [blockIndex, chunk.length-1];
         }
         if (delay) {
@@ -72,14 +73,14 @@ var Chat = function (core, account) {
       var chunk = [msg];
       blockIndex = Store.save(chunk);
       chat.core.chunks.push(blockIndex);
-      // This helps to find the message if sent later
       storageIndex = [blockIndex, 0];
       if (delay) {
         chat.account.toSendQ(storageIndex);
       }
+      callback();
     }
     this.core.last = msg;
-  }
+  }.bind(this));
   
   // Create a chat window for this contact
   this.show = function () {
