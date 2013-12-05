@@ -124,9 +124,10 @@ var App = {
   // Disconnect from every account
   disconnect: function () {
     for (var i in this.accounts) {
-      var account = this.accounts[i];      
-      account.presenceRender();
+      var account = this.accounts[i];
       account.connector.disconnect();
+      account.accountRender();
+      account.presenceRender();
     }
     $('section#main').attr('data-show', 'na');
   },

@@ -36,7 +36,9 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.disconnect = function () {
-    this.connected = false;
+    if (App.online) {
+      this.connected = false;
+    }
   }
   
   this.isConnected = function () {
@@ -60,10 +62,11 @@ App.connectors['coseme'] = function (account) {
   }.bind(this);
   
   this.contactsSync = function (cb) {
+    var account = this.account;
     var allContacts = navigator.mozContacts.getAll({sortBy: 'givenName', sortOrder: 'ascending'});
     allContacts.onsuccess = function (event) {
-      if (allContacts.result) {
-        var result = allContacts.result;
+      if (this.result) {
+        var result = this.result;
         var fullname = (result.givenName[0] 
           ? result.givenName[0] + ' ' + (result.familyName 
             ? (result.familyName[0] || '') : 
@@ -76,34 +79,45 @@ App.connectors['coseme'] = function (account) {
               : ''
             )
           )).trim();
-        var number = result.tel ? (result.tel[0] ? Tools.numSanitize(result.tel[0].value, this.account.core.cc) : null) : null;
-        if (number && fullname) {
+        if (result.tel) {
           var add = function (jid, name) {
             var contact = {
               jid: jid,
               name: fullname
             }
-            this.account.core.roster.push(contact);
+            account.core.roster.push(contact);
             console.log(name, 'did not exist, appending', contact);
-          }.bind(this);
+          }
           var update = function (existing, jid, name) {
             existing.name = name;
             console.log(name, 'already existed, updating to', existing);
-          }.bind(this);
-          var jid = this.account.core.cc + number + '@' + CoSeMe.config.domain;
-          var existing = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
-          if (existing) {
-            update(existing, jid, fullname);
-          } else {
-            add(jid, fullname);
           }
+          for (var i = 0; i < result.tel.length; i++) {
+            var number = result.tel[i] ? Tools.numSanitize(result.tel[i].value, account.core.cc) : null;
+            var jid = account.core.cc + number + '@' + CoSeMe.config.domain;
+            var existing = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
+            if (existing) {
+              update(existing, jid, fullname);
+            } else {
+              add(jid, fullname);
+            }
+          }   
         }
-        allContacts.continue();
-      }else if (cb){
+        this.continue();
+      } else if (cb){
         cb();
       }
-    }.bind(this);
+    }
   }.bind(this);
+  
+  this.contactsSort = function (cb) {
+    this.account.core.roster.sort(function (a,b) {
+      var aname = a.name ? a.name : a.jid;
+      var bname = b.name ? b.name : b.jid;
+      return aname > bname;
+    });
+    cb();
+  }
   
   this.presence.set = function (show, status) {
     this.presence.show = show || this.presence.show;
@@ -228,7 +242,7 @@ App.connectors['coseme'] = function (account) {
       profile_setStatusSuccess: null,
       ping: this.events.onPing,
       pong: null,
-      disconnected: null,
+      disconnected: this.events.onDisconnected,
       media_uploadRequestSuccess: null,
       media_uploadRequestFailed: null,
       media_uploadRequestDuplicate: null,
@@ -246,6 +260,10 @@ App.connectors['coseme'] = function (account) {
   this.events.onPing = function (idx) {
     var method = 'pong';
     MI.call(method, [idx]);
+  }
+  
+  this.events.onDisconnected = function () {
+    this.account.connect();
   }
   
   this.events.onMessage = function (id, from, body, stamp, e, nick, g) {

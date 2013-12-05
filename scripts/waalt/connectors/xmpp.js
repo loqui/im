@@ -66,10 +66,12 @@ App.connectors['XMPP'] = function (account) {
           break;
       }
     }.bind(this);
+    this.connection.reset();
     this.connection.connect(user, pass, handler, this.provider.connector.timeout);
   }
   
   this.disconnect = function () {
+    this.connection.disconnect();
     this.connected = false;
   }
   
