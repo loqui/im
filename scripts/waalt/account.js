@@ -24,14 +24,15 @@ var Account = function (core) {
           if (Accounts.find(this.core.fullJid || this.core.user) < 0) {
             App.accounts.push(this);
             App.smartpush('accountsCores', this.core);
+            Lungo.Notification.hide();
+            $('section.setup#' + this.core.provider + ' input').val('');
+            $('section#success span#imported').text(_('Imported', {number: (this.core.roster && this.core.roster.length) ? this.core.roster.length : 0}));
+            this.connector.avatar(function (avatar) {
+              $('section#success img#avatar').attr('src', avatar);
+            });
+            Lungo.Router.section('success');
           }
-          Lungo.Notification.hide();
-          $('section.setup#' + this.core.provider + ' input').val('');
-          $('section#success span#imported').text(_('Imported', {number: (this.core.roster && this.core.roster.length) ? this.core.roster.length : 0}));
-          this.connector.avatar(function (avatar) {
-            $('section#success img#avatar').attr('src', avatar);
-          });
-          Lungo.Router.section('success');
+        Lungo.Notification.error(_('DupliAccount'), _('DupliAccountNotice'), 'exclamation-sign', 5);
         }
         this.sync(cb.bind(this));
       }.bind(this),
