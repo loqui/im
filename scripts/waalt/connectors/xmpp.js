@@ -31,7 +31,7 @@ App.connectors['XMPP'] = function (account) {
           if (callback.connfail) {
             callback.connfail();
           }
-          Lungo.Notification.error(_('NoAuth'), _('NoAuthNotice'), 'signout', 5);
+          Lungo.Notification.error(_('NoAuth'), _('NoAuthNotice'), 'remove-circle', 5);
           break;
         case Strophe.Status.AUTHENTICATING:
           console.log('Authenticating');

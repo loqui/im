@@ -32,12 +32,12 @@ var Account = function (core) {
             });
             Lungo.Router.section('success');
           }
-        Lungo.Notification.error(_('DupliAccount'), _('DupliAccountNotice'), 'exclamation-sign', 5);
+        Lungo.Notification.error(_('DupliAccount'), _('DupliAccountNotice'), 'signal', 5);
         }
         this.sync(cb.bind(this));
       }.bind(this),
       authfail: function () {
-          Lungo.Notification.error(_('NoAuth'), _('NoAuthNotice'), 'signout', 5);
+          Lungo.Notification.error(_('NoAuth'), _('NoAuthNotice'), 'warning-sign', 5);
       }
     });
   }
