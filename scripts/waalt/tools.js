@@ -124,13 +124,51 @@ var Tools = {
         var canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
-        canvas.getContext('2d').drawImage(img, 0, 0, 96, 96);
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
         var url = canvas.toDataURL();
         callback(url);
       }
       img.src = event.target.result;
     }
     reader.readAsDataURL(blob);
+  },
+
+  saveImage: function (image, name, onSuccess, onError) {
+      var sdCard = navigator.getDeviceStorage("pictures");
+
+      onSuccess = function () {
+          console.log('El archivo "' + this.result.name + '" se escribio correctamente');
+      };
+      onError = function () {
+          console.log('No se puede escribir el archivo: ' + this.error);
+      };
+
+      var request = sdCard.add(image);
+      request.onsuccess = onSuccess;
+      request.onerror = onError;
+  },
+
+  b64ToBlob: function(b64Data, contentType, sliceSize) {
+    contentType = contentType | '';
+    sliceSize = sliceSize || 512;
+
+      var byteCharacters = atob(b64Data);
+      var byteArrays = [];
+
+      for (var offset = 0; offset < byteCharacters.length; offset+= sliceSize) {
+          var slice = byteCharacters.slice(offset, offset + sliceSize);
+
+          var byteNumbers = new Array(slice.length);
+          for (var i = 0; i < slice.length; i++) {
+              byteNumbers[i] = slice.charCodeAt(i);
+          }
+
+          var byteArray = new Uint8Array(byteNumbers);
+          byteArrays.push(byteArray);
+      }
+
+      var blob = new Blob(byteArrays, { type: contentType });
+      return blob;
   }
 
 }

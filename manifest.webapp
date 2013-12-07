@@ -42,6 +42,10 @@
     "device-storage:sdcard": {
       "description": "Required for file handling",
       "access": "readwrite"
+    },
+    "device-storage:pictures": {
+      "description": "Required for image handling",
+      "access": "readwrite"
     }
   }
 }

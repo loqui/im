@@ -195,7 +195,7 @@ App.connectors['coseme'] = function (account) {
       auth_success: null,
       auth_fail: null,
       message_received: this.events.onMessage,
-      image_received: null,
+      image_received: this.events.onImageReceived,
       vcard_received: null,
       video_received: null,
       audio_received: null,
@@ -287,6 +287,11 @@ App.connectors['coseme'] = function (account) {
       this.ack(id, from);
     }
     return true;
+  }
+
+  this.events.onImageReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast) {
+      console.log('Media received:', msgId, fromAttribute, mediaSize, wantsReceipt, isBroadcast, mediaPreview);
+      Tools.saveImage(mediaPreview, "image.jpeg", function(){}, function() {});
   }
   
   this.events.onAvatar = function (jid, picId, blob) {
