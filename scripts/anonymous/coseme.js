@@ -7170,31 +7170,37 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
      */
     auth_login: function(aUsername, aPassword) {
         logger.log('auth_login called for', aUsername);
-        CoSeMe.auth.authenticate(aUsername, aPassword, function(aConn) {
-          try {
-            if (aConn) {
-              self.socket = aConn;
-              self.readerThread.socket = self.socket;
-              self.readerThread.autoPong = self.autoPong;
-              self.readerThread.ping = self.sendPing;
-              self.readerThread.onPing = self.sendPong;
-              self.readerThread.signalInterface = {
-                send: fireEvent
-              };
-              self.jid = self.socket.jid;
-              self.out = self.socket.writer;
-              self.state = 2;
-              self.domain = CoSeMe.config.auth.domain;
-              fireEvent('auth_success', [aUsername, null]);
-            } else {
-              fireEvent('auth_fail', [aUsername, null]);
-            }
-          } catch (x) {
-            logger.error('Error authenticating!', x);
-            self.state = 0;
-            fireEvent('auth_fail', [aUsername, null]);
-          }
-        });
+        if(localStorage.flagAuthFail===true){
+        	//TODO shows message: your are using WhatsApp in other device or App	
+        }else{
+	        CoSeMe.auth.authenticate(aUsername, aPassword, function(aConn) {
+	          try {
+	            if (aConn) {
+	              self.socket = aConn;
+	              self.readerThread.socket = self.socket;
+	              self.readerThread.autoPong = self.autoPong;
+	              self.readerThread.ping = self.sendPing;
+	              self.readerThread.onPing = self.sendPong;
+	              self.readerThread.signalInterface = {
+	                send: fireEvent
+	              };
+	              self.jid = self.socket.jid;
+	              self.out = self.socket.writer;
+	              self.state = 2;
+	              self.domain = CoSeMe.config.auth.domain;
+	              fireEvent('auth_success', [aUsername, null]);
+	            } else {
+	              fireEvent('auth_fail', [aUsername, null]);
+	              //patch what avoid banning accounts in WhatApp Network 
+	              localStorage.flagAuthFail=true;
+	            }
+	          } catch (x) {
+	            logger.error('Error authenticating!', x);
+	            self.state = 0;
+	            fireEvent('auth_fail', [aUsername, null]);
+	          }
+	        });
+        }
     },
 
     /*
