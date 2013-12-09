@@ -24,12 +24,12 @@ var Message = function (account, core) {
           chunks: []
         }, this.account);
       }
+      var ul = $('section#chat ul#messages');
+      var li = ul.children('li:last-child');
+      li.append(this.preRender());
+      ul[0].scrollTop = ul[0].scrollHeight;
       chat.messageAppend.push({msg: this.core}, function (err) {
         chat.save(ci, true);
-        var ul = $('section#chat ul#messages');
-        var li = ul.children('li:last-child');
-        li.append(this.preRender());
-        ul[0].scrollTop = ul[0].scrollHeight;
       }.bind(this));
     }
   }
@@ -55,29 +55,29 @@ var Message = function (account, core) {
     if (!$('section#chat').hasClass('show') || $('section#chat').data('jid') != this.core.from) {
       chat.core.unread++;
     }
+    if ($('section#chat').data('jid') == chatJid) {
+      var ul = $('section#chat ul#messages');
+      var li = ul.children('li:last-child');
+      li.append(this.preRender());
+      ul[0].scrollTop = ul[0].scrollHeight;
+    }
+    var pic = App.avatars[chatJid];
+    var callback = function () {
+      chat.show();
+	    App.toForeground();
+    }
+    var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', Strophe.getBareJidFromJid(message.core.from));
+    var subject = muc ? ((contact ? (contact.name || message.core.pushName) : message.core.pushName) + ' @ ' + chat.core.title) : chat.core.title;
+    console.log(subject, muc, contact, message);
+    if (pic) {
+      Store.recover(pic, function (src) {
+        App.notify({ subject: subject, text: message.core.text, pic: src, callback: callback }, 'received');
+      });
+    } else {
+      App.notify({ subject: subject, text: message.core.text, pic: 'https://raw.github.com/waalt/loqui/master/img/foovatar.png', callback: callback }, 'received');
+    }
     chat.messageAppend.push({msg: this.core}, function (err) {
       chat.save(ci, true);
-      if ($('section#chat').data('jid') == chatJid) {
-        var ul = $('section#chat ul#messages');
-        var li = ul.children('li:last-child');
-        li.append(this.preRender());
-        ul[0].scrollTop = ul[0].scrollHeight;
-      }
-      var pic = App.avatars[chatJid];
-      var callback = function () {
-        chat.show();
-		    App.toForeground();
-      }
-      var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', Strophe.getBareJidFromJid(message.core.from));
-      var subject = muc ? ((contact ? (contact.name || message.core.pushName) : message.core.pushName) + ' @ ' + chat.core.title) : chat.core.title;
-      console.log(subject, muc, contact, message);
-      if (pic) {
-        Store.recover(pic, function (src) {
-          App.notify({ subject: subject, text: message.core.text, pic: src, callback: callback }, 'received');
-        });
-      } else {
-        App.notify({ subject: subject, text: message.core.text, pic: 'https://raw.github.com/waalt/loqui/master/img/foovatar.png', callback: callback }, 'received');
-      }
     }.bind(this));
   }
   
