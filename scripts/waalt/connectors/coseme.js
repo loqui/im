@@ -66,44 +66,48 @@ App.connectors['coseme'] = function (account) {
     var allContacts = navigator.mozContacts.getAll({sortBy: 'givenName', sortOrder: 'ascending'});
     allContacts.onsuccess = function (event) {
       if (this.result) {
-        var result = this.result;
-        var fullname = (result.givenName[0] 
-          ? result.givenName[0] + ' ' + (result.familyName 
-            ? (result.familyName[0] || '') : 
-            ''
-          ) 
-          : (result.familyName ? 
-              result.familyName[0] 
-            : (result.tel 
-              ? result.tel[0] 
-              : ''
-            )
-          )).trim();
-        if (result.tel) {
-          var add = function (jid, name) {
-            var contact = {
-              jid: jid,
-              name: fullname
-            }
-            account.core.roster.push(contact);
-            console.log(name, 'did not exist, appending', contact);
-          }
-          var update = function (existing, jid, name) {
-            existing.name = name;
-            console.log(name, 'already existed, updating to', existing);
-          }
-          for (var i = 0; i < result.tel.length; i++) {
-            var number = result.tel[i] ? Tools.numSanitize(result.tel[i].value, account.core.cc) : null;
-            if (number) {
-              var jid = number + '@' + CoSeMe.config.domain;
-              var existing = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
-              if (existing) {
-                update(existing, jid, fullname);
-              } else {
-                add(jid, fullname);
+        try {
+          var result = this.result;
+          var fullname = (result.givenName[0] 
+            ? result.givenName[0] + ' ' + (result.familyName 
+              ? (result.familyName[0] || '') : 
+              ''
+            ) 
+            : (result.familyName ? 
+                result.familyName[0] 
+              : (result.tel 
+                ? result.tel[0] 
+                : ''
+              )
+            )).trim();
+          if (result.tel) {
+            var add = function (jid, name) {
+              var contact = {
+                jid: jid,
+                name: fullname
               }
+              account.core.roster.push(contact);
+              console.log(name, 'did not exist, appending', contact);
             }
-          }   
+            var update = function (existing, jid, name) {
+              existing.name = name;
+              console.log(name, 'already existed, updating to', existing);
+            }
+            for (var i = 0; i < result.tel.length; i++) {
+              var number = result.tel[i] ? Tools.numSanitize(result.tel[i].value, account.core.cc) : null;
+              if (number) {
+                var jid = number + '@' + CoSeMe.config.domain;
+                var existing = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
+                if (existing) {
+                  update(existing, jid, fullname);
+                } else {
+                  add(jid, fullname);
+                }
+              }
+            }   
+          }
+        } catch (e) {
+          console.log('SYNC ERROR:', e);
         }
         this.continue();
       } else if (cb){

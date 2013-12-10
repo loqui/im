@@ -3050,10 +3050,10 @@ CoSeMe.namespace('config', (function(){
     domain: 's.whatsapp.net',
 
     tokenData: {
-      "v": "2.11.113",
+      "v": "2.11.134",
       // should be tokenData[d] + - + tokenData[v] + - + 443
-      "r": "Android-2.11.113-443",
-      "u": "WhatsApp/2.11.113 Android/4.3 Device/GalaxyS2",
+      "r": "Android-2.11.134-443",
+      "u": "WhatsApp/2.11.134 Android/4.3 Device/GalaxyS3",
       "t": "PdA2DJyKoUrwLw1Bg6EIhzh502dF9noR9uFCllGk1377032097395{phone}",
       "d": "Android"
     },
@@ -3928,7 +3928,6 @@ CoSeMe.namespace('protocol', (function(){
     this.flushBuffer(counting);
   }
 
-
   BinaryWriter.prototype._streamStart = function(domain, resource, counting) {
     var attributes = {to: domain, resource: resource};
 
@@ -4227,10 +4226,10 @@ CoSeMe.namespace('protocol', (function(){
         this._callback(null, realOutLength);
       }
     } catch (x) {
-      logger.log('Socket state:', this._socket.readyState);
-      logger.error(x);
+      var socketState = this._socket.readyState;
+      logger.error('Error writing. Socket state:', socketState);
       if (typeof this._callback === 'function') {
-        this._callback(new Error("DISCONNECTED"));
+        this._callback(socketState === 'closed' ? 'disconnected' : x);
       }
     }
   };
@@ -4355,11 +4354,35 @@ CoSeMe.namespace('protocol', (function(){
   BinaryReader.prototype.startListening = function(connection) {
     this.socket = connection.socket;
     this.isStreamStartRead = false;
+    this.paused = false;
 
     var self = this;
     this.socket.ondata = function(evt) {
      self.onSocketData(evt.data);
     };
+  };
+
+  BinaryReader.prototype.pendingTrees = [];
+
+  /**
+   * Suspend receiving data and calling onStreamStart and onTree callbacks.
+   * Call it before switching from one handler to another.
+   */
+  BinaryReader.prototype.suspend = function() {
+    if (this.paused) return;
+    this.socket.suspend(); //TODO: Consider the option of not suspend the socket
+    this.paused = true;
+  };
+
+  /**
+   * Resume receiving data and calling onStreamStart and onTree callbacks.
+   * Call it after switching from one handler to another.
+   */
+  BinaryReader.prototype.resume = function() {
+    if (!this.paused) return;
+    this.socket.resume();
+    this.paused = false;
+    this.attendPendingTrees();
   };
 
   /**
@@ -4394,7 +4417,7 @@ CoSeMe.namespace('protocol', (function(){
    * onStreamStart() callback.
    */
   BinaryReader.prototype.readStreamStart = function() {
-    var readerTask = this.newReaderTask(this.onStreamStart);
+    var readerTask = this.newReaderTask();
     setTimeout(function() {
       readerTask._readStreamStart();
     });
@@ -4404,7 +4427,7 @@ CoSeMe.namespace('protocol', (function(){
    * Enqueue a task to read a tree, then call to onTree() callback.
    */
   BinaryReader.prototype.readNextTree = function() {
-    var readerTask = this.newReaderTask(this.onTree);
+    var readerTask = this.newReaderTask();
     setTimeout(function() {
       readerTask._readNextTree();
     });
@@ -4414,20 +4437,25 @@ CoSeMe.namespace('protocol', (function(){
    * Creates a task as a specialization of the main BinaryReader unable to spawn
    * new taskes with the mission of read a given tree.
    */
-  BinaryReader.prototype.newReaderTask = function(callback) {
+  BinaryReader.prototype.newReaderTask = function() {
     var task = Object.create(this);
 
     this.readStanza();
+    task.startListening = undefined;
+    task.suspend = undefined;
+    task.resume = undefined;
     task.newReaderTask = undefined;
+
     task.mac = this.mac;
     task.message = this.message;
     task.stanzaSize = this.stanzaSize;
     task.isEncrypted = this.isEncrypted;
-    task.callback = callback;
     this.finishReading();
 
     return task;
   };
+
+  var IS_STREAM_START = true;
 
   /**
    * Parses the start of the protocol. If all goes well, call onStreamStart()
@@ -4449,9 +4477,7 @@ CoSeMe.namespace('protocol', (function(){
       logger.error(err);
     }
 
-    if (typeof this.callback === 'function') {
-      this.callback(err);
-    }
+    this.dispatchResult(err, IS_STREAM_START, 'onStreamStart');
   };
 
   /**
@@ -4472,8 +4498,38 @@ CoSeMe.namespace('protocol', (function(){
       logger.error(e);
     }
 
-    if (typeof this.callback === 'function') {
-      this.callback(err, tree);
+    this.dispatchResult(err, tree, 'onTree');
+  };
+
+  /**
+   * Enqueue the task of calling the callback `callbackName` with `err` and
+   * `tree` as parameters once the queue is attended.
+   */
+  BinaryReader.prototype.dispatchResult = function(err, tree, callbackName) {
+    this.pendingTrees.push([err, tree, callbackName]);
+    if (!this.paused) {
+      this.attendPendingTrees();
+    }
+  };
+
+  /**
+   * Attend all pending trees by calling to the proper callback.
+   * Tree dispatching occurs in the same order than they were received.
+   */
+  BinaryReader.prototype.attendPendingTrees = function() {
+    var args, err, tree, callbackName;
+    while (args = this.pendingTrees.shift()) {
+
+      err = args[0];
+      tree = args[1];
+      callbackName = args[2];
+
+      setTimeout((function _processTree(callbackName, err, tree) {
+        var method = this[callbackName];
+        if (typeof method === 'function') {
+          method(err, tree);
+        }
+      }).bind(this, callbackName, err, tree));
     }
   };
 
@@ -4928,7 +4984,6 @@ CoSeMe.namespace('http', (function(){
     }
   };
 }()));
-
 CoSeMe.namespace('registration', (function(){
   'use strict';
 
@@ -4942,7 +4997,7 @@ CoSeMe.namespace('registration', (function(){
     // registration code again.
     // Just remember to NOT include this file on the general file!
 
-    var classesMd5 = atob("MOpsiNsR+nHEv0dFc3dqmA==");
+    var classesMd5 = atob("r4WQV17nVTl3+uFlF9mvEg==");
     var prefix = atob("Y29tLndoYXRzYXBw");
     var signature = atob(
       "MIIDMjCCAvCgAwIBAgIETCU2pDALBgcqhkjOOAQDBQAwfDELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFDASBgNVBAcTC1NhbnRhIENsYXJhMRYwFAYDVQQKEw1XaGF0c0FwcCBJbmMuMRQwEgYDVQQLEwtFbmdpbmVlcmluZzEUMBIGA1UEAxMLQnJpYW4gQWN0b24wHhcNMTAwNjI1MjMwNzE2WhcNNDQwMjE1MjMwNzE2WjB8MQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEUMBIGA1UEBxMLU2FudGEgQ2xhcmExFjAUBgNVBAoTDVdoYXRzQXBwIEluYy4xFDASBgNVBAsTC0VuZ2luZWVyaW5nMRQwEgYDVQQDEwtCcmlhbiBBY3RvbjCCAbgwggEsBgcqhkjOOAQBMIIBHwKBgQD9f1OBHXUSKVLfSpwu7OTn9hG3UjzvRADDHj+AtlEmaUVdQCJR+1k9jVj6v8X1ujD2y5tVbNeBO4AdNG/yZmC3a5lQpaSfn+gEexAiwk+7qdf+t8Yb+DtX58aophUPBPuD9tPFHsMCNVQTWhaRMvZ1864rYdcq7/IiAxmd0UgBxwIVAJdgUI8VIwvMspK5gqLrhAvwWBz1AoGBAPfhoIXWmz3ey7yrXDa4V7l5lK+7+jrqgvlXTAs9B4JnUVlXjrrUWU/mcQcQgYC0SRZxI+hMKBYTt88JMozIpuE8FnqLVHyNKOCjrh4rs6Z1kW6jfwv6ITVi8ftiegEkO8yk8b6oUZCJqIPf4VrlnwaSi2ZegHtVJWQBTDv+z0kqA4GFAAKBgQDRGYtLgWh7zyRtQainJfCpiaUbzjJuhMgo4fVWZIvXHaSHBU1t5w//S0lDK2hiqkj8KpMWGywVov9eZxZy37V26dEqr/c2m5qZ0E+ynSu7sqUD7kGx/zeIcGT0H+KAVgkGNQCo5Uc0koLRWYHNtYoIvt5R3X6YZylbPftF/8ayWTALBgcqhkjOOAQDBQADLwAwLAIUAKYCp0d6z4QQdyN74JDfQ2WCyi8CFDUM4CaNB+ceVXdKtOrNTQcc0e+t"
@@ -5807,9 +5862,9 @@ function hex2Str(hex) {
               node = tree;
               if (node) {
                 var success = readSuccess(node);
+                connection.reader.suspend();
                 connection.reader.onTree = undefined;
                 connection.reader.onStreamStart = undefined;
-                connection.socket.suspend();
                 connection.jid = aUsr + '@' + CoSeMe.config.auth.domain;
                 aCallback(success ? connection : null);
               }
@@ -6095,7 +6150,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
 
   function onError(evt) {
     var reason = evt.data;
-    logger.error('Socket error due to:', reason, '!');
+    logger.error('Socket error due to:', evt, '!');
     _signalInterface.send('disconnected', [reason]);
   }
 
@@ -6777,11 +6832,11 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
         _connection = aSocket;
         _connection.reader.onTree = handleNode;
         _connection.onconnectionclosed = onError;
-        _connection.socket.resume();
+        _connection.reader.resume();
         alive = true;
         pingId = setInterval(sendPings, 1000 * _pingInterval);
       } else {
-        // Should we fire something here?
+        _connection.reader.onStreamStart = undefined;
         _connection.reader.onTree = undefined;
         _connection.onconnectionclosed = undefined;
         _connection = aSocket;
@@ -6964,15 +7019,16 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
     _writeNode: function (aNode) {
       logger.log('Write node called with ', aNode);
       if (self.state == 2) {
-        try {
-          self.out.write(aNode);
-          return true;
-        } catch (x) {
-          self.state = 0;
-          self.readerThread.socket = null;
-          logger.error('Error writing!', x);
-          return false;
-        }
+        self.out.write(aNode, this._onErrorSendDisconnected);
+      }
+    },
+
+    _onErrorSendDisconnected: function (error) {
+      if (error && self.state !== 0) {
+        self.state = 0;
+        self.readerThread.socket = null;
+        self.readerThread.sendDisconnected(error);
+        logger.error('Error writing!', error);
       }
     },
 
