@@ -413,7 +413,7 @@ App.connectors['coseme'] = function (account) {
   this.events.onPresenceUpdated = function (jid, lastSeen) {
     var account = this.account;
     var time = Tools.convenientDate(Tools.localize(Tools.stamp( Math.floor((new Date).valueOf()/1000) - parseInt(lastSeen) )));
-    $('section#chat[data-jid="' + jid + '"] header .status').text(_('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})}));
+    $('section#chat[data-jid="' + jid + '"] header .status').text(parseInt(lastSeen) < 180 ? _('showa') : _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})}));
   }
     
 }
