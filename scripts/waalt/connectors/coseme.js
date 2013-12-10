@@ -62,6 +62,7 @@ App.connectors['coseme'] = function (account) {
   }.bind(this);
   
   this.contactsSync = function (cb) {
+    console.log('SYNCING CONTACTS');
     var account = this.account;
     var allContacts = navigator.mozContacts.getAll({sortBy: 'givenName', sortOrder: 'ascending'});
     allContacts.onsuccess = function (event) {
@@ -107,12 +108,17 @@ App.connectors['coseme'] = function (account) {
             }   
           }
         } catch (e) {
-          console.log('SYNC ERROR:', e);
+          console.log('CONTACT NORMALIZATION ERROR:', e);
         }
         this.continue();
       } else if (cb){
         cb();
       }
+    }
+    allContacts.onerror = function (event) {
+      console.log('CONTACTS ERROR:', event);
+      Lungo.Notification.error(_('ContactsGetError'), _('ContactsGetErrorExp'), 'exclamation-sign', 5);
+      cb();
     }
   }.bind(this);
   

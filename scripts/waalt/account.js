@@ -21,7 +21,8 @@ var Account = function (core) {
         Lungo.Notification.show('download', _('Synchronizing'));
         var cb = function () {
           // Don't add an account if already set up
-          if (Accounts.find(this.core.fullJid || this.core.user) < 0) {
+          if (Accounts.find(this.core.fullJid) < 0) {
+            console.log('ADDING ACCOUNT', this);
             App.accounts.push(this);
             App.smartpush('accountsCores', this.core);
             Lungo.Notification.hide();
@@ -31,8 +32,9 @@ var Account = function (core) {
               $('section#success img#avatar').attr('src', avatar);
             });
             Lungo.Router.section('success');
+          } else {
+            Lungo.Notification.error(_('DupliAccount'), _('DupliAccountNotice'), 'warning-sign', 5);
           }
-        Lungo.Notification.error(_('DupliAccount'), _('DupliAccountNotice'), 'warning-sign', 5);
         }
         this.sync(cb.bind(this));
       }.bind(this),
