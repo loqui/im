@@ -15,6 +15,7 @@ App.connectors['coseme'] = function (account) {
   this.handlers = {};
   this.events = {}
   this.chat = {};
+  this.contacts = {};
   this.connected = false;
   
   this.connect = function (callback) {
@@ -55,13 +56,13 @@ App.connectors['coseme'] = function (account) {
   this.sync = function (callback) {
     if (!('roster' in this.account.core)) {
       this.account.core.roster = [];
-      this.contactsSync(callback);
+      this.contacts.sync(callback);
     } else {
       callback();
     }
   }.bind(this);
   
-  this.contactsSync = function (cb) {
+  this.contacts.sync = function (cb) {
     console.log('SYNCING CONTACTS');
     var account = this.account;
     var allContacts = navigator.mozContacts.getAll({sortBy: 'givenName', sortOrder: 'ascending'});
@@ -122,13 +123,16 @@ App.connectors['coseme'] = function (account) {
     }
   }.bind(this);
   
-  this.contactsSort = function (cb) {
+  this.contacts.order = function (cb) {
     this.account.core.roster.sort(function (a,b) {
       var aname = a.name ? a.name : a.jid;
       var bname = b.name ? b.name : b.jid;
       return aname > bname;
     });
     cb();
+  }
+  
+  this.contacts.remove = function () {
   }
   
   this.presence.set = function (show, status) {

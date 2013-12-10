@@ -162,26 +162,30 @@ var Messenger = {
   
   contactRemove: function (jid) {
     var account = Messenger.account();
-    if (App.online && account.connector.connection.connected) {
+    if (App.online && account.connector.connected) {
       if (account.supports('rosterMgmt')) {
         var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
         var name = contact.name || jid;
         var will = confirm(_('ConfirmContactRemove', {name: name}));
         if (will) {
-          account.connector.connection.roster.remove(jid);
-          account.connector.connection.roster.get(function(){});
+          account.connector.contacts.remove(jid);
+          var ri;
           for (var i in account.core.roster) {
-            if (account.core.roster[i].jid == jid) break;
+            if (account.core.roster[i].jid == jid) {
+              ri = i;
+              break;
+            }
           }
-          var index = account.chatFind(jid);
-          var chat = account.chats[index];
-          for (var i in chat.chunks) {
-            var chunk = chat.chunks[i];
-            Store.blockDrop(chunk);
+          var ci = account.chatFind(jid);
+          if (ci >= 0) {
+            var chat = account.chats[ci];
+            for (var i in chat.chunks) {
+              var chunk = chat.chunks[i];
+              Store.blockDrop(chunk);
+            }
+            account.chats.splice(ci, 1);
           }
-          account.chats.splice(index, 1);
-          account.core.roster.splice(i, 1);
-          account.core.chats.splice(index, 1);
+          account.core.roster.splice(ri, 1);
           account.save();
           account.allRender();
           Lungo.Router.section('main');

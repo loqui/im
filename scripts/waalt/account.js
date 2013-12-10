@@ -235,8 +235,8 @@ var Account = function (core) {
         $('section#main fieldset#searchForm input').val('').trigger('keyup');
       }
       var syncOnClick = function (event) {
-        this.connector.contactsSync(function () {
-          this.connector.contactsSort(function () {
+        this.connector.contacts.sync(function () {
+          this.connector.contacts.sort(function () {
             this.save();
             this.allRender();
           }.bind(this));

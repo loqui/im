@@ -11,6 +11,7 @@ App.connectors['XMPP'] = function (account) {
   this.handlers = {};
   this.events = {}
   this.chat = {};
+  this.contacts = {};
   this.connected = false;
   
   this.connection = new Strophe.Connection(this.provider.connector.host);
@@ -196,6 +197,11 @@ App.connectors['XMPP'] = function (account) {
   this.emojiRender = function (img, emoji) {
     App.emoji[Providers.data[this.account.core.provider].emoji].render(img, emoji);
   }.bind(this);
+  
+  this.contacts.remove = function (jid) {
+    this.connection.roster.remove(jid);
+    this.connection.roster.get(function(){});
+  }
   
   this.handlers.init = function () {
     if (!this.handlers.onMessage) {
