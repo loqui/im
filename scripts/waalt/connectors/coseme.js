@@ -130,7 +130,7 @@ App.connectors['coseme'] = function (account) {
       return aname > bname;
     });
     cb();
-  }
+  }.bind(this);
   
   this.contacts.remove = function () {
   }

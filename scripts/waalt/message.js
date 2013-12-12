@@ -51,6 +51,7 @@ var Message = function (account, core) {
         title: contact ? contact.name || chatJid : chatJid,
         chunks: []
       }, this.account);
+      chat.save();
     }
     if ($('section#chat').data('jid') == chatJid && $('section#chat').hasClass('show')) {
       var ul = $('section#chat ul#messages');
@@ -76,9 +77,7 @@ var Message = function (account, core) {
     } else {
       App.notify({ subject: subject, text: message.core.text, pic: 'https://raw.github.com/waalt/loqui/master/img/foovatar.png', callback: callback }, 'received');
     }
-    chat.messageAppend.push({msg: this.core}, function (err) {
-      chat.save(ci, true);
-    }.bind(this));
+    chat.messageAppend.push({msg: this.core}, function (err) { });
   }
   
   // Represent this message in HTML

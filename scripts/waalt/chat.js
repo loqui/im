@@ -90,6 +90,10 @@ var Chat = function (core, account) {
     }
   }.bind(this));
   
+  this.messageAppend.drain = function () {
+    this.save(null, true);
+  }.bind(this);
+  
   // Create a chat window for this contact
   this.show = function () {
     var section = $('section#chat');
