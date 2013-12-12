@@ -13,15 +13,17 @@ var Chat = function (core, account) {
     var ul = $('section#chat ul#messages');
     ul.empty().append('<li/>');
     var index = this.core.chunks.length - 1;
-    this.chunkRender(index);
+    if (index >= 0) {
+      this.chunkRender(index);
+    }
   }
   
   // Render a chunk of messages
   this.chunkRender = function (index) {
     var chat = this;
-    if (index >= 0) {
+    var ul = $('section#chat ul#messages');
+    if (index >= 0 && ul.children('li[data-chunk="' + index + '"]').length < 1) {
       var stIndex = this.core.chunks[index];
-      var ul = $('section#chat ul#messages');
       Store.recover(stIndex, function (chunk) {
         var li = $('<li/>');
         li.addClass('chunk');
@@ -33,7 +35,7 @@ var Chat = function (core, account) {
         }
         ul.prepend(li);
         var onSwipe = function (e) {
-          this.chunkRender(index-1);
+          this.chunkRender(index - 1);
         }
         ul.off('swipeDown').on('swipeDown', onSwipe.bind(chat));
         ul[0].scrollTop += li.height();
@@ -52,16 +54,21 @@ var Chat = function (core, account) {
     var chunkListSize = this.core.chunks.length;
     var blockIndex = this.core.chunks[chunkListSize - 1];
     var storageIndex;
-    if (chunkListSize) {
+    this.core.last = msg;
+    if (chunkListSize > 0) {
       Store.recover(blockIndex, function (chunk) {
-        if (chunk.length > App.defaults.Chat.chunkSize) {
+        if (chunk.length >= App.defaults.Chat.chunkSize) {
+          console.log('FULL', chunk.length);
           var chunk = [msg];
           blockIndex = Store.save(chunk);
+          console.log('PUSHING', blockIndex, chunk);
           chat.core.chunks.push(blockIndex, callback);
           storageIndex = [blockIndex, 0];
         } else {
+          console.log('FITS');
           chunk.push(msg);
           blockIndex = chat.core.chunks[chunkListSize - 1];
+          console.log('PUSHING', blockIndex, chunk);
           Store.update(blockIndex, chunk, callback);
           storageIndex = [blockIndex, chunk.length-1];
         }
@@ -70,8 +77,10 @@ var Chat = function (core, account) {
         }
       });
     } else {
+      console.log('NEW');
       var chunk = [msg];
       blockIndex = Store.save(chunk);
+      console.log('PUSHING', blockIndex, chunk);
       chat.core.chunks.push(blockIndex);
       storageIndex = [blockIndex, 0];
       if (delay) {
@@ -79,7 +88,6 @@ var Chat = function (core, account) {
       }
       callback();
     }
-    this.core.last = msg;
   }.bind(this));
   
   // Create a chat window for this contact

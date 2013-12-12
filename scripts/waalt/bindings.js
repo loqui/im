@@ -31,7 +31,7 @@ $('document').ready(function(){
 });
 
 if (navigator.mozAlarms) {
-  navigator.mozSetMessageHandler("alarm", function (message) {
+  navigator.mozSetMessageHandler('alarm', function (message) {
     App.alarmSet(message.data);
   });
 }

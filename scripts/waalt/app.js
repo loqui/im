@@ -192,6 +192,9 @@ var App = {
       App.lastNot = navigator.mozNotification.createNotification(core.subject, core.text, core.pic);
       App.lastNot.onclick = function () {
         core.callback();
+        this.onclick = function (e) {
+          // This is a trick for circumventing Gaia bug #949257 
+        };
       }
       App.lastNot.show();
     } else {

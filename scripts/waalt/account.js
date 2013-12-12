@@ -235,13 +235,14 @@ var Account = function (core) {
         $('section#main fieldset#searchForm input').val('').trigger('keyup');
       }
       var syncOnClick = function (event) {
-        this.connector.contacts.sync(function () {
-          this.connector.contacts.sort(function () {
-            this.save();
-            this.allRender();
-          }.bind(this));
-        }.bind(this));
-      }.bind(this);
+        var account = Messenger.account();
+        account.connector.contacts.sync(function () {
+          account.connector.contacts.order(function () {
+            account.save();
+            account.allRender();
+          });
+        });
+      };
       searchForm.bind('keyup', searchFormOnKeyUp);
       clear.bind('click', clearOnClick);
       sync.bind('click', syncOnClick);

@@ -52,17 +52,17 @@ var Message = function (account, core) {
         chunks: []
       }, this.account);
     }
-    if (!$('section#chat').hasClass('show') || $('section#chat').data('jid') != this.core.from) {
-      chat.core.unread++;
-    }
-    if ($('section#chat').data('jid') == chatJid) {
+    if ($('section#chat').data('jid') == chatJid && $('section#chat').hasClass('show')) {
       var ul = $('section#chat ul#messages');
       var li = ul.children('li:last-child');
       li.append(this.preRender());
       ul[0].scrollTop = ul[0].scrollHeight;
+    } else {
+      chat.core.unread++;
     }
     var pic = App.avatars[chatJid];
     var callback = function () {
+      message.account.show();
       chat.show();
 	    App.toForeground();
     }
