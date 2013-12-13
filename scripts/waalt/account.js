@@ -241,6 +241,7 @@ var Account = function (core) {
             account.save();
             account.allRender();
           });
+        Lungo.Notification.show('download', _('Synchronizing'), 2);
         });
       };
       searchForm.bind('keyup', searchFormOnKeyUp);
