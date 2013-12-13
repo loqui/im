@@ -89,10 +89,8 @@ var Tools = {
                     :
                       PHONE_NUMBER_META_DATA[cc].slice(2, 4)
                     );
-                      
     var parsed = PhoneNumber.Parse(num.replace(/[\s\-\+]/g, ''), region);
-    console.log(num.replace(/[\s\-\+]/g, ''), cc, region, parsed);
-    return parsed ? parsed.internationalFormat.replace(/[\ \+]/g, '') : null;
+    return parsed ? parsed.internationalFormat.replace(/[\s\-\+]/g, '') : null;
   },
   
   countries: function () {
