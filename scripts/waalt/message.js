@@ -39,12 +39,12 @@ var Message = function (account, core) {
     var message = this;
     var chatJid = muc ? this.core.to : this.core.from;
     var ci = this.account.chatFind(chatJid);
-    coToolsog('PROCESSED MESSAGE', muc, this.core.to, this.core.from, ci, this);
+    Tools.log('PROCESSED MESSAGE', muc, this.core.to, this.core.from, ci, this);
     if (ci >= 0) {
       var chat = this.account.chats[ci];
     } else {
       // There is no chat for the sender of the message
-      consTools('No chat for ', chatJid, 'creating new one', this.account);
+      Tools.log('No chat for ', chatJid, 'creating new one', this.account);
       var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.from);
       var chat = new Chat({
         jid: chatJid, 

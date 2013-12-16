@@ -99,14 +99,14 @@ var Store = {
           }
         }      
       } else {
-        coToolsog('DS IS NOT SUPPORTED');
+        Tools.log('DS IS NOT SUPPORTED');
         Store.put('fakesdcard_' + path, {content: content, type: type}, onsuccess);
       }
     },
     
     recover: function (path, onsuccess, onerror) {
       if ('getDeviceStorage' in navigator) {
-        consTools('DS IS SUPPORTED');
+        Tools.log('DS IS SUPPORTED');
         var req = this.card.get(path);
         req.onsuccess = function () {
             onsuccess(this.result);

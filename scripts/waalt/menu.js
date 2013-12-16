@@ -110,7 +110,7 @@ var Menu = {
         Lungo.Notification.success(_('Reloading'), _('AppWillReload'), 'signout', 3);
         App.disconnect();
         App.run();
-        coToolsog(App.name + ' has been reloaded')
+        Tools.log(App.name + ' has been reloaded')
       } else {
         console.log('Upps...');
       }
