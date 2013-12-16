@@ -23,13 +23,13 @@ App.connectors['coseme'] = function (account) {
     var method = 'auth_login';
     var params = [this.account.core.data.login, this.account.core.data.pw];
     SI.registerListener('auth_success', function() {
-      console.log("CONNECTED");
+      Tools.log("CONNECTED");
       this.connected = true;
       this.account.core.fullJid = CoSeMe.yowsup.connectionmanager.jid;
       callback.connected();
     }.bind(this));
     SI.registerListener('auth_fail', function() {
-      console.log("AUTH FAIL");
+      Tools.log("AUTH FAIL");
       this.connected = false;
       callback.authfail();
     }.bind(this));
@@ -47,7 +47,7 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.start = function () {
-    console.log('CONNECTOR START');
+    Tools.log('CONNECTOR START');
     this.handlers.init();
     this.presence.set();
     this.groupsGet('participating');
@@ -63,7 +63,7 @@ App.connectors['coseme'] = function (account) {
   }.bind(this);
   
   this.contacts.sync = function (cb) {
-    console.log('SYNCING CONTACTS');
+    Tools.log('SYNCING CONTACTS');
     var account = this.account;
     var allContacts = navigator.mozContacts.getAll({sortBy: 'givenName', sortOrder: 'ascending'});
     allContacts.onsuccess = function (event) {
@@ -89,11 +89,11 @@ App.connectors['coseme'] = function (account) {
                 name: fullname
               }
               account.core.roster.push(contact);
-              console.log(name, 'did not exist, appending', contact);
+              Tools.log(name, 'did not exist, appending', contact);
             }
             var update = function (existing, jid, name) {
               existing.name = name;
-              console.log(name, 'already existed, updating to', existing);
+              Tools.log(name, 'already existed, updating to', existing);
             }
             for (var i = 0; i < result.tel.length; i++) {
               var number = result.tel[i] ? Tools.numSanitize(result.tel[i].value, account.core.cc) : null;
@@ -109,7 +109,7 @@ App.connectors['coseme'] = function (account) {
             }   
           }
         } catch (e) {
-          console.log('CONTACT NORMALIZATION ERROR:', e);
+          Tools.log('CONTACT NORMALIZATION ERROR:', e);
         }
         this.continue();
       } else if (cb){
@@ -117,7 +117,7 @@ App.connectors['coseme'] = function (account) {
       }
     }
     allContacts.onerror = function (event) {
-      console.log('CONTACTS ERROR:', event);
+      Tools.log('CONTACTS ERROR:', event);
       Lungo.Notification.error(_('ContactsGetError'), _('ContactsGetErrorExp'), 'exclamation-sign', 5);
       cb();
     }
@@ -204,7 +204,7 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.handlers.init = function () {
-    console.log('HANDLERS INIT');
+    Tools.log('HANDLERS INIT');
     var signals = {
       auth_success: null,
       auth_fail: null,
@@ -266,7 +266,7 @@ App.connectors['coseme'] = function (account) {
     Object.keys(signals).forEach(function(signal) {
       var customCallback = signals[signal];
       if (customCallback) {
-        console.log('REGISTER', signal, customCallback);
+        Tools.log('REGISTER', signal, customCallback);
         Yowsup.connectionmanager.signals[signal].length = 0;
         SI.registerListener(signal, customCallback.bind(this));
       }
@@ -283,7 +283,7 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.events.onMessage = function (id, from, body, stamp, e, nick, g) {
-    console.log('MESSAGE', id, from, body, stamp, e, nick, g);
+    Tools.log('MESSAGE', id, from, body, stamp, e, nick, g);
     var account = this.account;
     var from = from;
     var to = this.account.user + '@' + CoSeMe.config.domain;
@@ -305,7 +305,7 @@ App.connectors['coseme'] = function (account) {
   
   this.events.onAvatar = function (jid, picId, blob) {
     var account = this.account;
-    console.log(jid, picId, blob);
+    Tools.log(jid, picId, blob);
     if (jid == this.account.core.fullJid) {
       Tools.picUnblob(blob, 96, 96, function (url) {
         $('section#main[data-jid="' + jid + '"] footer span.avatar img').attr('src', url);
@@ -328,18 +328,18 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.events.onMessageSent = function (from, msgId) {
-    console.log('SENT', from, msgId);
+    Tools.log('SENT', from, msgId);
     $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"]').data('receipt', 'sent');
   }
 
   this.events.onMessageDelivered = function (from, msgId) {
-    console.log('DELIVERED', from, msgId); 
+    Tools.log('DELIVERED', from, msgId);
     $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"]').data('receipt', 'delivered');
     MI.call('delivered_ack', [from, msgId]);
   }
   
   this.events.onMessageVisible = function (from, msgId) {
-    console.log('VISIBLE', from, msgId); 
+    Tools.log('VISIBLE', from, msgId);
     $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"]').data('receipt', 'visible');
   }
   
@@ -382,7 +382,7 @@ App.connectors['coseme'] = function (account) {
     var ci = account.chatFind(jid);
     if (ci >= 0) {
       var chat = account.chats[ci];
-      console.log('RECEIVED PARTICIPANTS FOR', jid, chat, participants);
+      Tools.log('RECEIVED PARTICIPANTS FOR', jid, chat, participants);
       if (!chat.core.participants || (JSON.stringify(chat.core.participants) != JSON.stringify(participants))) {
         chat.core.participants = participants;
         chat.save(ci);
@@ -392,7 +392,7 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.events.onGroupMessage = function (msgId, from, author, data, stamp, wantsReceipt, pushName) {
-    console.log('GROUPMESSAGE', msgId, from, author, data, stamp, wantsReceipt, pushName);
+    Tools.log('GROUPMESSAGE', msgId, from, author, data, stamp, wantsReceipt, pushName);
     var account = this.account;
     var to = from;
     var from = author;
@@ -407,7 +407,7 @@ App.connectors['coseme'] = function (account) {
         stamp: stamp,
         pushName: pushName
       });
-      console.log('RECEIVED', msg);
+      Tools.log('RECEIVED', msg);
       msg.receive(true);
       this.ack(msgId, to);
     }
@@ -495,9 +495,9 @@ App.logForms['coseme'] = function (article, provider, data) {
       var codeGet = function (deviceId) {
         $(article).data('deviceId', deviceId);
         var onsent = function (data) {
-          console.log(data);
+          Tools.log(data);
           if (data.status == 'sent') {
-            console.log('Sent SMS to', cc, user, 'with DID', deviceId, 'retry after', data.retry_after);
+            Tools.log('Sent SMS to', cc, user, 'with DID', deviceId, 'retry after', data.retry_after);
             Lungo.Notification.success(_('SMSsent'), _('SMSsentExp'), 'envelope', 3);
             sms.addClass('hidden');
             code.removeClass('hidden');
@@ -513,11 +513,11 @@ App.logForms['coseme'] = function (article, provider, data) {
                 }); 
                 account.test();  
             } else {
-              console.log('Not valid', 'Reason:', data.reason, 'with DID', deviceId);
+              Tools.log('Not valid', 'Reason:', data.reason, 'with DID', deviceId);
               Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
             }
           } else {
-            console.log('Could not sent SMS', 'Reason:', data.reason, 'with DID', deviceId);
+            Tools.log('Could not sent SMS', 'Reason:', data.reason, 'with DID', deviceId);
             Lungo.Notification.error(_('SMSnotSent'), _('SMSreason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
           }        
         }
@@ -548,7 +548,7 @@ App.logForms['coseme'] = function (article, provider, data) {
     var deviceId = $(article).data('deviceId');
     if (cc && user && rCode && deviceId) {
       var onready = function (data) {
-        console.log(data);
+        Tools.log(data);
         if (data.type == 'existing') {
           var account = new Account({
             user: user,
@@ -560,7 +560,7 @@ App.logForms['coseme'] = function (article, provider, data) {
           });  
           account.test();    
         } else {
-          console.log('Not valid', 'Reason:', data.reason);
+          Tools.log('Not valid', 'Reason:', data.reason);
           Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
         }
       }

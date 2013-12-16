@@ -12,7 +12,7 @@ var Plus = {
         account.connector.attention.request(to);
         window.navigator.vibrate([100,30,100,30,100,200,200,30,200,30,200,200,100,30,100,30,100]);
         App.audio('thunder');
-        console.log('Sent a bolt to', to);
+        Tools.log('Sent a bolt to', to);
       } else {
         Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter', 'exclamation-sign'));
       }

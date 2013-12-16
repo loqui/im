@@ -58,17 +58,17 @@ var Chat = function (core, account) {
     if (chunkListSize > 0) {
       Store.recover(blockIndex, function (chunk) {
         if (chunk.length >= App.defaults.Chat.chunkSize) {
-          console.log('FULL', chunk.length);
+          Tools.log('FULL', chunk.length);
           var chunk = [msg];
           blockIndex = Store.save(chunk);
-          console.log('PUSHING', blockIndex, chunk);
+          Tools.log('PUSHING', blockIndex, chunk);
           chat.core.chunks.push(blockIndex, callback);
           storageIndex = [blockIndex, 0];
         } else {
-          console.log('FITS');
+          Tools.log('FITS');
           chunk.push(msg);
           blockIndex = chat.core.chunks[chunkListSize - 1];
-          console.log('PUSHING', blockIndex, chunk);
+          Tools.log('PUSHING', blockIndex, chunk);
           Store.update(blockIndex, chunk, callback);
           storageIndex = [blockIndex, chunk.length-1];
         }
@@ -77,10 +77,10 @@ var Chat = function (core, account) {
         }
       });
     } else {
-      console.log('NEW');
+      Tools.log('NEW');
       var chunk = [msg];
       blockIndex = Store.save(chunk);
-      console.log('PUSHING', blockIndex, chunk);
+      Tools.log('PUSHING', blockIndex, chunk);
       chat.core.chunks.push(blockIndex);
       storageIndex = [blockIndex, 0];
       if (delay) {

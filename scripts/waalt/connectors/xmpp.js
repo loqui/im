@@ -22,45 +22,45 @@ App.connectors['XMPP'] = function (account) {
     var handler = function (status) {
      switch (status) {
         case Strophe.Status.CONNECTING:
-          console.log('Connecting');
+          Tools.log('Connecting');
           if (callback.connecting) {
             callback.connecting();
           }
           break;
         case Strophe.Status.CONNFAIL:
-          console.log('Connection failed');
+          Tools.log('Connection failed');
           if (callback.connfail) {
             callback.connfail();
           }
           Lungo.Notification.error(_('NoAuth'), _('NoAuthNotice'), 'remove-circle', 5);
           break;
         case Strophe.Status.AUTHENTICATING:
-          console.log('Authenticating');
+          Tools.log('Authenticating');
           if (callback.authenticating) {
             callback.authenticating();
           }
           break;
         case Strophe.Status.AUTHFAIL:
-          console.log('Authentication failed');
+          Tools.log('Authentication failed');
           if (callback.authfail) {
             callback.authfail();
           }
           break;
         case Strophe.Status.CONNECTED:
-          console.log('Connected');
+          Tools.log('Connected');
           this.connected = true;
           if (callback.connected) {
             callback.connected();
           }
           break;
         case Strophe.Status.DISCONNECTING:
-          console.log('Disconnecting');
+          Tools.log('Disconnecting');
           if (callback.disconnecting) {
             callback.disconnecting();
           }
           break;
         case Strophe.Status.DISCONNECTED:
-          console.log('Disconnected');
+          Tools.log('Disconnected');
           if (callback.disconnected) {
             callback.disconnected();
           }
@@ -275,7 +275,7 @@ App.connectors['XMPP'] = function (account) {
         }
       }, 'thunder');
     }
-    console.log(from, 'sent you a bolt.');
+    Tools.log(from, 'sent you a bolt.');
     return true;
   }.bind(this);
   

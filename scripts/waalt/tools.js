@@ -2,6 +2,12 @@
 
 var Tools = {
 
+  log: function () {
+    if (App.debug) {
+      console.log.apply(console, [].slice.call(arguments));
+    }
+  },
+
   convenientDate: function (stamp) {
     var day = this.day(stamp);
     var today = this.day(this.localize(this.stamp()));
