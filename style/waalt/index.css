@@ -581,6 +581,7 @@ section#chat:not([data-muc='true']) ul#messages > li > div > span.name {
 section#chat ul#messages > li > div > span.text {
   font-weight: 300;
   font-size: .9em;
+  word-wrap: break-word;
 }
 section#chat ul#messages > li > div[data-type='out'][data-receipt='sent']:after {
   content: "";
