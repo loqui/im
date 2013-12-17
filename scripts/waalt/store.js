@@ -85,7 +85,7 @@ var Store = {
     
     save: function (path, type, content, onsuccess, onerror) {
       if ('getDeviceStorage' in navigator) {
-        console.log('DS IS SUPPORTED');
+        Tools.log('DS IS SUPPORTED');
         var file = new Blob(content, {type: type});
         var req = this.card.addNamed(file, path);
         req.onsuccess = function () {
@@ -99,14 +99,14 @@ var Store = {
           }
         }      
       } else {
-        console.log('DS IS NOT SUPPORTED');
+        Tools.log('DS IS NOT SUPPORTED');
         Store.put('fakesdcard_' + path, {content: content, type: type}, onsuccess);
       }
     },
     
     recover: function (path, onsuccess, onerror) {
       if ('getDeviceStorage' in navigator) {
-        console.log('DS IS SUPPORTED');
+        Tools.log('DS IS SUPPORTED');
         var req = this.card.get(path);
         req.onsuccess = function () {
             onsuccess(this.result);

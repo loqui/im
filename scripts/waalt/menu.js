@@ -96,7 +96,7 @@ var Menu = {
           });
           App.killAll();
           setTimeout(function () {
-            console.log(App.name + ' has been closed');
+            Tools.log(App.name + ' has been closed');
             window.close();
           }, 3000);
         }
@@ -110,7 +110,7 @@ var Menu = {
         Lungo.Notification.success(_('Reloading'), _('AppWillReload'), 'signout', 3);
         App.disconnect();
         App.run();
-        console.log(App.name + ' has been reloaded')
+        Tools.log(App.name + ' has been reloaded')
       } else {
         console.log('Upps...');
       }

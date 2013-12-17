@@ -22,7 +22,7 @@ var Account = function (core) {
         var cb = function () {
           // Don't add an account if already set up
           if (Accounts.find(this.core.fullJid) < 0) {
-            console.log('ADDING ACCOUNT', this);
+            Tools.log('ADDING ACCOUNT', this);
             App.accounts.push(this);
             App.smartpush('accountsCores', this.core);
             Lungo.Notification.hide();
@@ -430,7 +430,7 @@ var Accounts = {
       var li = $('<li/>').data('jid', account.core.fullJid || account.core.user);
       var button = $('<button/>').addClass('account').on('click', function () {
         var index = Accounts.find(this.parentNode.dataset.jid);
-        console.log('SWITCHING TO ACCOUNT', index, this.parentNode.dataset.jid);
+        Tools.log('SWITCHING TO ACCOUNT', index, this.parentNode.dataset.jid);
         if (index) {
           App.accounts[index].show();
         }

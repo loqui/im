@@ -15,6 +15,7 @@ var App = {
   avatars: {},
   online: true,
   lastNot: null,
+  debug: true,
   
   // Default values
   defaults: {
@@ -135,13 +136,13 @@ var App = {
   // Update an array and put it in storage
   smartpush: function (key, value, callback) {
     this[key].push(value);
-    console.log('SAVING ' + key);
+    Tools.log('SAVING ' + key);
     Store.put(key, this[key], callback);
   },
   
   // Update an object and put it in storage
   smartupdate: function (key, callback) {
-    console.log('SAVING ' + key);
+    Tools.log('SAVING ' + key);
     Store.put(key, this[key], callback);
   },
   
