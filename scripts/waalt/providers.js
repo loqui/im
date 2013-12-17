@@ -32,6 +32,7 @@ var Providers = {
       terms: {
         user: 'ProviderUsername',
         pass: 'Password',
+        userInputType: 'text'
       },
       notice: true,
       emoji: 'FB'
@@ -50,7 +51,8 @@ var Providers = {
       terms: {
         user: 'ProviderAddress',
         pass: 'Password',
-        placeholder: 'username@gmail.com'
+        placeholder: 'username@gmail.com',
+        userInputType: 'email'
       },
       notice: true,
       emoji: 'XMPP'
@@ -67,7 +69,8 @@ var Providers = {
       color: '#FF8702',
       terms: {
         user: 'Username',
-        pass: 'Password'
+        pass: 'Password',
+        userInputType: 'text'
       },
       emoji: 'XMPP'
     },
@@ -84,7 +87,8 @@ var Providers = {
       color: '#39B006',
       terms: {
         user: 'Username',
-        pass: 'Password'
+        pass: 'Password',
+        userInputType: 'text'
       },
       emoji: 'XMPP'
     },
@@ -102,7 +106,8 @@ var Providers = {
       terms: {
         user: 'ProviderAddress',
         pass: 'Password',
-        placeholder: 'username@example.com'
+        placeholder: 'username@example.com',
+        userInputType: 'email'
       },
       emoji: 'XMPP'
     },
@@ -119,7 +124,8 @@ var Providers = {
       terms: {
         user: 'FullJID',
         pass: 'Password',
-        placeholder: 'username@example.com'
+        placeholder: 'username@example.com',
+        userInputType: 'email'
       },
       emoji: 'XMPP'
     }
