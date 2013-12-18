@@ -389,6 +389,7 @@ var Account = function (core) {
         break;
       }
     }
+    console.log(jid, '@', index);
     return index;
   }
     

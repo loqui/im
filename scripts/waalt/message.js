@@ -14,6 +14,10 @@ var Message = function (account, core) {
       var ci = this.account.chatFind(this.core.to);
       if (ci >= 0) {
         var chat = this.account.chats[ci];
+        this.account.chats.push(chat);
+        this.account.core.chats.push(chat.core);
+        this.account.chats.splice(ci, 1);
+        this.account.core.chats.splice(ci, 1);
       } else {
         // There is no chat for the receiver of the message
         Tools.log('No chat for ', this.core.to, 'creating new one', this.account);
@@ -23,13 +27,16 @@ var Message = function (account, core) {
           title: contact ? contact.name || this.core.to : this.core.to,
           chunks: []
         }, this.account);
+        this.account.chats.push(chat);
+        this.account.core.chats.push(chat.core);
       }
       var ul = $('section#chat ul#messages');
       var li = ul.children('li:last-child');
       li.append(this.preRender());
       ul[0].scrollTop = ul[0].scrollHeight;
       chat.messageAppend.push({msg: this.core}, function (err) {
-        chat.save(ci, true);
+      
+        chat.save(true);
       }.bind(this));
     }
   }
@@ -42,6 +49,10 @@ var Message = function (account, core) {
     Tools.log('PROCESSED MESSAGE', muc, this.core.to, this.core.from, ci, this);
     if (ci >= 0) {
       var chat = this.account.chats[ci];
+      this.account.chats.push(chat);
+      this.account.core.chats.push(chat.core);
+      this.account.chats.splice(ci, 1);
+      this.account.core.chats.splice(ci, 1);
     } else {
       // There is no chat for the sender of the message
       Tools.log('No chat for ', chatJid, 'creating new one', this.account);
@@ -51,7 +62,8 @@ var Message = function (account, core) {
         title: contact ? contact.name || chatJid : chatJid,
         chunks: []
       }, this.account);
-      chat.save();
+      this.account.chats.push(chat);
+      this.account.core.chats.push(chat.core);
     }
     if ($('section#chat').data('jid') == chatJid && $('section#chat').hasClass('show')) {
       var ul = $('section#chat ul#messages');
@@ -77,7 +89,7 @@ var Message = function (account, core) {
     } else {
       App.notify({ subject: subject, text: message.core.text, pic: 'https://raw.github.com/waalt/loqui/master/img/foovatar.png', callback: callback }, 'received');
     }
-    chat.messageAppend.push({msg: this.core}, function (err) { });
+    chat.messageAppend.push({msg: message.core}, function (err) { });
   }
   
   // Represent this message in HTML

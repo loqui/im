@@ -91,7 +91,7 @@ var Chat = function (core, account) {
   }.bind(this));
   
   this.messageAppend.drain = function () {
-    this.save(null, true);
+    this.save(true);
   }.bind(this);
   
   // Create a chat window for this contact
@@ -143,13 +143,7 @@ var Chat = function (core, account) {
   }
   
   // Save or update this chat in store
-  this.save = function (ci, render) {
-    if (ci >= 0) {
-      this.account.chats.splice(ci, 1);
-      this.account.core.chats.splice(ci, 1);
-    }
-    this.account.chats.push(this);
-    this.account.core.chats.push(this.core);    
+  this.save = function (render) {
     this.account.save();
     if (render) {
       this.account.allRender();
