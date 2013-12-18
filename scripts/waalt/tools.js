@@ -3,8 +3,14 @@
 var Tools = {
 
   log: function () {
-    if (App.settings.debug) {
+    if (App.devsettings.debug) {
       console.log.apply(console, [].slice.call(arguments));
+    }
+  },
+
+  dev: function () {
+    if (App.settings.devMode) {
+      // $('section#settings nav a#developer').show();
     }
   },
 
