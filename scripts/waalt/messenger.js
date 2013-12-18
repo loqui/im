@@ -228,7 +228,7 @@ var Messenger = {
     var account = Messenger.account();
     var will = confirm(_('ConfirmAccountRemove', {account: account.core.user}));
     if (will) {
-      var accountIndex = Accounts.find(account.core.user, account.core.provider);
+      var accountIndex = Accounts.find(account.core.fullJid);
       var chat = account.chats[account.chatFind(jid)];
       if (chat) {
         for (var i in chat.chunks) {
