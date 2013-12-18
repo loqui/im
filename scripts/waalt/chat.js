@@ -25,21 +25,25 @@ var Chat = function (core, account) {
     if (index >= 0 && ul.children('li[data-chunk="' + index + '"]').length < 1) {
       var stIndex = this.core.chunks[index];
       Store.recover(stIndex, function (chunk) {
-        var li = $('<li/>');
-        li.addClass('chunk');
-        li.data('chunk', index);
-        for (var i in chunk) {
-          var core = chunk[i];
-          var msg = new Message(chat.account, core);
-          li.append(msg.preRender());
-        }
-        ul.prepend(li);
-        var onSwipe = function (e) {
-          this.chunkRender(index - 1);
-        }
-        ul.off('swipeDown').on('swipeDown', onSwipe.bind(chat));
-        ul[0].scrollTop += li.height();
-        if (chunk.length < App.defaults.Chat.chunkSize / 2) {
+        if (chunk) {
+          var li = $('<li/>');
+          li.addClass('chunk');
+          li.data('chunk', index);
+          for (var i in chunk) {
+            var core = chunk[i];
+            var msg = new Message(chat.account, core);
+            li.append(msg.preRender());
+          }
+          ul.prepend(li);
+          var onSwipe = function (e) {
+            this.chunkRender(index - 1);
+          }
+          ul.off('swipeDown').on('swipeDown', onSwipe.bind(chat));
+          ul[0].scrollTop += li.height();
+          if (chunk.length < App.defaults.Chat.chunkSize / 2) {
+            chat.chunkRender(index - 1);
+          }
+        } else {
           chat.chunkRender(index - 1);
         }
       });
@@ -57,12 +61,12 @@ var Chat = function (core, account) {
     this.core.last = msg;
     if (chunkListSize > 0) {
       Store.recover(blockIndex, function (chunk) {
-        if (chunk.length >= App.defaults.Chat.chunkSize) {
-          Tools.log('FULL', chunk.length);
+        if (!chunk || chunk.length >= App.defaults.Chat.chunkSize) {
+          Tools.log('FULL OR NULL');
           var chunk = [msg];
           blockIndex = Store.save(chunk);
           Tools.log('PUSHING', blockIndex, chunk);
-          chat.core.chunks.push(blockIndex, callback);
+          chat.core.chunks.push(blockIndex);
           storageIndex = [blockIndex, 0];
         } else {
           Tools.log('FITS');
