@@ -946,3 +946,26 @@ div.switch div.ball {
     transform: scale(1.2);
   }
 }
+
+/* MEDIA QUERIES */
+@media only screen and (orientation:landscape) and (max-height: 18vw) {
+  section#chat header {
+    display: none;
+  }
+  section#chat {    
+    height: 100%;
+  }
+  section#chat ul#messages {
+    display: none;
+  }
+  section#chat #footbox #text {
+    position: fixed!important;
+    top: 0!important;
+    left: 0!important;
+    width: 100%!important;
+    max-height: 100%!important;
+    bottom: 0!important;
+    border: none!important;
+    border-radius: 0!important;
+  }
+}
