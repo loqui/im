@@ -21,6 +21,7 @@ input[type='text'],
 input[type='password'],
 input[type='number'],
 input[type='search'],
+input[type='email'],
 select {
   margin-top: 0!important;
   margin-bottom: .5!important;
