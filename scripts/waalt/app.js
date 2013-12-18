@@ -15,7 +15,6 @@ var App = {
   avatars: {},
   online: true,
   lastNot: null,
-  debug: true,
   
   // Default values
   defaults: {
@@ -24,9 +23,8 @@ var App = {
         reconnect: true,
         sound: true,
         disHide: false,
-        //boltGet: true,
         csn: true,
-        //psychic: true
+        debug: false        
       },
       online: true
     },

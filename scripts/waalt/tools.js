@@ -3,7 +3,7 @@
 var Tools = {
 
   log: function () {
-    if (App.debug) {
+    if (App.settings.debug) {
       console.log.apply(console, [].slice.call(arguments));
     }
   },
