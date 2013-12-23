@@ -154,12 +154,15 @@ var Account = function (core) {
           var ci = account.chatFind(this.dataset.jid);
           if (ci >= 0) {
             var chat = account.chats[ci];
-          } else { 
+          } else {
             var chat = new Chat({
               jid: this.dataset.jid,
               title: $(this).children('.name').text(),
               chunks: []
             }, account);
+          }
+          if (this.dataset.jid.match(/\-/)) {
+            chat.core.muc = true;
           }
           chat.show();
         }).bind('hold', function () {
