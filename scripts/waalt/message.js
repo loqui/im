@@ -14,22 +14,29 @@ var Message = function (account, core) {
       var ci = this.account.chatFind(this.core.to);
       if (ci >= 0) {
         var chat = this.account.chats[ci];
+        this.account.chats.push(chat);
+        this.account.core.chats.push(chat.core);
+        this.account.chats.splice(ci, 1);
+        this.account.core.chats.splice(ci, 1);
       } else {
         // There is no chat for the receiver of the message
-        console.log('No chat for ', this.core.to, 'creating new one', this.account);
+        Tools.log('No chat for ', this.core.to, 'creating new one', this.account);
         var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.to);
         var chat = new Chat({
           jid: this.core.to, 
           title: contact ? contact.name || this.core.to : this.core.to,
           chunks: []
         }, this.account);
+        this.account.chats.push(chat);
+        this.account.core.chats.push(chat.core);
       }
+      var ul = $('section#chat ul#messages');
+      var li = ul.children('li:last-child');
+      li.append(this.preRender());
+      ul[0].scrollTop = ul[0].scrollHeight;
       chat.messageAppend.push({msg: this.core}, function (err) {
-        chat.save(ci, true);
-        var ul = $('section#chat ul#messages');
-        var li = ul.children('li:last-child');
-        li.append(this.preRender());
-        ul[0].scrollTop = ul[0].scrollHeight;
+      
+        chat.save(true);
       }.bind(this));
     }
   }
@@ -39,46 +46,50 @@ var Message = function (account, core) {
     var message = this;
     var chatJid = muc ? this.core.to : this.core.from;
     var ci = this.account.chatFind(chatJid);
-    console.log('PROCESSED MESSAGE', muc, this.core.to, this.core.from, ci, this);
+    Tools.log('PROCESSED MESSAGE', muc, this.core.to, this.core.from, ci, this);
     if (ci >= 0) {
       var chat = this.account.chats[ci];
+      this.account.chats.push(chat);
+      this.account.core.chats.push(chat.core);
+      this.account.chats.splice(ci, 1);
+      this.account.core.chats.splice(ci, 1);
     } else {
       // There is no chat for the sender of the message
-      console.log('No chat for ', chatJid, 'creating new one', this.account);
+      Tools.log('No chat for ', chatJid, 'creating new one', this.account);
       var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.from);
       var chat = new Chat({
         jid: chatJid, 
         title: contact ? contact.name || chatJid : chatJid,
         chunks: []
       }, this.account);
+      this.account.chats.push(chat);
+      this.account.core.chats.push(chat.core);
     }
-    if (!$('section#chat').hasClass('show') || $('section#chat').data('jid') != this.core.from) {
+    if ($('section#chat').data('jid') == chatJid && $('section#chat').hasClass('show')) {
+      var ul = $('section#chat ul#messages');
+      var li = ul.children('li:last-child');
+      li.append(this.preRender());
+      ul[0].scrollTop = ul[0].scrollHeight;
+    } else {
       chat.core.unread++;
     }
-    chat.messageAppend.push({msg: this.core}, function (err) {
-      chat.save(ci, true);
-      if ($('section#chat').data('jid') == chatJid) {
-        var ul = $('section#chat ul#messages');
-        var li = ul.children('li:last-child');
-        li.append(this.preRender());
-        ul[0].scrollTop = ul[0].scrollHeight;
-      }
-      var pic = App.avatars[chatJid];
-      var callback = function () {
-        chat.show();
-		    App.toForeground();
-      }
-      var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', Strophe.getBareJidFromJid(message.core.from));
-      var subject = muc ? ((contact ? (contact.name || message.core.pushName) : message.core.pushName) + ' @ ' + chat.core.title) : chat.core.title;
-      console.log(subject, muc, contact, message);
-      if (pic) {
-        Store.recover(pic, function (src) {
-          App.notify({ subject: subject, text: message.core.text, pic: src, callback: callback }, 'received');
-        });
-      } else {
-        App.notify({ subject: subject, text: message.core.text, pic: 'https://raw.github.com/waalt/loqui/master/img/foovatar.png', callback: callback }, 'received');
-      }
-    }.bind(this));
+    var pic = App.avatars[chatJid];
+    var callback = function () {
+      message.account.show();
+      chat.show();
+	    App.toForeground();
+    }
+    var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', Strophe.getBareJidFromJid(message.core.from));
+    var subject = muc ? ((contact ? (contact.name || message.core.pushName) : message.core.pushName) + ' @ ' + chat.core.title) : chat.core.title;
+    console.log(subject, muc, contact, message);
+    if (pic) {
+      Store.recover(pic, function (src) {
+        App.notify({ subject: subject, text: message.core.text, pic: src, callback: callback }, 'received');
+      });
+    } else {
+      App.notify({ subject: subject, text: message.core.text, pic: 'https://raw.github.com/waalt/loqui/master/img/foovatar.png', callback: callback }, 'received');
+    }
+    chat.messageAppend.push({msg: message.core}, function (err) { });
   }
   
   // Represent this message in HTML

@@ -31,21 +31,21 @@ $('document').ready(function(){
 });
 
 if (navigator.mozAlarms) {
-  navigator.mozSetMessageHandler("alarm", function (message) {
+  navigator.mozSetMessageHandler('alarm', function (message) {
     App.alarmSet(message.data);
   });
 }
 
 // Reconnect on new WiFi / 3G connection
 document.body.addEventListener('online', function () {
-  console.log('ONLINE AGAIN');
+  Tools.log('ONLINE AGAIN');
   App.online = true;
   App.connect();
 }, false);
 
 // Go to offline mode
 document.body.addEventListener('offline', function () {
-  console.log('OFFLINE');
+  Tools.log('OFFLINE');
   App.online = false;
   App.disconnect();
 }, false);
@@ -135,11 +135,11 @@ if (navigator.mozAlarms) {
 }
 
 Strophe.Connection.rawInput = function (data) {
-  console.log(data);
+  Tools.log(data);
 };
 
 Strophe.Connection.rawOutput = function (data) {
-  console.log(data);
+  Tools.log(data);
 };
 
 var bindings = function () {

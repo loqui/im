@@ -4,7 +4,7 @@ var App = {
 
   name: 'Loqui IM',
   shortName: 'Loqui',
-  version: 'v0.2.3',
+  version: 'v0.2.4',
   connectors: [],
   logForms: [],
   emoji: [],
@@ -23,9 +23,8 @@ var App = {
         reconnect: true,
         sound: true,
         disHide: false,
-        //boltGet: true,
         csn: true,
-        //psychic: true
+        debug: false        
       },
       online: true
     },
@@ -135,13 +134,13 @@ var App = {
   // Update an array and put it in storage
   smartpush: function (key, value, callback) {
     this[key].push(value);
-    console.log('SAVING ' + key);
+    Tools.log('SAVING ' + key);
     Store.put(key, this[key], callback);
   },
   
   // Update an object and put it in storage
   smartupdate: function (key, callback) {
-    console.log('SAVING ' + key);
+    Tools.log('SAVING ' + key);
     Store.put(key, this[key], callback);
   },
   
@@ -192,6 +191,9 @@ var App = {
       App.lastNot = navigator.mozNotification.createNotification(core.subject, core.text, core.pic);
       App.lastNot.onclick = function () {
         core.callback();
+        this.onclick = function (e) {
+          // This is a trick for circumventing Gaia bug #949257 
+        };
       }
       App.lastNot.show();
     } else {

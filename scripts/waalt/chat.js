@@ -13,31 +13,37 @@ var Chat = function (core, account) {
     var ul = $('section#chat ul#messages');
     ul.empty().append('<li/>');
     var index = this.core.chunks.length - 1;
-    this.chunkRender(index);
+    if (index >= 0) {
+      this.chunkRender(index);
+    }
   }
   
   // Render a chunk of messages
   this.chunkRender = function (index) {
     var chat = this;
-    if (index >= 0) {
+    var ul = $('section#chat ul#messages');
+    if (index >= 0 && ul.children('li[data-chunk="' + index + '"]').length < 1) {
       var stIndex = this.core.chunks[index];
-      var ul = $('section#chat ul#messages');
       Store.recover(stIndex, function (chunk) {
-        var li = $('<li/>');
-        li.addClass('chunk');
-        li.data('chunk', index);
-        for (var i in chunk) {
-          var core = chunk[i];
-          var msg = new Message(chat.account, core);
-          li.append(msg.preRender());
-        }
-        ul.prepend(li);
-        var onSwipe = function (e) {
-          this.chunkRender(index-1);
-        }
-        ul.off('swipeDown').on('swipeDown', onSwipe.bind(chat));
-        ul[0].scrollTop += li.height();
-        if (chunk.length < App.defaults.Chat.chunkSize / 2) {
+        if (chunk) {
+          var li = $('<li/>');
+          li.addClass('chunk');
+          li.data('chunk', index);
+          for (var i in chunk) {
+            var core = chunk[i];
+            var msg = new Message(chat.account, core);
+            li.append(msg.preRender());
+          }
+          ul.prepend(li);
+          var onSwipe = function (e) {
+            this.chunkRender(index - 1);
+          }
+          ul.off('swipeDown').on('swipeDown', onSwipe.bind(chat));
+          ul[0].scrollTop += li.height();
+          if (chunk.length < App.defaults.Chat.chunkSize / 2) {
+            chat.chunkRender(index - 1);
+          }
+        } else {
           chat.chunkRender(index - 1);
         }
       });
@@ -52,16 +58,21 @@ var Chat = function (core, account) {
     var chunkListSize = this.core.chunks.length;
     var blockIndex = this.core.chunks[chunkListSize - 1];
     var storageIndex;
-    if (chunkListSize) {
+    this.core.last = msg;
+    if (chunkListSize > 0) {
       Store.recover(blockIndex, function (chunk) {
-        if (chunk.length > App.defaults.Chat.chunkSize) {
+        if (!chunk || chunk.length >= App.defaults.Chat.chunkSize) {
+          Tools.log('FULL OR NULL');
           var chunk = [msg];
           blockIndex = Store.save(chunk);
-          chat.core.chunks.push(blockIndex, callback);
+          Tools.log('PUSHING', blockIndex, chunk);
+          chat.core.chunks.push(blockIndex);
           storageIndex = [blockIndex, 0];
         } else {
+          Tools.log('FITS');
           chunk.push(msg);
           blockIndex = chat.core.chunks[chunkListSize - 1];
+          Tools.log('PUSHING', blockIndex, chunk);
           Store.update(blockIndex, chunk, callback);
           storageIndex = [blockIndex, chunk.length-1];
         }
@@ -70,8 +81,10 @@ var Chat = function (core, account) {
         }
       });
     } else {
+      Tools.log('NEW');
       var chunk = [msg];
       blockIndex = Store.save(chunk);
+      Tools.log('PUSHING', blockIndex, chunk);
       chat.core.chunks.push(blockIndex);
       storageIndex = [blockIndex, 0];
       if (delay) {
@@ -79,8 +92,11 @@ var Chat = function (core, account) {
       }
       callback();
     }
-    this.core.last = msg;
   }.bind(this));
+  
+  this.messageAppend.drain = function () {
+    this.save(true);
+  }.bind(this);
   
   // Create a chat window for this contact
   this.show = function () {
@@ -131,13 +147,7 @@ var Chat = function (core, account) {
   }
   
   // Save or update this chat in store
-  this.save = function (ci, render) {
-    if (ci >= 0) {
-      this.account.chats.splice(ci, 1);
-      this.account.core.chats.splice(ci, 1);
-    }
-    this.account.chats.push(this);
-    this.account.core.chats.push(this.core);    
+  this.save = function (render) {
     this.account.save();
     if (render) {
       this.account.allRender();

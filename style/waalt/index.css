@@ -21,6 +21,7 @@ input[type='text'],
 input[type='password'],
 input[type='number'],
 input[type='search'],
+input[type='email'],
 select {
   margin-top: 0!important;
   margin-bottom: .5!important;
@@ -581,6 +582,7 @@ section#chat:not([data-muc='true']) ul#messages > li > div > span.name {
 section#chat ul#messages > li > div > span.text {
   font-weight: 300;
   font-size: .9em;
+  word-wrap: break-word;
 }
 section#chat ul#messages > li > div[data-type='out'][data-receipt='sent']:after {
   content: "";
@@ -904,28 +906,27 @@ div.switch {
   display: block;
   width: 3rem;
   height: 1.4rem;
-  border: .1rem solid #CCC;
   border-radius: 1.4rem;
-  background-color: #E9E9E9;
+  background-color: #BDC6C8;
   transition: all .2s;
+  overflow: hidden;
 }
 div.switch img.tick {
   display: none;
   position: absolute;
   height: .9rem;
-  left: .4rem;
-  top: .2rem;
-  transition: all .2s;
+  left: .3rem;
+  top: .21rem;
 }
 div.switch div.ball {
   position: absolute;
   display: block;
-  top: .08rem;
-  left: .05rem;
-  width: 1.1rem;
-  height: 1.1rem;
-  border: .1rem solid #CCC;
-  border-radius: 1rem;
+  top: -.4rem;
+  left: -.4rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  border: .5rem solid #ABB5B7;
+  border-radius: 50%;
   background-color: #FFF;
   transition: all .2s;
 }
@@ -933,15 +934,38 @@ div.switch div.ball {
   display: block;
 }
 [data-value="true"] div.switch {
-  background-color: #0CF;
-  border-color: #0BE;
+  background-color: #00B8D6;
 }
 [data-value="true"] div.switch div.ball {
-  left: 1.7rem;
+  left: 1.2rem;
+  border-color: #00D3F5;
 }
 /* KEYFRAMES */
 @keyframes blink {
   from {
     transform: scale(1.2);
+  }
+}
+
+/* MEDIA QUERIES */
+@media only screen and (orientation:landscape) and (max-height: 18vw) {
+  section#chat header {
+    display: none;
+  }
+  section#chat {    
+    height: 100%;
+  }
+  section#chat ul#messages {
+    display: none;
+  }
+  section#chat #footbox #text {
+    position: fixed!important;
+    top: 0!important;
+    left: 0!important;
+    width: 100%!important;
+    max-height: 100%!important;
+    bottom: 0!important;
+    border: none!important;
+    border-radius: 0!important;
   }
 }

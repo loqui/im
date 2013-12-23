@@ -21,7 +21,8 @@ var Account = function (core) {
         Lungo.Notification.show('download', _('Synchronizing'));
         var cb = function () {
           // Don't add an account if already set up
-          if (Accounts.find(this.core.fullJid || this.core.user) < 0) {
+          if (Accounts.find(this.core.fullJid) < 0) {
+            Tools.log('ADDING ACCOUNT', this);
             App.accounts.push(this);
             App.smartpush('accountsCores', this.core);
             Lungo.Notification.hide();
@@ -31,8 +32,9 @@ var Account = function (core) {
               $('section#success img#avatar').attr('src', avatar);
             });
             Lungo.Router.section('success');
+          } else {
+            Lungo.Notification.error(_('DupliAccount'), _('DupliAccountNotice'), 'warning-sign', 5);
           }
-        Lungo.Notification.error(_('DupliAccount'), _('DupliAccountNotice'), 'warning-sign', 5);
         }
         this.sync(cb.bind(this));
       }.bind(this),
@@ -152,12 +154,15 @@ var Account = function (core) {
           var ci = account.chatFind(this.dataset.jid);
           if (ci >= 0) {
             var chat = account.chats[ci];
-          } else { 
+          } else {
             var chat = new Chat({
               jid: this.dataset.jid,
               title: $(this).children('.name').text(),
               chunks: []
             }, account);
+          }
+          if (this.dataset.jid.match(/\-/)) {
+            chat.core.muc = true;
           }
           chat.show();
         }).bind('hold', function () {
@@ -233,13 +238,15 @@ var Account = function (core) {
         $('section#main fieldset#searchForm input').val('').trigger('keyup');
       }
       var syncOnClick = function (event) {
-        this.connector.contactsSync(function () {
-          this.connector.contactsSort(function () {
-            this.save();
-            this.allRender();
-          }.bind(this));
-        }.bind(this));
-      }.bind(this);
+        var account = Messenger.account();
+        account.connector.contacts.sync(function () {
+          account.connector.contacts.order(function () {
+            account.save();
+            account.allRender();
+          });
+        Lungo.Notification.show('download', _('Synchronizing'), 2);
+        });
+      };
       searchForm.bind('keyup', searchFormOnKeyUp);
       clear.bind('click', clearOnClick);
       sync.bind('click', syncOnClick);
@@ -385,6 +392,7 @@ var Account = function (core) {
         break;
       }
     }
+    console.log(jid, '@', index);
     return index;
   }
     
@@ -426,7 +434,7 @@ var Accounts = {
       var li = $('<li/>').data('jid', account.core.fullJid || account.core.user);
       var button = $('<button/>').addClass('account').on('click', function () {
         var index = Accounts.find(this.parentNode.dataset.jid);
-        console.log('SWITCHING TO ACCOUNT', index, this.parentNode.dataset.jid);
+        Tools.log('SWITCHING TO ACCOUNT', index, this.parentNode.dataset.jid);
         if (index) {
           App.accounts[index].show();
         }
