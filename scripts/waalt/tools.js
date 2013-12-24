@@ -4,7 +4,7 @@ var Tools = {
 
   log: function () {
     if (App.settings.debug) {
-      console.log.apply(console, [].slice.call(arguments));
+      Tools.log.apply(console, [].slice.call(arguments));
     }
   },
 
@@ -134,20 +134,47 @@ var Tools = {
       }
       img.src = event.target.result;
     }
+
+    reader.onerror = function ( event ) {
+      Tools.log(event);
+    }
     reader.readAsDataURL(blob);
   },
 
-  saveImage: function (image, name, onSuccess, onError) {
+  getFileType: function(type) {
+    var fileType = null;
+    switch (type) {
+      case 'jpeg':
+      case 'jpg':
+        fileType = 'image/jpeg';
+        break;
+      case 'png':
+        fileType = 'image/png';
+        break;
+      case 'gif':
+        fileType = 'image/gif';
+        break;
+    }
+
+    return fileType;
+  },
+
+  saveImage: function (image, type, name, onSuccess, onError) {
       var sdCard = navigator.getDeviceStorage("pictures");
 
       onSuccess = function () {
-          console.log('El archivo "' + this.result.name + '" se escribio correctamente');
+          Tools.log('El archivo "' + this.result + '" se escribio correctamente');
       };
       onError = function () {
-          console.log('No se puede escribir el archivo: ' + this.error);
+          Tools.log(this.error);
       };
 
-      var request = sdCard.add(image);
+      var fileType = this.getFileType(type);
+
+      var imageBlob = CoSeMe.utils.latin1ToBlob(image, fileType);
+      name = 'loqui/' + name + '.' + type;
+
+      var request = sdCard.addNamed(imageBlob, name);
       request.onsuccess = onSuccess;
       request.onerror = onError;
   },

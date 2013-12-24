@@ -117,7 +117,7 @@ var Store = {
           }
         }
       } else {
-        console.log('DS IS NOT SUPPORTED');
+        Tools.log('DS IS NOT SUPPORTED');
         Store.get('fakesdcard_' + path, function (value) {
           if (value) {
             onsuccess(new Blob(value.content, {type: value.type}));

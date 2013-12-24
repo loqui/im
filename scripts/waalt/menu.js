@@ -112,7 +112,7 @@ var Menu = {
         App.run();
         Tools.log(App.name + ' has been reloaded')
       } else {
-        console.log('Upps...');
+        Tools.log('Upps...');
       }
     }
   },

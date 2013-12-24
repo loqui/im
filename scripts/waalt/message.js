@@ -81,7 +81,7 @@ var Message = function (account, core) {
     }
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', Strophe.getBareJidFromJid(message.core.from));
     var subject = muc ? ((contact ? (contact.name || message.core.pushName) : message.core.pushName) + ' @ ' + chat.core.title) : chat.core.title;
-    console.log(subject, muc, contact, message);
+    Tools.log(subject, muc, contact, message);
     if (pic) {
       Store.recover(pic, function (src) {
         App.notify({ subject: subject, text: message.core.text, pic: src, callback: callback }, 'received');
@@ -94,7 +94,7 @@ var Message = function (account, core) {
   
   // Represent this message in HTML
   this.preRender = function () {
-    var text = App.emoji[Providers.data[this.account.core.provider].emoji].fy(Tools.urlHL(Tools.HTMLescape(this.core.text)));
+    var text = App.emoji[Providers.data[this.account.core.provider].emoji].fy(Tools.urlHL(this.core.text));
   	var type = (this.core.from == this.account.core.user || this.core.from == this.account.core.realJid) ? 'out' : 'in';
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', Strophe.getBareJidFromJid(this.core.from));
     var name = type == 'in' ? ((contact ? (contact.name || contact.jid) : (this.core.pushName || this.core.from))).split(' ')[0] : _('Me');
