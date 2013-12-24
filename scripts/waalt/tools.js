@@ -4,7 +4,7 @@ var Tools = {
 
   log: function () {
     if (App.settings.debug) {
-      console.log.apply(console, [].slice.call(arguments));
+      Tools.log.apply(console, [].slice.call(arguments));
     }
   },
 
@@ -128,13 +128,78 @@ var Tools = {
         var canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
-        canvas.getContext('2d').drawImage(img, 0, 0, 96, 96);
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
         var url = canvas.toDataURL();
         callback(url);
       }
       img.src = event.target.result;
     }
+
+    reader.onerror = function ( event ) {
+      Tools.log(event);
+    }
     reader.readAsDataURL(blob);
+  },
+
+  getFileType: function(type) {
+    var fileType = null;
+    switch (type) {
+      case 'jpeg':
+      case 'jpg':
+        fileType = 'image/jpeg';
+        break;
+      case 'png':
+        fileType = 'image/png';
+        break;
+      case 'gif':
+        fileType = 'image/gif';
+        break;
+    }
+
+    return fileType;
+  },
+
+  saveImage: function (image, type, name, onSuccess, onError) {
+      var sdCard = navigator.getDeviceStorage("pictures");
+
+      onSuccess = function () {
+          Tools.log('El archivo "' + this.result + '" se escribio correctamente');
+      };
+      onError = function () {
+          Tools.log(this.error);
+      };
+
+      var fileType = this.getFileType(type);
+
+      var imageBlob = CoSeMe.utils.latin1ToBlob(image, fileType);
+      name = 'loqui/' + name + '.' + type;
+
+      var request = sdCard.addNamed(imageBlob, name);
+      request.onsuccess = onSuccess;
+      request.onerror = onError;
+  },
+
+  b64ToBlob: function(b64Data, contentType, sliceSize) {
+    contentType = contentType | '';
+    sliceSize = sliceSize || 512;
+
+      var byteCharacters = atob(b64Data);
+      var byteArrays = [];
+
+      for (var offset = 0; offset < byteCharacters.length; offset+= sliceSize) {
+          var slice = byteCharacters.slice(offset, offset + sliceSize);
+
+          var byteNumbers = new Array(slice.length);
+          for (var i = 0; i < slice.length; i++) {
+              byteNumbers[i] = slice.charCodeAt(i);
+          }
+
+          var byteArray = new Uint8Array(byteNumbers);
+          byteArrays.push(byteArray);
+      }
+
+      var blob = new Blob(byteArrays, { type: contentType });
+      return blob;
   }
 
 }

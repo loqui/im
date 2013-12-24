@@ -6253,6 +6253,8 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
                                   [msgId, fromAttribute, author, mediaPreview,
                                   mediaUrl, mediaSize, wantsReceipt]);
           } else {
+              //mediaPreview = CoSeMe.utils.aToBlob(mediaPreview, mediaType);
+              mediaPreview = Tools.b64ToBlob(mediaPreview, mediaType);
             _signalInterface.send("image_received", [msgId, fromAttribute, mediaPreview, mediaUrl,
                                                      mediaSize, wantsReceipt, isBroadcast]);
           }

@@ -392,7 +392,7 @@ var Account = function (core) {
         break;
       }
     }
-    console.log(jid, '@', index);
+    Tools.log(jid, '@', index);
     return index;
   }
     

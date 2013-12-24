@@ -209,7 +209,7 @@ App.connectors['coseme'] = function (account) {
       auth_success: null,
       auth_fail: null,
       message_received: this.events.onMessage,
-      image_received: null,
+      image_received: this.events.onImageReceived,
       vcard_received: null,
       video_received: null,
       audio_received: null,
@@ -234,7 +234,7 @@ App.connectors['coseme'] = function (account) {
       group_gotParticipants: this.events.onGroupGotParticipants,
       group_setSubjectSuccess: null,
       group_messageReceived: this.events.onGroupMessage,
-      group_imageReceived: null,
+      group_imageReceived: this.events.onImageReceived,
       group_vcardReceived: null,
       group_videoReceived: null,
       group_audioReceived: null,
@@ -300,6 +300,32 @@ App.connectors['coseme'] = function (account) {
       msg.receive();
       this.ack(id, from);
     }
+    return true;
+  }
+
+  this.events.onImageReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast) {
+    var self = this;
+    var fileType = mediaUrl.split('.').pop();
+    var account = this.account;
+
+    var image = CoSeMe.utils.aToBlob(mediaPreview, Tools.getFileType(fileType));
+
+    Tools.log('Media received:', msgId, fromAttribute, mediaSize, fileType, mediaUrl, wantsReceipt, isBroadcast, mediaPreview);
+    //Tools.saveImage(mediaPreview, fileType, msgId, function(){}, function() {});
+    Tools.picUnblob(image, 120, 120, function (url) {
+      Tools.log('IMAGE!!!', url);
+      var to = account.user + '@' + CoSeMe.config.domain;
+      var body = '<img src="' + url + '" class="receivedImage" id="' + msgId + '" data-downloaded="0" data-url="' + mediaUrl + '">';
+      var stamp = Tools.localize(Tools.stamp(new Date()));
+      var msg = new Message(account, {
+        from: fromAttribute,
+        to: to,
+        text: body,
+        stamp: stamp
+      });
+      msg.receive();
+      self.ack(msgId, fromAttribute);
+    });
     return true;
   }
   
