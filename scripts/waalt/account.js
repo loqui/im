@@ -161,9 +161,7 @@ var Account = function (core) {
               chunks: []
             }, account);
           }
-          if (this.dataset.jid.match(/\-/)) {
-            chat.core.muc = true;
-          }
+          chat.core.muc = account.supports('muc') && this.dataset.jid.substring(1).match(/\-/) ? true : false;
           chat.show();
         }).bind('hold', function () {
           window.navigator.vibrate([100]);
