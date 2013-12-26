@@ -315,12 +315,17 @@ App.connectors['coseme'] = function (account) {
     Tools.picUnblob(image, 120, 120, function (url) {
       Tools.log('IMAGE!!!', url);
       var to = account.user + '@' + CoSeMe.config.domain;
-      var body = '<img src="' + url + '" class="receivedImage" id="' + msgId + '" data-downloaded="0" data-url="' + mediaUrl + '">';
+      var media = {
+        type: 'image',
+        thumb: url,
+        url: mediaUrl,
+        downloaded: false
+      };
       var stamp = Tools.localize(Tools.stamp(new Date()));
       var msg = new Message(account, {
         from: fromAttribute,
         to: to,
-        text: body,
+        media: media,
         stamp: stamp
       });
       msg.receive();
@@ -583,7 +588,7 @@ App.logForms['coseme'] = function (article, provider, data) {
       }
       var onneedsid = function (error) {
         var deviceId = Math.random().toString(36).substring(2);
-        Store.SD.save('.coseme.id', 'text/plain', [deviceId]);
+        Store.SD.save('.coseme.id', [deviceId]);
         codeGet(deviceId);
       }
       Store.SD.recover('.coseme.id', onhasid, onneedsid);

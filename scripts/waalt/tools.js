@@ -4,7 +4,7 @@ var Tools = {
 
   log: function () {
     if (App.settings.debug) {
-      Tools.log.apply(console, [].slice.call(arguments));
+      console.log.apply(console, [].slice.call(arguments));
     }
   },
 
@@ -72,6 +72,20 @@ var Tools = {
     div.appendChild(document.createTextNode(str));
     return div.innerHTML;
   },
+  
+  fileGet: function (url, cb) {
+    var type = Tools.getFileType(url.split('.').pop());
+    var xhr = new XMLHttpRequest({
+      mozAnon: true,
+      mozSystem: true
+    });
+    xhr.open('GET', url);
+    xhr.responseType = 'blob';
+    xhr.onload = function (e) {
+      cb(xhr.response);
+    }
+    xhr.send();
+  },
 
   /**
    *
@@ -134,7 +148,6 @@ var Tools = {
       }
       img.src = event.target.result;
     }
-
     reader.onerror = function ( event ) {
       Tools.log(event);
     }
@@ -154,52 +167,45 @@ var Tools = {
       case 'gif':
         fileType = 'image/gif';
         break;
+      default:
+        fileType = 'text/plain';
+        break;
     }
-
     return fileType;
   },
 
-  saveImage: function (image, type, name, onSuccess, onError) {
-      var sdCard = navigator.getDeviceStorage("pictures");
-
-      onSuccess = function () {
-          Tools.log('El archivo "' + this.result + '" se escribio correctamente');
-      };
-      onError = function () {
-          Tools.log(this.error);
-      };
-
-      var fileType = this.getFileType(type);
-
-      var imageBlob = CoSeMe.utils.latin1ToBlob(image, fileType);
-      name = 'loqui/' + name + '.' + type;
-
-      var request = sdCard.addNamed(imageBlob, name);
-      request.onsuccess = onSuccess;
-      request.onerror = onError;
+  imageSave: function (image, type, name, onSuccess, onError) {
+    var sdCard = navigator.getDeviceStorage('pictures');
+    onSuccess = function () {
+      Tools.log('El archivo "' + this.result + '" se escribio correctamente');
+    };
+    onError = function () {
+      Tools.log(this.error);
+    };
+    var fileType = this.getFileType(type);
+    var imageBlob = CoSeMe.utils.latin1ToBlob(image, fileType);
+    name = 'loqui/' + name + '.' + type;
+    var request = sdCard.addNamed(imageBlob, name);
+    request.onsuccess = onSuccess;
+    request.onerror = onError;
   },
 
   b64ToBlob: function(b64Data, contentType, sliceSize) {
-    contentType = contentType | '';
-    sliceSize = sliceSize || 512;
-
-      var byteCharacters = atob(b64Data);
-      var byteArrays = [];
-
-      for (var offset = 0; offset < byteCharacters.length; offset+= sliceSize) {
-          var slice = byteCharacters.slice(offset, offset + sliceSize);
-
-          var byteNumbers = new Array(slice.length);
-          for (var i = 0; i < slice.length; i++) {
-              byteNumbers[i] = slice.charCodeAt(i);
-          }
-
-          var byteArray = new Uint8Array(byteNumbers);
-          byteArrays.push(byteArray);
+    var contentType = contentType | '';
+    var sliceSize = sliceSize || 512;
+    var byteCharacters = atob(b64Data);
+    var byteArrays = [];
+    for (var offset = 0; offset < byteCharacters.length; offset+= sliceSize) {
+      var slice = byteCharacters.slice(offset, offset + sliceSize);
+      var byteNumbers = new Array(slice.length);
+      for (var i = 0; i < slice.length; i++) {
+        byteNumbers[i] = slice.charCodeAt(i);
       }
-
-      var blob = new Blob(byteArrays, { type: contentType });
-      return blob;
+      var byteArray = new Uint8Array(byteNumbers);
+      byteArrays.push(byteArray);
+    }
+    var blob = new Blob(byteArrays, { type: contentType });
+    return blob;
   }
 
 }

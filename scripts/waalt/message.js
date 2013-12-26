@@ -93,8 +93,50 @@ var Message = function (account, core) {
   }
   
   // Represent this message in HTML
-  this.preRender = function () {
-    var text = App.emoji[Providers.data[this.account.core.provider].emoji].fy(Tools.urlHL(this.core.text));
+  this.preRender = function (index) {
+    var account = this.account;
+    if (this.core.text) {
+      var html = App.emoji[Providers.data[this.account.core.provider].emoji].fy(Tools.urlHL(Tools.HTMLescape(this.core.text)));
+    } else if (this.core.media) {
+      var html = $('<img/>').attr('src', this.core.media.thumb).addClass('image').data('url', this.core.media.url).data('downloaded', this.core.media.downloaded || false).data('index', index);
+      var open = function (blob) {
+        return new MozActivity({
+          name: 'open',
+          data: {
+            type: 'image/jpeg',
+            blob: blob
+          }
+        });
+      }
+      html.bind('click', function (e) {
+        var url = e.target.dataset.url;
+        var ext = url.split('.').pop();
+        var localUrl = 'loqui/' + $(e.target).parent().siblings('.stamp').data('stamp').replace(/[-:]/g, '') + '.' + ext;
+        if (e.target.dataset.downloaded == 'true') {
+          Store.SD.recover(localUrl, function (blob) {
+            open(blob);
+          });
+        } else {
+          Tools.fileGet(url, function (blob) {
+            var img = e.target;
+            Store.SD.save(localUrl, blob, function () {
+              open(blob);
+              var index = [$(img).closest('li[data-chunk]').data('chunk'), img.dataset.index];
+              Store.recover(index[0], function (chunk) {
+                Tools.log(chunk, index);
+                chunk[index[1]].media.downloaded = true;
+                Store.update(index[0], chunk, function () {
+                  img.dataset.downloaded = true;
+                  Tools.log('SUCCESS');
+                });
+              })
+            }, function (error) {
+              Tools.log('SAVE ERROR', error);
+            });
+          });
+        }
+      });
+    }
   	var type = (this.core.from == this.account.core.user || this.core.from == this.account.core.realJid) ? 'out' : 'in';
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', Strophe.getBareJidFromJid(this.core.from));
     var name = type == 'in' ? ((contact ? (contact.name || contact.jid) : (this.core.pushName || this.core.from))).split(' ')[0] : _('Me');
@@ -103,10 +145,12 @@ var Message = function (account, core) {
     if (this.core.id) {
       div.data('id', this.core.id);
     }
-    var stampSpan = $('<span/>').addClass('stamp').html(Tools.convenientDate(this.core.stamp).join('<br/>'));
+    var stampSpan = $('<span/>').addClass('stamp').html(Tools.convenientDate(this.core.stamp).join('<br/>')).data('stamp', this.core.stamp);
     var nameSpan = $('<span/>').addClass('name').text(name);
-    var textSpan = $('<span/>').addClass('text').html(text);
-    div.append(stampSpan).append(nameSpan).append(textSpan);
+    var textSpan = $('<span/>').addClass('text').html(html);
+    if (html) {
+      div.append(stampSpan).append(nameSpan).append(textSpan);
+    }
   	return div;
   }
   

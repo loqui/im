@@ -28,11 +28,11 @@ var Chat = function (core, account) {
         if (chunk) {
           var li = $('<li/>');
           li.addClass('chunk');
-          li.data('chunk', index);
+          li.data('chunk', stIndex);
           for (var i in chunk) {
             var core = chunk[i];
             var msg = new Message(chat.account, core);
-            li.append(msg.preRender());
+            li.append(msg.preRender(i));
           }
           ul.prepend(li);
           var onSwipe = function (e) {

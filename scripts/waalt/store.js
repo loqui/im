@@ -83,10 +83,11 @@ var Store = {
     
     card: 'getDeviceStorage' in navigator ? navigator.getDeviceStorage('sdcard') : null,
     
-    save: function (path, type, content, onsuccess, onerror) {
-      if ('getDeviceStorage' in navigator) {
-        Tools.log('DS IS SUPPORTED');
-        var file = new Blob(content, {type: type});
+    save: function (path, content, onsuccess, onerror) {
+      if (this.card) {
+        Tools.log('SAVING', path);
+        var type = Tools.getFileType(path.split('.').pop());
+        var file = content instanceof Blob ? content : new Blob(content, {type: type});
         var req = this.card.addNamed(file, path);
         req.onsuccess = function () {
           if (onsuccess) {
@@ -105,11 +106,10 @@ var Store = {
     },
     
     recover: function (path, onsuccess, onerror) {
-      if ('getDeviceStorage' in navigator) {
-        Tools.log('DS IS SUPPORTED');
+      if (this.card) {
         var req = this.card.get(path);
         req.onsuccess = function () {
-            onsuccess(this.result);
+          onsuccess(this.result);
         }
         req.onerror = function () {
           if (onerror) {
