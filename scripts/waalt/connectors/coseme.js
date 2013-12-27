@@ -203,6 +203,28 @@ App.connectors['coseme'] = function (account) {
     MI.call(method, [jid]);
   }
   
+  this.fileSend = function (jid, blob) {
+    var reader = new FileReader;
+    reader.addEventListener("loadend", function () {
+      var aB64Hash = CryptoJS.SHA256(reader.result).toString(CryptoJS.enc.Base64);
+      var aT = blob.type.split("/")[0];
+      var aSize = blob.size;
+      var type = blob.type;
+      Tools.blobToBase64(blob, function (aB64OrigHash){
+        Store.put(aB64Hash,
+        {
+          to: jid,
+          data: aB64OrigHash
+        },
+        function () {
+          var method = 'media_requestUpload';
+          MI.call(method, [aB64Hash, aT, aSize]);
+        });
+      });
+    });
+    reader.readAsBinaryString(blob);
+  }
+  
   this.handlers.init = function () {
     Tools.log('HANDLERS INIT');
     var signals = {
@@ -259,7 +281,7 @@ App.connectors['coseme'] = function (account) {
       ping: this.events.onPing,
       pong: null,
       disconnected: this.events.onDisconnected,
-      media_uploadRequestSuccess: null,
+      media_uploadRequestSuccess: this.events.onUploadRequestSuccess,
       media_uploadRequestFailed: null,
       media_uploadRequestDuplicate: null,
     };
@@ -307,21 +329,17 @@ App.connectors['coseme'] = function (account) {
     var self = this;
     var fileType = mediaUrl.split('.').pop();
     var account = this.account;
-
     var image = CoSeMe.utils.aToBlob(mediaPreview, Tools.getFileType(fileType));
-
     Tools.log('Media received:', msgId, fromAttribute, mediaSize, fileType, mediaUrl, wantsReceipt, isBroadcast, mediaPreview);
-    //Tools.saveImage(mediaPreview, fileType, msgId, function(){}, function() {});
     Tools.picUnblob(image, 120, 120, function (url) {
-      Tools.log('IMAGE!!!', url);
-      var to = account.user + '@' + CoSeMe.config.domain;
+      var to = account.core.fullJid;
       var media = {
         type: 'image',
         thumb: url,
         url: mediaUrl,
         downloaded: false
       };
-      var stamp = Tools.localize(Tools.stamp(new Date()));
+      var stamp = Tools.localize(Tools.stamp());
       var msg = new Message(account, {
         from: fromAttribute,
         to: to,
@@ -449,22 +467,25 @@ App.connectors['coseme'] = function (account) {
     var self = this;
     var account = this.account;
     var fileType = mediaUrl.split('.').pop();
-
     var image = CoSeMe.utils.aToBlob(mediaPreview, Tools.getFileType(fileType));
-
-    Tools.picUnblob(image, 120, 120, function(url) {
+    Tools.picUnblob(image, 120, 120, function (url) {
       console.log('URL!', url);
-      var body = '<img src="' + url + '" class="receivedImage" id="' + msgId + '" data-downloaded="0" data-url="' + mediaUrl + '">';
-      var stamp = Tools.localize(Tools.stamp(new Date()));
+      var stamp = Tools.localize(Tools.stamp());
+      var media = {
+        type: 'image',
+        thumb: url,
+        url: mediaUrl,
+        downloaded: false
+      };
       var msg = new Message(account, {
         from: author,
         to: fromAttribute,
-        text: body,
+        media: media,
         stamp: stamp,
         pushName: author
       });
       Tools.log('RECEIVED', msg);
-      msg.receive(true);
+      msg.receive();
       self.ack(msgId, fromAttribute);
     });
     return true;
@@ -474,6 +495,31 @@ App.connectors['coseme'] = function (account) {
     var account = this.account;
     var time = Tools.convenientDate(Tools.localize(Tools.stamp( Math.floor((new Date).valueOf()/1000) - parseInt(lastSeen) )));
     $('section#chat[data-jid="' + jid + '"] header .status').text(parseInt(lastSeen) < 180 ? _('showa') : _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})}));
+  }
+  
+  this.events.onUploadRequestSuccess = function (hash, url, resumeFrom) {
+    var media = CoSeMe.media;
+    Store.get(hash, function (obj) {
+      var toJID = obj.to;
+      var blob = Tools.b64ToBlob(obj.data.split(',').pop(), obj.data.split(/[:;]/)[1]);
+      var uploadUrl = url;
+      media.upload(toJID, blob, uploadUrl, function (url) {
+        // SUCCESS
+        Tools.log(url);
+        Tools.picUnblob(blob, 120, 120, function (data) {
+          Store.drop(hash, function () {
+            var method = 'message_imageSend';
+            MI.call(method, [toJID, url, hash, '0', data.split(',').pop()]);          
+          });
+        });
+      }, function (error) {
+        // ERROR
+        Tools.log(error);
+      }, function (value) {
+        // PROGRESS
+        Tools.log(value); 
+      });
+    });
   }
     
 }

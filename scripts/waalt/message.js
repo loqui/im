@@ -103,7 +103,7 @@ var Message = function (account, core) {
         return new MozActivity({
           name: 'open',
           data: {
-            type: 'image/jpeg',
+            type: blob.type,
             blob: blob
           }
         });
@@ -111,7 +111,7 @@ var Message = function (account, core) {
       html.bind('click', function (e) {
         var url = e.target.dataset.url;
         var ext = url.split('.').pop();
-        var localUrl = 'loqui/' + $(e.target).parent().siblings('.stamp').data('stamp').replace(/[-:]/g, '') + '.' + ext;
+        var localUrl = 'loqui/' + $(e.target).parent().siblings('.stamp').data('stamp').replace(/[-:]/g, '') + Math.random().toString(36).substring(7).toUpperCase() + '.' + ext;
         if (e.target.dataset.downloaded == 'true') {
           Store.SD.recover(localUrl, function (blob) {
             open(blob);

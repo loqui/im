@@ -75,6 +75,9 @@ var Menu = {
       }
       Lungo.Router.article('chat', 'emoji');
     },
+    imageSend: function () {
+      Plus.imageSend();
+    },
     call: function () {
       $('section#chat nav#plus').removeClass('show');
       Lungo.Router.article('chat', 'call');
@@ -103,7 +106,6 @@ var Menu = {
         req.onerror = function () { }
       }
     },
-
     reloadApp: function () {
       var sure = confirm(_('ConfirmReload'));
       if (sure) {

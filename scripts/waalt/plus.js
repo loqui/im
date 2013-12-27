@@ -14,7 +14,7 @@ var Plus = {
         App.audio('thunder');
         Tools.log('Sent a bolt to', to);
       } else {
-        Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter', 'exclamation-sign'));
+        Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign');
       }
     }
   },
@@ -22,6 +22,25 @@ var Plus = {
   emoji: function (emoji) {
     Lungo.Router.article('chat', 'main');
     Messenger.say(emoji);
+  },
+  
+  imageSend: function () {
+    var account = Messenger.account();
+    if (account.supports('imageSend')) {
+    var to = $('section#chat').data('jid');
+      var e = new MozActivity({
+        name: 'pick',
+        data: {
+          type: ['image/png', 'image/jpg', 'image/jpeg']
+        }
+      });
+      e.onsuccess = function () {
+        var blob = this.result.blob;
+        account.connector.fileSend(to, blob);      
+      }
+    } else {
+      Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign');
+    }
   },
   
   rtc: function (constraints) {

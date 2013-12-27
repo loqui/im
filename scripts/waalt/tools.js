@@ -206,6 +206,15 @@ var Tools = {
     }
     var blob = new Blob(byteArrays, { type: contentType });
     return blob;
+  },
+  
+  blobToBase64: function (blob, cb) {
+    var reader = new FileReader;
+    reader.onload = function (e) {
+        var res = e.target.result;
+        cb(res);
+    }
+    reader.readAsDataURL(blob);
   }
 
 }
