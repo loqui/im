@@ -352,7 +352,7 @@ App.connectors['coseme'] = function (account) {
     return true;
   }
 
-  this.events.onVideoReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast) {
+  this.events.onVideoReceived = function (hash, image, type, name, onSuccess, onError, msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast) {
     var self = this;
     var fileType = mediaUrl.split('.').pop();
     var account = this.account;
@@ -375,6 +375,21 @@ App.connectors['coseme'] = function (account) {
       });
       msg.receive();
       self.ack(msgId, fromAttribute);
+      Store.SD.save(hash, function (obj) {
+        var sdCard = navigator.getDeviceStorage('pictures');
+        onSuccess = function () {
+          Tools.log('El archivo "' + this.result + '" se escribio correctamente');
+        };
+        onError = function () {
+          Tools.log(this.error);
+        };
+        var fileType = this.getFileType(type);
+        var imageBlob = CoSeMe.utils.latin1ToBlob(image, fileType);
+        name = 'loqui/' + name + '.' + type;
+        var request = sdCard.addNamed(imageBlob, name);
+        request.onsuccess = onSuccess;
+        request.onerror = onError;
+      });
     });
     return true;
   }
@@ -518,7 +533,7 @@ App.connectors['coseme'] = function (account) {
     return true;
   }
 
-  this.events.onGroupVideoReceived = function (msgId, fromAttribute, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt) {
+  this.events.onGroupVideoReceived = function (hash, image, type, name, onSuccess, onError, msgId, fromAttribute, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt) {
     var self = this;
     var account = this.account;
     var fileType = mediaUrl.split('.').pop();
@@ -542,6 +557,21 @@ App.connectors['coseme'] = function (account) {
       Tools.log('RECEIVED', msg);
       msg.receive();
       self.ack(msgId, fromAttribute);
+      Store.SD.save(hash, function (obj) {
+        var sdCard = navigator.getDeviceStorage('pictures');
+        onSuccess = function () {
+          Tools.log('El archivo "' + this.result + '" se escribio correctamente');
+        };
+        onError = function () {
+          Tools.log(this.error);
+        };
+        var fileType = this.getFileType(type);
+        var imageBlob = CoSeMe.utils.latin1ToBlob(image, fileType);
+        name = 'loqui/' + name + '.' + type;
+        var request = sdCard.addNamed(imageBlob, name);
+        request.onsuccess = onSuccess;
+        request.onerror = onError;
+      });
     });
     return true;
   }
