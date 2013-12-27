@@ -198,6 +198,21 @@ var Messenger = {
       Lungo.Notification.error(_('Error'), _('NoWhenOffline'), 'exclamation-sign', 3);
     }
   },
+
+  paidWhatsapp: function () {
+    if (account.supports('paid')) {
+      var tel = this.account;
+      var activity = new MozActivity({
+        name: 'view',
+          data: {
+            type: 'url',
+            url: 'http://www.whatsapp.com/payments/cksum_pay.php?phone='+tel+'&cksum='+CryptoJS.MD5(tel+"abc").toString(CryptoJS.enc.Hex)
+          }
+      });
+    } else {
+      Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign', 3);
+    }
+  }
   
   chatRemove: function (jid) {
     var account = Messenger.account();
