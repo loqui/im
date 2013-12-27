@@ -764,6 +764,9 @@ section#me[data-lacks~=rosterMgmt] button.contactAdd {
 section#me[data-lacks~=pay] button.accountPurchase {
   display: none!important;
 }
+section#chat[data-lacks~=imageSend] a.picture {
+  display: none!important;
+}
 section#me div#status input {
   width: 100%;
   height: 2.4rem;
