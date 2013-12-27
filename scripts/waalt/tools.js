@@ -154,6 +154,26 @@ var Tools = {
     reader.readAsDataURL(blob);
   },
 
+  vidUnblob: function (blob, width, height, callback) {
+    var reader = new FileReader();
+    reader.onload = function (event) {
+      var vid = new Video();
+      vid.onload = function () {
+        var canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(vid, 0, 0, width, height);
+        var url = canvas.toDataURL();
+        callback(url);
+      }
+      vid.src = event.target.result;
+    }
+    reader.onerror = function ( event ) {
+      Tools.log(event);
+    }
+    reader.readAsDataURL(blob);
+  },
+
   getFileType: function(type) {
     var fileType = null;
     switch (type) {
@@ -166,6 +186,15 @@ var Tools = {
         break;
       case 'gif':
         fileType = 'image/gif';
+        break;
+      case 'webm':
+        fileType = 'video/webm';
+        break;
+      case 'mp4':
+        fileType = 'video/mp4';
+        break;
+      case '3gpp':
+        fileType = 'video/3gpp';
         break;
       default:
         fileType = 'text/plain';
@@ -186,6 +215,22 @@ var Tools = {
     var imageBlob = CoSeMe.utils.latin1ToBlob(image, fileType);
     name = 'loqui/' + name + '.' + type;
     var request = sdCard.addNamed(imageBlob, name);
+    request.onsuccess = onSuccess;
+    request.onerror = onError;
+  },
+
+  videoSave: function (video, type, name, onSuccess, onError) {
+    var sdCard = navigator.getDeviceStorage('videos');
+    onSuccess = function () {
+      Tools.log('El archivo "' + this.result + '" se escribio correctamente');
+    };
+    onError = function () {
+      Tools.log(this.error);
+    };
+    var fileType = this.getFileType(type);
+    var videoBlob = CoSeMe.utils.latin1ToBlob(video, fileType);
+    name = 'loqui/' + name + '.' + type;
+    var request = sdCard.addNamed(videoBlob, name);
     request.onsuccess = onSuccess;
     request.onerror = onError;
   },
