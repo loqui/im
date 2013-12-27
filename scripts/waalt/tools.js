@@ -167,6 +167,9 @@ var Tools = {
       case 'gif':
         fileType = 'image/gif';
         break;
+      case 'bmp':
+        fileType = 'image/bmp';
+        break;
       default:
         fileType = 'text/plain';
         break;

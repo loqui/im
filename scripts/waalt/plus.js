@@ -31,7 +31,7 @@ var Plus = {
       var e = new MozActivity({
         name: 'pick',
         data: {
-          type: ['image/png', 'image/jpg', 'image/jpeg']
+          type: ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/bmp']
         }
       });
       e.onsuccess = function () {
