@@ -90,7 +90,7 @@ var Menu = {
     },
     purchase: function () {
       if (account.supports('pay')) {
-        var number = this.account();
+        var number = this.account().core.cc;
         var activity = new MozActivity({
           name: 'view',
             data: {
