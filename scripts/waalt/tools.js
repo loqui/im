@@ -162,7 +162,7 @@ var Tools = {
         var canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
-        canvas.getContext('2d').drawImage(vid, 0, 0, width, height);
+        canvas.getContext('2d').drawVideo(vid, 0, 0, width, height);
         var url = canvas.toDataURL();
         callback(url);
       }
