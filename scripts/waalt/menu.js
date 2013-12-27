@@ -19,6 +19,7 @@ var Menu = {
     },
     settings: function () {
       Lungo.Router.section('settings');
+      // $('section#settings nav a#developer').hide();
     },
     me: function () {
       Lungo.Router.section('me');
