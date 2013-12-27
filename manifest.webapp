@@ -46,6 +46,10 @@
     "device-storage:pictures": {
       "description": "Required for image handling",
       "access": "readwrite"
+    },
+    "device-storage:videos": {
+      "description": "Required for video handling",
+      "access": "readwrite"
     }
   }
 }

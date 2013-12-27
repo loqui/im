@@ -154,6 +154,26 @@ var Tools = {
     reader.readAsDataURL(blob);
   },
 
+  vidUnblob: function (blob, width, height, callback) {
+    var reader = new FileReader();
+    reader.onload = function (event) {
+      var vid = new Video();
+      vid.onload = function () {
+        var canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawVideo(vid, 0, 0, width, height);
+        var url = canvas.toDataURL();
+        callback(url);
+      }
+      vid.src = event.target.result;
+    }
+    reader.onerror = function ( event ) {
+      Tools.log(event);
+    }
+    reader.readAsDataURL(blob);
+  },
+
   getFileType: function(type) {
     var fileType = null;
     switch (type) {
@@ -169,6 +189,15 @@ var Tools = {
         break;
       case 'bmp':
         fileType = 'image/bmp';
+        break;
+      case 'webm':
+        fileType = 'image/webm';
+        break;
+      case 'mp4':
+        fileType = 'image/mp4';
+        break;
+      case '3gpp':
+        fileType = 'image/3gpp';
         break;
       default:
         fileType = 'text/plain';

@@ -233,7 +233,7 @@ App.connectors['coseme'] = function (account) {
       message_received: this.events.onMessage,
       image_received: this.events.onImageReceived,
       vcard_received: null,
-      video_received: null,
+      video_received: this.events.onVideoReceived,
       audio_received: null,
       location_received: null,
       message_error: null,
@@ -258,7 +258,7 @@ App.connectors['coseme'] = function (account) {
       group_messageReceived: this.events.onGroupMessage,
       group_imageReceived: this.events.onGroupImageReceived,
       group_vcardReceived: null,
-      group_videoReceived: null,
+      group_videoReceived: this.events.onGroupVideoReceived,
       group_audioReceived: null,
       group_locationReceived: null,
       group_setPictureSuccess: null,
@@ -335,6 +335,33 @@ App.connectors['coseme'] = function (account) {
       var to = account.core.fullJid;
       var media = {
         type: 'image',
+        thumb: url,
+        url: mediaUrl,
+        downloaded: false
+      };
+      var stamp = Tools.localize(Tools.stamp());
+      var msg = new Message(account, {
+        from: fromAttribute,
+        to: to,
+        media: media,
+        stamp: stamp
+      });
+      msg.receive();
+      self.ack(msgId, fromAttribute);
+    });
+    return true;
+  }
+
+  this.events.onVideoReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast) {
+    var self = this;
+    var fileType = mediaUrl.split('.').pop();
+    var account = this.account;
+    var video = CoSeMe.utils.aToBlob(mediaPreview, Tools.getFileType(fileType));
+    Tools.log('Media received:', msgId, fromAttribute, mediaSize, fileType, mediaUrl, wantsReceipt, isBroadcast, mediaPreview);
+    Tools.vidUnblob(video, 120, 120, function (url) {
+      var to = account.core.fullJid;
+      var media = {
+        type: 'video',
         thumb: url,
         url: mediaUrl,
         downloaded: false
@@ -490,6 +517,34 @@ App.connectors['coseme'] = function (account) {
     });
     return true;
   }
+
+  this.events.onGroupImageReceived = function (msgId, fromAttribute, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt) {
+    var self = this;
+    var account = this.account;
+    var fileType = mediaUrl.split('.').pop();
+    var video = CoSeMe.utils.aToBlob(mediaPreview, Tools.getFileType(fileType));
+    Tools.vidUnblob(video, 120, 120, function (url) {
+      console.log('URL!', url);
+      var stamp = Tools.localize(Tools.stamp());
+      var media = {
+        type: 'video',
+        thumb: url,
+        url: mediaUrl,
+        downloaded: false
+      };
+      var msg = new Message(account, {
+        from: author,
+        to: fromAttribute,
+        media: media,
+        stamp: stamp,
+        pushName: author
+      });
+      Tools.log('RECEIVED', msg);
+      msg.receive();
+      self.ack(msgId, fromAttribute);
+    });
+    return true;
+  }
   
   this.events.onPresenceUpdated = function (jid, lastSeen) {
     var account = this.account;
@@ -509,6 +564,12 @@ App.connectors['coseme'] = function (account) {
         Tools.picUnblob(blob, 120, 120, function (data) {
           Store.drop(hash, function () {
             var method = 'message_imageSend';
+            MI.call(method, [toJID, url, hash, '0', data.split(',').pop()]);          
+          });
+        });
+        Tools.vidUnblob(blob, 120, 120, function (data) {
+          Store.drop(hash, function () {
+            var method = 'message_videoSend';
             MI.call(method, [toJID, url, hash, '0', data.split(',').pop()]);          
           });
         });

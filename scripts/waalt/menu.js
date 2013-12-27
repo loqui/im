@@ -78,6 +78,9 @@ var Menu = {
     imageSend: function () {
       Plus.imageSend();
     },
+    videoSend: function () {
+      Plus.videoSend();
+    },
     call: function () {
       $('section#chat nav#plus').removeClass('show');
       Lungo.Router.article('chat', 'call');
@@ -89,20 +92,24 @@ var Menu = {
       Plus.rtc({audio: true, video: true});
     },
     purchase: function () {
-      if (account.supports('pay')) {
-        var number = this.account().core.cc;
-        var openURL = new MozActivity({
-          name: "view",
-          data: {
-            type: "url",
-            url: 'http://www.whatsapp.com/payments/cksum_pay.php?phone='+number+'&cksum='+CryptoJS.MD5(number+"abc").toString(CryptoJS.enc.Hex)
+      if (account.supports('pay')) { 
+        if (typeof MozActivity != 'undefined') {
+          var number = this.account().core.cc;
+          var openURL = new MozActivity({
+            name: "view",
+            data: {
+              type: "url",
+              url: 'http://www.whatsapp.com/payments/cksum_pay.php?phone='+number+'&cksum='+CryptoJS.MD5(number+"abc").toString(CryptoJS.enc.Hex)
+            }
+          });
+          openURL.onsuccess = function () {
+            Tools.log('Purchase');
           }
-        });
-        openURL.onsuccess = function () {
-          Tools.log('Purchase');
-        }
-        openURL.onerror = function () {
-          Tools.log('Something bad');
+          openURL.onerror = function () {
+            Tools.log('Something bad');
+          }
+        } else {
+          Lungo.Notification.error(_('NoDevice'), _('FxOSisBetter', 'exclamation-sign'), 3);
         }
       } else {
         Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign', 3);
