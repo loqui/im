@@ -88,6 +88,20 @@ var Menu = {
       Lungo.Router.article('chat', 'videocall');
       Plus.rtc({audio: true, video: true});
     },
+    purchase: function () {
+      if (account.supports('pay')) {
+        var number = this.account().core.cc;
+        var activity = new MozActivity({
+          name: 'view',
+            data: {
+              type: 'url',
+              url: 'http://www.whatsapp.com/payments/cksum_pay.php?phone='+number+'&cksum='+CryptoJS.MD5(number+"abc").toString(CryptoJS.enc.Hex)
+            }
+        });
+      } else {
+        Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign', 3);
+      }
+    },
     powerOff: function () {
       var will = confirm(_('ConfirmClose'));
       if (will) {

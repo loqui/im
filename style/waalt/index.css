@@ -761,6 +761,9 @@ section#me[data-lacks~=statusChange] div#status {
 section#me[data-lacks~=rosterMgmt] button.contactAdd {
   display: none!important;
 }
+section#me[data-lacks~=pay] button.accountPurchase {
+  display: none!important;
+}
 section#me div#status input {
   width: 100%;
   height: 2.4rem;
