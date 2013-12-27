@@ -567,6 +567,12 @@ App.connectors['coseme'] = function (account) {
             MI.call(method, [toJID, url, hash, '0', data.split(',').pop()]);          
           });
         });
+        Tools.vidUnblob(blob, 120, 120, function (data) {
+          Store.drop(hash, function () {
+            var method = 'message_videoSend';
+            MI.call(method, [toJID, url, hash, '0', data.split(',').pop()]);          
+          });
+        });
       }, function (error) {
         // ERROR
         Tools.log(error);
