@@ -42,6 +42,25 @@ var Plus = {
       Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign');
     }
   },
+
+  videoSend: function () {
+    var account = Messenger.account();
+    if (account.supports('videoSend')) {
+    var to = $('section#chat').data('jid');
+      var e = new MozActivity({
+        name: 'pick',
+        data: {
+          type: ['video/webm', 'video/mp4', 'video/3gpp']
+        }
+      });
+      e.onsuccess = function () {
+        var blob = this.result.blob;
+        account.connector.fileSend(to, blob);      
+      }
+    } else {
+      Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign');
+    }
+  },
   
   rtc: function (constraints) {
     

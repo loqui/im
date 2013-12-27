@@ -78,6 +78,9 @@ var Menu = {
     imageSend: function () {
       Plus.imageSend();
     },
+    videoSend: function () {
+      Plus.videoSend();
+    },
     call: function () {
       $('section#chat nav#plus').removeClass('show');
       Lungo.Router.article('chat', 'call');
