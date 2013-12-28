@@ -283,7 +283,7 @@ App.connectors['coseme'] = function (account) {
       disconnected: this.events.onDisconnected,
       media_uploadRequestSuccess: this.events.onUploadRequestSuccess,
       media_uploadRequestFailed: this.events.onUploadRequestFailed,
-      media_uploadRequestDuplicate: null,
+      media_uploadRequestDuplicate: this.events.onUploadRequestDuplicate,
     };
     Object.keys(signals).forEach(function(signal) {
       var customCallback = signals[signal];
@@ -642,6 +642,7 @@ App.connectors['coseme'] = function (account) {
       }, function (value) {
         // PROGRESS
         Lungo.Notification.show('up-sign', value+'% '+_('Uploaded'));
+        Tools.log(value);
       });
     });
   }
