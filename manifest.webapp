@@ -50,6 +50,10 @@
     "device-storage:videos": {
       "description": "Required for video handling",
       "access": "readwrite"
+    },
+    "device-storage:music": {
+      "description": "Required for audio handling",
+      "access": "readwrite"
     }
   }
 }
