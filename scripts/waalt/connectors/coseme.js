@@ -282,7 +282,7 @@ App.connectors['coseme'] = function (account) {
       pong: null,
       disconnected: this.events.onDisconnected,
       media_uploadRequestSuccess: this.events.onUploadRequestSuccess,
-      media_uploadRequestFailed: null,
+      media_uploadRequestFailed: this.events.onUploadRequestFailed,
       media_uploadRequestDuplicate: null,
     };
     Object.keys(signals).forEach(function(signal) {
@@ -634,14 +634,24 @@ App.connectors['coseme'] = function (account) {
             MI.call(method, [toJID, url, hash, '0', data.split(',').pop()]);          
           });
         });
+      Lungo.Notification.hide();
       }, function (error) {
         // ERROR
+        Lungo.Notification.error(_('NotUploaded'), _('ErrorUploading'), 'warning-sign', 5);
         Tools.log(error);
       }, function (value) {
         // PROGRESS
-        Tools.log(value); 
+        Lungo.Notification.show('up-sign', value+'% '+_('Uploaded'));
       });
     });
+  }
+
+  this.events.onUploadRequestFailed = function (hash) {
+    Lungo.Notification.error(_('NotUploaded'), _('ErrorUploading'), 'warning-sign', 5);
+  }
+
+  this.events.onUploadRequestDuplicate = function (hash) {
+    Lungo.Notification.error(_('NotUploaded'), _('DuplicatedUpload'), 'warning-sign', 5);
   }
     
 }
