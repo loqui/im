@@ -27,7 +27,7 @@ var Providers = {
         timeout: 300
       },
       autodomain: 'chat.facebook.com',
-      lacks: ['multi', 'avatarChange', 'statusChange', 'attention', 'rosterMgmt', 'receipts', 'localContacts', 'imageSend', 'pay', 'videoSend'],
+      lacks: ['multi', 'avatarChange', 'statusChange', 'attention', 'rosterMgmt', 'receipts', 'localContacts', 'imageSend', 'pay', 'videoSend', 'audioSend'],
       color: '#3D539F',
       terms: {
         user: 'ProviderUsername',
@@ -46,7 +46,7 @@ var Providers = {
         timeout: 300
       },
       autodomain: 'gmail.com',
-      lacks: ['avatarChange', 'receipts', 'localContacts', 'imageSend', 'pay', 'videoSend'],
+      lacks: ['avatarChange', 'receipts', 'localContacts', 'imageSend', 'pay', 'videoSend', 'audioSend'],
       color: '#4EA43B',
       terms: {
         user: 'ProviderAddress',
@@ -65,7 +65,7 @@ var Providers = {
         timeout: 300
       },
       autodomain: 'nimbuzz.com',
-      lacks: ['vcard', 'avatarChange', 'attention', 'receipts', 'localContacts', 'imageSend', 'pay', 'videoSend'],
+      lacks: ['vcard', 'avatarChange', 'attention', 'receipts', 'localContacts', 'imageSend', 'pay', 'videoSend', 'audioSend'],
       color: '#FF8702',
       terms: {
         user: 'Username',
@@ -83,7 +83,7 @@ var Providers = {
         timeout: 300
       },
       autodomain: 'chat.ovi.com',
-      lacks: ['avatarChange', 'attention', 'receipts', 'localContacts', 'imageSend', 'pay', 'videoSend'],
+      lacks: ['avatarChange', 'attention', 'receipts', 'localContacts', 'imageSend', 'pay', 'videoSend', 'audioSend'],
       color: '#39B006',
       terms: {
         user: 'Username',
@@ -101,7 +101,7 @@ var Providers = {
         timeout: 300
       },
       autodomain: false,
-      lacks: ['avatarChange', 'attention', 'receipts', 'localContacts', 'imageSend', 'pay', 'videoSend'],
+      lacks: ['avatarChange', 'attention', 'receipts', 'localContacts', 'imageSend', 'pay', 'videoSend', 'audioSend'],
       color: '#0071C5',
       terms: {
         user: 'ProviderAddress',
@@ -119,7 +119,7 @@ var Providers = {
         timeout: 300
       },
       autodomain: false,
-      lacks: ['receipts', 'localContacts', 'imageSend', 'pay', 'videoSend'],
+      lacks: ['receipts', 'localContacts', 'imageSend', 'pay', 'videoSend', 'audioSend'],
       color: '#149ED2',
       terms: {
         user: 'FullJID',

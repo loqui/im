@@ -174,6 +174,26 @@ var Tools = {
     reader.readAsDataURL(blob);
   },
 
+  audUnblob: function (blob, width, height, callback) {
+    var reader = new FileReader();
+    reader.onload = function (event) {
+      var aud = new Audio();
+      vid.onload = function () {
+        var canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawAudio(aud, 0, 0, width, height);
+        var url = canvas.toDataURL();
+        callback(url);
+      }
+      aud.src = event.target.result;
+    }
+    reader.onerror = function ( event ) {
+      Tools.log(event);
+    }
+    reader.readAsDataURL(blob);
+  },
+
   getFileType: function(type) {
     var fileType = null;
     switch (type) {
@@ -191,14 +211,24 @@ var Tools = {
         fileType = 'image/bmp';
         break;
       case 'webm':
-        fileType = 'image/webm';
+        fileType = 'video/webm';
         break;
       case 'mp4':
-        fileType = 'image/mp4';
+        fileType = 'video/mp4';
         break;
       case '3gpp':
-        fileType = 'image/3gpp';
+        fileType = 'video/3gpp';
         break;
+      case 'mpeg':
+      	fileType = 'audio/mpeg';
+      	break;
+      case 'ogg':
+      	fileType = 'audio/ogg';
+      	break;
+/*      How to specify when is video and when is audio?
+		case 'mp4':
+      	fileType = 'audio/mp4';
+      	break;*/
       default:
         fileType = 'text/plain';
         break;
@@ -234,6 +264,22 @@ var Tools = {
     var videoBlob = CoSeMe.utils.latin1ToBlob(video, fileType);
     name = 'loqui/' + name + '.' + type;
     var request = sdCard.addNamed(videoBlob, name);
+    request.onsuccess = onSuccess;
+    request.onerror = onError;
+  },
+
+  audioSave: function (audio, type, name, onSuccess, onError) {
+    var sdCard = navigator.getDeviceStorage('music');
+    onSuccess = function () {
+      Tools.log('El archivo "' + this.result + '" se escribio correctamente');
+    };
+    onError = function () {
+      Tools.log(this.error);
+    };
+    var fileType = this.getFileType(type);
+    var audioBlob = CoSeMe.utils.latin1ToBlob(audio, fileType);
+    name = 'loqui/' + name + '.' + type;
+    var request = sdCard.addNamed(audioBlob, name);
     request.onsuccess = onSuccess;
     request.onerror = onError;
   },
