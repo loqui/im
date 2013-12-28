@@ -158,8 +158,7 @@ var bindings = function () {
   $('section#chat nav#plus a.bolt').on('click', function() {
     Plus.bolt();
   });
-  //Para Resolver Issue #167 https://github.com/waalt/loqui/issues/167
-  $('#welcome').on('click',function(){
+  $('section#welcome').on('click',function(){
      Menu.show('providers', null, 500);
   });
 }
