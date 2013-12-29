@@ -283,7 +283,7 @@ App.connectors['coseme'] = function (account) {
       disconnected: this.events.onDisconnected,
       media_uploadRequestSuccess: this.events.onUploadRequestSuccess,
       media_uploadRequestFailed: this.events.onUploadRequestFailed,
-      media_uploadRequestDuplicate: this.events.onUploadRequestDuplicate,
+      media_uploadRequestDuplicate: this.events.onUploadRequestDuplicate
     };
     Object.keys(signals).forEach(function(signal) {
       var customCallback = signals[signal];
@@ -326,84 +326,19 @@ App.connectors['coseme'] = function (account) {
   }
 
   this.events.onImageReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast) {
-    var self = this;
-    var fileType = mediaUrl.split('.').pop();
-    var account = this.account;
-    var image = CoSeMe.utils.aToBlob(mediaPreview, Tools.getFileType(fileType));
-    Tools.log('Media received:', msgId, fromAttribute, mediaSize, fileType, mediaUrl, wantsReceipt, isBroadcast, mediaPreview);
-    Tools.picUnblob(image, 120, 120, function (url) {
-      var to = account.core.fullJid;
-      var media = {
-        type: 'image',
-        thumb: url,
-        url: mediaUrl,
-        downloaded: false
-      };
-      var stamp = Tools.localize(Tools.stamp());
-      var msg = new Message(account, {
-        from: fromAttribute,
-        to: to,
-        media: media,
-        stamp: stamp
-      });
-      msg.receive();
-      self.ack(msgId, fromAttribute);
-    });
-    return true;
+    var to = this.account.core.fullJid;
+    var isGroup = false;
+    return this.processFile('image', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, isGroup);
   }
 
   this.events.onVideoReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast) {
-    var self = this;
-    var fileType = mediaUrl.split('.').pop();
-    var account = this.account;
-    var video = CoSeMe.utils.aToBlob(mediaPreview, Tools.getFileType(fileType));
-    Tools.log('Media received:', msgId, fromAttribute, mediaSize, fileType, mediaUrl, wantsReceipt, isBroadcast, mediaPreview);
-    Tools.vidUnblob(video, 120, 120, function (url) {
-      var to = account.core.fullJid;
-      var media = {
-        type: 'video',
-        thumb: url,
-        url: mediaUrl,
-        downloaded: false
-      };
-      var stamp = Tools.localize(Tools.stamp());
-      var msg = new Message(account, {
-        from: fromAttribute,
-        to: to,
-        media: media,
-        stamp: stamp
-      });
-      msg.receive();
-      self.ack(msgId, fromAttribute);
-    });
-    return true;
+    var to = this.account.core.fullJid;
+    return this.processFile('video', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, false);
   }
 
-  this.events.onAudioReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast) {
-    var self = this;
-    var fileType = mediaUrl.split('.').pop();
-    var account = this.account;
-    var audio = CoSeMe.utils.aToBlob(mediaPreview, Tools.getFileType(fileType));
-    Tools.log('Media received:', msgId, fromAttribute, mediaSize, fileType, mediaUrl, wantsReceipt, isBroadcast, mediaPreview);
-    Tools.audUnblob(audio, 120, 120, function (url) {
-      var to = account.core.fullJid;
-      var media = {
-        type: 'audio',
-        thumb: url,
-        url: mediaUrl,
-        downloaded: false
-      };
-      var stamp = Tools.localize(Tools.stamp());
-      var msg = new Message(account, {
-        from: fromAttribute,
-        to: to,
-        media: media,
-        stamp: stamp
-      });
-      msg.receive();
-      self.ack(msgId, fromAttribute);
-    });
-    return true;
+  this.events.onAudioReceived = function (msgId, fromAttribute, mediaUrl, mediaSize, wantsReceipt, isBroadcast) {
+    var to = this.account.core.fullJid;
+    return this.processAudio(msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, false);
   }
   
   this.events.onAvatar = function (jid, picId, blob) {
@@ -518,87 +453,24 @@ App.connectors['coseme'] = function (account) {
   }
 
   this.events.onGroupImageReceived = function (msgId, fromAttribute, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt) {
-    var self = this;
-    var account = this.account;
-    var fileType = mediaUrl.split('.').pop();
-    var image = CoSeMe.utils.aToBlob(mediaPreview, Tools.getFileType(fileType));
-    Tools.picUnblob(image, 120, 120, function (url) {
-      Tools.log('URL!', url);
-      var stamp = Tools.localize(Tools.stamp());
-      var media = {
-        type: 'image',
-        thumb: url,
-        url: mediaUrl,
-        downloaded: false
-      };
-      var msg = new Message(account, {
-        from: author,
-        to: fromAttribute,
-        media: media,
-        stamp: stamp,
-        pushName: author
-      });
-      Tools.log('RECEIVED', msg);
-      msg.receive();
-      self.ack(msgId, fromAttribute);
-    });
-    return true;
+    var to = fromAttribute;
+    var fromAttribute = author;
+    var isGroup = true;
+    return this.processFile('image', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, isGroup);
   }
 
-  this.events.onGroupImageReceived = function (msgId, fromAttribute, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt) {
-    var self = this;
-    var account = this.account;
-    var fileType = mediaUrl.split('.').pop();
-    var video = CoSeMe.utils.aToBlob(mediaPreview, Tools.getFileType(fileType));
-    Tools.vidUnblob(video, 120, 120, function (url) {
-      Tools.log('URL!', url);
-      var stamp = Tools.localize(Tools.stamp());
-      var media = {
-        type: 'video',
-        thumb: url,
-        url: mediaUrl,
-        downloaded: false
-      };
-      var msg = new Message(account, {
-        from: author,
-        to: fromAttribute,
-        media: media,
-        stamp: stamp,
-        pushName: author
-      });
-      Tools.log('RECEIVED', msg);
-      msg.receive();
-      self.ack(msgId, fromAttribute);
-    });
-    return true;
+  this.events.onGroupAudioReceived = function (msgId, fromAttribute, author, mediaUrl, mediaSize, wantsReceipt) {
+    var to = fromAttribute;
+    var fromAttribute = author;
+    var isGroup = true;
+    return this.processAudio(msgId, fromAttribute, to, mediaUrl, mediaSize, isGroup);
   }
 
-  this.events.onGroupAudioReceived = function (msgId, fromAttribute, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt) {
-    var self = this;
-    var account = this.account;
-    var fileType = mediaUrl.split('.').pop();
-    var audio = CoSeMe.utils.aToBlob(mediaPreview, Tools.getFileType(fileType));
-    Tools.audUnblob(audio, 120, 120, function (url) {
-      Tools.log('URL!', url);
-      var stamp = Tools.localize(Tools.stamp());
-      var media = {
-        type: 'audio',
-        thumb: url,
-        url: mediaUrl,
-        downloaded: false
-      };
-      var msg = new Message(account, {
-        from: author,
-        to: fromAttribute,
-        media: media,
-        stamp: stamp,
-        pushName: author
-      });
-      Tools.log('RECEIVED', msg);
-      msg.receive();
-      self.ack(msgId, fromAttribute);
-    });
-    return true;
+  this.events.onGroupVideoReceived = function (msgId, fromAttribute, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt) {
+    var to = fromAttribute;
+    var fromAttribute = author;
+    var isGroup = true;
+    return this.processFile('video', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, isGroup);
   }
   
   this.events.onPresenceUpdated = function (jid, lastSeen) {
@@ -653,6 +525,65 @@ App.connectors['coseme'] = function (account) {
 
   this.events.onUploadRequestDuplicate = function (hash) {
     Lungo.Notification.error(_('NotUploaded'), _('DuplicatedUpload'), 'warning-sign', 5);
+  }
+
+  this.processFile = function (fileType, msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, isGroup) {
+    console.log('Processing file');
+    var self = this;
+    //var type = mediaUrl.split('.').pop();
+    //type = Tools.getFileType(type);
+    // Type siempre como 'image/jpeg' porque este solo se usa para el preview
+    var type = 'image/jpeg';
+    var account = this.account;
+    var image = CoSeMe.utils.aToBlob(mediaPreview, type);
+    Tools.picUnblob(image, 120, 120, function (url) {
+      var media = {
+        type: 'image',
+        thumb: url,
+        url: mediaUrl,
+        downloaded: false
+      };
+      var stamp = Tools.localize(Tools.stamp());
+      var msgObj = {
+        from: fromAttribute,
+        to: to,
+        media: media,
+        stamp: stamp
+      };
+      if (isGroup) {
+        msgObj.pushName = fromAttribute;
+      }
+      var msg = new Message(account, msgObj);
+      msg.receive(isGroup);
+      self.ack(msgId, fromAttribute);
+    });
+    console.log('EndingProcessing');
+    return true;
+  }
+
+  this.processAudio = function (msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, isGroup) {
+    console.log('processAudio');
+    var audioIcon = '>>';
+    var self = this;
+    var account = this.account;
+    var media = {
+      type: 'audio',
+      thumb: audioIcon,
+      url: mediaUrl,
+      downloaded: false
+    };
+    var stamp = Tools.localize(Tools.stamp());
+    var msg = new Message(account, {
+      from: fromAttribute,
+      to: to,
+      media: media,
+      stamp: stamp
+    });
+    msg.receive();
+    self.ack(msgId, fromAttribute);
+
+    console.log('Audio message processed');
+    return true;
   }
     
 }
