@@ -456,7 +456,7 @@ App.connectors['coseme'] = function (account) {
     var to = fromAttribute;
     var fromAttribute = author;
     var isGroup = true;
-    return this.processFile('image', msgId, fromAttribute, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt);
+    return this.processFile('image', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, isGroup);
   }
 
   this.events.onGroupAudioReceived = function (msgId, fromAttribute, author, mediaUrl, mediaSize, wantsReceipt) {
@@ -470,7 +470,7 @@ App.connectors['coseme'] = function (account) {
     var to = fromAttribute;
     var fromAttribute = author;
     var isGroup = true;
-    return this.processFile('video', msgId, fromAttribute, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt);
+    return this.processFile('video', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, isGroup);
   }
   
   this.events.onPresenceUpdated = function (jid, lastSeen) {
@@ -537,7 +537,6 @@ App.connectors['coseme'] = function (account) {
     var account = this.account;
     var image = CoSeMe.utils.aToBlob(mediaPreview, type);
     Tools.picUnblob(image, 120, 120, function (url) {
-      var to = account.core.fullJid;
       var media = {
         type: 'image',
         thumb: url,
@@ -545,13 +544,17 @@ App.connectors['coseme'] = function (account) {
         downloaded: false
       };
       var stamp = Tools.localize(Tools.stamp());
-      var msg = new Message(account, {
+      var msgObj = {
         from: fromAttribute,
         to: to,
         media: media,
         stamp: stamp
-      });
-      msg.receive();
+      };
+      if (isGroup) {
+        msgObj.pushName = fromAttribute;
+      }
+      var msg = new Message(account, msgObj);
+      msg.receive(isGroup);
       self.ack(msgId, fromAttribute);
     });
     console.log('EndingProcessing');
