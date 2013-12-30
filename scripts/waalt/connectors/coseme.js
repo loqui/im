@@ -480,30 +480,32 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.events.onUploadRequestSuccess = function (hash, url, resumeFrom) {
+    console.log('onUploadRequest!');
+    var self = this;
     var media = CoSeMe.media;
+    var account = this.account;
     Store.get(hash, function (obj) {
+      var type, method = null;
+      if (obj.data.indexOf(':image') > 0) {
+        type = 'image';
+        method = 'message_imageSend';
+      } else if (obj.data.indexOf(':video') > 0) {
+        type = 'video';
+        method = 'message_videoSend';
+      } else if (obj.data.indexOf(':audio') > 0) {
+        type = 'audio';
+        method = 'message_audioSend';
+      }
       var toJID = obj.to;
       var blob = Tools.b64ToBlob(obj.data.split(',').pop(), obj.data.split(/[:;]/)[1]);
       var uploadUrl = url;
       media.upload(toJID, blob, uploadUrl, function (url) {
         // SUCCESS
-        Tools.log(url);
         Tools.picUnblob(blob, 120, 120, function (data) {
           Store.drop(hash, function () {
-            var method = 'message_imageSend';
-            MI.call(method, [toJID, url, hash, '0', data.split(',').pop()]);          
-          });
-        });
-        Tools.vidUnblob(blob, 120, 120, function (data) {
-          Store.drop(hash, function () {
-            var method = 'message_videoSend';
-            MI.call(method, [toJID, url, hash, '0', data.split(',').pop()]);          
-          });
-        });
-        Tools.audUnblob(blob, 120, 120, function (data) {
-          Store.drop(hash, function () {
-            var method = 'message_audioSend';
-            MI.call(method, [toJID, url, hash, '0', data.split(',').pop()]);          
+            MI.call(method, [toJID, url, hash, '0', data.split(',').pop()]);
+            self.addMediaMessageToChat(type, data, url, account.core.user, toJID);
+            App.audio('sent');
           });
         });
       Lungo.Notification.hide();
@@ -525,6 +527,35 @@ App.connectors['coseme'] = function (account) {
 
   this.events.onUploadRequestDuplicate = function (hash) {
     Lungo.Notification.error(_('NotUploaded'), _('DuplicatedUpload'), 'warning-sign', 5);
+  }
+
+  this.addMediaMessageToChat = function(type, data, url, from, to) {
+    var account = this.account;
+    var msgMedia = {
+      type: type,
+      thumb: data,
+      url: url,
+      downloaded: true
+    };
+    var stamp = Tools.localize(Tools.stamp());
+    var msg = new Message(account, {
+      from: from,
+      to: to,
+      media: msgMedia,
+      stamp: stamp
+    });
+
+    var chatIndex = account.chatFind(to);
+
+    if (chatIndex > 0) {
+      var chat = account.chats[chatIndex];
+      chat.messageAppend.push(
+        {msg: msg.core},
+        function(err) {
+          chat.save(true);
+        }
+      ).bind(msg);
+    }
   }
 
   this.processFile = function (fileType, msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, isGroup) {
