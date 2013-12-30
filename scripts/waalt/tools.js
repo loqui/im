@@ -251,22 +251,6 @@ var Tools = {
     request.onsuccess = onSuccess;
     request.onerror = onError;
   },
-  
-  videoSave: function (video, type, name, onSuccess, onError) {
-    var sdCard = navigator.getDeviceStorage('videos');
-    onSuccess = function () {
-      Tools.log('El archivo "' + this.result + '" se escribio correctamente');
-    };
-    onError = function () {
-      Tools.log(this.error);
-    };
-    var fileType = this.getFileType(type);
-    var videoBlob = CoSeMe.utils.latin1ToBlob(video, fileType);
-    name = 'loqui/' + name + '.' + type;
-    var request = sdCard.addNamed(videoBlob, name);
-    request.onsuccess = onSuccess;
-    request.onerror = onError;
-  },
 
   audioSave: function (audio, type, name, onSuccess, onError) {
     var sdCard = navigator.getDeviceStorage('music');
