@@ -159,6 +159,6 @@ var bindings = function () {
     Plus.bolt();
   });
   $('section#welcome').on('click',function(){
-     Menu.show('providers', null, 500);
+     Menu.show('providers');
   });
 }
