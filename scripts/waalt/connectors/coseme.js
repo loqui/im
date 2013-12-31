@@ -250,7 +250,7 @@ App.connectors['coseme'] = function (account) {
       group_createFail: null,
       group_endSuccess: null,
       group_gotInfo: this.events.onGroupGotInfo,
-      group_infoError: null,
+      group_infoError: this.events.onGroupInfoError,
       group_addParticipantsSuccess: null,
       group_removeParticipantsSuccess: null,
       group_gotParticipants: this.events.onGroupGotParticipants,
@@ -273,8 +273,8 @@ App.connectors['coseme'] = function (account) {
       notification_groupParticipantRemoved: null,
       contact_gotProfilePictureId: null,
       contact_gotProfilePicture: this.events.onAvatar,
-      contact_typing: null,
-      contact_paused: null,
+      contact_typing: this.events.onContactTyping,
+      contact_paused: this.events.onContactPaused,
       profile_setPictureSuccess: null,
       profile_setPictureError: null,
       profile_setStatusSuccess: null,
@@ -367,6 +367,20 @@ App.connectors['coseme'] = function (account) {
         });
       }
     }
+  }
+
+  this.events.onContactTyping = function (to, state) {
+    var method = state == 'composing';
+    MI.call(method, [to]);
+    Tools.log('TYPING', to)
+    $("section#chat #typing").show();
+  }
+
+  this.events.onContactPaused = function (to, state) {
+    var method = state == 'typing_paused';
+    MI.call(method, [to]);
+    Tools.log('TYPING PAUSED', to)
+    $("section#chat #typing").hide();
   }
   
   this.events.onMessageSent = function (from, msgId) {
