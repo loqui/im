@@ -384,6 +384,10 @@ App.connectors['coseme'] = function (account) {
     Tools.log('VISIBLE', from, msgId);
     $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"]').data('receipt', 'visible');
   }
+
+  this.events.onGroupInfoError = function (jid, owner, subject, subjectOwner, subjectTime, creation) {
+    Tools.log('ERROR GETTING GROUP INFO', jid, owner, subject, subjectOwner, subjectTime, creation);
+  }
   
   this.events.onGroupGotInfo = function (jid, owner, subject, subjectOwner, subjectTime, creation) {
     var account = this.account;
