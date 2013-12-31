@@ -246,7 +246,7 @@ var Tools = {
     };
     var fileType = this.getFileType(type);
     var imageBlob = CoSeMe.utils.latin1ToBlob(image, fileType);
-    name = 'loqui/' + name + '.' + type;
+    name = 'loqui/files/' + name + '.' + type;
     var request = sdCard.addNamed(imageBlob, name);
     request.onsuccess = onSuccess;
     request.onerror = onError;
@@ -262,7 +262,7 @@ var Tools = {
     };
     var fileType = this.getFileType(type);
     var audioBlob = CoSeMe.utils.latin1ToBlob(audio, fileType);
-    name = 'loqui/' + name + '.' + type;
+    name = 'loqui/files/' + name + '.' + type;
     var request = sdCard.addNamed(audioBlob, name);
     request.onsuccess = onSuccess;
     request.onerror = onError;
