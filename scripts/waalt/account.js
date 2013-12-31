@@ -133,6 +133,7 @@ var Account = function (core) {
     var account = this;
     var oldUl = $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"]');
     var ul = $("<ul />");
+    var media = _('AttachedFile');
     ul.data('jid', account.core.fullJid);
     ul.attr('style', oldUl.attr('style'));
     var totalUnread = 0;
@@ -140,7 +141,7 @@ var Account = function (core) {
       for (var i in this.core.chats) {
         var chat = this.core.chats[i];
         var title = App.emoji[Providers.data[this.core.provider].emoji].fy(chat.title);
-        var lastMsg = chat.last.text ? App.emoji[Providers.data[account.core.provider].emoji].fy(chat.last.text) : '';
+        var lastMsg = chat.last.text ? App.emoji[Providers.data[account.core.provider].emoji].fy(chat.last.text) : media;
         var lastStamp = chat.last.stamp ? Tools.convenientDate(chat.last.stamp).join('<br />') : '';
         var li = $('<li/>').data('jid', chat.jid);
         li.append($('<span/>').addClass('avatar').append('<img/>'));
