@@ -236,7 +236,7 @@ App.connectors['coseme'] = function (account) {
       video_received: this.events.onVideoReceived,
       audio_received: this.events.onAudioReceived,
       location_received: null,
-      message_error: null,
+      message_error: this.events.onMessageError,
       receipt_messageSent: this.events.onMessageSent,
       receipt_messageDelivered: this.events.onMessageDelivered,
       receipt_visible: this.events.onMessageVisible,
@@ -323,6 +323,10 @@ App.connectors['coseme'] = function (account) {
       this.ack(id, from);
     }
     return true;
+  }
+
+  this.events.onMessageError = function (id, from, body, stamp, e, nick, g) {
+    Tools.log('MESSAGE NOT RECEIVED', id, from, body, stamp, e, nick, g);
   }
 
   this.events.onImageReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast) {
