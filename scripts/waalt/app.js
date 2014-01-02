@@ -15,6 +15,8 @@ var App = {
   avatars: {},
   online: true,
   lastNot: null,
+  pathFiles: 'loqui/files/',
+  pathBackup: 'loqui/backup/',
   
   // Default values
   defaults: {
