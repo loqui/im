@@ -79,6 +79,9 @@ var Account = function (core) {
     var account = this;
     $('section#main').data('jid', this.core.fullJid);
     $('section#main header').style('background', this.connector.provider.color);
+    $('section#me article button').style('background', this.connector.provider.color);
+    $('section#contact article button').style('background', this.connector.provider.color);
+    $('section#contactAdd article button').style('background', this.connector.provider.color);
     var vCard = $(this.connector.vcard);
     var address = ( vCard.length && vCard.find('FN').length ) ? vCard.find('FN').text() : this.core.user;
     $('section#main footer .address').text(address);
