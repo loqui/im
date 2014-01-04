@@ -925,6 +925,14 @@ section:not([data-show]) footer .backchange {
   display: none;
 }
 
+section#settings nav a#developer {
+  display: none;
+}
+
+.devMode section#settings nav a#developer {
+  display: block;
+}
+
 div.switch {
   position: absolute;
   top: 1rem;
