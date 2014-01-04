@@ -480,6 +480,7 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.events.onUploadRequestSuccess = function (hash, url, resumeFrom) {
+    Lungo.Notification.show('up-sign', '0% ' + _('Uploaded'));
     console.log('onUploadRequest!');
     var self = this;
     var media = CoSeMe.media;
@@ -499,25 +500,33 @@ App.connectors['coseme'] = function (account) {
       var toJID = obj.to;
       var blob = Tools.b64ToBlob(obj.data.split(',').pop(), obj.data.split(/[:;]/)[1]);
       var uploadUrl = url;
-      media.upload(toJID, blob, uploadUrl, function (url) {
-        // SUCCESS
-        Tools.picUnblob(blob, 120, 120, function (data) {
-          Store.drop(hash, function () {
-            MI.call(method, [toJID, url, hash, '0', data.split(',').pop()]);
+      var onSuccess = function (url) {
+        Tools.picUnblob(blob, 120, 120, function(data) {
+          Store.drop(hash, function() {
+            MI.call(
+              method,
+              [toJID, url, hash, '0', data.split(',').pop()]
+            );
             self.addMediaMessageToChat(type, data, url, account.core.user, toJID);
             App.audio('sent');
           });
-        });
-      Lungo.Notification.hide();
-      }, function (error) {
-        // ERROR
-        Lungo.Notification.error(_('NotUploaded'), _('ErrorUploading'), 'warning-sign', 5);
+        })
+        Lungo.Notification.show('up-sign', _('Uploaded'), 1);
+      };
+      var onError = function (error) {
+        Lungo.Notification.error(
+          _('NotUploaded'),
+          _('ErrorUploading'),
+          'warning-sign', 5
+        );
         Tools.log(error);
-      }, function (value) {
-        // PROGRESS
-        Lungo.Notification.show('up-sign', value+'% '+_('Uploaded'));
-        Tools.log(value);
-      });
+      };
+      var onProgress = function(value) {
+        if ($('div.notification').hasClass('show')) {
+          Tools.modifyLungoNotification(value.toFixed(0) + '% ' + _('Uploaded'));
+        }
+      };
+      media.upload(toJID, blob, uploadUrl, onSuccess, onError, onProgress);
     });
   }
 

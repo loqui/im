@@ -309,6 +309,11 @@ var Tools = {
         cb(res);
     }
     reader.readAsDataURL(blob);
+  },
+
+  modifyLungoNotification: function ( newText ) {
+    var notificationDiv = $('div.notification');
+    notificationDiv.children('div').children('strong').html(newText);
   }
 
 }
