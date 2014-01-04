@@ -215,7 +215,7 @@ var Account = function (core) {
       var searchFormOnKeyUp = function (event) {
         var target = $(event.target);
         var key = target.val().toUpperCase();
-        var contactList = document.getElementById('contacts').getElementsByTagName('li');
+        var contactList = $('#contacts').$('<li>');
         var matchContact = function (contact) {
           if (contact.localName == 'li') {
             var name = contact.getElementsByClassName('name').item(0).innerHTML.toUpperCase();
