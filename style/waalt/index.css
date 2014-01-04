@@ -392,6 +392,15 @@ section#main:not([data-lacks~='localContacts']) fieldset#searchForm span.clear {
   right: 1.8rem;
 }
 
+section#settings article#devmode div p {
+  position: relative;
+  padding: 1rem;
+  border-bottom: .1rem solid #CCC;
+  list-style-type: none;
+  cursor: pointer;
+  font-weight: 300;
+  font-size: .9em;
+}
 
 section#settings ul li {
   position: relative;
@@ -931,6 +940,17 @@ section#settings nav a#developer {
 
 .devMode section#settings nav a#developer {
   display: block;
+}
+
+section#settings article#devmode div button {
+  position: absolute;
+  right: 1rem;
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  background-color: #00B8D6;
+  transition: all .2s;
+  overflow: hidden;
 }
 
 div.switch {
