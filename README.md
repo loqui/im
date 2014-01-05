@@ -35,6 +35,7 @@ If you are thinking on send a Pull Request with a fix for an issue, new feature,
  * Make your changes on your fork
  * Commit the changes (Try to be descriptibe with your commits)
  * Create a Pull Request.
+ * The changes in the Pull Request must be for ```dev``` branch, not for ```master```.
  * Explain as best as you can why and what are the changes in the Pull Request.
  * Wait for an answer from owners to know if it is good to be landed in Loqui or needs changes.
 
