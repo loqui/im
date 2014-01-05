@@ -23,6 +23,23 @@ We may change soon the connection protocol for WebSockets + SimplePUSH in order 
 
 In longer term, connections should be made through javascript TCPSockets API, avoiding the need for BOSH or WebSockets servers and thus improving performance and reliability.
 
+Contribute
+===
+
+There are many ways to contribute, sending a Pull Request, testing the latest changes in the repository, filling a new issue or just confirming an issue reported by other user. If you have a problem and you are going to create a new issue, first check if another user have not been reported yet an issue similar to the yours, if not create a new issue.
+
+If you are thinking on send a Pull Request with a fix for an issue, new feature, or a new language localization for Loqui, those are the steps to follow:
+
+ * Fork this project
+ * Create another branch to work on the fix, feature, localization. (ex: Fix-for-issue-#XXX)
+ * Make your changes on your fork
+ * Commit the changes (Try to be descriptibe with your commits)
+ * Create a Pull Request.
+ * Explain as best as you can why and what are the changes in the Pull Request.
+ * Wait for an answer from owners to know if it is good to be landed in Loqui or needs changes.
+
+If you have been submited a Pull Request that needs attention and no owners have been commented it, ping us (@aesedepece or @Gioyik) and we will take a look of the Pull Request as soon as possible.
+
 Acknowledgements
 ===
 We would like to thank:
