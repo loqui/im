@@ -167,6 +167,7 @@ var Account = function (core) {
           }
           chat.core.muc = account.supports('muc') && this.dataset.jid.substring(1).match(/\-/) ? true : false;
           chat.show();
+          $('section#main article#chats ul li[data-jid="' + chat.jid + '"]').data('muc', true);
         }).bind('hold', function () {
           window.navigator.vibrate([100]);
           if (this.dataset.jid.match(/\-/)) {
@@ -178,6 +179,7 @@ var Account = function (core) {
         totalUnread += chat.unread;
         ul.prepend(li);
       }
+      $('section#main article#chats ul li[data-jid="' + chat.jid + '"]').data('muc', true);
     } else {
       var span = $('<span/>').addClass('noChats')
         .append($('<strong/>').text(_('NoChats')))
@@ -187,6 +189,7 @@ var Account = function (core) {
       });
       ul.prepend(span);
     }
+    $('section#main article#chats ul li[data-jid="' + chat.jid + '"]').data('muc', true);
     oldUl.replaceWith(ul);
     Lungo.Element.count('aside li[data-jid="' + this.core.fullJid + '"]', totalUnread);
     if (ul.style('display') == 'block') {

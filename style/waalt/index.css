@@ -205,6 +205,20 @@ section#main article ul li {
   height: 4rem;
   cursor: pointer;
 }
+section#main article ul li[data-muc="true"] {
+  position: relative;
+  background-color: #B0B8FC;
+  border-bottom: .05rem solid #E6E6E6;
+  height: 4rem;
+  cursor: pointer;
+}
+section#main article ul li[data-muc="true"] span.avatar img:not([src]) {
+  height: 3.2rem;
+  width: 3.2rem;
+  background-image: url('../../img/goovatar.png');
+  background-size: 100%;
+  background-color: #D4D2C5;
+}
 section#main article ul li:active {
   background-color: #DDD;
 }
