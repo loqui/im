@@ -378,14 +378,14 @@ App.connectors['coseme'] = function (account) {
   }
 
   this.events.onContactTyping = function (to, state) {
-    var method = state == 'composing';
+    var method = 'typing_send';
     MI.call(method, [to]);
     Tools.log('TYPING', to)
     $("section#chat #typing").show();
   }
 
   this.events.onContactPaused = function (to, state) {
-    var method = state == 'typing_paused';
+    var method ='typing_paused';
     MI.call(method, [to]);
     Tools.log('TYPING PAUSED', to)
     $("section#chat #typing").hide();
