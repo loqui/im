@@ -348,9 +348,9 @@ App.connectors['coseme'] = function (account) {
     return this.processAudio(msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, false);
   }
 
-  this.events.onLocationReceived = function (msgId, fromAttribute, mediaUrl, mediaSize, wantsReceipt, isBroadcast) {
+  this.events.onLocationReceived = function (msgId, fromAttribute, name, mediaPreview, mlatitude, mlongitude, wantsReceipt, isBroadcast) {
     var to = this.account.core.fullJid;
-    return this.processLocation(msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, mlatitude, mlongitude, false);
+    return this.processLocation(msgId, fromAttribute, to, mediaPreview, name, mlatitude, mlongitude, false);
   }
   
   this.events.onAvatar = function (jid, picId, blob) {
@@ -496,11 +496,11 @@ App.connectors['coseme'] = function (account) {
     return this.processAudio(msgId, fromAttribute, to, mediaUrl, mediaSize, isGroup);
   }
 
-  this.events.onGroupLocationReceived = function (msgId, fromAttribute, author, mediaUrl, mediaSize, wantsReceipt) {
+  this.events.onGroupLocationReceived = function (msgId, fromAttribute, author, name, mediaPreview, mlatitude, mlongitude, wantsReceipt) {
     var to = fromAttribute;
     var fromAttribute = author;
     var isGroup = true;
-    return this.processAudio(msgId, fromAttribute, to, mediaUrl, mediaSize, mlatitude, mlongitude, isGroup);
+    return this.processLocation(msgId, fromAttribute, to, mediaPreview, name, mlatitude, mlongitude, isGroup);
   }
 
   this.events.onGroupVideoReceived = function (msgId, fromAttribute, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt) {
@@ -672,8 +672,9 @@ App.connectors['coseme'] = function (account) {
     return true;
   }
 
-  this.processLocation = function (msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, mlatitude, mlongitude, isGroup) {
+  this.processLocation = function (msgId, fromAttribute, to, mediaPreview, name, mlatitude, mlongitude, isGroup) {
     Tools.log('processLocation');
+    console.log(name);
     var locationIcon = 'iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEcElEQVR4nN2bW4hOURTHfy4zJrdch8gtk3GZFzHyJuXyoJQoJZeQhgchkgdFlBchIvJAGR54UUpuj5QowsxILiWFGjMYwzDMzOdhn0/jM99Za8/Ze58vv1ql4az/+h/n7L323mcgDEOBZcBh4AbwBviYE2+ivzsELAWGBKrNG4OBjcAdoB3IWEY7cBuoAgYFrj0RozD/i83Ym84XzcBBYGRAH9aUAHuB77gznhstkUZJEEcWlAEP8Wc8Nx4AE4M4U7AYaCKc+Wx8BhYF8BfLDqCD8Oaz0QFs9+4yD5sUBYa6CVWevf7Dcuyntk/AOWA1UAmMwEyVg6M/zwLWANWYx9smdxumzwjCFOCrRXG1wCrsRu4SzI16aqHTDJQncqagGHhiUdBmoFcCvd7AFsz0p9F8BBQl0BPZpSzkGeZJcUUl8E6pvcOh7l+MRvfoPwJKPeiPAWoU+l/w1DEeVYi/wAxovhgDvFfUcci18HDk9/AbUOFauAtmI7fb34BhLkW3CoIZYJtLQYHdino2uxSU+vxnmBFbwzTMvkAt8CGKmuhnU5U5+iEPiveVuURGCUIZYJ0iTzFwHNO05MvThhlrNFOZ1Il24Gg8WiEINQF9hRzFwE0hT+e4Hl0TRz/kPYflapcxSKP/BUWOU0KOruKEIu9FIccRRQ6R64LIeuH6Crq3JdaGPCZUCTmuql3G8EoQqRSu1/QP+eKwkHu2cP1ztcsYGgURab61WdDkRo2Qu1S4/oPaZQytgog0WCXZHP0i5O4jXN+qdhnDD0FEmrJsls6ub0CL2mUMUsPh8xWoFXJLr8BbtcsY6gSRQh4EpTFExRVBRJoGpxHf/eWLX8BkIbc0DV5Wu4xhvyCiaYSOCDm6ioOKvFIjtFeRQ2SZIKJphYuQG6rOcQ15caVphZeoXcYwEnnvP43F0AahpnbMPoYTfCyH6zAbG98xo73NcrgYeCnU5Gw5DHBAEMsQdkNkp6KefS4FKxSCrcAcl6J5mAv8VNSjfZrUPFCINuD31LYs0pDquOdDXLMvmME0H2M96I/DjBWaGpzuB2YZiP7MrhGY51B7PuY7Io32J2CAQ+2/OKYsIjsm7Af6J9DLfnWieeez4WQXKB8TsW9r32HaZdvD0bXAa0utX5hXxSvVlkV1fjRzj8d7RZH0eDwbZzz6/sM45D2CNKIFs4UfhNMBDNmGZhfZGUPRzcehop4UviwtlG+EMpiFUXB6YjqutM3fjWpJhZl079DDVbQBM7y7FEhzQDwZwJ9IKeYAIrT5ehxueCRlIWG/GO0AFgRxZsFxwt2Ao4E8WVGC/hvCJPEYcyJUkExHPktMEi2YPcWCRvsxZXfC20eQLukBXMK9+eqQJpLSn2SHorlRR7KNlVQoxxxvJzXfBEwKXLsz1pD8BqwMXrVj9tB987tTqNc5PYCz2JsviD7fFUXALfTmb+L5Fx/SYCC6TvFx9G//S8owq7h85uspoF+I9MUsut5PbED+3ui/YQJwHnOE1ojp8sanUchvhscTL49v8mgAAAAASUVORK5CYII=';
     var self = this;
     var account = this.account;
