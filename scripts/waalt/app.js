@@ -4,7 +4,7 @@ var App = {
 
   name: 'Loqui IM',
   shortName: 'Loqui',
-  version: 'v0.2.4',
+  version: 'v0.2.5',
   connectors: [],
   logForms: [],
   emoji: [],
@@ -12,9 +12,12 @@ var App = {
   accounts: [],
   accountsCores: [],
   settings: {},
+  devsettings: {},
   avatars: {},
   online: true,
   lastNot: null,
+  pathFiles: 'loqui/files/',
+  pathBackup: 'loqui/backup/',
   
   // Default values
   defaults: {
@@ -24,6 +27,9 @@ var App = {
         sound: true,
         disHide: false,
         csn: true,
+        devMode: false
+      },
+      devsettings: {
         debug: false        
       },
       online: true
@@ -88,6 +94,12 @@ var App = {
         });
       },
       function (callback) {
+        Store.get('devsettings', function (val) {
+          App.devsettings = val && Object.keys(val).length ? val : App.defaults.App.devsettings;
+          callback(null);
+        });
+      },
+      function (callback) {
         Store.get('avatars', function (val) {
           App.avatars = val || {};
           callback(null);
@@ -104,6 +116,7 @@ var App = {
     if (App.accounts.length) {
       App.alarmSet({});
       App.switchesRender();
+      App.switchesDevRender();
       this.connect();
       Menu.show('main');
     } else {
@@ -154,7 +167,7 @@ var App = {
   
   // Render settings switches
   switchesRender: function () {
-    var ul = $('section#settings ul').empty();
+    var ul = $('section#settings article#features ul').empty();
     var body = $('body');
     for (var key in this.settings) {
       var value = this.settings[key];
@@ -175,6 +188,38 @@ var App = {
           body.removeClass(key);
         }
         App.smartupdate('settings');
+      });
+      ul.append(li);
+      if (value) {
+        body.addClass(key);
+      } else {
+        body.removeClass(key);
+      }
+    }
+  },
+
+  switchesDevRender: function () {
+    var ul = $('section#settings article#devmode ul').empty();
+    var body = $('body');
+    for (var key in this.devsettings) {
+      var value = this.devsettings[key];
+      var li = $('<li><span></span><switch/></li>');
+      li.children('span').text(_('Set' + key));
+      var div = $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>')
+      li.children('switch').replaceWith(div);
+      li.data('key', key);
+      li.data('value', value);
+      li.bind('click', function () {
+        var key = this.dataset.key;
+        var newVal = this.dataset.value == "true" ? false : true;
+        this.dataset.value = newVal;
+        App.devsettings[key] = newVal;
+        if (newVal) {
+          body.addClass(key);
+        } else {
+          body.removeClass(key);
+        }
+        App.smartupdate('devsettings');
       });
       ul.append(li);
       if (value) {

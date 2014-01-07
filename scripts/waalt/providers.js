@@ -9,7 +9,7 @@ var Providers = {
       connector: {
         type: 'coseme'
       },
-      lacks: ['attention', 'multi', 'presence', 'easyAvatars', 'csn', 'avatarChange', 'statusChange'],
+      lacks: ['attention', 'multi', 'presence', 'easyAvatars', 'avatarChange', 'statusChange'],
       color: '#254242',
       terms: {
         user: 'YourNumber',

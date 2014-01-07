@@ -23,6 +23,10 @@ We may change soon the connection protocol for WebSockets + SimplePUSH in order 
 
 In longer term, connections should be made through javascript TCPSockets API, avoiding the need for BOSH or WebSockets servers and thus improving performance and reliability.
 
+Contribute
+===
+See the [Contribute](https://github.com/waalt/loqui/wiki/Contribute) page on the wiki.
+
 Acknowledgements
 ===
 We would like to thank:

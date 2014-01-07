@@ -205,6 +205,14 @@ section#main article ul li {
   height: 4rem;
   cursor: pointer;
 }
+section#main article ul li[data-muc="true"] {
+  background-color: #EBE9DD;
+}
+section#main article ul li[data-muc="true"] span.avatar img:not([src]) {
+  background-image: url('../../img/goovatar.png');
+  background-size: 100%;
+  background-color: #D4D2C5;
+}
 section#main article ul li:active {
   background-color: #DDD;
 }
@@ -392,6 +400,15 @@ section#main:not([data-lacks~='localContacts']) fieldset#searchForm span.clear {
   right: 1.8rem;
 }
 
+section#settings article#devmode div p {
+  position: relative;
+  padding: 1rem;
+  border-bottom: .1rem solid #CCC;
+  list-style-type: none;
+  cursor: pointer;
+  font-weight: 300;
+  font-size: .9em;
+}
 
 section#settings ul li {
   position: relative;
@@ -622,13 +639,6 @@ section#chat ul#messages span.text img.video {
     border-radius: .4rem;
 }
 section#chat ul#messages span.text img.video[data-downloaded=false] {
-    opacity: .4;
-}
-section#chat ul#messages span.text img.audio {
-    width: calc(100%);
-    border-radius: .4rem;
-}
-section#chat ul#messages span.text img.audio[data-downloaded=false] {
     opacity: .4;
 }
 section#chat article#emoji {
@@ -930,6 +940,25 @@ section:not([data-show]) footer .backchange {
 
 .disHide section#main article#contacts li[data-show='na'] {
   display: none;
+}
+
+section#settings nav a#developer {
+  display: none;
+}
+
+.devMode section#settings nav a#developer {
+  display: block;
+}
+
+section#settings article#devmode div button {
+  position: absolute;
+  right: 1rem;
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  background-color: #00B8D6;
+  transition: all .2s;
+  overflow: hidden;
 }
 
 div.switch {

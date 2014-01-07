@@ -76,18 +76,27 @@
       <nav data-control='groupbar'>
         <a data-l10n-id='Features' data-view-article='features' class='active'>Features</a>
         <a data-l10n-id='Info' data-view-article='info'>Info</a>
+        <a id="developer" data-l10n-id='Developer' data-view-article='devmode'>Developer</a>
       </nav>
     </header>
     <article id='features' class='scroll'>
       <ul></ul>
     </article>
-    <article id='system' class='scroll'>
-      System
-    </article>
     <article id='info' class='simple scroll'>
       <h1><span data-var='name'></span> <span data-var='version'></span></h1>
       <p data-l10n-id='Copyright'>© 2013 Waaltcom. Some rights reserved.</p><br />
       <small data-l10n-id='FreeSoftware'>This program is free software; you may redistribute and/or modify it under the terms of the GNU Affero General Public License (AGPL 3) as published by the Free Software Foundation.</small>
+    </article>
+    <article id='devmode' class='scroll'>
+      <ul></ul>
+      <div id='export'>
+        <button data-icon='up-sign'></button>
+        <p data-l10n-id='Export'>Export data</p>
+      </div>
+      <div div='import'>
+        <button data-icon='down-sign'></button>
+        <p data-l10n-id='Import'>Import data</p>
+      </div>
     </article>
   </section>
   <section id='me' data-transition='slide' class='fix head profile'>

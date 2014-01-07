@@ -97,6 +97,7 @@ var Store = {
         req.onerror = function () {
           if (onerror) {
             onerror(this.error);
+            Lungo.Notification.error(_('Error'), _('NoSDAccess'), 'cloud-download', 5);
           }
         }      
       } else {
@@ -114,6 +115,7 @@ var Store = {
         req.onerror = function () {
           if (onerror) {
             onerror(this.error);
+            Lungo.Notification.error(_('Error'), _('NoSDAccess'), 'cloud-download', 5);
           }
         }
       } else {
