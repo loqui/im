@@ -217,6 +217,7 @@ App.connectors['coseme'] = function (account) {
           data: aB64OrigHash
         },
         function () {
+          Lungo.Notification.show('up-sign', '0% ' + _('Uploaded'));
           var method = 'media_requestUpload';
           MI.call(method, [aB64Hash, aT, aSize]);
         });
@@ -480,7 +481,6 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.events.onUploadRequestSuccess = function (hash, url, resumeFrom) {
-    Lungo.Notification.show('up-sign', '0% ' + _('Uploaded'));
     console.log('onUploadRequest!');
     var self = this;
     var media = CoSeMe.media;
@@ -507,7 +507,7 @@ App.connectors['coseme'] = function (account) {
               method,
               [toJID, url, hash, '0', data.split(',').pop()]
             );
-            self.addMediaMessageToChat(type, data, url, account.core.user, toJID);
+            self.addMediaMessageToChat(type, data, url, account.core.user, toJID, Tools.guid());
             App.audio('sent');
           });
         })
@@ -538,7 +538,7 @@ App.connectors['coseme'] = function (account) {
     Lungo.Notification.error(_('NotUploaded'), _('DuplicatedUpload'), 'warning-sign', 5);
   }
 
-  this.addMediaMessageToChat = function(type, data, url, from, to) {
+  this.addMediaMessageToChat = function(type, data, url, from, to, id) {
     var account = this.account;
     var msgMedia = {
       type: type,
@@ -548,23 +548,33 @@ App.connectors['coseme'] = function (account) {
     };
     var stamp = Tools.localize(Tools.stamp());
     var msg = new Message(account, {
-      from: from,
+      from: account.core.user,
+      id: id,
       to: to,
       media: msgMedia,
       stamp: stamp
     });
 
+    msg.addToChat();
+
+    /*
     var chatIndex = account.chatFind(to);
 
     if (chatIndex > 0) {
       var chat = account.chats[chatIndex];
-      chat.messageAppend.push(
-        {msg: msg.core},
-        function(err) {
-          chat.save(true);
-        }
-      ).bind(msg);
+    } else {
+      var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', msg.core.from);
+      var chat = new Chat({
+        jid: to,
+        title: contact ? contact.name || to : to,
+        chunks: []
+      }, account);
+      account.chats.push(chat);
+      account.core.chats.push(chat.core);
     }
+
+    msg.addToChat(chat);
+    */
   }
 
   this.processFile = function (fileType, msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, isGroup) {

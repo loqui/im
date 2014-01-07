@@ -11,6 +11,8 @@ var Message = function (account, core) {
       this.core.id = account.connector.send(this.core.to, this.core.text, delay ? this.core.stamp : delay);
     }
     if (!justSend) {
+      this.addToChat();
+      /*
       var ci = this.account.chatFind(this.core.to);
       if (ci >= 0) {
         var chat = this.account.chats[ci];
@@ -30,6 +32,8 @@ var Message = function (account, core) {
         this.account.chats.push(chat);
         this.account.core.chats.push(chat.core);
       }
+      this.addToChat(chat);
+      /*
       var ul = $('section#chat ul#messages');
       var li = ul.children('li:last-child');
       li.append(this.preRender());
@@ -38,6 +42,7 @@ var Message = function (account, core) {
       
         chat.save(true);
       }.bind(this));
+      */
     }
   }
   
@@ -90,6 +95,43 @@ var Message = function (account, core) {
       App.notify({ subject: subject, text: message.core.text, pic: 'https://raw.github.com/waalt/loqui/master/img/foovatar.png', callback: callback }, 'received');
     }
     chat.messageAppend.push({msg: message.core}, function (err) { });
+  }
+
+  this.addToChat = function () {
+    var self = this;
+    var account = this.account;
+    var to = this.core.to;
+    var chatIndex = account.chatFind(to);
+    var chat = null;
+
+    if (chatIndex > 0) {
+      chat = account.chats[chatIndex];
+      account.chats.splice(chatIndex, 1);
+      account.core.chats.splice(chatIndex, 1);
+    } else {
+      var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', to);
+      chat = new Chat({
+        jid: to,
+        title: contact ? contact.name || to : to,
+        chunks: []
+      }, account);
+    }
+    account.chats.push(chat);
+    account.core.chats.push(chat.core);
+
+    var ul = $('section#chat ul#messages');
+    var li = ul.children('li:last-child');
+
+    li.append(self.preRender(self.core.id));
+    ul[0].scrollTop = ul[0].scrollHeight;
+
+    chat.messageAppend.push(
+      {msg: self.core},
+      function ( err ) {
+        console.log('Saving message!');
+        chat.save(true);
+      }.bind(self)
+    );
   }
   
   // Represent this message in HTML
