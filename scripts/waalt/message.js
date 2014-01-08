@@ -141,10 +141,10 @@ var Message = function (account, core) {
     if (this.core.text) {
       var html = App.emoji[Providers.data[this.account.core.provider].emoji].fy(Tools.urlHL(Tools.HTMLescape(this.core.text)));
     } else if (this.core.media) {
+      var html = $('<img/>').attr('src', this.core.media.thumb).data('url', this.core.media.url).data('downloaded', this.core.media.downloaded || false).data('index', index);
       switch (this.core.media.type) {
         case 'url':
-          var img = $('<img/>').attr('src', this.core.media.thumb).addClass('maps').data('url', this.core.media.url).data('downloaded', this.core.media.downloaded || false).data('index', index);
-          var texto = $('<span/>').html('Localizacion recibida');
+          html.addClass('maps');
           var onClick = function(e){
             e.preventDefault();
             return new MozActivity({
@@ -155,11 +155,9 @@ var Message = function (account, core) {
               }
             });
           };
-
-          var html = img.append(texto);
           break;
         default:
-          var html = $('<img/>').attr('src', this.core.media.thumb).addClass('image').data('url', this.core.media.url).data('downloaded', this.core.media.downloaded || false).data('index', index);
+          html.addClass('image');
           var open = function (blob) {
             return new MozActivity({
               name: 'open',
@@ -169,7 +167,7 @@ var Message = function (account, core) {
               }
             });
           }
-          onClick = function (e) {
+          var onClick = function (e) {
             var url = e.target.dataset.url;
             var ext = url.split('.').pop();
             var localUrl = App.pathFiles + $(e.target).parent().siblings('.stamp').data('stamp').replace(/[-:]/g, '') + url.split('/').pop().substring(0, 5).toUpperCase() + '.' + ext;
@@ -200,7 +198,6 @@ var Message = function (account, core) {
           break;
       }
       html.bind('click', onClick);
-
     }
   	var type = (this.core.from == this.account.core.user || this.core.from == this.account.core.realJid) ? 'out' : 'in';
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', Strophe.getBareJidFromJid(this.core.from));
