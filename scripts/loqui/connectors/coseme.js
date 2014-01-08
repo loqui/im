@@ -377,18 +377,16 @@ App.connectors['coseme'] = function (account) {
     }
   }
 
-  this.events.onContactTyping = function (to, state) {
-    var method = 'typing_send';
-    MI.call(method, [to]);
-    Tools.log('TYPING', to)
-    $("section#chat #typing").show();
+  this.events.onContactTyping = function (from) {
+    if (from == $('section#chat').data('jid')) {
+      $("section#chat #typing").show();
+    }
   }
 
-  this.events.onContactPaused = function (to, state) {
-    var method ='typing_paused';
-    MI.call(method, [to]);
-    Tools.log('TYPING PAUSED', to)
-    $("section#chat #typing").hide();
+  this.events.onContactPaused = function (from) {
+    if (from == $('section#chat').data('jid')) {
+      $("section#chat #typing").hide();
+    }
   }
   
   this.events.onMessageSent = function (from, msgId) {
@@ -399,7 +397,6 @@ App.connectors['coseme'] = function (account) {
   this.events.onMessageDelivered = function (from, msgId) {
     Tools.log('DELIVERED', from, msgId);
     $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"]').data('receipt', 'delivered');
-    MI.call('delivered_ack', [from, msgId]);
   }
   
   this.events.onMessageVisible = function (from, msgId) {
