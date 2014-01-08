@@ -210,7 +210,7 @@ var Message = function (account, core) {
     }
     if (this.core.media) {
       var li = $('section#chat ul#messages li');
-      var div = ul.children('div');
+      var div = li.children('div');
       div.data('media-type', this.core.media.type);
     }
     var stampSpan = $('<span/>').addClass('stamp').html(Tools.convenientDate(this.core.stamp).join('<br/>')).data('stamp', this.core.stamp);
