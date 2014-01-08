@@ -211,6 +211,9 @@ var Message = function (account, core) {
     if (this.core.id) {
       div.data('id', this.core.id);
     }
+    if (this.core.media) {
+      div.data('media-type', this.core.media.type);
+    }
     var stampSpan = $('<span/>').addClass('stamp').html(Tools.convenientDate(this.core.stamp).join('<br/>')).data('stamp', this.core.stamp);
     var nameSpan = $('<span/>').addClass('name').text(name);
     var textSpan = $('<span/>').addClass('text').html(html);
