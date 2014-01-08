@@ -209,9 +209,9 @@ var Message = function (account, core) {
       div.data('id', this.core.id);
     }
     if (this.core.media) {
-      var ul = $('section#chat ul#messages');
-      var li = ul.children('li');
-      li.data('media-type', this.core.media.type);
+      var li = $('section#chat ul#messages li');
+      var div = ul.children('div');
+      div.data('media-type', this.core.media.type);
     }
     var stampSpan = $('<span/>').addClass('stamp').html(Tools.convenientDate(this.core.stamp).join('<br/>')).data('stamp', this.core.stamp);
     var nameSpan = $('<span/>').addClass('name').text(name);
