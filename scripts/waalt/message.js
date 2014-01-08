@@ -60,7 +60,8 @@ var Message = function (account, core) {
       var chat = new Chat({
         jid: chatJid, 
         title: contact ? contact.name || chatJid : chatJid,
-        chunks: []
+        chunks: [],
+        muc: muc || false
       }, this.account);
       this.account.chats.push(chat);
       this.account.core.chats.push(chat.core);
