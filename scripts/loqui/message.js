@@ -142,7 +142,10 @@ var Message = function (account, core) {
     if (this.core.text) {
       var html = App.emoji[Providers.data[this.account.core.provider].emoji].fy(Tools.urlHL(Tools.HTMLescape(this.core.text)));
     } else if (this.core.media) {
-      var html = $('<img/>').attr('src', this.core.media.thumb).data('url', this.core.media.url).data('downloaded', this.core.media.downloaded || false).data('index', index);
+      var html = $('<img/>').attr('src', this.core.media.thumb).data('url', this.core.media.url).data('downloaded', this.core.media.downloaded || false);
+      if (index) {
+        html.data('index', index);
+      }
       switch (this.core.media.type) {
         case 'url':
           html.addClass('maps');
