@@ -74,7 +74,6 @@ var Message = function (account, core) {
     if ($('section#chat').data('jid') == chatJid && $('section#chat').hasClass('show')) {
       var ul = $('section#chat ul#messages');
       var li = ul.children('li:last-child');
-      li.data('media-type', this.core.media.type);
       li.append(this.preRender());
       ul[0].scrollTop = ul[0].scrollHeight;
     } else {
@@ -208,6 +207,11 @@ var Message = function (account, core) {
     var div = $('<div/>').data('type', type);
     if (this.core.id) {
       div.data('id', this.core.id);
+    }
+    if (this.core.media) {
+      var ul = $('section#chat ul#messages');
+      var li = ul.children('li');
+      li.data('media-type', this.core.media.type);
     }
     var stampSpan = $('<span/>').addClass('stamp').html(Tools.convenientDate(this.core.stamp).join('<br/>')).data('stamp', this.core.stamp);
     var nameSpan = $('<span/>').addClass('name').text(name);
