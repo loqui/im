@@ -631,6 +631,10 @@ section#chat ul#messages span.text img.image {
     width: calc(100%);
     border-radius: .4rem;
 }
+section#chat ul#messages span.text img.maps{
+    width: calc(30%);
+    border-radius: .4rem;
+}
 section#chat ul#messages span.text img.image[data-downloaded=false] {
     opacity: .4;
 }

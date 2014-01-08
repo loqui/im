@@ -389,7 +389,7 @@ var Account = function (core) {
   this.chatFind = function (jid) {
     var index = -1;
     for (var i in this.chats) {
-      if (this.chats[i].core.jid == jid) {
+      if (this.chats[i].core && this.chats[i].core.jid == jid) {
         index = i;
         break;
       }

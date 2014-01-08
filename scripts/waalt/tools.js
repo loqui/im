@@ -293,6 +293,19 @@ var Tools = {
         cb(res);
     }
     reader.readAsDataURL(blob);
+  },
+
+  modifyLungoNotification: function ( newText ) {
+    var notificationDiv = $('div.notification');
+    notificationDiv.children('div').children('strong').html(newText);
+  },
+
+  guid: function () {
+    var s4 = function() {
+      return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+    };
+
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + '-' + s4() + s4() + s4();
   }
 
 }
