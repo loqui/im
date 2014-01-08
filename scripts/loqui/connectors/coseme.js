@@ -302,7 +302,16 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.events.onDisconnected = function () {
-    this.account.connect();
+    if (App.online) {
+      this.connect({
+        connected: function () {
+          Tools.log('RECONNECTED');
+        },
+        authfail: function () {
+          Tools.log('FAILED TO RECONNECT');
+        }
+      });
+    }
   }
   
   this.events.onMessage = function (id, from, body, stamp, e, nick, g) {
