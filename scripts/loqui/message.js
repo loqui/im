@@ -74,6 +74,7 @@ var Message = function (account, core) {
     if ($('section#chat').data('jid') == chatJid && $('section#chat').hasClass('show')) {
       var ul = $('section#chat ul#messages');
       var li = ul.children('li:last-child');
+      li.data('media-type', this.core.media.type);
       li.append(this.preRender());
       ul[0].scrollTop = ul[0].scrollHeight;
     } else {

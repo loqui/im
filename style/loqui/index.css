@@ -627,6 +627,9 @@ section#chat ul#messages > li > div[data-type='out'][data-receipt='delivered']:a
 section#chat ul#messages > li:last-child {
   margin-bottom: 3.5rem;
 }
+ul#messages li[data-media-type="image"]:after {
+  content: url('../../img/play.png');
+}
 section#chat ul#messages span.text img.image {
     width: calc(100%);
     border-radius: .4rem;
@@ -636,13 +639,6 @@ section#chat ul#messages span.text img.maps{
     border-radius: .4rem;
 }
 section#chat ul#messages span.text img.image[data-downloaded=false] {
-    opacity: .4;
-}
-section#chat ul#messages span.text img.video {
-    width: calc(100%);
-    border-radius: .4rem;
-}
-section#chat ul#messages span.text img.video[data-downloaded=false] {
     opacity: .4;
 }
 section#chat article#emoji {
