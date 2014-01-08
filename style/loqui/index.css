@@ -627,7 +627,7 @@ section#chat ul#messages > li > div[data-type='out'][data-receipt='delivered']:a
 section#chat ul#messages > li:last-child {
   margin-bottom: 3.5rem;
 }
-ul#messages li[data-media-type="image"]:after {
+section#chat ul#messages li[data-media-type="image"]:after {
   content: url('../../img/play.png');
 }
 section#chat ul#messages span.text img.image {
