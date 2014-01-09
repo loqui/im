@@ -61,6 +61,13 @@ var Chat = function (core, account) {
     this.core.last = msg;
     if (chunkListSize > 0) {
       Store.recover(blockIndex, function (chunk) {
+        console.log('CHUNKITOS');
+        console.log(chunk, App.defaults.Chat.chunkSize, blockIndex);
+        if (chunk.length >= App.defaults.Chat.chunkSize){
+          console.log('SUPERADO!', chunk);
+          chunk.shift();
+          console.log('POSTSHIFT!', chunk);
+        }
         if (!chunk || chunk.length >= App.defaults.Chat.chunkSize) {
           Tools.log('FULL OR NULL');
           var chunk = [msg];
