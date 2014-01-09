@@ -40,7 +40,7 @@ var App = {
       }
     },
     Chat: {
-      chunkSize: 30
+      chunkSize: 50
     },
     Connector: {
       presence: { 
