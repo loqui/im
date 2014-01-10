@@ -236,22 +236,6 @@ var Tools = {
     return fileType;
   },
 
-  imageSave: function (image, type, name, onSuccess, onError) {
-    var sdCard = navigator.getDeviceStorage('pictures');
-    onSuccess = function () {
-      Tools.log('El archivo "' + this.result + '" se escribio correctamente');
-    };
-    onError = function () {
-      Tools.log(this.error);
-    };
-    var fileType = this.getFileType(type);
-    var imageBlob = CoSeMe.utils.latin1ToBlob(image, fileType);
-    name = App.pathFiles + name + '.' + type;
-    var request = sdCard.addNamed(imageBlob, name);
-    request.onsuccess = onSuccess;
-    request.onerror = onError;
-  },
-
   audioSave: function (audio, type, name, onSuccess, onError) {
     var sdCard = navigator.getDeviceStorage('music');
     onSuccess = function () {
