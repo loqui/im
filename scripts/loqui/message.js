@@ -93,7 +93,7 @@ var Message = function (account, core) {
         App.notify({ subject: subject, text: message.core.text, pic: src, callback: callback }, 'received');
       });
     } else {
-      App.notify({ subject: subject, text: message.core.text, pic: 'https://raw.github.com/waalt/loqui/master/img/foovatar.png', callback: callback }, 'received');
+      App.notify({ subject: subject, text: message.core.text, pic: 'https://raw.github.com/loqui/im/master/img/foovatar.png', callback: callback }, 'received');
     }
     chat.messageAppend.push({msg: message.core}, function (err) { });
   }
