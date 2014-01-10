@@ -161,7 +161,7 @@ var Message = function (account, core) {
           };
           break;
         default:
-          html.addClass('image');
+          html.addClass(this.core.media.type);
           var open = function (blob) {
             return new MozActivity({
               name: 'open',
