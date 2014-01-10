@@ -1,8 +1,8 @@
 {
   "name": "Loqui IM",
   "developer": {
-    "name": "Waalt Communications",
-    "url": "http://waalt.com"
+    "name": "LoquiIM",
+    "url": "http://loqui.im"
   },
   "type": "privileged",
   "launch_path": "/index.html",
