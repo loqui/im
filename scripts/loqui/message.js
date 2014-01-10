@@ -93,7 +93,7 @@ var Message = function (account, core) {
         App.notify({ subject: subject, text: message.core.text, pic: src, callback: callback }, 'received');
       });
     } else {
-      App.notify({ subject: subject, text: message.core.text, pic: 'https://raw.github.com/waalt/loqui/master/img/foovatar.png', callback: callback }, 'received');
+      App.notify({ subject: subject, text: message.core.text, pic: 'https://raw.github.com/loqui/im/master/img/foovatar.png', callback: callback }, 'received');
     }
     chat.messageAppend.push({msg: message.core}, function (err) { });
   }
@@ -210,6 +210,9 @@ var Message = function (account, core) {
     var div = $('<div/>').data('type', type);
     if (this.core.id) {
       div.data('id', this.core.id);
+    }
+    if (this.core.media) {
+      div.data('media-type', this.core.media.type);
     }
     var stampSpan = $('<span/>').addClass('stamp').html(Tools.convenientDate(this.core.stamp).join('<br/>')).data('stamp', this.core.stamp);
     var nameSpan = $('<span/>').addClass('name').text(name);
