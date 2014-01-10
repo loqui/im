@@ -649,6 +649,12 @@ section#chat ul#messages span.text img.video {
 section#chat ul#messages span.text img.video[data-downloaded=false] {
     opacity: .4;
 }
+section#chat ul#messages li div[data-media-type="video"]:after {
+  content: url(../../img/play.png);
+  position: absolute;
+  left: 7.5rem;
+  top: 6.5rem;
+}
 section#chat article#emoji {
   padding: 1rem;
 }
