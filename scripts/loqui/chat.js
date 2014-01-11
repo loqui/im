@@ -68,6 +68,7 @@ var Chat = function (core, account) {
           Tools.log('PUSHING', blockIndex, chunk);
           chat.core.chunks.push(blockIndex);
           storageIndex = [blockIndex, 0];
+          callback();
         } else {
           Tools.log('FITS');
           chunk.push(msg);
