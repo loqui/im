@@ -143,16 +143,14 @@ var Chat = function (core, account) {
     this.lastChunkRender();
     if (this.core.unread) {
       this.core.unread = 0;
-      this.save(this.account.chatFind(this.core.jid), true);
+      this.save();
     }
   }
   
   // Save or update this chat in store
-  this.save = function (render) {
+  this.save = function (up) {
     this.account.save();
-    if (render) {
-      this.account.allRender();
-    }
+    this.account.singleRender(this, up);
   }
     
 }
