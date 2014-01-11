@@ -206,15 +206,9 @@ section#main article ul li {
   cursor: pointer;
 }
 section#main article ul li[data-muc="true"] {
-  position: relative;
-  background-color: #A7B9FF;
-  border-bottom: .05rem solid #E6E6E6;
-  height: 4rem;
-  cursor: pointer;
+  background-color: #EBE9DD;
 }
 section#main article ul li[data-muc="true"] span.avatar img:not([src]) {
-  height: 3.2rem;
-  width: 3.2rem;
   background-image: url('../../img/goovatar.png');
   background-size: 100%;
   background-color: #D4D2C5;
@@ -637,6 +631,14 @@ section#chat ul#messages span.text img.image {
     width: calc(100%);
     border-radius: .4rem;
 }
+section#chat ul#messages span.text img.audio{
+    width: calc(50%);
+    border-radius: .4rem;
+}
+section#chat ul#messages span.text img.maps{
+    width: calc(30%);
+    border-radius: .4rem;
+}
 section#chat ul#messages span.text img.image[data-downloaded=false] {
     opacity: .4;
 }
@@ -646,6 +648,12 @@ section#chat ul#messages span.text img.video {
 }
 section#chat ul#messages span.text img.video[data-downloaded=false] {
     opacity: .4;
+}
+section#chat ul#messages li div[data-media-type="video"]:after {
+  content: url(../../img/play.png);
+  position: absolute;
+  left: 7.5rem;
+  top: 6.5rem;
 }
 section#chat article#emoji {
   padding: 1rem;

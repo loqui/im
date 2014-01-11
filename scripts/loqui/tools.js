@@ -236,22 +236,6 @@ var Tools = {
     return fileType;
   },
 
-  imageSave: function (image, type, name, onSuccess, onError) {
-    var sdCard = navigator.getDeviceStorage('pictures');
-    onSuccess = function () {
-      Tools.log('El archivo "' + this.result + '" se escribio correctamente');
-    };
-    onError = function () {
-      Tools.log(this.error);
-    };
-    var fileType = this.getFileType(type);
-    var imageBlob = CoSeMe.utils.latin1ToBlob(image, fileType);
-    name = App.pathFiles + name + '.' + type;
-    var request = sdCard.addNamed(imageBlob, name);
-    request.onsuccess = onSuccess;
-    request.onerror = onError;
-  },
-
   audioSave: function (audio, type, name, onSuccess, onError) {
     var sdCard = navigator.getDeviceStorage('music');
     onSuccess = function () {
@@ -293,6 +277,19 @@ var Tools = {
         cb(res);
     }
     reader.readAsDataURL(blob);
+  },
+
+  modifyLungoNotification: function ( newText ) {
+    var notificationDiv = $('div.notification');
+    notificationDiv.children('div').children('strong').html(newText);
+  },
+
+  guid: function () {
+    var s4 = function() {
+      return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+    };
+
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + '-' + s4() + s4() + s4();
   }
 
 }

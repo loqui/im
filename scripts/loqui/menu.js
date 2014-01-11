@@ -95,7 +95,7 @@ var Menu = {
       Plus.rtc({audio: true, video: true});
     },
     purchase: function () {
-      var number = this.account().core.cc;
+      var number = Messenger.account().core.data.login;
       var openURL = new MozActivity({
         name: "view",
         data: {

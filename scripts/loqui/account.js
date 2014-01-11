@@ -147,7 +147,6 @@ var Account = function (core) {
         var lastMsg = chat.last.text ? App.emoji[Providers.data[account.core.provider].emoji].fy(chat.last.text) : media;
         var lastStamp = chat.last.stamp ? Tools.convenientDate(chat.last.stamp).join('<br />') : '';
         var li = $('<li/>').data('jid', chat.jid);
-        li.data('muc', this.core.muc || false);
         li.append($('<span/>').addClass('avatar').append('<img/>'));
         li.append($('<span/>').addClass('name').html(title));
         li.append($('<span/>').addClass('lastMessage').html(lastMsg));
@@ -155,6 +154,7 @@ var Account = function (core) {
         li.append($('<span/>').addClass('show').addClass('backchange'));
         li.append($('<span/>').addClass('unread').text(chat.unread));
         li.data('unread', chat.unread ? 1 : 0);
+        li.data('muc', (account.supports('muc') && chat.jid.substring(1).match(/\-/)) ? true : false);
         li.bind('click', function () {
           var ci = account.chatFind(this.dataset.jid);
           if (ci >= 0) {
@@ -166,7 +166,6 @@ var Account = function (core) {
               chunks: []
             }, account);
           }
-          chat.core.muc = account.supports('muc') && this.dataset.jid.substring(1).match(/\-/) ? true : false;
           chat.show();
         }).bind('hold', function () {
           window.navigator.vibrate([100]);
@@ -390,7 +389,7 @@ var Account = function (core) {
   this.chatFind = function (jid) {
     var index = -1;
     for (var i in this.chats) {
-      if (this.chats[i].core.jid == jid) {
+      if (this.chats[i].core && this.chats[i].core.jid == jid) {
         index = i;
         break;
       }

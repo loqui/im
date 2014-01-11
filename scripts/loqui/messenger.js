@@ -20,6 +20,8 @@ var Messenger = {
       });
       msg.send();
       $$("section#chat div#text").empty();
+      var ul = $('section#chat ul#messages');
+      ul[0].scrollTop = ul[0].scrollHeight;
       App.audio('sent');
     }
     $('section#chat article#main button#plus').show();
