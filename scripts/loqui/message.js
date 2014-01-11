@@ -88,12 +88,15 @@ var Message = function (account, core) {
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', Strophe.getBareJidFromJid(message.core.from));
     var subject = muc ? ((contact ? (contact.name || message.core.pushName) : message.core.pushName) + ' @ ' + chat.core.title) : chat.core.title;
     Tools.log(subject, muc, contact, message);
+    if (this.core.media) {
+      var altText = _('SentYou', {type: _('MediaType_' + this.core.media.type)});
+    }
     if (pic) {
       Store.recover(pic, function (src) {
-        App.notify({ subject: subject, text: message.core.text, pic: src, callback: callback }, 'received');
+        App.notify({ subject: subject, text: message.core.text || altText, pic: src, callback: callback }, 'received');
       });
     } else {
-      App.notify({ subject: subject, text: message.core.text, pic: 'https://raw.github.com/loqui/im/master/img/foovatar.png', callback: callback }, 'received');
+      App.notify({ subject: subject, text: message.core.text || altText, pic: 'https://raw.github.com/loqui/im/master/img/foovatar.png', callback: callback }, 'received');
     }
     chat.messageAppend.push({msg: message.core}, function (err) { });
   }
