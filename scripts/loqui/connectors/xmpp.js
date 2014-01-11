@@ -388,7 +388,14 @@ App.emoji['FB'] = {
     ['emoji16', '>:O','>:o'],
     ['emoji17', ':v'],
     ['emoji18', ':poop:'],
-    ['emoji19', 'O:)']
+    ['emoji19', 'O:)'],
+    ['emoji20', ';-)', ';)'],
+    ['emoji21', '^_^'],
+    ['emoji22', '-_-'],
+    ['emoji23', ':\|\]'],
+    ['emoji24', ':putnam:'],
+    ['emoji25', '(^^^)'],
+    ['emoji20', '<(")']
   ],
 
   fy: function (text) {
@@ -413,6 +420,62 @@ App.emoji['FB'] = {
   render: function (img, emoji) {
     img
       .attr('src', '/img/emoji/fb/' + emoji[0] + '.png')
+      .data('emoji', emoji[0]);
+  }
+  
+}
+
+App.emoji['GTALK'] = {
+  
+  map: [
+    ['angry', 'x-('],
+    ['brokenheart', '</3'],
+    ['cool', 'B-)'],
+    ['cowbell', '+/\'\\'],
+    ['crab', 'V.v.V'],
+    ['cry', ':\'('],
+    ['devil', '\}:-)'],
+    ['frown', ':(', '=(', ':-('],
+    ['grin', ':D', '=D', ':-D'],
+    ['heart', '<3'],
+    ['kissstar', ':*', ':-x'],
+    ['monkey', ':(|)'],
+    ['mustache', ':\{'],
+    ['pig', ':(:)'],
+    ['poop', '~@~'],
+    ['robot', ':\|\]'],
+    ['rockout', '\\m/'],
+    ['shocked', ':-o'],
+    ['slant', ':-/', '=/'],
+    ['smile', ':)', '=D', ':-)'],
+    ['straightface', ':-\|'],
+    ['tongue', ':p', ':P', '=p', '=P', ':-p', ':-P'],
+    ['wince', '\\>.\\<'],
+    ['wink', ';)', ';-)', ';^)']
+  ],
+
+  fy: function (text) {
+    var mapped = text;
+    var map = this.map;
+    if (map.length != undefined) {
+      for (var i in map) {
+        var original = map[i][0];
+        for (var j in map[i]) {
+          var token = map[i][j].replace(/([\*\|\(\)\{\[\]\}\\\$])/g, '\\$1');
+          var rexp = new RegExp('('+token+')', 'g');
+          mapped = mapped.replace(rexp, '<img src="img/emoji/gtalk/'+original+'.gif" alt="$1" />');
+          if (mapped != text) {
+            return mapped;
+          }
+        }
+      }
+    }
+    return text;
+  },
+  
+  render: function (img, emoji) {
+    img
+      .attr('src', '/img/emoji/gtalk/' + emoji[0] + '.gif')
       .data('emoji', emoji[0]);
   }
   
