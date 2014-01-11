@@ -12,37 +12,6 @@ var Message = function (account, core) {
     }
     if (!justSend) {
       this.addToChat();
-      /*
-      var ci = this.account.chatFind(this.core.to);
-      if (ci >= 0) {
-        var chat = this.account.chats[ci];
-        this.account.chats.push(chat);
-        this.account.core.chats.push(chat.core);
-        this.account.chats.splice(ci, 1);
-        this.account.core.chats.splice(ci, 1);
-      } else {
-        // There is no chat for the receiver of the message
-        Tools.log('No chat for ', this.core.to, 'creating new one', this.account);
-        var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.to);
-        var chat = new Chat({
-          jid: this.core.to, 
-          title: contact ? contact.name || this.core.to : this.core.to,
-          chunks: []
-        }, this.account);
-        this.account.chats.push(chat);
-        this.account.core.chats.push(chat.core);
-      }
-      this.addToChat(chat);
-      /*
-      var ul = $('section#chat ul#messages');
-      var li = ul.children('li:last-child');
-      li.append(this.preRender());
-      ul[0].scrollTop = ul[0].scrollHeight;
-      chat.messageAppend.push({msg: this.core}, function (err) {
-      
-        chat.save(true);
-      }.bind(this));
-      */
     }
   }
   
@@ -105,7 +74,7 @@ var Message = function (account, core) {
     var chatIndex = account.chatFind(to);
     var chat = null;
 
-    if (chatIndex > 0) {
+    if (chatIndex >= 0) {
       chat = account.chats[chatIndex];
       account.chats.splice(chatIndex, 1);
       account.core.chats.splice(chatIndex, 1);
@@ -122,17 +91,10 @@ var Message = function (account, core) {
 
     var ul = $('section#chat ul#messages');
     var li = ul.children('li:last-child');
-
     li.append(self.preRender(self.core.id));
     ul[0].scrollTop = ul[0].scrollHeight;
-
-    chat.messageAppend.push(
-      {msg: self.core},
-      function ( err ) {
-        console.log('Saving message!');
-        chat.save(true);
-      }.bind(self)
-    );
+    
+    chat.messageAppend.push({msg: self.core}, function (err) { });
   }
   
   // Represent this message in HTML

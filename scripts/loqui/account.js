@@ -131,6 +131,30 @@ var Account = function (core) {
     li.data('show', this.connector.presence.show);
   }
   
+  this.singleRender = function (chat, up) {
+    var ul = $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"]');
+    var li = ul.children('li[data-jid="' + chat.core.jid + '"]');
+    if (li.length) {
+      if (up) {
+        li.remove();
+        ul.prepend(li);
+      }
+      li.children('.lastMessage').html(chat.core.last.text ? App.emoji[Providers.data[this.core.provider].emoji].fy(chat.core.last.text) : _('AttachedFile'));
+      li.children('.lastStamp').html(chat.core.last.stamp ? Tools.convenientDate(chat.core.last.stamp).join('<br />') : '');
+      li.data('unread', chat.core.unread ? 1 : 0).children('.unread').text(chat.core.unread);
+      var totalUnread = this.chats.reduceRight(function (prev, cur, i, all) {
+        return prev + cur.core.unread;
+      }, 0);
+      console.log(this.chats, totalUnread);
+      Lungo.Element.count('aside li[data-jid="' + this.core.fullJid + '"]', totalUnread);
+      if (ul.style('display') == 'block') {
+        Lungo.Element.count('section#main header nav button[data-view-article="chats"]', totalUnread);
+      }
+    } else {
+      this.allRender();
+    }
+  }
+  
   // List all chats for this account
   this.chatsRender = function () {
     var account = this;
