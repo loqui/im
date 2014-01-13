@@ -145,10 +145,22 @@ App.connectors['XMPP'] = function (account) {
     this.presence.send();
   }.bind(this);
   
-  this.presence.send = function (show, status, priority) {
+  this.presence.send = function (show, status) {
     var show = show || this.presence.show;
     var status = status || this.presence.status;
-    var priority = priority || '127';
+    var idle = document.hidden ? new Date - App.lastActive : 0;
+    var priority =
+      idle < 1000 ? 100 :
+      idle < 5000 ? 80 :
+      idle < 30000 ? 60 :
+      40;      
+    priority += {
+      chat: -4,
+      a: -4,
+      dnd: -4,
+      away: -8,
+      xa: -12
+    }[show];
     if (App.online && this.connection.connected) {
       var msg = $pres();
       if (show != 'a') {
