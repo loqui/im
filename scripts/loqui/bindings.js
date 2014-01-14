@@ -62,6 +62,7 @@ document.addEventListener("visibilitychange", function() {
     if (document.hidden) {
       account.connector.presence.send('away');
     } else {
+      App.lastActive = new Date;
       account.connector.presence.send();
     }
   }
