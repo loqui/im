@@ -4235,10 +4235,27 @@ CoSeMe.namespace('protocol', (function(){
   var LONG_STRING_MARK  = k.LONG_STRING_MARK;
 
   /**
-   * Writes a string token in an efficent encoding derived from a dictionary.
+   * Writes bytes from a JavaScript (latin1) string, an ArrayBuffer or any
+   * type with a buffer property of type ArrayBuffer like ArrayBufferView
+   * instances.
    */
-  BinaryWriter.prototype.writeBytes = function(string, counting) {
-    var bytes = CoSeMe.utils.bytesFromLatin1(string);
+  BinaryWriter.prototype.writeBytes = function(data, counting) {
+    var bytes;
+    if (typeof data === 'string') {
+      bytes = CoSeMe.utils.bytesFromLatin1(data);
+
+    } else if (data instanceof ArrayBuffer) {
+      bytes = new Uint8Array(data);
+
+    } else if (data && data.buffer instanceof ArrayBuffer) {
+      bytes = new Uint8Array(data.buffer);
+
+    } else {
+      var fallback = data === null || data === undefined ? '' : data.toString();
+      console.error('Expecting string, ArrayBuffer or ArrayBufferView-like',
+                    'object. A', data.constructor.name, 'received instead.');
+      bytes = CoSeMe.utils.bytesFromLatin1(fallback);
+    }
 
     var l = bytes.length;
 
@@ -7331,21 +7348,34 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
   }
 
 
-  function sendSetPicture(aJid, aImageData) {
+  function sendSetPicture(aJid, preview, aImageData) {
 
       var idx = self.makeId('set_picture_');
-      self.readerThread.requests[idx] = self.readerThread.parseSetPicture;
 
-      var  listNode = newProtocolTreeNode(
-                       'picture',
-                       {xmlns: 'w:profile:picture', type: 'image'},
-                       null,
-                       aImageData);
+      var picture = newProtocolTreeNode(
+        'picture',
+        { xmlns: 'w:profile:picture' },
+        null,
+        aImageData
+      );
+
+      var thumb = newProtocolTreeNode(
+        'picture',
+        { type: 'preview' },
+        null,
+        preview
+      );
 
       var iqNode = newProtocolTreeNode(
-                     'iq',
-                     {id: idx, to: aJid, type: 'set'},
-                     [listNode]);
+        'iq',
+        {
+          id: idx,
+          to: aJid,
+          type: 'set'
+        },
+        [picture, thumb],
+        null
+      );
 
       self._writeNode(iqNode);
   }
@@ -7661,7 +7691,9 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
       return messageNode.getAttributeValue('id');
     },
 
-    profile_setPicture: sendSetPicture.bind(undefined, self.jid),
+    profile_setPicture: function (preview, thumb) {
+      sendSetPicture(self.jid, preview, thumb);
+    },
 
     // Misc
 
