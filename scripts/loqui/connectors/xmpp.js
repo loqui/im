@@ -347,7 +347,7 @@ App.emoji['XMPP'] = {
       for (var i in map) {
         var original = map[i][0];
         for (var j in map[i].slice(1)) {
-          var token = map[i][j].replace(/([\*\|\(\)\[\]\\\$])/g, '\\$1');
+          var token = map[i][j].replace(/([\*\|\(\)\[\]\\\$\{\}\.\+\?\^])/g, '\\$1');
           var rexp = new RegExp('('+token+')', 'g');
           mapped = mapped.replace(rexp, '<img src="img/emoji/xmpp/'+original+'.png" alt="$1" />');
           if (mapped != text) {
@@ -377,12 +377,12 @@ App.emoji['FB'] = {
     ['emoji5', ':O'],
     ['emoji6', ':3'],
     ['emoji7', '8)'],
-    ['emoji8', '8\|'],
+    ['emoji8', '8|'],
     ['emoji9', '>:('],
     ['emoji10', ':\\', ':/'],
     ['emoji11', ':\'('],
     ['emoji12', '3:)'],
-    ['emoji13', ':\*'],
+    ['emoji13', ':*'],
     ['emoji14', '<3'],
     ['emoji15', 'O.o','o.O'],
     ['emoji16', '>:O','>:o'],
@@ -392,7 +392,7 @@ App.emoji['FB'] = {
     ['emoji20', ';-)', ';)'],
     ['emoji21', '^_^'],
     ['emoji22', '-_-'],
-    ['emoji23', ':\|\]'],
+    ['emoji23', ':|]'],
     ['emoji24', ':putnam:'],
     ['emoji25', '(^^^)'],
     ['emoji20', '<(")']
@@ -405,7 +405,7 @@ App.emoji['FB'] = {
       for (var i in map) {
         var original = map[i][0];
         for (var j in map[i].slice(1)) {
-          var token = map[i][j].replace(/([\*\|\(\)\[\]\\\$])/g, '\\$1');
+          var token = map[i][j].replace(/([\*\|\(\)\[\]\\\$\{\}\.\+\?\^])/g, '\\$1');
           var rexp = new RegExp('('+token+')', 'g');
           mapped = mapped.replace(rexp, '<img src="img/emoji/fb/'+original+'.png" alt="$1" />');
           if (mapped != text) {
@@ -443,7 +443,7 @@ App.emoji['GTALK'] = {
     ['mustache', ':{'],
     ['pig', ':(:)'],
     ['poop', '~@~'],
-    ['robot', ':\|\]'],
+    ['robot', ':|]'],
     ['rockout', '\\m/'],
     ['shocked', ':-o'],
     ['slant', ':-/', '=/'],
@@ -461,7 +461,7 @@ App.emoji['GTALK'] = {
       for (var i in map) {
         var original = map[i][0];
         for (var j in map[i].slice(1)) {
-          var token = map[i][j].replace(/([\*\|\(\)\[\]\\\$])/g, '\\$1');
+          var token = map[i][j].replace(/([\*\|\(\)\[\]\\\$\{\}\.\+\?\^])/g, '\\$1');
           var rexp = new RegExp('('+token+')', 'g');
           mapped = mapped.replace(rexp, '<img src="img/emoji/gtalk/'+original+'.gif" alt="$1" />');
           if (mapped != text) {
