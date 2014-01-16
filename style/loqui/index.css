@@ -652,8 +652,8 @@ section#chat ul#messages span.text img.video[data-downloaded=false] {
 section#chat ul#messages li div[data-media-type="video"]:after {
   content: url(../../img/play.png);
   position: absolute;
-  left: 7.5rem;
-  top: 6.5rem;
+  left: calc(50% - 2rem);
+  top: calc(50% - 2rem);
 }
 section#chat article#emoji {
   padding: 1rem;

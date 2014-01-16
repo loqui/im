@@ -167,6 +167,14 @@ var Message = function (account, core) {
           break;
       }
       html.bind('click', onClick);
+      var onDivClick = function(e) {
+        e.preventDefault();
+        var target = $(e.target);
+        var span = target[0].lastChild;
+
+        var img = span.firstChild;
+        img.click();
+      };
     }
   	var type = (this.core.from == this.account.core.user || this.core.from == this.account.core.realJid) ? 'out' : 'in';
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', Strophe.getBareJidFromJid(this.core.from));
@@ -184,6 +192,9 @@ var Message = function (account, core) {
     var textSpan = $('<span/>').addClass('text').html(html);
     if (html) {
       div.append(stampSpan).append(nameSpan).append(textSpan);
+    }
+    if (onDivClick !== undefined) {
+      div[0].onclick = onDivClick;
     }
   	return div;
   }
