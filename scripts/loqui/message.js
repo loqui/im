@@ -137,16 +137,16 @@ var Message = function (account, core) {
             });
           }
           var onClick = function (e) {
-            var url = e.target.dataset.url;
+            var img = e.target;
+            var url = img.dataset.url;
             var ext = url.split('.').pop();
             var localUrl = App.pathFiles + $(e.target).parent().siblings('.stamp').data('stamp').replace(/[-:]/g, '') + url.split('/').pop().substring(0, 5).toUpperCase() + '.' + ext;
-            if (e.target.dataset.downloaded == 'true') {
+            if (img.dataset.downloaded == 'true') {
               Store.SD.recover(localUrl, function (blob) {
                 open(blob);
               });
             } else {
               Tools.fileGet(url, function (blob) {
-                var img = e.target;
                 Store.SD.save(localUrl, blob, function () {
                   open(blob);
                   var index = [$(img).closest('li[data-chunk]').data('chunk'), img.dataset.index];
