@@ -1045,3 +1045,14 @@ div.switch div.ball {
     border-radius: 0!important;
   }
 }
+
+/* PROGRESS BAR */
+
+div #progressBar > span.bar > span.value {
+    position: relative;
+    display: block;
+    width: 0%;
+    background-color: indianred;
+    top: -20px;
+    height: 10px;
+}

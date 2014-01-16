@@ -74,6 +74,13 @@ var Tools = {
   },
   
   fileGet: function (url, cb) {
+    var progress = function (event) {
+      if (event.lengthComputable) {
+        var percentComplete = (event.loaded / event.total) * 100;
+        percentComplete = percentComplete.toFixed(0);
+        Lungo.Element.progress("#progressBar", percentComplete, false);
+      }
+    };
     var type = Tools.getFileType(url.split('.').pop());
     var xhr = new XMLHttpRequest({
       mozAnon: true,
@@ -82,8 +89,10 @@ var Tools = {
     xhr.open('GET', url);
     xhr.responseType = 'blob';
     xhr.onload = function (e) {
+      Lungo.Element.progress("#progressBar", 0, false);
       cb(xhr.response);
     }
+    xhr.onprogress = progress;
     xhr.send();
   },
 
