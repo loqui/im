@@ -171,9 +171,10 @@ var Message = function (account, core) {
         e.preventDefault();
         var target = $(e.target);
         var span = target[0].lastChild;
-
-        var img = span.firstChild;
-        img.click();
+        if (span) {
+          var img = span.firstChild;
+          img.click();
+        }
       };
     }
   	var type = (this.core.from == this.account.core.user || this.core.from == this.account.core.realJid) ? 'out' : 'in';
