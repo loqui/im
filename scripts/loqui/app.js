@@ -30,6 +30,7 @@ var App = {
         devMode: false
       },
       devsettings: {
+		devConsole:false,
         debug: false        
       },
       online: true

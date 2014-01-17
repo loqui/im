@@ -964,6 +964,14 @@ section#settings nav a#developer {
   display: block;
 }
 
+div#debugConsole {
+  display: none;
+}
+
+.devConsole div#debugConsole {
+  display: block;
+}
+
 section#settings article#devmode div button {
   position: absolute;
   right: 1rem;

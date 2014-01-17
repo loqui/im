@@ -162,4 +162,7 @@ var bindings = function () {
   $('section#welcome').on('click',function(){
      Menu.show('providers');
   });
+  $('#debugConsole #mostrarconsola').on('click',DebugConsole.mostrarConsola);
+  $('#debugConsole #consola #frente div#titulo').on('click',DebugConsole.ocultarConsola);
+  $('div#debugConsole div#consola div#frente div#limpiar').on('click',DebugConsole.limpiar);
 }
