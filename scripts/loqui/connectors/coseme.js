@@ -324,6 +324,7 @@ App.connectors['coseme'] = function (account) {
       var date = new Date(stamp);
       var stamp = Tools.localize(Tools.stamp(stamp));
       var msg = new Message(account, {
+        id: id,
         from: from,
         to: to,
         text: body,
@@ -398,17 +399,17 @@ App.connectors['coseme'] = function (account) {
   
   this.events.onMessageSent = function (from, msgId) {
     Tools.log('SENT', from, msgId);
-    $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"]').data('receipt', 'sent');
+    $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"][data-type="out"]').data('receipt', 'sent');
   }
 
   this.events.onMessageDelivered = function (from, msgId) {
     Tools.log('DELIVERED', from, msgId);
-    $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"]').data('receipt', 'delivered');
+    $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"][data-type="out"]').data('receipt', 'delivered');
   }
   
   this.events.onMessageVisible = function (from, msgId) {
     Tools.log('VISIBLE', from, msgId);
-    $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"]').data('receipt', 'visible');
+    $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"][data-type="out"]').data('receipt', 'visible');
   }
 
   this.events.onGroupInfoError = function (jid, owner, subject, subjectOwner, subjectTime, creation) {
@@ -464,7 +465,7 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.events.onGroupMessage = function (msgId, from, author, data, stamp, wantsReceipt, pushName) {
-    console.log('GROUPMESSAGE', msgId, from, author, data, stamp, wantsReceipt, pushName);
+    Tools.log('GROUPMESSAGE', msgId, from, author, data, stamp, wantsReceipt, pushName);
     var account = this.account;
     var to = from;
     var from = author;
@@ -521,7 +522,7 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.events.onUploadRequestSuccess = function (hash, url, resumeFrom) {
-    console.log('onUploadRequest!');
+    Tools.log('onUploadRequest!');
     var self = this;
     var media = CoSeMe.media;
     var account = this.account;
@@ -547,7 +548,7 @@ App.connectors['coseme'] = function (account) {
               method,
               [toJID, url, hash, '0', data.split(',').pop()]
             );
-            self.addMediaMessageToChat(type, data, url, account.core.user, toJID, Tools.guid());
+            self.addMediaMessageToChat(type, data, url, account.core.user, toJID, Math.floor((new Date).getTime() / 1000) + '-1');
             App.audio('sent');
           });
         })
@@ -618,7 +619,7 @@ App.connectors['coseme'] = function (account) {
   }
 
   this.processFile = function (fileType, msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, isGroup) {
-    console.log('Processing file');
+    Tools.log('Processing file');
     var self = this;
     //var type = mediaUrl.split('.').pop();
     //type = Tools.getFileType(type);
@@ -635,6 +636,7 @@ App.connectors['coseme'] = function (account) {
       };
       var stamp = Tools.localize(Tools.stamp());
       var msgObj = {
+        id: msgId,
         from: fromAttribute,
         to: to,
         media: media,
@@ -647,12 +649,12 @@ App.connectors['coseme'] = function (account) {
       msg.receive(isGroup);
       self.ack(msgId, fromAttribute);
     });
-    console.log('EndingProcessing');
+    Tools.log('EndingProcessing');
     return true;
   }
 
   this.processAudio = function (msgId, fromAttribute, to, mediaUrl, mediaSize, isGroup) {
-    console.log('processAudio');
+    Tools.log('processAudio');
     var audioIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAADaElEQVR4nO2bS0gVYRiGHxOzCxGUkikUkXaKWkQEttIDmQXRbSEU6qJFm4hWQVCREESrbosWtXGTEYIELYKWkhBEVLQooSi6u6hQ1GzjscWcodG+7zT/3OeML/yr8/7ffO975r//A/OYR1xoBNqKZXXMuUSK7cBjYMZRpoEBoD7GvCLBFmCU2eKd5QNQF1t2ISMHjKCLt8tAXAmGifXAZ/4v3m4OZdUnbMTdP+8se2LJNAQ0AG8xEz8DdPh45gIfdQNFAzCMuXi/BvQBx33UDwQbgI94E+/HgMOOGNeJ6W3IAZ/wLt6rASv5t6+57EOHJzQDP/En3qsB/UqsHs9qDNEM/FCSCNuA5ejDbAHo9i7LHbqA30oCUb0BdcAzJd4UsNWTMhc4hTV5CUq8n06wFn3YfQks9hhXxBKsISdI4X4NAGsE+q7EveQj7izksRwNQ7xbAxaW+K0dq+1LTWFdqaCLgFbgQDEJZ+kEzgFDIQo3MaAPuFDi9ytK7H6JXAmcB8YiEBeEAYcc3B6FUw28EWIXgM1OYgVwOwGi3RpQw+wJT6EE/6AS/6aT1JkAwSYG3BX4o8Aahf9I4E8CK2xCFG06KAOWAV+VOg+UOh0K/5hNGE+AYJM3YFuJnFsFfhXwReDetwlxizU1AOCIUu+hwr8qcCcpToziFuvFgArktl3AmgjNxU7lOfm0GgDW4kuqe0bgVgETAvdkmg0AeC3UHVS4TwTurbQbcFGoO4m8E9QrcIfSbkCLUr9R4J4VeMNpN6BWqd8icE8IvG9pN6ASedW3T+B2CbypcjVgv8DtLkcDtCbQKnClJjCSdgMy3wlmfhg0mQg9FbipngiZTIWrgV8CN7VTYdPFULvynHxaDTBdDl8TuBMUl8NZ3RC5ZxMGEyDYrQFBbokdtQlZ3BQdxzpQBbK5LX5jLjFrByObtMD20VjbnLKLMj8aM0WeMj0cNcFS4I7wkKgM0BDJ8bgTmb0g4UQ7wXagXgxoAt4p8caQl8iBYgcZviRlI4e/C5J+3oBeJVbkt0YbgfdKMmEakIiLkjZWAc+J1gCAvfx97U97Tz8Y1AAviNYASMhlaRu1wCuiNSAx1+Vt1GP+zcDuWDINEWtxPzpMY/UhZYcm9M0MZynLj6ZsZPqzORuZ/nDSicx+OjuPJOEPsoJJRJjtDLEAAAAASUVORK5CYII=';
     var self = this;
     var account = this.account;
@@ -672,13 +674,12 @@ App.connectors['coseme'] = function (account) {
     msg.receive();
     self.ack(msgId, fromAttribute);
 
-    console.log('Audio message processed');
+    Tools.log('Audio message processed');
     return true;
   }
 
   this.processLocation = function (msgId, fromAttribute, to, mediaPreview, name, mlatitude, mlongitude, isGroup) {
     Tools.log('processLocation');
-    console.log(name);
     var locationIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEcElEQVR4nN2bW4hOURTHfy4zJrdch8gtk3GZFzHyJuXyoJQoJZeQhgchkgdFlBchIvJAGR54UUpuj5QowsxILiWFGjMYwzDMzOdhn0/jM99Za8/Ze58vv1ql4az/+h/n7L323mcgDEOBZcBh4AbwBviYE2+ivzsELAWGBKrNG4OBjcAdoB3IWEY7cBuoAgYFrj0RozD/i83Ym84XzcBBYGRAH9aUAHuB77gznhstkUZJEEcWlAEP8Wc8Nx4AE4M4U7AYaCKc+Wx8BhYF8BfLDqCD8Oaz0QFs9+4yD5sUBYa6CVWevf7Dcuyntk/AOWA1UAmMwEyVg6M/zwLWANWYx9smdxumzwjCFOCrRXG1wCrsRu4SzI16aqHTDJQncqagGHhiUdBmoFcCvd7AFsz0p9F8BBQl0BPZpSzkGeZJcUUl8E6pvcOh7l+MRvfoPwJKPeiPAWoU+l/w1DEeVYi/wAxovhgDvFfUcci18HDk9/AbUOFauAtmI7fb34BhLkW3CoIZYJtLQYHdino2uxSU+vxnmBFbwzTMvkAt8CGKmuhnU5U5+iEPiveVuURGCUIZYJ0iTzFwHNO05MvThhlrNFOZ1Il24Gg8WiEINQF9hRzFwE0hT+e4Hl0TRz/kPYflapcxSKP/BUWOU0KOruKEIu9FIccRRQ6R64LIeuH6Crq3JdaGPCZUCTmuql3G8EoQqRSu1/QP+eKwkHu2cP1ztcsYGgURab61WdDkRo2Qu1S4/oPaZQytgog0WCXZHP0i5O4jXN+qdhnDD0FEmrJsls6ub0CL2mUMUsPh8xWoFXJLr8BbtcsY6gSRQh4EpTFExRVBRJoGpxHf/eWLX8BkIbc0DV5Wu4xhvyCiaYSOCDm6ioOKvFIjtFeRQ2SZIKJphYuQG6rOcQ15caVphZeoXcYwEnnvP43F0AahpnbMPoYTfCyH6zAbG98xo73NcrgYeCnU5Gw5DHBAEMsQdkNkp6KefS4FKxSCrcAcl6J5mAv8VNSjfZrUPFCINuD31LYs0pDquOdDXLMvmME0H2M96I/DjBWaGpzuB2YZiP7MrhGY51B7PuY7Io32J2CAQ+2/OKYsIjsm7Af6J9DLfnWieeez4WQXKB8TsW9r32HaZdvD0bXAa0utX5hXxSvVlkV1fjRzj8d7RZH0eDwbZzz6/sM45D2CNKIFs4UfhNMBDNmGZhfZGUPRzcehop4UviwtlG+EMpiFUXB6YjqutM3fjWpJhZl079DDVbQBM7y7FEhzQDwZwJ9IKeYAIrT5ehxueCRlIWG/GO0AFgRxZsFxwt2Ao4E8WVGC/hvCJPEYcyJUkExHPktMEi2YPcWCRvsxZXfC20eQLukBXMK9+eqQJpLSn2SHorlRR7KNlVQoxxxvJzXfBEwKXLsz1pD8BqwMXrVj9tB987tTqNc5PYCz2JsviD7fFUXALfTmb+L5Fx/SYCC6TvFx9G//S8owq7h85uspoF+I9MUsut5PbED+3ui/YQJwHnOE1ojp8sanUchvhscTL49v8mgAAAAASUVORK5CYII=';
     var self = this;
     var account = this.account;

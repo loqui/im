@@ -11,7 +11,8 @@ var Chat = function (core, account) {
   // Render last chunk of messages
   this.lastChunkRender = function () {
     var ul = $('section#chat ul#messages');
-    ul.empty().append('<li/>');
+    //ul.empty().append($('<li/>').addClass('chunk'));
+    ul.empty();
     var index = this.core.chunks.length - 1;
     if (index >= 0) {
       this.chunkRender(index);
@@ -68,7 +69,7 @@ var Chat = function (core, account) {
           Tools.log('PUSHING', blockIndex, chunk);
           chat.core.chunks.push(blockIndex);
           storageIndex = [blockIndex, 0];
-          callback();
+          callback(blockIndex);
         } else {
           Tools.log('FITS');
           chunk.push(msg);
@@ -91,7 +92,7 @@ var Chat = function (core, account) {
       if (delay) {
         chat.account.toSendQ(storageIndex);
       }
-      callback();
+      callback(blockIndex);
     }
   }.bind(this));
   
