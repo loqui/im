@@ -154,15 +154,25 @@ var bindings = function () {
     Messenger.say();
   });
   $('section#chat nav#plus a.cancel').on('click', function() {
-    $(this).parent().removeClass("show");
+    $(this).parent().removeClass('show');
   });
   $('section#chat nav#plus a.bolt').on('click', function() {
     Plus.bolt();
   });
-  $('section#welcome').on('click',function(){
+  $('section#welcome').on('click', function(){
      Menu.show('providers');
   });
-  $('#debugConsole #mostrarconsola').on('click',DebugConsole.mostrarConsola);
-  $('#debugConsole #consola #frente div#titulo').on('click',DebugConsole.ocultarConsola);
-  $('div#debugConsole div#consola div#frente div#limpiar').on('click',DebugConsole.limpiar);
+  $('#debugConsole #showConsole').on('click', function () {
+    Plus.showConsole();
+    $('#debugConsole #showConsole').hide();
+    $('#debugConsole #hideConsole').show();
+  });
+  $('#debugConsole #hideConsole').on('click', function() {
+    Plus.hideConsole();
+    $('#debugConsole #showConsole').show();
+    $('#debugConsole #hideConsole').hide();
+  });
+  $('#debugConsole #consoleClear').on('click', function() {
+    Plus.clearConsole();
+  });
 }

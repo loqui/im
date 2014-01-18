@@ -5,7 +5,7 @@ var Tools = {
   log: function () {
     if (App.devsettings.debug) {
       console.log.apply(console, [].slice.call(arguments));
-	  DebugConsole.log([].slice.call(arguments));
+	    Plus.log([].slice.call(arguments));
     }
   },
 

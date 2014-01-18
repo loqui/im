@@ -83,6 +83,29 @@ var Plus = {
   
   rtc: function (constraints) {
     
+  },
+
+  showConsole: function() {
+    $('#console').show();
+  },
+  
+  hideConsole: function() {
+    $('#console').hide();
+  },
+  
+  log: function(msg) {
+    var node=document.createElement("DIV");
+    var textnode=document.createTextNode(msg);
+    node.appendChild(textnode);
+    document.getElementById('logConsole').appendChild(node);
+    while(document.getElementById('logConsole').childNodes.length>15)
+    { 
+      document.getElementById('logConsole').removeChild(document.getElementById('logConsole').firstChild);
+    }
+  },
+  
+  clearConsole: function() {
+    document.getElementById('logConsole').innerHTML='';
   }
   
 }
