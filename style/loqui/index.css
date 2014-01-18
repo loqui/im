@@ -675,13 +675,12 @@ section#chat article#emoji ul li {
   cursor: pointer;
 }
 section#chat article#emoji ul li img {
-  width: 2rem;
-  height: 2rem;
+  width: 1.5rem;
+  height: 1.5rem;
 }
 section#chat article#emoji button {
   width: 100%;
 }
-
 section#chat article#call {
   padding: 1rem;
 }

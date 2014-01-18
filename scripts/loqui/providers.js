@@ -55,7 +55,7 @@ var Providers = {
         userInputType: 'email'
       },
       notice: true,
-      emoji: 'XMPP'
+      emoji: 'GTALK'
     },
     'nimbuzz': {
       longName: 'Nimbuzz',
