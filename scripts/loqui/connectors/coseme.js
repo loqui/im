@@ -653,7 +653,7 @@ App.connectors['coseme'] = function (account) {
 
   this.processAudio = function (msgId, fromAttribute, to, mediaUrl, mediaSize, isGroup) {
     console.log('processAudio');
-    var audioIcon = 'img/blank.png';
+    var audioIcon = 'img/blank.jpg';
     var self = this;
     var account = this.account;
     var media = {
@@ -679,7 +679,7 @@ App.connectors['coseme'] = function (account) {
   this.processLocation = function (msgId, fromAttribute, to, mediaPreview, name, mlatitude, mlongitude, isGroup) {
     Tools.log('processLocation');
     console.log(name);
-    var locationIcon = 'img/blank.png';
+    var locationIcon = 'img/blank.jpg';
     var self = this;
     var account = this.account;
     var media = {
