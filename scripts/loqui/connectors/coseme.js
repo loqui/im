@@ -32,7 +32,6 @@ App.connectors['coseme'] = function (account) {
       Tools.log("AUTH FAIL");
       this.connected = false;
       callback.authfail();
-      Lungo.Router.section('providers');
       Lungo.Notification.error(_('AuthInvalid'), _('AuthInvalidNotice'), 'warning-sign', 8);
     }.bind(this));
     MI.call(method, params);
