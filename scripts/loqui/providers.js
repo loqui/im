@@ -143,7 +143,7 @@ var Providers = {
       a.prepend(img);
       li.append(a);
       ul.append(li);
-      var section = $('<section/>').attr('id', provider).addClass('setup').data('transition', 'slide');
+      var section = $('<section/>').attr('id', provider).addClass('setup').data('transition', 'simple');
       var article = $('<article/>').addClass('simple form');
       App.logForms[data.connector.type](article, provider, data);
       section.append(article);
