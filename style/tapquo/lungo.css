@@ -493,6 +493,11 @@ aside[data-aside-left="show"]{-webkit-animation-name:asideLeftHide;-moz-animatio
 }@keyframes asideLeftHide{0%{-webkit-transform:translateX(0);-moz-transform:translateX(0);-ms-transform:translateX(0);-o-transform:translateX(0);transform:translateX(0)}
 100%{-webkit-transform:translateX(-5rem);-moz-transform:translateX(-5rem);-ms-transform:translateX(-5rem);-o-transform:translateX(-5rem);transform:translateX(-5rem)}
 }
+body[data-device="phone"] > section[data-transition="simple"]{-webkit-transform-origin:100% 100%;-moz-transform-origin:100% 100%;-ms-transform-origin:100% 100%;-o-transform-origin:100% 100%;transform-origin:100% 100%;}
+body[data-device="phone"] > section[data-transition="simple"][data-direction="in"]{z-index:2;-webkit-animation-name:phoneSimpleIn;-moz-animation-name:phoneSimpleIn;-ms-animation-name:phoneSimpleIn;-o-animation-name:phoneSimpleIn;animation-name:phoneSimpleIn}
+body[data-device="phone"] > section[data-transition="simple"][data-direction="out"]{z-index:1;-webkit-animation-name:phoneSimpleOut;-moz-animation-name:phoneSimpleOut;-ms-animation-name:phoneSimpleOut;-o-animation-name:phoneSimpleOut;animation-name:phoneSimpleOut;-webkit-animation-timing-function:step-end;-moz-animation-timing-function:step-end;-ms-animation-timing-function:step-end;-o-animation-timing-function:step-end;animation-timing-function:step-end}
+body[data-device="phone"] > section[data-transition="simple"][data-direction="back-in"]{z-index:1;-webkit-animation-name:phoneSimpleBackIn;-moz-animation-name:phoneSimpleBackIn;-ms-animation-name:phoneSimpleBackIn;-o-animation-name:phoneSimpleBackIn;animation-name:phoneSimpleBackIn}
+body[data-device="phone"] > section[data-transition="simple"][data-direction="back-out"]{z-index:2;-webkit-animation-name:phoneSimpleBackOut;-moz-animation-name:phoneSimpleBackOut;-ms-animation-name:phoneSimpleBackOut;-o-animation-name:phoneSimpleBackOut;animation-name:phoneSimpleBackOut}
 body[data-device="phone"] > section[data-transition="slide"]{-webkit-transform-origin:100% 100%;-moz-transform-origin:100% 100%;-ms-transform-origin:100% 100%;-o-transform-origin:100% 100%;transform-origin:100% 100%;}
 body[data-device="phone"] > section[data-transition="slide"][data-direction="in"]{z-index:2;-webkit-animation-name:phoneSlideIn;-moz-animation-name:phoneSlideIn;-ms-animation-name:phoneSlideIn;-o-animation-name:phoneSlideIn;animation-name:phoneSlideIn}
 body[data-device="phone"] > section[data-transition="slide"][data-direction="out"]{z-index:1;-webkit-animation-name:phoneSlideOut;-moz-animation-name:phoneSlideOut;-ms-animation-name:phoneSlideOut;-o-animation-name:phoneSlideOut;animation-name:phoneSlideOut}
@@ -507,7 +512,42 @@ body[data-device="phone"] > section[data-transition="fade"][data-direction="in"]
 body[data-device="phone"] > section[data-transition="fade"][data-direction="out"]{-webkit-animation-name:phoneFadeOut;-moz-animation-name:phoneFadeOut;-ms-animation-name:phoneFadeOut;-o-animation-name:phoneFadeOut;animation-name:phoneFadeOut}
 body[data-device="phone"] > section[data-transition="fade"][data-direction="back-in"]{-webkit-animation-name:phoneFadeIn;-moz-animation-name:phoneFadeIn;-ms-animation-name:phoneFadeIn;-o-animation-name:phoneFadeIn;animation-name:phoneFadeIn}
 body[data-device="phone"] > section[data-transition="fade"][data-direction="back-out"]{-webkit-animation-name:phoneFadeOut;-moz-animation-name:phoneFadeOut;-ms-animation-name:phoneFadeOut;-o-animation-name:phoneFadeOut;animation-name:phoneFadeOut}
-@-moz-keyframes phoneSlideOut{0%{-webkit-transform:translateZ(0);-moz-transform:translateZ(0);-ms-transform:translateZ(0);-o-transform:translateZ(0);transform:translateZ(0)}
+@-moz-keyframes phoneSimpleOut{0%{-webkit-transform:translateX(0);-moz-transform:translateX(0);-ms-transform:translateX(0);-o-transform:translateX(0);transform:translateX(0)}
+100%{-webkit-transform:translateX(110%);-moz-transform:translateX(110%);-ms-transform:translateX(110%);-o-transform:translateX(110%);transform:translateX(110%)}
+}@-moz-keyframes phoneSimpleIn{0%{-webkit-transform:translateX(110%);-moz-transform:translateX(110%);-ms-transform:translateX(110%);-o-transform:translateX(110%);transform:translateX(110%)}
+100%{-webkit-transform:translateX(0);-moz-transform:translateX(0);-ms-transform:translateX(0);-o-transform:translateX(0);transform:translateX(0)}
+}@-moz-keyframes phoneSimpleBackOut{0%{-webkit-transform:translateX(0);-moz-transform:translateX(0);-ms-transform:translateX(0);-o-transform:translateX(0);transform:translateX(0)}
+100%{-webkit-transform:translateX(110%);-moz-transform:translateX(110%);-ms-transform:translateX(110%);-o-transform:translateX(110%);transform:translateX(110%)}
+}@-moz-keyframes phoneSimpleBackIn{100%{-webkit-transform:translateX(0);-moz-transform:translateX(0);-ms-transform:translateX(0);-o-transform:translateX(0);transform:translateX(0)}
+}@-webkit-keyframes phoneSimpleOut{0%{-webkit-transform:translateX(0);-moz-transform:translateX(0);-ms-transform:translateX(0);-o-transform:translateX(0);transform:translateX(0)}
+100%{-webkit-transform:translateX(110%);-moz-transform:translateX(110%);-ms-transform:translateX(110%);-o-transform:translateX(110%);transform:translateX(110%)}
+}@-webkit-keyframes phoneSimpleIn{0%{-webkit-transform:translateX(110%);-moz-transform:translateX(110%);-ms-transform:translateX(110%);-o-transform:translateX(110%);transform:translateX(110%)}
+100%{-webkit-transform:translateX(0);-moz-transform:translateX(0);-ms-transform:translateX(0);-o-transform:translateX(0);transform:translateX(0)}
+}@-webkit-keyframes phoneSimpleBackOut{0%{-webkit-transform:translateX(0);-moz-transform:translateX(0);-ms-transform:translateX(0);-o-transform:translateX(0);transform:translateX(0)}
+100%{-webkit-transform:translateX(110%);-moz-transform:translateX(110%);-ms-transform:translateX(110%);-o-transform:translateX(110%);transform:translateX(110%)}
+}@-webkit-keyframes phoneSimpleBackIn{100%{-webkit-transform:translateX(0);-moz-transform:translateX(0);-ms-transform:translateX(0);-o-transform:translateX(0);transform:translateX(0)}
+}@-o-keyframes phoneSimpleOut{0%{-webkit-transform:translateX(0);-moz-transform:translateX(0);-ms-transform:translateX(0);-o-transform:translateX(0);transform:translateX(0)}
+100%{-webkit-transform:translateX(110%);-moz-transform:translateX(110%);-ms-transform:translateX(110%);-o-transform:translateX(110%);transform:translateX(110%)}
+}@-o-keyframes phoneSimpleIn{0%{-webkit-transform:translateX(110%);-moz-transform:translateX(110%);-ms-transform:translateX(110%);-o-transform:translateX(110%);transform:translateX(110%)}
+100%{-webkit-transform:translateX(0);-moz-transform:translateX(0);-ms-transform:translateX(0);-o-transform:translateX(0);transform:translateX(0)}
+}@-o-keyframes phoneSimpleBackOut{0%{-webkit-transform:translateX(0);-moz-transform:translateX(0);-ms-transform:translateX(0);-o-transform:translateX(0);transform:translateX(0)}
+100%{-webkit-transform:translateX(110%);-moz-transform:translateX(110%);-ms-transform:translateX(110%);-o-transform:translateX(110%);transform:translateX(110%)}
+}@-o-keyframes phoneSimpleBackIn{100%{-webkit-transform:translateX(0);-moz-transform:translateX(0);-ms-transform:translateX(0);-o-transform:translateX(0);transform:translateX(0)}
+}@-ms-keyframes phoneSimpleOut{0%{-webkit-transform:translateX(0);-moz-transform:translateX(0);-ms-transform:translateX(0);-o-transform:translateX(0);transform:translateX(0)}
+100%{-webkit-transform:translateX(110%);-moz-transform:translateX(110%);-ms-transform:translateX(110%);-o-transform:translateX(110%);transform:translateX(110%)}
+}@-ms-keyframes phoneSimpleIn{0%{-webkit-transform:translateX(110%);-moz-transform:translateX(110%);-ms-transform:translateX(110%);-o-transform:translateX(110%);transform:translateX(110%)}
+100%{-webkit-transform:translateX(0);-moz-transform:translateX(0);-ms-transform:translateX(0);-o-transform:translateX(0);transform:translateX(0)}
+}@-ms-keyframes phoneSimpleBackOut{0%{-webkit-transform:translateX(0);-moz-transform:translateX(0);-ms-transform:translateX(0);-o-transform:translateX(0);transform:translateX(0)}
+100%{-webkit-transform:translateX(110%);-moz-transform:translateX(110%);-ms-transform:translateX(110%);-o-transform:translateX(110%);transform:translateX(110%)}
+}@-ms-keyframes phoneSimpleBackIn{100%{-webkit-transform:translateX(0);-moz-transform:translateX(0);-ms-transform:translateX(0);-o-transform:translateX(0);transform:translateX(0)}
+}@keyframes phoneSimpleOut{0%{-webkit-transform:translateX(0);-moz-transform:translateX(0);-ms-transform:translateX(0);-o-transform:translateX(0);transform:translateX(0)}
+100%{-webkit-transform:translateX(110%);-moz-transform:translateX(110%);-ms-transform:translateX(110%);-o-transform:translateX(110%);transform:translateX(110%)}
+}@keyframes phoneSimpleIn{0%{-webkit-transform:translateX(110%);-moz-transform:translateX(110%);-ms-transform:translateX(110%);-o-transform:translateX(110%);transform:translateX(110%)}
+100%{-webkit-transform:translateX(0);-moz-transform:translateX(0);-ms-transform:translateX(0);-o-transform:translateX(0);transform:translateX(0)}
+}@keyframes phoneSimpleBackOut{0%{-webkit-transform:translateX(0);-moz-transform:translateX(0);-ms-transform:translateX(0);-o-transform:translateX(0);transform:translateX(0)}
+100%{-webkit-transform:translateX(110%);-moz-transform:translateX(110%);-ms-transform:translateX(110%);-o-transform:translateX(110%);transform:translateX(110%)}
+}@keyframes phoneSimpleBackIn{100%{-webkit-transform:translateX(0);-moz-transform:translateX(0);-ms-transform:translateX(0);-o-transform:translateX(0);transform:translateX(0)}
+}@-moz-keyframes phoneSlideOut{0%{-webkit-transform:translateZ(0);-moz-transform:translateZ(0);-ms-transform:translateZ(0);-o-transform:translateZ(0);transform:translateZ(0)}
 100%{-webkit-transform:rotateY(-15deg);-moz-transform:rotateY(-15deg);-ms-transform:rotateY(-15deg);-o-transform:rotateY(-15deg);transform:rotateY(-15deg);opacity:.25}
 }@-webkit-keyframes phoneSlideOut{0%{-webkit-transform:translateZ(0);-moz-transform:translateZ(0);-ms-transform:translateZ(0);-o-transform:translateZ(0);transform:translateZ(0)}
 100%{-webkit-transform:rotateY(-15deg);-moz-transform:rotateY(-15deg);-ms-transform:rotateY(-15deg);-o-transform:rotateY(-15deg);transform:rotateY(-15deg);opacity:.25}
