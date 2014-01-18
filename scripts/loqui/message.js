@@ -40,14 +40,6 @@ var Message = function (account, core) {
       this.account.chats.push(chat);
       this.account.core.chats.push(chat.core);
     }
-    if ($('section#chat').data('jid') == chatJid && $('section#chat').hasClass('show')) {
-      var ul = $('section#chat ul#messages');
-      var li = ul.children('li:last-child');
-      li.append(this.preRender());
-      ul[0].scrollTop = ul[0].scrollHeight;
-    } else {
-      chat.core.unread++;
-    }
     var pic = App.avatars[chatJid];
     var callback = function () {
       message.account.show();
@@ -67,11 +59,26 @@ var Message = function (account, core) {
     } else {
       App.notify({ subject: subject, text: message.core.text || altText, pic: 'https://raw.github.com/loqui/im/master/img/foovatar.png', callback: callback }, 'received');
     }
-    chat.messageAppend.push({msg: message.core}, function (err) { });
+    chat.messageAppend.push({msg: message.core}, function (blockIndex) {
+      if ($('section#chat').data('jid') == chatJid && $('section#chat').hasClass('show')) {
+        var ul = $('section#chat ul#messages');
+        var li = ul.children('li[data-chunk="' + blockIndex + '"]');
+        if (li.length) {
+          li.append(message.preRender());
+        } else {
+          var li = $('<li/>').addClass('chunk').data('chunk', blockIndex);
+          li.append(message.preRender());
+          ul.append(li);
+        }
+        ul[0].scrollTop = ul[0].scrollHeight;   
+      } else {
+        chat.core.unread++;
+      }
+    });
   }
 
   this.addToChat = function () {
-    var self = this;
+    var message = this;
     var account = this.account;
     var to = this.core.to;
     var chatIndex = account.chatFind(to);
@@ -92,25 +99,30 @@ var Message = function (account, core) {
     account.chats.push(chat);
     account.core.chats.push(chat.core);
 
-    var ul = $('section#chat ul#messages');
-    var li = ul.children('li:last-child');
-    li.append(self.preRender(self.core.id));
-    ul[0].scrollTop = ul[0].scrollHeight;
-    
-    chat.messageAppend.push({msg: self.core}, function (err) { });
+    chat.messageAppend.push({msg: message.core}, function (blockIndex) {
+      if ($('section#chat').data('jid') == to && $('section#chat').hasClass('show')) {
+        var ul = $('section#chat ul#messages');
+        var li = ul.children('li[data-chunk="' + blockIndex + '"]');
+        if (li.length) {
+          li.append(message.preRender());
+        } else {
+          var li = $('<li/>').addClass('chunk').data('chunk', blockIndex);
+          li.append(message.preRender());
+          ul.append(li);
+        }
+        ul[0].scrollTop = ul[0].scrollHeight;   
+      }
+    });
   }
   
   // Represent this message in HTML
   this.preRender = function (index) {
-    var self = this;
+    var message = this;
     var account = this.account;
     if (this.core.text) {
       var html = App.emoji[Providers.data[this.account.core.provider].emoji].fy(Tools.urlHL(Tools.HTMLescape(this.core.text)));
     } else if (this.core.media) {
       var html = $('<img/>').attr('src', this.core.media.thumb).data('url', this.core.media.url).data('downloaded', this.core.media.downloaded || false);
-      if (index) {
-        html.data('index', index);
-      }
       switch (this.core.media.type) {
         case 'url':
           html.addClass('maps');
@@ -120,7 +132,7 @@ var Message = function (account, core) {
               name: "view",
               data: {
                 type: "url",
-                url: self.core.media.url
+                url: message.core.media.url
               }
             });
           };
@@ -149,7 +161,7 @@ var Message = function (account, core) {
               Tools.fileGet(url, function (blob) {
                 Store.SD.save(localUrl, blob, function () {
                   open(blob);
-                  var index = [$(img).closest('li[data-chunk]').data('chunk'), img.dataset.index];
+                  var index = [$(img).closest('li[data-chunk]').data('chunk'), $(img).closest('div[data-index]').data('index')];
                   Store.recover(index[0], function (chunk) {
                     Tools.log(chunk, index);
                     chunk[index[1]].media.downloaded = true;
@@ -182,6 +194,9 @@ var Message = function (account, core) {
     var name = type == 'in' ? ((contact ? (contact.name || contact.jid) : (this.core.pushName || this.core.from))).split(' ')[0] : _('Me');
     var day = Tools.day(this.core.stamp);
     var div = $('<div/>').data('type', type);
+    var index = index || parseInt($('section#chat ul#messages li > div').last().data('index')) + 1;
+    index = index >= App.defaults.Chat.chunkSize ? 0 : index;
+    div.data('index', index);
     if (this.core.id) {
       div.data('id', this.core.id);
     }
