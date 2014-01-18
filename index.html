@@ -15,7 +15,6 @@
     <link rel='stylesheet' href='style/tapquo/lungo.icon.css'>
     <link rel='stylesheet' href='style/tapquo/lungo.theme.css'>
     <link rel='stylesheet' href='style/loqui/index.css'>
-    <link rel='stylesheet' href='style/console/console.css'>
     <link rel='prefetch' type='application/l10n' href='l10n/main.ini' />
     <link rel='shortcut icon' href='img/icon-32.png' type='image/png' />
 </head>
@@ -246,6 +245,22 @@
         <a class='videocall' data-menu-onclick='videocall' data-icon='video' data-l10n-id='VideoCall'>VideoCall</a>-->
     </nav>
   </section>
+  <div id='debugConsole'>
+    <div id='showConsole'>
+     <img src='img/console-active.png' >
+    </div>
+    <div id='hideConsole'>
+     <img src='img/console-inactive.png' >
+    </div>
+    <div id='console' >
+      <div id='backgroundConsole'></div>
+      <div id='bodyConsole'>
+        <p id='consoleTitle' data-l10n-id='consoleTitle'>Console:</p>
+        <button id='consoleClear' data-l10n-id='consoleClear'>Clear</button>
+        <div id='logConsole' >...</div>
+      </div>
+    </div>
+  </div>
   <aside id='accounts'>
     <article id='chats' class='active list'>
       <button data-menu-onclick='settings' class='settings account' data-image='img/providers/squares/settings.svg'></button>
@@ -294,23 +309,5 @@
   <script type='text/javascript' src='scripts/loqui/tools.js'></script>
   <script type='text/javascript' src='scripts/loqui/connectors/xmpp.js'></script>
   <script type='text/javascript' src='scripts/loqui/connectors/coseme.js'></script>
-  <script type='text/javascript' src='scripts/console/console.js'></script>
-  <div id='debugConsole'>
-    <div id='mostrarconsola'>
-		<img src='img/flechaconsola.png' >
-	</div>
-
-	<div  id='consola' >
-		<div id='fondo'></div>
-		<div id='frente'>
-			<div id='titulo'>Consola:</div>
-			<div id='limpiar'>Limpiar</div>
-			<br> <hr />
-			<div id='mensajeconsola' >
-			...
-			</div>
-		</div>
-	</div>
-  </div>
 </body>
 </html>
