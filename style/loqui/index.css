@@ -655,6 +655,18 @@ section#chat ul#messages li div[data-media-type="video"]:after {
   left: calc(50% - 2rem);
   top: calc(50% - 2rem);
 }
+section#chat ul#messages li div[data-media-type="audio"]:after {
+  content: url(../../img/audio.png);
+  position: absolute;
+  left: calc(50% - 2rem);
+  top: calc(50% - 2rem);
+}
+section#chat ul#messages li div[data-media-type="url"]:after {
+  content: url(../../img/location.png);
+  position: absolute;
+  left: calc(50% - 2rem);
+  top: calc(50% - 2rem);
+}
 section#chat article#emoji {
   padding: 1rem;
 }
