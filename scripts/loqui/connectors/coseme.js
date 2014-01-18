@@ -33,7 +33,6 @@ App.connectors['coseme'] = function (account) {
       Tools.log("AUTH FAIL");
       this.connected = false;
       callback.authfail();
-      Lungo.Router.section('providers');
       Lungo.Notification.error(_('AuthInvalid'), _('AuthInvalidNotice'), 'warning-sign', 8);
     }.bind(this));
     MI.call(method, params);
@@ -335,6 +334,7 @@ App.connectors['coseme'] = function (account) {
       var date = new Date(stamp);
       var stamp = Tools.localize(Tools.stamp(stamp));
       var msg = new Message(account, {
+        id: id,
         from: from,
         to: to,
         text: body,
@@ -409,17 +409,17 @@ App.connectors['coseme'] = function (account) {
   
   this.events.onMessageSent = function (from, msgId) {
     Tools.log('SENT', from, msgId);
-    $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"]').data('receipt', 'sent');
+    $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"][data-type="out"]').data('receipt', 'sent');
   }
 
   this.events.onMessageDelivered = function (from, msgId) {
     Tools.log('DELIVERED', from, msgId);
-    $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"]').data('receipt', 'delivered');
+    $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"][data-type="out"]').data('receipt', 'delivered');
   }
   
   this.events.onMessageVisible = function (from, msgId) {
     Tools.log('VISIBLE', from, msgId);
-    $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"]').data('receipt', 'visible');
+    $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"][data-type="out"]').data('receipt', 'visible');
   }
 
   this.events.onGroupInfoError = function (jid, owner, subject, subjectOwner, subjectTime, creation) {
@@ -475,7 +475,7 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.events.onGroupMessage = function (msgId, from, author, data, stamp, wantsReceipt, pushName) {
-    console.log('GROUPMESSAGE', msgId, from, author, data, stamp, wantsReceipt, pushName);
+    Tools.log('GROUPMESSAGE', msgId, from, author, data, stamp, wantsReceipt, pushName);
     var account = this.account;
     var to = from;
     var from = author;
@@ -532,7 +532,7 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.events.onUploadRequestSuccess = function (hash, url, resumeFrom) {
-    console.log('onUploadRequest!');
+    Tools.log('onUploadRequest!');
     var self = this;
     var media = CoSeMe.media;
     var account = this.account;
@@ -558,7 +558,7 @@ App.connectors['coseme'] = function (account) {
               method,
               [toJID, url, hash, '0', data.split(',').pop()]
             );
-            self.addMediaMessageToChat(type, data, url, account.core.user, toJID, Tools.guid());
+            self.addMediaMessageToChat(type, data, url, account.core.user, toJID, Math.floor((new Date).getTime() / 1000) + '-1');
             App.audio('sent');
           });
         })
@@ -629,7 +629,7 @@ App.connectors['coseme'] = function (account) {
   }
 
   this.processFile = function (fileType, msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, isGroup) {
-    console.log('Processing file');
+    Tools.log('Processing file');
     var self = this;
     //var type = mediaUrl.split('.').pop();
     //type = Tools.getFileType(type);
@@ -646,6 +646,7 @@ App.connectors['coseme'] = function (account) {
       };
       var stamp = Tools.localize(Tools.stamp());
       var msgObj = {
+        id: msgId,
         from: fromAttribute,
         to: to,
         media: media,
@@ -658,7 +659,7 @@ App.connectors['coseme'] = function (account) {
       msg.receive(isGroup);
       self.ack(msgId, fromAttribute);
     });
-    console.log('EndingProcessing');
+    Tools.log('EndingProcessing');
     return true;
   }
 
@@ -683,7 +684,7 @@ App.connectors['coseme'] = function (account) {
     msg.receive();
     self.ack(msgId, fromAttribute);
 
-    console.log('Audio message processed');
+    Tools.log('Audio message processed');
     return true;
   }
 
