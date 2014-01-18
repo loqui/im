@@ -17,6 +17,7 @@ App.connectors['coseme'] = function (account) {
   this.chat = {};
   this.contacts = {};
   this.connected = false;
+  this.failStamps = [];
   
   this.connect = function (callback) {
     var callback = callback;
@@ -302,12 +303,22 @@ App.connectors['coseme'] = function (account) {
   
   this.events.onDisconnected = function () {
     if (App.online) {
+      var connector = this;
       this.connect({
         connected: function () {
           Tools.log('RECONNECTED');
         },
         authfail: function () {
           Tools.log('FAILED TO RECONNECT');
+          connector.failStamps.push(new Date);
+          var time = Math.floor(connector.failStamps.slice(-3).reduce(function (total, cur, i, all) {
+            var diff = all[i] - all[i-1];
+            var ret = total + diff || 0;
+            return ret;
+          }, 0) / 1000);
+          if (time < 30) {
+            location.reload();
+          }
         }
       });
     }
