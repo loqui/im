@@ -624,6 +624,17 @@ section#chat ul#messages > li > div[data-type='out'][data-receipt='delivered']:a
   top: .3rem;
   left: -.9rem;
 }
+section#chat ul#messages > li > div[data-type='out'][data-receipt='notsent']:after {
+  content: "";
+  display: block;
+  width: .5rem;
+  height: .5rem;
+  border-radius: 50%;
+  background-color: #E23939;
+  position: absolute;
+  top: .3rem;
+  left: -.9rem;
+}
 section#chat ul#messages > li:last-child {
   margin-bottom: 3.5rem;
 }
