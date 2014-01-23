@@ -353,22 +353,22 @@ App.connectors['coseme'] = function (account) {
   this.events.onImageReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast) {
     var to = this.account.core.fullJid;
     var isGroup = false;
-    return this.processFile('image', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, isGroup);
+    return this.mediaProcess('image', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, isGroup);
   }
 
   this.events.onVideoReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast) {
     var to = this.account.core.fullJid;
-    return this.processFile('video', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, false);
+    return this.mediaProcess('video', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, false);
   }
 
   this.events.onAudioReceived = function (msgId, fromAttribute, mediaUrl, mediaSize, wantsReceipt, isBroadcast) {
     var to = this.account.core.fullJid;
-    return this.processAudio(msgId, fromAttribute, to, mediaUrl, mediaSize, false);
+    return this.mediaProcess('audio', msgId, fromAttribute, to, null, mediaUrl, mediaSize, false);
   }
 
   this.events.onLocationReceived = function (msgId, fromAttribute, name, mediaPreview, mlatitude, mlongitude, wantsReceipt, isBroadcast) {
     var to = this.account.core.fullJid;
-    return this.processLocation(msgId, fromAttribute, to, mediaPreview, name, mlatitude, mlongitude, false);
+    return this.mediaProcess('location', msgId, fromAttribute, to, [mlatitude, mlongitude, name], null, null, false);
   }
   
   this.events.onAvatar = function (jid, picId, blob) {
@@ -500,29 +500,25 @@ App.connectors['coseme'] = function (account) {
   this.events.onGroupImageReceived = function (msgId, fromAttribute, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt) {
     var to = fromAttribute;
     var fromAttribute = author;
-    var isGroup = true;
-    return this.processFile('image', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, isGroup);
-  }
-
-  this.events.onGroupAudioReceived = function (msgId, fromAttribute, author, mediaUrl, mediaSize, wantsReceipt) {
-    var to = fromAttribute;
-    var fromAttribute = author;
-    var isGroup = true;
-    return this.processAudio(msgId, fromAttribute, to, mediaUrl, mediaSize, isGroup);
-  }
-
-  this.events.onGroupLocationReceived = function (msgId, fromAttribute, author, name, mediaPreview, mlatitude, mlongitude, wantsReceipt) {
-    var to = fromAttribute;
-    var fromAttribute = author;
-    var isGroup = true;
-    return this.processLocation(msgId, fromAttribute, to, mediaPreview, name, mlatitude, mlongitude, isGroup);
+    return this.mediaProcess('image', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, true);
   }
 
   this.events.onGroupVideoReceived = function (msgId, fromAttribute, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt) {
     var to = fromAttribute;
     var fromAttribute = author;
-    var isGroup = true;
-    return this.processFile('video', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, isGroup);
+    return this.mediaProcess('video', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, true);
+  }
+
+  this.events.onGroupAudioReceived = function (msgId, fromAttribute, author, mediaUrl, mediaSize, wantsReceipt) {
+    var to = fromAttribute;
+    var fromAttribute = author;
+    return this.mediaProcess('audio', msgId, fromAttribute, to, null, mediaUrl, mediaSize, true);
+  }
+
+  this.events.onGroupLocationReceived = function (msgId, fromAttribute, author, name, mediaPreview, mlatitude, mlongitude, wantsReceipt) {
+    var to = fromAttribute;
+    var fromAttribute = author;
+    return this.mediaProcess('location', fromAttribute, to, [mlatitude, mlongitude, name], null, null, true);
   }
   
   this.events.onPresenceUpdated = function (jid, lastSeen) {
@@ -537,31 +533,32 @@ App.connectors['coseme'] = function (account) {
     var media = CoSeMe.media;
     var account = this.account;
     Store.get(hash, function (obj) {
-      var type, method = null;
+      var type, method, thumbnailer = null;
       if (obj.data.indexOf(':image') > 0) {
         type = 'image';
         method = 'message_imageSend';
+        thumbnailer = Tools.picThumb;
       } else if (obj.data.indexOf(':video') > 0) {
         type = 'video';
         method = 'message_videoSend';
+        thumbnailer = Tools.vidThumb;
       } else if (obj.data.indexOf(':audio') > 0) {
         type = 'audio';
         method = 'message_audioSend';
+        thumbnailer = Tools.audThumb;
       }
       var toJID = obj.to;
       var blob = Tools.b64ToBlob(obj.data.split(',').pop(), obj.data.split(/[:;]/)[1]);
       var uploadUrl = url;
       var onSuccess = function (url) {
-        Tools.picUnblob(blob, 120, 120, function(data) {
-          Store.drop(hash, function() {
-            MI.call(
-              method,
-              [toJID, url, hash, '0', data.split(',').pop()]
-            );
-            self.addMediaMessageToChat(type, data, url, account.core.user, toJID, Math.floor((new Date).getTime() / 1000) + '-1');
-            App.audio('sent');
-          });
-        })
+        thumbnailer(blob, 120, 120, function(thumb) {
+          MI.call(
+            method,
+            [toJID, url, hash, '0', thumb.split(',').pop()]
+          );
+          self.addMediaMessageToChat(type, thumb, url, account.core.user, toJID, Math.floor((new Date).getTime() / 1000) + '-1');
+          App.audio('sent');
+        });
         Lungo.Notification.show('up-sign', _('Uploaded'), 1);
       };
       var onError = function (error) {
@@ -580,15 +577,12 @@ App.connectors['coseme'] = function (account) {
       media.upload(toJID, blob, uploadUrl, onSuccess, onError, onProgress);
     });
   }
-
   this.events.onUploadRequestFailed = function (hash) {
     Lungo.Notification.error(_('NotUploaded'), _('ErrorUploading'), 'warning-sign', 5);
   }
-
   this.events.onUploadRequestDuplicate = function (hash) {
     Lungo.Notification.error(_('NotUploaded'), _('DuplicatedUpload'), 'warning-sign', 5);
   }
-
   this.addMediaMessageToChat = function(type, data, url, from, to, id) {
     var account = this.account;
     var msgMedia = {
@@ -605,47 +599,20 @@ App.connectors['coseme'] = function (account) {
       media: msgMedia,
       stamp: stamp
     });
-
     msg.addToChat();
-
-    /*
-    var chatIndex = account.chatFind(to);
-
-    if (chatIndex > 0) {
-      var chat = account.chats[chatIndex];
-    } else {
-      var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', msg.core.from);
-      var chat = new Chat({
-        jid: to,
-        title: contact ? contact.name || to : to,
-        chunks: []
-      }, account);
-      account.chats.push(chat);
-      account.core.chats.push(chat.core);
-    }
-
-    msg.addToChat(chat);
-    */
   }
 
-  this.processFile = function (fileType, msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, isGroup) {
-    Tools.log('Processing file');
-    var self = this;
-    //var type = mediaUrl.split('.').pop();
-    //type = Tools.getFileType(type);
-    // Type siempre como 'image/jpeg' porque este solo se usa para el preview
-    var type = 'image/jpeg';
-    var account = this.account;
-    var image = CoSeMe.utils.aToBlob(mediaPreview, type);
-    Tools.picUnblob(image, 120, 120, function (url) {
+  this.mediaProcess = function (fileType, msgId, fromAttribute, to, payload, mediaUrl, mediaSize, isGroup) {
+    Tools.log('Processing file of type', fileType);
+    var process = function (thumb) {
       var media = {
         type: fileType,
-        thumb: url,
+        thumb: thumb,
         url: mediaUrl,
         downloaded: false
       };
       var stamp = Tools.localize(Tools.stamp());
-      var msgObj = {
+      var msg = {
         id: msgId,
         from: fromAttribute,
         to: to,
@@ -653,65 +620,26 @@ App.connectors['coseme'] = function (account) {
         stamp: stamp
       };
       if (isGroup) {
-        msgObj.pushName = fromAttribute;
+        msg.pushName = fromAttribute;
       }
-      var msg = new Message(account, msgObj);
+      var msg = new Message(this.account, msg);
       msg.receive(isGroup);
-      self.ack(msgId, fromAttribute);
-    });
-    Tools.log('EndingProcessing');
-    return true;
-  }
-
-  this.processAudio = function (msgId, fromAttribute, to, mediaUrl, mediaSize, isGroup) {
-    console.log('processAudio');
-    var audioIcon = 'img/blank.jpg';
-    var self = this;
-    var account = this.account;
-    var media = {
-      type: 'audio',
-      thumb: audioIcon,
-      url: mediaUrl,
-      downloaded: false
-    };
-    var stamp = Tools.localize(Tools.stamp());
-    var msg = new Message(account, {
-      from: fromAttribute,
-      to: to,
-      media: media,
-      stamp: stamp
-    });
-    msg.receive();
-    self.ack(msgId, fromAttribute);
-
-    Tools.log('Audio message processed');
-    return true;
-  }
-
-  this.processLocation = function (msgId, fromAttribute, to, mediaPreview, name, mlatitude, mlongitude, isGroup) {
-    Tools.log('processLocation');
-    console.log(name);
-    var locationIcon = 'img/blank.jpg';
-    var self = this;
-    var account = this.account;
-    var media = {
-      type: 'url',
-      thumb: locationIcon,
-      url: 'http://maps.google.com/maps?q='+mlatitude+','+mlongitude,
-      downloaded: false
-    };
-    var stamp = Tools.localize(Tools.stamp());
-    var msg = new Message(account, {
-      from: fromAttribute,
-      to: to,
-      media: media,
-      stamp: stamp
-    });
-    msg.receive();
-    self.ack(msgId, fromAttribute);
-
-    Tools.log('Location message processed');
-    return true;
+      this.ack(msgId, fromAttribute);
+      Tools.log('Finished processing file of type', fileType);
+    }.bind(this);
+    switch (fileType) {
+      case 'image':
+      case 'video':
+        Tools.picThumb(CoSeMe.utils.aToBlob(payload, 'i'), 120, 120, process);
+        break;
+      case 'audio':
+        process('img/blank.jpg');
+        break;
+      case 'location':
+        mediaUrl = 'https://maps.google.com/maps?q=' + payload[0] + ',' + payload[1],
+        process('img/blank.jpg');
+        break;
+    }
   }
     
 }

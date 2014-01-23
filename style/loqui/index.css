@@ -627,17 +627,18 @@ section#chat ul#messages > li > div[data-type='out'][data-receipt='delivered']:a
 section#chat ul#messages > li:last-child {
   margin-bottom: 3.5rem;
 }
+section#chat ul#messages > li:last-child {
+  margin-bottom: 3.5rem;
+}
 section#chat ul#messages span.text img.image {
-    width: calc(100%);
+    width: 100%;
     border-radius: .4rem;
 }
 section#chat ul#messages span.text img.audio{
-    width: calc(50%);
-    border-radius: .4rem;
+    width: 0;
 }
 section#chat ul#messages span.text img.maps{
-    width: calc(30%);
-    border-radius: .4rem;
+    width: 0;
 }
 section#chat ul#messages span.text img.image[data-downloaded=false] {
     opacity: .4;
@@ -649,23 +650,26 @@ section#chat ul#messages span.text img.video {
 section#chat ul#messages span.text img.video[data-downloaded=false] {
     opacity: .4;
 }
-section#chat ul#messages li div[data-media-type="video"]:after {
+section#chat ul#messages li div[data-media-type='video']:after {
   content: url(../../img/play.png);
   position: absolute;
+  width: 4rem;
   left: calc(50% - 2rem);
   top: calc(50% - 2rem);
 }
-section#chat ul#messages li div[data-media-type="audio"]:after {
+section#chat ul#messages li div[data-media-type='audio']:after {
+  display: block;
   content: url(../../img/audio.png);
-  position: absolute;
-  left: calc(50% - 2rem);
-  top: calc(50% - 2rem);
+  height: 6.8rem;
+  margin: -2.15rem -.7rem -.85rem -.7rem;
+  text-align: center;
 }
-section#chat ul#messages li div[data-media-type="url"]:after {
+section#chat ul#messages li div[data-media-type='url']:after {
+  display: block;
   content: url(../../img/location.png);
-  position: absolute;
-  left: calc(50% - 2rem);
-  top: calc(50% - 2rem);
+  height: 6.8rem;
+  margin: -2.15rem -.7rem -.85rem -.7rem;
+  text-align: center;
 }
 section#chat article#emoji {
   padding: 1rem;
