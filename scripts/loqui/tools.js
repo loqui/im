@@ -144,9 +144,9 @@ var Tools = {
     fr.readAsText(blob);
   },
   
-  picUnblob: function (blob, width, height, callback) {
+  picThumb: function (blob, width, height, callback) {
     var reader = new FileReader();
-    reader.onload = function (event) {
+    reader.onloadend = function (e) {
       var img = new Image();
       img.onload = function () {
         var canvas = document.createElement('canvas');
@@ -156,52 +156,51 @@ var Tools = {
         var url = canvas.toDataURL();
         callback(url);
       }
-      img.src = event.target.result;
+      img.src = reader.result;
     }
-    reader.onerror = function ( event ) {
-      Tools.log(event);
-    }
-    reader.readAsDataURL(blob);
-  },
-
-  vidUnblob: function (blob, width, height, callback) {
-    var reader = new FileReader();
-    reader.onload = function (event) {
-      var vid = new Video();
-      vid.onload = function () {
-        var canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        canvas.getContext('2d').drawVideo(vid, 0, 0, width, height);
-        var url = canvas.toDataURL();
-        callback(url);
-      }
-      vid.src = event.target.result;
-    }
-    reader.onerror = function ( event ) {
-      Tools.log(event);
+    reader.onerror = function (e) {
+      Tools.log(e);
     }
     reader.readAsDataURL(blob);
   },
 
-  audUnblob: function (blob, width, height, callback) {
-    var reader = new FileReader();
-    reader.onload = function (event) {
-      var aud = new Audio();
-      vid.onload = function () {
-        var canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        canvas.getContext('2d').drawAudio(aud, 0, 0, width, height);
-        var url = canvas.toDataURL();
-        callback(url);
-      }
-      aud.src = event.target.result;
+  vidThumb: function (blob, width, height, callback) {
+    var img = new Image();
+    img.onload = function () {
+      var canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      var url = canvas.toDataURL();
+      callback(url);
     }
-    reader.onerror = function ( event ) {
-      Tools.log(event);
+    img.src = 'img/video.png';
+  },
+
+  audThumb: function (blob, width, height, callback) {
+    var img = new Image();
+    img.onload = function () {
+      var canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      var url = canvas.toDataURL();
+      callback(url);
     }
-    reader.readAsDataURL(blob);
+    img.src = 'img/audio.png';
+  },
+  
+  locThumb: function (blob, width, height, callback) {
+    var img = new Image();
+    img.onload = function () {
+      var canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      var url = canvas.toDataURL();
+      callback(url);
+    }
+    img.src = 'img/location.png';
   },
 
   getFileType: function(type) {
@@ -263,7 +262,7 @@ var Tools = {
   },
 
   b64ToBlob: function(b64Data, contentType, sliceSize) {
-    var contentType = contentType | '';
+    var contentType = contentType || '';
     var sliceSize = sliceSize || 512;
     var byteCharacters = atob(b64Data);
     var byteArrays = [];
