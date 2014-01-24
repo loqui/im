@@ -33,15 +33,14 @@ var Geo = {
   
   error: function (err) {
     if (err.code == 1) {
-      Tools.log('The user denied the request for location information.')
+      Lungo.Notification.error(_('Error'), _('LocationDenied'), 'exclamation-sign');
     } else if (err.code == 2) {
-      Tools.log('Your location information is unavailable.')
+      Lungo.Notification.error(_('Error'), _('LocationUnavailable'), 'exclamation-sign');
     } else if (err.code == 3) {
-      Tools.log('The request to get your location timed out.')
+      Lungo.Notification.error(_('Error'), _('LocationTimedout'), 'exclamation-sign');
     } else {
-      Tools.log('An unknown error occurred while requesting your location.')
+      Lungo.Notification.error(_('Error'), null, 'exclamation-sign');
     }
-    Lungo.Notification.hide();
   },
   
   distance: function (a, b) {
