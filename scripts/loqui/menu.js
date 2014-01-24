@@ -84,6 +84,9 @@ var Menu = {
     audioSend: function () {
       Plus.audioSend();
     },
+    locationSend: function () {
+      Plus.locationSend();
+    },
     call: function () {
       $('section#chat nav#plus').removeClass('show');
       Lungo.Router.article('chat', 'call');
