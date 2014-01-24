@@ -52,6 +52,14 @@ var Menu = {
       var jid = $(obj).closest('section').data('jid');
       Messenger.accountRemove(jid);
     },
+    plus: function () {
+      var menu = $('section#chat nav#plus');
+      if (menu.hasClass('show')) {
+        menu.removeClass('show');
+      } else {
+        menu.addClass('show');
+      }
+    },
     emoji: function () {
       var account = Messenger.account();
       $('section#chat nav#plus').removeClass('show');
