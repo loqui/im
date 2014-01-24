@@ -54,6 +54,9 @@
     "device-storage:music": {
       "description": "Required for audio handling",
       "access": "readwrite"
-    }
+    },
+	  "geolocation": {
+	    "description": "Required for sending location messages to other users"
+	  }
   }
 }
