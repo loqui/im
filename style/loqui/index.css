@@ -826,6 +826,9 @@ section#chat[data-lacks~=videoSend] a.video {
 section#chat[data-lacks~=audioSend] a.audio {
   display: none!important;
 }
+section#chat[data-lacks~=locationSend] a.location {
+  display: none!important;
+}
 section#me div#status input {
   width: 100%;
   height: 2.4rem;
