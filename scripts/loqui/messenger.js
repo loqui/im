@@ -111,9 +111,9 @@ var Messenger = {
       section.find('#participants h2').text(_('NumParticipants', {number: chat.core.participants.length}));
       var partUl = section.find('#participants ul').empty();
       for (var i in chat.core.participants) {
-        var jid = chat.core.participants[i];
-        var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
-        partUl.append($('<li/>').text(contact ? contact.name : jid.split('@')[0]));
+        var participantJid = chat.core.participants[i];
+        var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', participantJid);
+        partUl.append($('<li/>').text(contact ? contact.name : participantJid.split('@')[0]));
       }
     }
     if (App.avatars[jid]) {
