@@ -130,8 +130,34 @@ var Store = {
           }
         });
       }
+    },
+      
+    copy : function (from, to, onsuccess, onerror) {
+      if (this.card) {
+        var req = this.card.get(from);
+        req.onsuccess = function () {
+          Store.SD.save(to, this.result, onsuccess, onerror);
+        }
+        req.onerror = function () {
+          if (onerror) {
+            onerror(this.error);
+            Lungo.Notification.error(_('Error'), _('NoSDAccess'), 'cloud-download', 5);
+          }
+        }
+      } else {
+        Tools.log('DS IS NOT SUPPORTED');
+        Store.get('fakesdcard_' + from, function (value) {
+          if (value) {
+            Store.put('fakesdcard_' + to, value, onsuccess);
+          } else {
+            if (onerror) {
+              onerror();
+            }
+          }
+        });
+      }
     }
     
   }
-  
+      
 }
