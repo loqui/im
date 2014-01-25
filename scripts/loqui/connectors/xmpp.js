@@ -228,6 +228,9 @@ App.connectors['XMPP'] = function (account) {
     }
   }.bind(this);
   
+  this.events.onDisconnected = function () {
+  }
+  
   this.events.onMessage = function (stanza) {
     var account = this.account;
     var tree = $(stanza);
