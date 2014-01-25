@@ -552,12 +552,15 @@ App.connectors['coseme'] = function (account) {
       var uploadUrl = url;
       var onSuccess = function (url) {
         thumbnailer(blob, 120, 120, function(thumb) {
-          MI.call(
+          var id = MI.call(
             method,
             [toJID, url, hash, '0', thumb.split(',').pop()]
           );
           self.addMediaMessageToChat(type, thumb, url, account.core.user, toJID, Math.floor((new Date).getTime() / 1000) + '-1');
           App.audio('sent');
+          var ext = url.split('.').pop();
+          var localUrl = App.pathFiles + Tools.localize(Tools.stamp(id)).replace(/[-:]/g, '') + url.split('/').pop().substring(0, 5).toUpperCase() + '.' + ext;
+          Store.SD.save(localUrl, blob);
         });
         Lungo.Notification.show('up-sign', _('Uploaded'), 1);
       };
