@@ -35,6 +35,9 @@ App.connectors['coseme'] = function (account) {
       callback.authfail();
       Lungo.Notification.error(_('AuthInvalid'), _('AuthInvalidNotice'), 'warning-sign', 8);
     }.bind(this));
+    SI.registerListener('disconnected', function () {
+      callback.disconnected();
+    });
     MI.call(method, params);
   }
   
@@ -281,7 +284,7 @@ App.connectors['coseme'] = function (account) {
       profile_setStatusSuccess: null,
       ping: this.events.onPing,
       pong: null,
-      disconnected: this.events.onDisconnected,
+      disconnected: null,
       media_uploadRequestSuccess: this.events.onUploadRequestSuccess,
       media_uploadRequestFailed: this.events.onUploadRequestFailed,
       media_uploadRequestDuplicate: this.events.onUploadRequestDuplicate
@@ -302,26 +305,6 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.events.onDisconnected = function () {
-    if (App.online) {
-      var connector = this;
-      this.connect({
-        connected: function () {
-          Tools.log('RECONNECTED');
-        },
-        authfail: function () {
-          Tools.log('FAILED TO RECONNECT');
-          connector.failStamps.push(new Date);
-          var time = Math.floor(connector.failStamps.slice(-3).reduce(function (total, cur, i, all) {
-            var diff = all[i] - all[i-1];
-            var ret = total + diff || 0;
-            return ret;
-          }, 0) / 1000);
-          if (time < 30) {
-            location.reload();
-          }
-        }
-      });
-    }
   }
   
   this.events.onMessage = function (id, from, body, stamp, e, nick, g) {
