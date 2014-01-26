@@ -190,7 +190,11 @@ var Account = function (core) {
         li.append($('<span/>').addClass('show').addClass('backchange'));
         li.append($('<span/>').addClass('unread').text(chat.unread));
         li.data('unread', chat.unread ? 1 : 0);
-        li.data('muc', (account.supports('muc') && chat.jid.substring(1).match(/\-/)) ? true : false);
+        if (!chat.muc && account.supports('muc') && chat.jid.substring(1).match(/\-/)) {
+          account.chats[i].core.muc = true;
+          account.chats[i].save();
+        }
+        li.data('muc', chat.muc ? true : false);
         li.bind('click', function () {
           var ci = account.chatFind(this.dataset.jid);
           if (ci >= 0) {
