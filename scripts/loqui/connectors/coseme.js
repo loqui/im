@@ -227,6 +227,16 @@ App.connectors['coseme'] = function (account) {
     reader.readAsBinaryString(blob);
   }
   
+  this.locationSend = function (jid, loc) {
+    var self = this;
+    Tools.locThumb(loc, 120, 120, function (thumb) {
+      var method = 'message_locationSend';
+      MI.call(method, [jid, loc.lat, loc.long, thumb]);
+      self.addMediaMessageToChat('url', thumb, 'https://maps.google.com/maps?q=' + loc.lat + ',' + loc.long, account.core.user, jid, Math.floor((new Date).getTime() / 1000) + '-1');
+      App.audio('sent');
+    });
+  }
+  
   this.handlers.init = function () {
     Tools.log('HANDLERS INIT');
     var signals = {
@@ -349,7 +359,7 @@ App.connectors['coseme'] = function (account) {
 
   this.events.onLocationReceived = function (msgId, fromAttribute, name, mediaPreview, mlatitude, mlongitude, wantsReceipt, isBroadcast) {
     var to = this.account.core.fullJid;
-    return this.mediaProcess('location', msgId, fromAttribute, to, [mlatitude, mlongitude, name], null, null, false);
+    return this.mediaProcess('url', msgId, fromAttribute, to, [mlatitude, mlongitude, name], null, null, false);
   }
   
   this.events.onAvatar = function (jid, picId, blob) {
@@ -499,7 +509,7 @@ App.connectors['coseme'] = function (account) {
   this.events.onGroupLocationReceived = function (msgId, fromAttribute, author, name, mediaPreview, mlatitude, mlongitude, wantsReceipt) {
     var to = fromAttribute;
     var fromAttribute = author;
-    return this.mediaProcess('location', fromAttribute, to, [mlatitude, mlongitude, name], null, null, true);
+    return this.mediaProcess('url', fromAttribute, to, [mlatitude, mlongitude, name], null, null, true);
   }
   
   this.events.onPresenceUpdated = function (jid, lastSeen) {
@@ -619,7 +629,7 @@ App.connectors['coseme'] = function (account) {
       case 'audio':
         process('img/blank.jpg');
         break;
-      case 'location':
+      case 'url':
         mediaUrl = 'https://maps.google.com/maps?q=' + payload[0] + ',' + payload[1],
         process('img/blank.jpg');
         break;

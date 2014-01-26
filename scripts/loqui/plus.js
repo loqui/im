@@ -81,6 +81,18 @@ var Plus = {
     }
   },
   
+  locationSend: function () {
+    var account = Messenger.account();
+    if (account.supports('locationSend')) {
+      var to = $('section#chat').data('jid');
+      Geo.posGet(function (loc) {
+        account.connector.locationSend(to, loc);
+      });
+    } else {
+      Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign');
+    }
+  },
+  
   rtc: function (constraints) {
     
   },
