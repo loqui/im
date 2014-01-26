@@ -214,16 +214,14 @@ App.connectors['coseme'] = function (account) {
       var aSize = blob.size;
       var type = blob.type;
       Tools.blobToBase64(blob, function (aB64OrigHash){
-        Store.put(aB64Hash,
+        Store.cache[aB64Hash] =
         {
           to: jid,
           data: aB64OrigHash
         },
-        function () {
-          Lungo.Notification.show('up-sign', '0% ' + _('Uploaded'));
-          var method = 'media_requestUpload';
-          MI.call(method, [aB64Hash, aT, aSize]);
-        });
+        Lungo.Notification.show('up-sign', '0% ' + _('Uploaded'));
+        var method = 'media_requestUpload';
+        MI.call(method, [aB64Hash, aT, aSize]);
       });
     });
     reader.readAsBinaryString(blob);
@@ -515,53 +513,50 @@ App.connectors['coseme'] = function (account) {
     var self = this;
     var media = CoSeMe.media;
     var account = this.account;
-    Store.get(hash, function (obj) {
-      var type, method, thumbnailer = null;
-      if (obj.data.indexOf(':image') > 0) {
-        type = 'image';
-        method = 'message_imageSend';
-        thumbnailer = Tools.picThumb;
-      } else if (obj.data.indexOf(':video') > 0) {
-        type = 'video';
-        method = 'message_videoSend';
-        thumbnailer = Tools.vidThumb;
-      } else if (obj.data.indexOf(':audio') > 0) {
-        type = 'audio';
-        method = 'message_audioSend';
-        thumbnailer = Tools.audThumb;
-      }
-      var toJID = obj.to;
-      var blob = Tools.b64ToBlob(obj.data.split(',').pop(), obj.data.split(/[:;]/)[1]);
-      var uploadUrl = url;
-      var onSuccess = function (url) {
-        thumbnailer(blob, 120, 120, function(thumb) {
-          var id = MI.call(
-            method,
-            [toJID, url, hash, '0', thumb.split(',').pop()]
-          );
-          self.addMediaMessageToChat(type, thumb, url, account.core.user, toJID, Math.floor((new Date).getTime() / 1000) + '-1');
-          App.audio('sent');
-          var ext = url.split('.').pop();
-          var localUrl = App.pathFiles + Tools.localize(Tools.stamp(id)).replace(/[-:]/g, '') + url.split('/').pop().substring(0, 5).toUpperCase() + '.' + ext;
-          Store.SD.save(localUrl, blob);
-        });
-        Lungo.Notification.show('up-sign', _('Uploaded'), 1);
-      };
-      var onError = function (error) {
-        Lungo.Notification.error(
-          _('NotUploaded'),
-          _('ErrorUploading'),
-          'warning-sign', 5
+    var obj = Store.cache[hash];
+    var type, method, thumbnailer = null;
+    if (obj.data.indexOf(':image') > 0) {
+      type = 'image';
+      method = 'message_imageSend';
+      thumbnailer = Tools.picThumb;
+    } else if (obj.data.indexOf(':video') > 0) {
+      type = 'video';
+      method = 'message_videoSend';
+      thumbnailer = Tools.vidThumb;
+    } else if (obj.data.indexOf(':audio') > 0) {
+      type = 'audio';
+      method = 'message_audioSend';
+      thumbnailer = Tools.audThumb;
+    }
+    var toJID = obj.to;
+    var blob = Tools.b64ToBlob(obj.data.split(',').pop(), obj.data.split(/[:;]/)[1]);
+    var uploadUrl = url;
+    var onSuccess = function (url) {
+      thumbnailer(blob, 120, 120, function(thumb) {
+        MI.call(
+          method,
+          [toJID, url, hash, '0', thumb.split(',').pop()]
         );
-        Tools.log(error);
-      };
-      var onProgress = function(value) {
-        if ($('div.notification').hasClass('show')) {
-          Tools.modifyLungoNotification(value.toFixed(0) + '% ' + _('Uploaded'));
-        }
-      };
-      media.upload(toJID, blob, uploadUrl, onSuccess, onError, onProgress);
-    });
+        self.addMediaMessageToChat(type, thumb, url, account.core.user, toJID, Math.floor((new Date).getTime() / 1000) + '-1');
+        App.audio('sent');
+        delete Store.cache[hash];
+      });
+      Lungo.Notification.show('up-sign', _('Uploaded'), 1);
+    };
+    var onError = function (error) {
+      Lungo.Notification.error(
+        _('NotUploaded'),
+        _('ErrorUploading'),
+        'warning-sign', 5
+      );
+      Tools.log(error);
+    };
+    var onProgress = function(value) {
+      if ($('div.notification').hasClass('show')) {
+        Tools.modifyLungoNotification(value.toFixed(0) + '% ' + _('Uploaded'));
+      }
+    };
+    media.upload(toJID, blob, uploadUrl, onSuccess, onError, onProgress);
   }
   this.events.onUploadRequestFailed = function (hash) {
     Lungo.Notification.error(_('NotUploaded'), _('ErrorUploading'), 'warning-sign', 5);
