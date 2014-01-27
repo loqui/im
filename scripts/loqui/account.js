@@ -65,7 +65,7 @@ var Account = function (core) {
           authfail: function () {
             var failStamps = this.connector.failStamps || {};
             failStamps.push(new Date);
-            if (failStamps.length > 2 && Math.floor(failStamps.slice(-1) - failStamps.slice(-3)) < 30) {
+            if (failStamps.length > 2 && Math.floor((failStamps.slice(-1)[0] - failStamps.slice(-3)[0])/1000) < 30) {
               location.reload();
             }
           }.bind(this),
