@@ -366,7 +366,7 @@ App.connectors['coseme'] = function (account) {
     var account = this.account;
     Tools.log(jid, picId, blob);
     if (jid == this.account.core.fullJid) {
-      Tools.picUnblob(blob, 96, 96, function (url) {
+      Tools.picThumb(blob, 96, 96, function (url) {
         $('section#main[data-jid="' + jid + '"] footer span.avatar img').attr('src', url);
         App.avatars[jid] = Store.save(url, function () {
           Store.put('avatars', App.avatars);
@@ -375,7 +375,7 @@ App.connectors['coseme'] = function (account) {
     } else {
       var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
       if (contact) {
-        Tools.picUnblob(blob, 96, 96, function (url) {
+        Tools.picThumb(blob, 96, 96, function (url) {
           $('ul[data-jid="' + account.core.fullJid + '"] [data-jid="' + jid + '"] span.avatar img').attr('src', url);
           $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', url);
           App.avatars[jid] = Store.save(url, function () {
@@ -442,7 +442,7 @@ App.connectors['coseme'] = function (account) {
   
   this.events.onGroupGotPicture = function (jid, picId, blob) {
     var account = this.account;
-    Tools.picUnblob(blob, 96, 96, function (url) {
+    Tools.picThumb(blob, 96, 96, function (url) {
       $('ul[data-provider="' + account.core.provider + '"][data-user="' + account.core.user + '"] [data-jid="' + jid + '"] span.avatar img').attr('src', url);
       $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', url);
       App.avatars[jid] = Store.save(url, function () {
