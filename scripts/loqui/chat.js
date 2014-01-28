@@ -23,27 +23,35 @@ var Chat = function (core, account) {
   this.chunkRender = function (index) {
     var chat = this;
     var ul = $('section#chat ul#messages');
-    if (index >= 0 && ul.children('li[data-chunk="' + index + '"]').length < 1) {
+    if (index >= 0 && ul.children('li[data-index="' + index + '"]').length < 1) {
       var stIndex = this.core.chunks[index];
+      var height = ul[0].scrollHeight - ul[0].scrollTop;
       Store.recover(stIndex, function (chunk) {
         if (chunk) {
           var li = $('<li/>');
           li.addClass('chunk');
           li.data('chunk', stIndex);
+          li.data('index', index);
           for (var i in chunk) {
             var core = chunk[i];
             var msg = new Message(chat.account, core);
             li.append(msg.preRender(i));
           }
-          ul.prepend(li);
-          var onSwipe = function (e) {
-            this.chunkRender(index - 1);
+          var more = ul.children('.more');
+          if (more.length) {
+            more.replaceWith(li);
+          } else {
+            ul.prepend(li);
           }
-          ul.off('swipeDown').on('swipeDown', onSwipe.bind(chat));
-          ul[0].scrollTop += li.height();
+          if (index > 0) {
+            ul.prepend($('<button/>').addClass('more').html(_('MoreMessages', {number: App.defaults.Chat.chunkSize, total: index * App.defaults.Chat.chunkSize})).on('click', function (e) {
+              chat.chunkRender(index - 1);
+            }));
+          }
           if (chunk.length < App.defaults.Chat.chunkSize / 2) {
             chat.chunkRender(index - 1);
           }
+          ul[0].scrollTop += li.height();
         } else {
           chat.chunkRender(index - 1);
         }

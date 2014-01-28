@@ -541,6 +541,10 @@ section#chat ul#messages {
   overflow-x: hidden;
   list-style-type: none;
 }
+section#chat ul#messages > .more {
+  width: calc(100% - 1rem);
+  margin: 0 .5rem;
+}
 section#chat ul#messages > li > div {
   position: relative;
   border: .1rem solid #DDD;
