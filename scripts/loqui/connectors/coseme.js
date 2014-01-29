@@ -416,7 +416,7 @@ App.connectors['coseme'] = function (account) {
   this.events.onGroupInfoError = function (jid, owner, subject, subjectOwner, subjectTime, creation) {
     Tools.log('ERROR GETTING GROUP INFO', jid, owner, subject, subjectOwner, subjectTime, creation);
   }
-  
+
   this.events.onGroupGotInfo = function (jid, owner, subject, subjectOwner, subjectTime, creation) {
     var account = this.account;
     var ci = account.chatFind(jid);
@@ -436,7 +436,9 @@ App.connectors['coseme'] = function (account) {
         owner: owner,
         chunks: []
       }, account);
-      chat.save(ci, true);
+      account.chats.push(chat);
+      account.core.chats.push(chat.core);
+      chat.save(ci);
     }
   }
   
