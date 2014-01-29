@@ -99,7 +99,7 @@ App.connectors['coseme'] = function (account) {
               Tools.log(name, 'already existed, updating to', existing);
             }
             for (var i = 0; i < result.tel.length; i++) {
-              var number = result.tel[i] ? Tools.numSanitize(result.tel[i].value, account.core.cc) : null;
+              var number = result.tel[i] ? Tools.numSanitize(account.core.cc, result.tel[i].value) : null;
               if (number) {
                 var jid = number + '@' + CoSeMe.config.domain;
                 var existing = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
@@ -116,6 +116,7 @@ App.connectors['coseme'] = function (account) {
         }
         this.continue();
       } else if (cb){
+        Tools.log('CONTACT ACQUIRE ERROR');
         cb();
       }
     }
