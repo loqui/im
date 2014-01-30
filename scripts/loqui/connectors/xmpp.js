@@ -81,9 +81,9 @@ App.connectors['XMPP'] = function (account) {
   }
   
   this.start = function () {
-    this.presence.set();
     this.handlers.init();
     this.capabilize();
+    this.presence.set();
   }
   
   this.sync = function (callback) {
@@ -142,13 +142,13 @@ App.connectors['XMPP'] = function (account) {
   
   this.capabilize = function () {
     var caps = [
-      ['delay', Strophe.NS.XEP0203],
       ['attention', Strophe.NS.XEP0224],
       ['csn', Strophe.NS.XEP0085],
+      ['delay', Strophe.NS.XEP0203],
       ['time', Strophe.NS.XEP0202]
     ];
     for (var i in caps) {
-      if (this.account.supports('XMPP' + caps[i][0])) {
+      if (this.account.supports(caps[i][0])) {
         this.connection.caps.addFeature(caps[i][1]);
       }
     }

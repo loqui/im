@@ -1,5 +1,5 @@
 /*
-  Copyright 2013, Adán Sánchez de Pedro Crespo <adansdpc@waalt.com>
+  Copyright 2014, Adán Sánchez de Pedro Crespo <adansdpc@waalt.com>
 */
 
 /**
