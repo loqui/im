@@ -40,6 +40,6 @@ var AttentionPlugin = function (conn) {
   }
 
   Strophe.addNamespace('XEP0224', 'urn:xmpp:attention:0');
-  this._connection.addHandler(this._handler.bind(this), null, 'message', 'headline', null, null);
+  this._connection.addHandler(this._handler.bind(this), Strophe.NS.XEP0224, 'message', 'headline', null, null);
   
 }
