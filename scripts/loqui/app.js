@@ -15,7 +15,7 @@ var App = {
   devsettings: {},
   avatars: {},
   online: true,
-  lastNot: null,
+  notifications: [],
   pathFiles: 'loqui/files/',
   pathBackup: 'loqui/backup/',
   
@@ -234,14 +234,13 @@ var App = {
   // Display a system notification or play a sound accordingly
   notify: function (core, altSound) {
     if (navigator.mozNotification && document.hidden) {
-      App.lastNot = navigator.mozNotification.createNotification(core.subject, core.text, core.pic);
-      App.lastNot.onclick = function () {
+      var notification = navigator.mozNotification.createNotification(core.subject, core.text, core.pic);
+      notification.onclick = function () {
         core.callback();
-        this.onclick = function (e) {
-          // This is a trick for circumventing Gaia bug #949257 
-        };
+        App.notifications.length = 0;
       }
-      App.lastNot.show();
+      notification.show();
+      App.notifications.push(notification);
     } else {
       this.audio(altSound);
     }
