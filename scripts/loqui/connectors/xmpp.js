@@ -17,7 +17,7 @@ App.connectors['XMPP'] = function (account) {
   this.connection = new Strophe.Connection(this.provider.connector.host);
   
   this.connect = function (callback) {
-    var user = this.account.core.user;
+    var user = this.account.core.user + '/' + App.shortName;
     var pass = this.account.core.pass;
     var handler = function (status) {
      switch (status) {
@@ -83,6 +83,7 @@ App.connectors['XMPP'] = function (account) {
   this.start = function () {
     this.presence.set();
     this.handlers.init();
+    this.capabilize();
   }
   
   this.sync = function (callback) {
@@ -139,6 +140,19 @@ App.connectors['XMPP'] = function (account) {
     });
   }.bind(this);
   
+  this.capabilize = function () {
+    var caps = [
+      ['delay', Strophe.NS.XEP0203],
+      ['attention', Strophe.NS.XEP0224],
+      ['csn', Strophe.NS.XEP0085]
+    ];
+    for (var i in caps) {
+      if (this.account.supports('XMPP' + caps[i][0])) {
+        this.connection.caps.addFeature(caps[i][1]);
+      }
+    }
+  }
+  
   this.presence.set = function (show, status) {
     this.presence.show = show || this.presence.show;
     this.presence.status = status || this.presence.status;
@@ -170,6 +184,7 @@ App.connectors['XMPP'] = function (account) {
         msg.c('status', {}, status);
       }
       msg.c('priority', {}, priority);
+      msg.cnode(this.connection.caps.createCapsNode().tree());
       this.connection.send(msg.tree());
     }
     $('section#main').attr('data-show', show);
@@ -225,6 +240,12 @@ App.connectors['XMPP'] = function (account) {
     if (!this.handlers.onAttention) {
       this.attention = new AttentionPlugin(this.connection);
       this.handlers.onAttention = this.attention.setCallback(this.events.onAttention);
+    }
+    if (!this.handlers.onDiscoInfo) {
+      this.handlers.onDiscoInfo = this.connection.addHandler(this.connection.disco._onDiscoInfo.bind(this.connection.disco), Strophe.NS.DISCO_INFO, 'iq', 'get', null, null);
+    }
+    if (!this.handlers.onDiscoItems) {
+      this.handlers.onDiscoItems = this.connection.addHandler(this.connection.disco._onDiscoItems.bind(this.connection.disco), Strophe.NS.DISCO_ITEMS, 'iq', 'get', null, null);
     }
   }.bind(this);
   
