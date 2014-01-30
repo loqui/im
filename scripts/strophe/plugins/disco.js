@@ -21,7 +21,7 @@ Strophe.addConnectionPlugin('disco',
      */
     init: function(conn)
     {
-    this._connection = conn;
+        this._connection = conn;
         this._identities = [];
         this._features   = [];
         this._items      = [];
