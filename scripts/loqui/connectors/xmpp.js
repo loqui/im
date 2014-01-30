@@ -144,7 +144,8 @@ App.connectors['XMPP'] = function (account) {
     var caps = [
       ['delay', Strophe.NS.XEP0203],
       ['attention', Strophe.NS.XEP0224],
-      ['csn', Strophe.NS.XEP0085]
+      ['csn', Strophe.NS.XEP0085],
+      ['time', Strophe.NS.XEP0202]
     ];
     for (var i in caps) {
       if (this.account.supports('XMPP' + caps[i][0])) {
@@ -240,6 +241,10 @@ App.connectors['XMPP'] = function (account) {
     if (!this.handlers.onAttention) {
       this.attention = new AttentionPlugin(this.connection);
       this.handlers.onAttention = this.attention.setCallback(this.events.onAttention);
+    }
+    if (!this.handlers.onTime) {
+      this.time = new TimePlugin(this.connection);
+      this.handlers.onTime = this.time.setCallback(this.events.onTime);
     }
     if (!this.handlers.onDiscoInfo) {
       this.handlers.onDiscoInfo = this.connection.addHandler(this.connection.disco._onDiscoInfo.bind(this.connection.disco), Strophe.NS.DISCO_INFO, 'iq', 'get', null, null);
