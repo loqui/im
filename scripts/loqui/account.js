@@ -101,11 +101,11 @@ var Account = function (core) {
     var index = Accounts.find(this.core.fullJid);
     $('aside#accounts .indicator').style('top', (6.25+4.5*index)+'rem').show();
     Lungo.Element.count('section#main header nav button[data-view-article="chats"]', this.unread);
-    var lacks = Providers.data[this.core.provider].lacks;
+    var features = Providers.data[this.core.provider].features;
     var meSection = $('section#me');
     var mainSection = $('section#main');
-    meSection.data('lacks', lacks.join(' '));
-    mainSection.data('lacks', lacks.join(' '));
+    meSection.data('features', features.join(' '));
+    mainSection.data('features', features.join(' '));
     meSection.find('#status input').val(this.connector.presence.status);
     meSection.find('#card .name').text(address == this.core.user ? '' : address);
     meSection.find('#card .user').text(this.core.user);
@@ -131,9 +131,7 @@ var Account = function (core) {
     this.chatsRender();
     this.contactsRender();
     this.presenceRender();
-    if (this.supports('vcard')) {
-      this.avatarsRender();
-    }
+    this.avatarsRender();
   }
   
   // Changes some styles based on presence and connection status
@@ -440,7 +438,7 @@ var Account = function (core) {
     
   // Check for feature support
   this.supports = function (feature) {
-    return !this.connector.provider.lacks || this.connector.provider.lacks.indexOf(feature) < 0;
+    return this.connector.provider.features.indexOf(feature) >= 0;
   }
   
   // Save to store

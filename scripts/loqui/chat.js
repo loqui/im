@@ -113,7 +113,7 @@ var Chat = function (core, account) {
     var section = $('section#chat');
     var header = section.children('header');
     section.data('jid', this.core.jid);
-    section.data('lacks', $('section#main').data('lacks'));
+    section.data('features', $('section#main').data('features'));
     section.data('muc', this.core.muc || false);
     header.children('.title').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(this.core.title));
     if (this.core.muc) {
