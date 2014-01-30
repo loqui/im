@@ -27,7 +27,7 @@
       conn.disco.addFeature(Strophe.NS.DISCO_INFO);
       conn.disco.addFeature(Strophe.NS.DISCO_ITEMS);
       if (conn.disco._identities.length === 0) {
-        return conn.disco.addIdentity("client", Lungo.Core.environment().isMobile ? "phone" : "web", "Loqui IM", "");
+        return conn.disco.addIdentity("client", Lungo.Core.environment().isMobile ? "phone" : "pc", "LoquiIM", "");
       }
     };
     addFeature = function(feature) {
