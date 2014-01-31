@@ -6265,6 +6265,8 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
         // self.eventHandler.onAccountChanged(_connection.accountKind,
         //                                    _connection.expireDate)
 
+      } else if (ProtocolTreeNode.tagEquals(node.getChild(0),'picture')) {
+        parseSetPicture(node);
       }
     },
 
@@ -6820,7 +6822,15 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
     var picNode = node.getChild("picture");
     var pictureId;
 
-    try {
+    if (jabberId == _connection.jid) {
+      if (picNode === null) {
+        //TODO: Send correct error code instead of 0
+        _signalInterface.send("profile_setPictureError", [0]);
+      } else {
+        pictureId = parseInt(picNode.getAttributeValue("id"), 10);
+        _signalInterface.send("profile_setPictureSuccess", [pictureId]);
+      }
+    } else {
       if (picNode === null) {
         // TODO: Send the correct error code instead of 0
         _signalInterface.send("group_setPictureError", [jabberId, 0]);
@@ -6828,14 +6838,6 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
         pictureId = parseInt(picNode.getAttributeValue("id"), 10);
         _signalInterface.send("group_setPictureSuccess",
                                   [jabberId, pictureId]);
-      }
-    } catch (e) {
-      if (picNode === null) {
-        //TODO: Send correct error code instead of 0
-        _signalInterface.send("profile_setPictureError", [0]);
-      } else {
-        pictureId = parseInt(picNode.getAttributeValue("id"), 10);
-        _signalInterface.send("profile_setPictureSuccess", [pictureId]);
       }
     }
 
