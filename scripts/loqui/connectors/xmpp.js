@@ -145,7 +145,8 @@ App.connectors['XMPP'] = function (account) {
       ['attention', Strophe.NS.XEP0224],
       ['csn', Strophe.NS.XEP0085],
       ['delay', Strophe.NS.XEP0203],
-      ['time', Strophe.NS.XEP0202]
+      ['time', Strophe.NS.XEP0202],
+      ['vcard', Strophe.NS.VCARD]
     ];
     for (var i in caps) {
       if (this.account.supports(caps[i][0])) {
@@ -185,7 +186,9 @@ App.connectors['XMPP'] = function (account) {
         msg.c('status', {}, status);
       }
       msg.c('priority', {}, priority);
-      msg.cnode(this.connection.caps.createCapsNode().tree());
+      msg.cnode(this.connection.caps.createCapsNode().tree()).up();
+      var photoNode = this.account.core.avatarHash ? $build('photo').t(this.account.core.avatarHash) : $build('photo');
+      msg.cnode(this.connection.vcard.createUpdateNode(photoNode.tree()).tree()).up();
       this.connection.send(msg.tree());
     }
     $('section#main').attr('data-show', show);
@@ -216,7 +219,23 @@ App.connectors['XMPP'] = function (account) {
     } else {
       extract($(this.vcard));
     }
-  }.bind(this);
+  }
+  
+  this.avatarSet = function(blob) {
+    Tools.picThumb(blob, 96, 96, function (url) {
+      var b64 = url.split(',').pop();
+      var vCardEl = $build('PHOTO');
+      vCardEl.c('TYPE', {}, 'image/png');
+      vCardEl.c('BINVAL', {}, b64);
+      this.connection.vcard.set(function (stanza) {
+        this.account.core.avatarHash = b64_sha1(b64);
+        this.account.save();
+        this.presence.send();
+        $('section#main footer .avatar img').attr('src', url);
+        $('section#me .avatar img').attr('src', url);
+      }.bind(this), vCardEl.tree());
+    }.bind(this));
+  }
   
   this.csnSend = function (to, state) {
       this.connection.Messaging.csnSend(to, state);

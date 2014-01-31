@@ -2,7 +2,9 @@
 Plugin to implement the vCard extension. 
 http://xmpp.org/extensions/xep-0054.html
 
-Author: Nathan Zorn (nathan.zorn@gmail.com)
+Authors:
+Nathan Zorn (nathan.zorn@gmail.com)
+Adán Sánchez de Pedro Crespo (adansdpc@waalt.com)
 
 */
 /* jslint configuration: */
@@ -52,6 +54,13 @@ Strophe.addConnectionPlugin('vcard', {
     */
     set: function(handler_cb, vCardEl, jid) {
         var iq = buildIq("set", this._connection.jid, jid, vCardEl);
+        console.log(Strophe.serialize(iq));
         this._connection.sendIQ(iq.tree(), handler_cb, null);
+    },
+    
+    createUpdateNode: function(vCardEl) {
+      var xNode = $build('x', {xmlns: 'vcard-temp:x:update'});
+      xNode.cnode(vCardEl);
+      return xNode;
     }
 });
