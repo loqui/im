@@ -175,7 +175,9 @@ App.connectors['coseme'] = function (account) {
     var method = 'contact_getProfilePicture';
     var params = id ? [id] : [this.account.core.fullJid];
     MI.call(method, params);
-    callback('img/foovatar.png');
+    if (callback) {
+      callback('img/foovatar.png');
+    }
   }.bind(this);
   
   this.groupAvatar = function (callback, id) {
@@ -238,6 +240,29 @@ App.connectors['coseme'] = function (account) {
     });
   }
   
+  this.avatarSet = function (blob) {
+    function UrlToBin (url, cb) {
+      var reader = new FileReader();
+      reader.addEventListener('loadend', function() {
+        cb(reader.result);
+      });
+      reader.readAsBinaryString(Tools.b64ToBlob(url.split(',').pop(), 'image/jpg'));
+    }
+    Tools.picThumb(blob, 480, 480, function (url) {
+      UrlToBin(url, function (bin) {
+        var picBin = bin;
+        Tools.picThumb(blob, 96, 96, function (url) {
+          UrlToBin(url, function (bin) {
+            var thumbBin = bin;
+            var method = 'profile_setPicture';
+            MI.call(method, [thumbBin, picBin]);
+            console.log(thumbBin, picBin);
+          });
+        });
+      });
+    });
+  }
+  
   this.handlers.init = function () {
     Tools.log('HANDLERS INIT');
     var signals = {
@@ -288,8 +313,8 @@ App.connectors['coseme'] = function (account) {
       contact_gotProfilePicture: this.events.onAvatar,
       contact_typing: this.events.onContactTyping,
       contact_paused: this.events.onContactPaused,
-      profile_setPictureSuccess: null,
-      profile_setPictureError: null,
+      profile_setPictureSuccess: this.events.onProfileSetPictureSuccess,
+      profile_setPictureError: this.events.onProfileSetPictureError,
       profile_setStatusSuccess: null,
       ping: this.events.onPing,
       pong: null,
@@ -369,6 +394,7 @@ App.connectors['coseme'] = function (account) {
     if (jid == this.account.core.fullJid) {
       Tools.picThumb(blob, 96, 96, function (url) {
         $('section#main[data-jid="' + jid + '"] footer span.avatar img').attr('src', url);
+        $('section#me .avatar img').attr('src', url);
         App.avatars[jid] = Store.save(url, function () {
           Store.put('avatars', App.avatars);
         });
@@ -519,6 +545,15 @@ App.connectors['coseme'] = function (account) {
     var account = this.account;
     var time = Tools.convenientDate(Tools.localize(Tools.stamp( Math.floor((new Date).valueOf()/1000) - parseInt(lastSeen) )));
     $('section#chat[data-jid="' + jid + '"] header .status').text(parseInt(lastSeen) < 180 ? _('showa') : _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})}));
+  }
+  
+  this.events.onProfileSetPictureSuccess = function (pictureId) {
+    Tools.log('CHANGED AVATAR TO', pictureId);
+    this.avatar();
+  }
+  
+  this.events.onProfileSetPictureError = function (err) {
+    Lungo.Notification.error(_('NotUploaded'), _('ErrorUploading'), 'warning-sign', 5);
   }
   
   this.events.onUploadRequestSuccess = function (hash, url, resumeFrom) {

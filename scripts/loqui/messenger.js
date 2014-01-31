@@ -38,7 +38,7 @@ var Messenger = {
   
   avatarSet: function (blob) {
     var account = this.account();
-    if (account.supports('avatarChange') && account.supports('vcard')) {
+    if (account.supports('avatarChange')) {
       account.connector.avatarSet(blob);
     } else {
       Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign', 3);
