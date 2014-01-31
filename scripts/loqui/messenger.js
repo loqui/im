@@ -38,30 +38,8 @@ var Messenger = {
   
   avatarSet: function (blob) {
     var account = this.account();
-    if (account.supports('avatarChange')) {
-      var reader = new FileReader();
-      var jid = Strophe.getBareJidFromJid(account.core.jid)
-      reader.onload = function (event) {
-        var img = new Image();
-        img.onload = function () {
-          var canvas = document.createElement('canvas');
-          canvas.width = 96;
-          canvas.height = 96;
-          canvas.getContext('2d').drawImage(img, 0, 0, 96, 96);
-          var url = canvas.toDataURL();
-          if (account.supports('vcard')) {
-            $(account.vcard).find('TYPE').text('image/png');
-            $(account.vcard).find('BINVAL').text(url.split(',')[1]);
-            account.connector.connection.vcard.set(function () {
-              $('section#main footer .avatar img').attr('src', url);
-            }, account.vcard, jid);
-          } else {
-            Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign', 3);
-          }
-        }
-        img.src = event.target.result;
-      }
-      reader.readAsDataURL(blob);
+    if (account.supports('avatarChange') && account.supports('vcard')) {
+      account.connector.avatarSet(blob);
     } else {
       Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign', 3);
     }
