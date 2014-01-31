@@ -153,7 +153,7 @@ var Tools = {
         canvas.width = width;
         canvas.height = height;
         canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-        var url = canvas.toDataURL();
+        var url = canvas.toDataURL('image/jpeg');
         callback(url);
       }
       img.src = reader.result;

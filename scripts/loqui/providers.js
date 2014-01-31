@@ -9,7 +9,7 @@ var Providers = {
       connector: {
         type: 'coseme'
       },
-      features: ['localContacts', 'receipts', 'imageSend', 'videoSend', 'audioSend', 'locationSend', 'pay', 'muc', 'csn'],
+      features: ['localContacts', 'receipts', 'imageSend', 'videoSend', 'audioSend', 'locationSend', 'pay', 'muc', 'csn', 'avatarChange'],
       color: '#254242',
       terms: {
         user: 'YourNumber',

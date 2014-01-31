@@ -225,7 +225,7 @@ App.connectors['XMPP'] = function (account) {
     Tools.picThumb(blob, 96, 96, function (url) {
       var b64 = url.split(',').pop();
       var vCardEl = $build('PHOTO');
-      vCardEl.c('TYPE', {}, 'image/png');
+      vCardEl.c('TYPE', {}, 'image/jpg');
       vCardEl.c('BINVAL', {}, b64);
       this.connection.vcard.set(function (stanza) {
         this.account.core.avatarHash = b64_sha1(b64);
