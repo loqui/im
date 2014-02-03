@@ -1,6 +1,6 @@
 LOQUI Instant Messenger
 =====
-Loqui Instant Messenger unifies all your chat accounts in just one FirefoxOS app
+Loqui Instant Messenger unifies all your chat accounts in just one Firefox OS app
 https://loqui.im
 
 Providers support
