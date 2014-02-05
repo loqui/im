@@ -25,7 +25,15 @@ In longer term, connections should be made through javascript TCPSockets API, av
 
 Contribute
 ===
-See the [Contribute](https://github.com/waalt/loqui/wiki/Contribute) page on the wiki.
+See the [Contribute](https://github.com/loqui/im/wiki/Contribute) page on the wiki.
+
+FAQ
+===
+See the [FAQ](https://github.com/loqui/im/wiki/FAQ) page on the wiki.
+
+Roadmap
+===
+See the [Roadmap](https://github.com/loqui/im/wiki/Roadmap) page on the wiki.
 
 Acknowledgements
 ===
