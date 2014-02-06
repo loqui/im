@@ -3708,11 +3708,16 @@ CoSeMe.namespace('utils', (function(){
     },
 
     len: function _len(obj) {
-      if (typeof obj !== 'object' && typeof obj.length === 'number')
-        return obj.length;
+      if (obj) {
+      
+        if (typeof obj !== 'object' && typeof obj.length === 'number')
+          return obj.length;
 
-      if (typeof obj === 'object')
-        return Object.keys(obj).length;
+        if (typeof obj === 'object')
+          return Object.keys(obj).length;
+          
+      }
+      return -1;
     },
 
     ByteArray: ByteArray,
@@ -6228,7 +6233,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
   var _requests = [];
 
   var _lastPongTime = 0;
-  var _pingInterval = 120;
+  var _pingInterval = 119;
 
   // _connection.socket should be a socket though
   var _connection = null;
@@ -6267,6 +6272,8 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
 
       } else if (ProtocolTreeNode.tagEquals(node.getChild(0),'picture')) {
         parseSetPicture(node);
+      } else if (ProtocolTreeNode.tagEquals(node.getChild(0),'status')) {
+        parseGetStatuses(node);
       }
     },
 
@@ -6350,7 +6357,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
           if (status == 'dirty') {
             //categories = self.parseCategories(node); #@@TODO, send along with signal
             logger.log('Will send DIRTY');
-            _signalInterface.send('status_dirty');
+            _signalInterface.send('status_dirty', [parseDirty(node)]);
             logger.log('DIRTY sent');
           }
 
@@ -6724,6 +6731,15 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
     var idx = node.getAttributeValue("id"); // FIXME: Why this?
     this.lastPongTime = Date.now();
   }
+  
+  function parseDirty(node) {
+    var categories = [];
+    var categoryNodes = node.getAllChildren("category");
+    categoryNodes.forEach(function(categoryNode) {
+      categories.push(categoryNode.getAttributeValue("name"));
+    });
+    return categories;
+  }
 
   function parseGroupInfo(node) {
     var jid = node.getAttributeValue("from");
@@ -6926,6 +6942,22 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
       }
     }
   }
+  
+  function parseGetStatuses(node) {
+    var jabberId = node.getAttributeValue("from");
+    var groupNode = node.getChild("status");
+    var child, children = groupNode.getAllChildren("user");
+
+    for (var i = 0, l = children.length; i < l; i++) {
+      child = children[i];
+      if (child.getAttributeValue('id') !== null) {
+        _signalInterface.send(
+          "contact_gotStatus",
+          [child.getAttributeValue("jid"), child.getAttributeValue("t"), child.getText()]
+        );
+      }
+    }
+  }
 
   function parseRequestUpload(_hash, iqNode) {
     var mediaNode = iqNode.getChild("media");
@@ -7016,6 +7048,8 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
     parseRequestUpload: parseRequestUpload,
 
     parsePingResponse: parsePingResponse,
+    
+    parseDirty: parseDirty,
 
     parseGroupInfo: parseGroupInfo,
 
@@ -7040,6 +7074,8 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
     parseLastOnline: parseLastOnline,
 
     parseGetPictureIds: parseGetPictureIds,
+    
+    parseGetStatuses: parseGetStatuses,
 
     // Not very pretty but then, what is?
     set signalInterface(si) {
@@ -7137,6 +7173,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
 
       contact_gotProfilePictureId: [],
       contact_gotProfilePicture: [],
+      contact_gotStatus: [],
       contact_typing: [],
       contact_paused: [],
 
@@ -7311,6 +7348,22 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
       var iqNode =
         newProtocolTreeNode('iq', {type: 'result', to: self.domain, id: aIdx});
       self._writeNode(iqNode);
+    },
+    
+    sendClearDirty: function(categories) {
+      var idx = self.makeId('cleardirty');
+      
+      var innerNodeChildren = [];
+      categories.forEach(function(category) {
+        innerNodeChildren.push(newProtocolTreeNode('category', {name: category}));
+      });
+      
+      var cleanNode = newProtocolTreeNode('clean',
+        {xmlns: 'urn:xmpp:whatsapp:dirty'}, innerNodeChildren);
+      var iqNode = newProtocolTreeNode('iq',
+        {type: 'set', to: self.domain, id: idx}, [cleanNode]);
+      self._writeNode(iqNode);
+      return idx;
     }
   };
 
@@ -7510,6 +7563,8 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
     ping: self.sendPing,
 
     pong: self.sendPong,
+    
+    cleardirty: self.sendClearDirty,
 
     //Groups
 
@@ -7675,6 +7730,23 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
                                           innerNodeChildren);
       var iqNode = newProtocolTreeNode('iq', {id: idx, type: 'get'}, [queryNode]);
 
+      self._writeNode(iqNode);
+    },
+    
+    contact_getStatuses: function(aJids) {
+      var idx = self.makeId('get_status_');
+      self.readerThread.requests[idx] = self.readerThread.parseGetStatuses;
+
+      var innerNodeChildren = [];
+      aJids.forEach(function (aJid) {
+        innerNodeChildren.push(newProtocolTreeNode('user', {jid: aJid}));
+      });
+
+      var queryNode = newProtocolTreeNode('status', {xmlns: 'status'},
+                                          innerNodeChildren);
+      var iqNode = newProtocolTreeNode(
+        'iq', {id: idx, type: 'get', to: 's.whatsapp.net'}, [queryNode]);
+        
       self._writeNode(iqNode);
     },
 

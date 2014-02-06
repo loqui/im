@@ -47,7 +47,7 @@ var Messenger = {
   
   presenceUpdate: function () {
     var account = this.account();
-    if (App.online && account.connector.connection.connected) {
+    if (App.online && account.connector.connected) {
       var status = $('section#me #status input').val();
       account.connector.presence.set(null, status);
     } else {

@@ -5,8 +5,8 @@ App.connectors['XMPP'] = function (account) {
   this.account = account;
   this.provider = Providers.data[account.core.provider];
   this.presence = {
-    show: App.defaults.Connector.presence.show,
-    status: App.defaults.Connector.presence.status
+    show: this.account.core.presence ? this.account.core.presence.show : App.defaults.Connector.presence.show,
+    status: this.account.core.presence ? this.account.core.presence.status : App.defaults.Connector.presence.status
   };
   this.handlers = {};
   this.events = {}
@@ -94,41 +94,9 @@ App.connectors['XMPP'] = function (account) {
       account.core.fullJid = fullJid;
       account.save();
     }
-    var rosterCb = function (items, item, to) {
-      if (to) {
-        var sameOrigin = Strophe.getDomainFromJid(to) == Providers.data[account.core.provider].autodomain;
-        var noMulti = !account.supports('multi');
-        if (to == account.core.user || (noMulti && sameOrigin)) {
-          connector.roster = items;
-          connector.roster.sort(function (a,b) {
-            var aname = a.name ? a.name : a.jid;
-            var bname = b.name ? b.name : b.jid;
-            return aname > bname;
-          });
-          var map = function (entry, cb) {
-            var show, status;
-            for (var j in entry.resources) {
-              show = entry.resources[Object.keys(entry.resources)[0]].show || 'a';
-              status = entry.resources[Object.keys(entry.resources)[0]].status || _('show' + show);
-              break;
-            }
-            cb(null, {
-              jid: entry.jid,
-              name: entry.name,
-              show: show,
-              status: status
-            });
-          }
-          async.map(connector.roster, map.bind(account), function (err, result) {
-            account.core.roster = result;
-            account.presenceRender();
-          });
-        }
-      }
-    }
-    connector.connection.roster.registerCallback(rosterCb.bind(account));
+    connector.connection.roster.registerCallback(connector.events.onPresence);
     connector.connection.roster.get( function (ret) {
-      rosterCb(ret, null, account.core.user);
+      connector.events.onPresence(ret, null, account.core.user);
       if (account.supports('vcard')) {
         connector.connection.vcard.get( function (data) {
           connector.vcard = $(data).find('vCard').get(0);
@@ -159,6 +127,11 @@ App.connectors['XMPP'] = function (account) {
     this.presence.show = show || this.presence.show;
     this.presence.status = status || this.presence.status;
     this.presence.send();
+    this.account.core.presence = {
+      show: this.presence.show,
+      status: this.presence.status
+    }
+    this.account.save();
   }.bind(this);
   
   this.presence.send = function (show, status) {
@@ -305,6 +278,42 @@ App.connectors['XMPP'] = function (account) {
       }
     }
     return true;
+  }.bind(this);
+  
+  this.events.onPresence = function (items, item, to) {
+    console.log(items, item, to);
+    var connector = this;
+    var account = this.account;
+    if (to) {
+      var sameOrigin = Strophe.getDomainFromJid(to) == Providers.data[account.core.provider].autodomain;
+      var noMulti = !account.supports('multi');
+      if (to == account.core.user || (noMulti && sameOrigin)) {
+        connector.roster = items;
+        connector.roster.sort(function (a,b) {
+          var aname = a.name ? a.name : a.jid;
+          var bname = b.name ? b.name : b.jid;
+          return aname > bname;
+        });
+        var map = function (entry, cb) {
+          var show, status;
+          for (var j in entry.resources) {
+            show = entry.resources[Object.keys(entry.resources)[0]].show || 'a';
+            status = entry.resources[Object.keys(entry.resources)[0]].status || _('show' + show);
+            break;
+          }
+          cb(null, {
+            jid: entry.jid,
+            name: entry.name,
+            show: show,
+            status: status
+          });
+        }
+        async.map(connector.roster, map.bind(account), function (err, result) {
+          account.core.roster = result;
+          account.presenceRender();
+        });
+      }
+    }
   }.bind(this);
   
   this.events.onSubRequest = function (stanza) {

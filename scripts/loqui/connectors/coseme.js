@@ -9,8 +9,8 @@ App.connectors['coseme'] = function (account) {
   this.account = account;
   this.provider = Providers.data[account.core.provider];
   this.presence = {
-    show: App.defaults.Connector.presence.show,
-    status: App.defaults.Connector.presence.status
+    show: this.account.core.presence ? this.account.core.presence.show : App.defaults.Connector.presence.show,
+    status: this.account.core.presence ? this.account.core.presence.status : App.defaults.Connector.presence.status
   };
   this.handlers = {};
   this.events = {}
@@ -36,7 +36,9 @@ App.connectors['coseme'] = function (account) {
       Lungo.Notification.error(_('AuthInvalid'), _('AuthInvalidNotice'), 'warning-sign', 8);
     }.bind(this));
     SI.registerListener('disconnected', function () {
-      callback.disconnected();
+      if (callback.disconnected) {
+        callback.disconnected();
+      }
     });
     MI.call(method, params);
   }
@@ -139,10 +141,20 @@ App.connectors['coseme'] = function (account) {
   this.contacts.remove = function () {
   }
   
+  this.presence.get = function (jid) {
+    var method = 'presence_request';
+    MI.call(method, [jid]);
+  }
+  
   this.presence.set = function (show, status) {
     this.presence.show = show || this.presence.show;
     this.presence.status = status || this.presence.status;
     this.presence.send();
+    this.account.core.presence = {
+      show: this.presence.show,
+      status: this.presence.status
+    }
+    this.account.save();
   }.bind(this);
   
   this.presence.send = function (show, status, priority) {
@@ -158,6 +170,7 @@ App.connectors['coseme'] = function (account) {
         chat: 'presence_sendAvailableForChat'
       };
       MI.call(method[show], []);
+      MI.call('profile_setStatus', [status]);
     }
   }.bind(this);
   
@@ -201,11 +214,6 @@ App.connectors['coseme'] = function (account) {
   
   this.groupParticipantsGet = function (jid) {
     var method = 'group_getParticipants';
-    MI.call(method, [jid]);
-  }
-  
-  this.contactPresenceGet = function (jid) {
-    var method = 'presence_request';
     MI.call(method, [jid]);
   }
   
@@ -279,7 +287,7 @@ App.connectors['coseme'] = function (account) {
       receipt_messageDelivered: this.events.onMessageDelivered,
       receipt_visible: this.events.onMessageVisible,
       receipt_broadcastSent: null,
-      status_dirty: null,
+      status_dirty: this.events.onStatusDirty,
       presence_updated: this.events.onPresenceUpdated,
       presence_available: null,
       presence_unavailable: null,
@@ -311,12 +319,13 @@ App.connectors['coseme'] = function (account) {
       notification_groupParticipantRemoved: null,
       contact_gotProfilePictureId: null,
       contact_gotProfilePicture: this.events.onAvatar,
+      contact_gotStatus: this.events.onPresenceUpdated,
       contact_typing: this.events.onContactTyping,
       contact_paused: this.events.onContactPaused,
       profile_setPictureSuccess: this.events.onProfileSetPictureSuccess,
       profile_setPictureError: this.events.onProfileSetPictureError,
-      profile_setStatusSuccess: null,
-      ping: this.events.onPing,
+      profile_setStatusSuccess: this.events.onMessageDelivered,
+      ping: console.log,
       pong: null,
       disconnected: null,
       media_uploadRequestSuccess: this.events.onUploadRequestSuccess,
@@ -332,10 +341,10 @@ App.connectors['coseme'] = function (account) {
       }
     }.bind(this));
   }.bind(this);
-  
-  this.events.onPing = function (idx) {
-    var method = 'pong';
-    MI.call(method, [idx]);
+
+  this.events.onStatusDirty = function (categories) {
+    var method = 'cleardirty';
+    MI.call(method, [categories]);
   }
   
   this.events.onDisconnected = function () {
@@ -433,11 +442,13 @@ App.connectors['coseme'] = function (account) {
   this.events.onMessageDelivered = function (from, msgId) {
     Tools.log('DELIVERED', from, msgId);
     $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"][data-type="out"]').data('receipt', 'delivered');
+    MI.call('delivered_ack', [from, msgId]);
   }
   
   this.events.onMessageVisible = function (from, msgId) {
     Tools.log('VISIBLE', from, msgId);
     $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"][data-type="out"]').data('receipt', 'visible');
+    MI.call('visible_ack', [from, msgId]);
   }
 
   this.events.onGroupInfoError = function (jid, owner, subject, subjectOwner, subjectTime, creation) {
@@ -541,10 +552,19 @@ App.connectors['coseme'] = function (account) {
     return this.mediaProcess('url', fromAttribute, to, [mlatitude, mlongitude, name], null, null, true);
   }
   
-  this.events.onPresenceUpdated = function (jid, lastSeen) {
+  this.events.onPresenceUpdated = function (jid, lastSeen, msg) {
+console.log('PRESENCE UPDATED', jid, lastSeen, msg);
     var account = this.account;
     var time = Tools.convenientDate(Tools.localize(Tools.stamp( Math.floor((new Date).valueOf()/1000) - parseInt(lastSeen) )));
-    $('section#chat[data-jid="' + jid + '"] header .status').text(parseInt(lastSeen) < 180 ? _('showa') : _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})}));
+    var chatSection = $('section#chat[data-jid="' + jid + '"]');
+    if (msg) {
+      var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
+      contact.presence.status = msg;
+      //chatSection.children('header .status').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(msg));
+      account.presenceRender();
+    } else {
+      chatSection.find('header .status').text(parseInt(lastSeen) < 180 ? _('showa') : _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})}));
+    }
   }
   
   this.events.onProfileSetPictureSuccess = function (pictureId) {

@@ -9,7 +9,7 @@ var Providers = {
       connector: {
         type: 'coseme'
       },
-      features: ['localContacts', 'receipts', 'imageSend', 'videoSend', 'audioSend', 'locationSend', 'pay', 'muc', 'csn', 'avatarChange'],
+      features: ['localContacts', 'receipts', 'imageSend', 'videoSend', 'audioSend', 'locationSend', 'pay', 'muc', 'csn', 'avatarChange', 'statusChange'],
       color: '#254242',
       terms: {
         user: 'YourNumber',
@@ -46,7 +46,7 @@ var Providers = {
         timeout: 300
       },
       autodomain: 'gmail.com',
-      features: ['multi', 'presence', 'vcard', 'easyAvatars', 'avatarChange', 'rosterMgmt', 'csn', 'delay'],
+      features: ['multi', 'presence', 'vcard', 'easyAvatars', 'avatarChange', 'rosterMgmt', 'csn', 'delay', 'statusChange'],
       color: '#4EA43B',
       terms: {
         user: 'ProviderAddress',
@@ -119,7 +119,7 @@ var Providers = {
         timeout: 300
       },
       autodomain: false,
-      features: ['multi', 'vcard', 'presence', 'easyAvatars', 'rosterMgmt', 'avatarChange', 'attention', 'csn', 'delay', 'time'],
+      features: ['multi', 'vcard', 'presence', 'easyAvatars', 'rosterMgmt', 'avatarChange', 'attention', 'csn', 'delay', 'time', 'statusChange'],
       color: '#149ED2',
       terms: {
         user: 'FullJID',
