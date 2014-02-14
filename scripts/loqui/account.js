@@ -178,7 +178,7 @@ var Account = function (core) {
       for (var i in this.core.chats) {
         var chat = this.core.chats[i];
         var title = App.emoji[Providers.data[this.core.provider].emoji].fy(chat.title);
-        var lastMsg = chat.last.text ? App.emoji[Providers.data[account.core.provider].emoji].fy(chat.last.text) : media;
+        var lastMsg = chat.last instanceof Array ? ' ' : (chat.last.text ? App.emoji[Providers.data[account.core.provider].emoji].fy(chat.last.text) : media);
         var lastStamp = chat.last.stamp ? Tools.convenientDate(chat.last.stamp).join('<br />') : '';
         var li = $('<li/>').data('jid', chat.jid);
         li.append($('<span/>').addClass('avatar').append('<img/>'));
@@ -331,17 +331,23 @@ var Account = function (core) {
   }
   
   // Render presence for every contact
-  this.presenceRender = function () {
+  this.presenceRender = function (jid) {
     if (this.connector.isConnected() && this.supports('presence')) {
-      for (var i in this.core.roster) {
-        var contact = this.core.roster[i];
+      var contactPresenceRender = function (contact) {
         var li = $('section#main article ul li[data-jid="'+contact.jid+'"]');
-        li.data('show', contact.show || 'na');
-        li.find('.status').show().text(contact.status || _('show' + (contact.show || 'na')));
+        li.data('show', contact.presence.show || 'na');
+        li.find('.status').show().html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));
         var section = $('section#chat');
         if (section.data('jid') == contact.jid) {
-          section.data('show', contact.show || 'na');
-          section.find('header .status').text(contact.status || _('show' + (contact.show || 'na')));
+          section.data('show', contact.presence.show || 'na');
+          section.find('header .status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));
+        }      
+      }.bind(this);
+      if (jid) {
+        contactPresenceRender(Lungo.Core.findByProperty(this.core.roster, 'jid', jid));
+      } else{
+        for (var i in this.core.roster) {
+          contactPresenceRender(this.core.roster[i]);
         }
       }
       $('section#main ul li span.show').show();

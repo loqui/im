@@ -95,6 +95,9 @@ var Menu = {
     locationSend: function () {
       Plus.locationSend();
     },
+    bolt: function () {
+      Plus.bolt();
+    },
     call: function () {
       $('section#chat nav#plus').removeClass('show');
       Lungo.Router.article('chat', 'call');

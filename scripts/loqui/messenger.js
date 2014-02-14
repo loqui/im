@@ -65,7 +65,7 @@ var Messenger = {
     section.find('#card .name').text(name == jid ? ' ' : name);
     section.find('#card .user').text(jid);
     section.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/' + account.core.provider + '.svg')).append(Providers.data[account.core.provider].longName);
-    section.find('#status p').text(contact.status || _('showna'));
+    section.find('#status p').html(App.emoji[Providers.data[account.core.provider].emoji].fy(contact.presence.status) || _('showna'));
     if (App.avatars[jid]) {
       Store.recover(App.avatars[jid], function (val) {
         section.find('#card .avatar').children('img').attr('src', val);

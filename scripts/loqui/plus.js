@@ -3,13 +3,12 @@
 var Plus = {
 
   bolt: function () {
-    $('section#chat nav#plus').removeClass('show');
+    var account = Messenger.account();
     var to = $('section#chat').data('jid');
-    var index = Accounts.find($('section#main').data('user'), $('section#main').data('provider'));
-    var account = App.accounts[index];
+    $('section#chat nav#plus').removeClass('show');
     if (to && App.online && account.connector.connection.connected){
-      if (account.supports('bolt')) {
-        account.connector.attention.request(to);
+      if (account.supports('attention')) {
+        account.connector.attentionSend(to);
         window.navigator.vibrate([100,30,100,30,100,200,200,30,200,30,200,200,100,30,100,30,100]);
         App.audio('thunder');
         Tools.log('Sent a bolt to', to);

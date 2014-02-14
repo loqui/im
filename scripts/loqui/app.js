@@ -27,6 +27,7 @@ var App = {
         sound: true,
         disHide: false,
         csn: true,
+        boltGet: true,
         devMode: false
       },
       devsettings: {
@@ -170,7 +171,10 @@ var App = {
   switchesRender: function () {
     var ul = $('section#settings article#features ul').empty();
     var body = $('body');
-    for (var key in this.settings) {
+    for (var key in App.defaults.App.settings) {
+      if (!(key in this.settings)) {
+        this.settings[key] = App.defaults.App.settings[key];
+      }
       var value = this.settings[key];
       var li = $('<li><span></span><switch/></li>');
       li.children('span').text(_('Set' + key));
@@ -197,6 +201,7 @@ var App = {
         body.removeClass(key);
       }
     }
+    App.smartupdate('settings');
   },
 
   switchesDevRender: function () {

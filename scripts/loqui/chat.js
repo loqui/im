@@ -125,12 +125,12 @@ var Chat = function (core, account) {
       }
     } else {
       var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.jid);
-      var show = contact ? (contact.show || 'na') : 'na';
-      var status = contact ? (contact.status || _('show' + show)) : ' ';
+      var show = contact ? (contact.presence.show || 'na') : 'na';
+      var status = contact ? (contact.presence.status || _('show' + show)) : ' ';
       if (this.account.connector.presence.get) {
         this.account.connector.presence.get(this.core.jid);
       }
-      header.children('.status').text(status);
+      header.children('.status').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(status));
       section.data('show', show);
     }
     if (App.avatars[this.core.jid]) {
