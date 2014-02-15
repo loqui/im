@@ -992,6 +992,10 @@ section#main article#contacts li[data-muc='true'] .show {
   display: none!important;
 }
 
+section#chat[data-muc='true'] header .show {
+  display: none!important;
+}
+
 section#settings nav a#developer {
   display: none;
 }
