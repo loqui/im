@@ -63,6 +63,9 @@ App.connectors['coseme'] = function (account) {
       this.account.core.roster = [];
       this.contacts.sync(callback);
     } else {
+      var method = 'contact_getStatuses';
+      var list = this.account.core.roster.map(function(e){return e.jid;});
+      MI.call(method, [list]);
       callback();
     }
   }.bind(this);
@@ -264,7 +267,6 @@ App.connectors['coseme'] = function (account) {
             var thumbBin = bin;
             var method = 'profile_setPicture';
             MI.call(method, [thumbBin, picBin]);
-            console.log(thumbBin, picBin);
           });
         });
       });
@@ -325,7 +327,7 @@ App.connectors['coseme'] = function (account) {
       profile_setPictureSuccess: this.events.onProfileSetPictureSuccess,
       profile_setPictureError: this.events.onProfileSetPictureError,
       profile_setStatusSuccess: this.events.onMessageDelivered,
-      ping: console.log,
+      ping: Tools.log,
       pong: null,
       disconnected: null,
       media_uploadRequestSuccess: this.events.onUploadRequestSuccess,
@@ -553,16 +555,24 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.events.onPresenceUpdated = function (jid, lastSeen, msg) {
-console.log('PRESENCE UPDATED', jid, lastSeen, msg);
     var account = this.account;
     var time = Tools.convenientDate(Tools.localize(Tools.stamp( Math.floor((new Date).valueOf()/1000) - parseInt(lastSeen) )));
     var chatSection = $('section#chat[data-jid="' + jid + '"]');
+    var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
+    if (!('presence' in contact)) {
+      contact.presence = {};
+    }
     if (msg) {
-      var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
       contact.presence.status = msg;
-      //chatSection.children('header .status').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(msg));
-      account.presenceRender();
+      if (msg == 'Hey there! I am using WhatsApp.') {
+        contact.presence.show = 'na';
+      } else {
+        contact.presence.show = contact.presence.show || 'away';
+      }  
+      account.presenceRender(jid);
     } else {
+      contact.presence.show = parseInt(lastSeen) < 180 ? 'a' : 'away';
+      account.presenceRender(jid);
       chatSection.find('header .status').text(parseInt(lastSeen) < 180 ? _('showa') : _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})}));
     }
   }

@@ -311,20 +311,10 @@ section#main > footer {
 section#main > footer .address {
   position: absolute;
   top: 1.05rem;
-  left: 1.4rem;
+  left: .8rem;
   line-height: 1em;
   font-weight: 300;
   font-size: .9rem;
-}
-section#main > footer .status {
-  display: block;
-  position: absolute;
-  left: .4rem;
-  top: 1.05rem;
-  width: .8rem;
-  height: .8rem;
-  border: .15rem solid #2F2F2F;
-  border-radius: 50%;
 }
 section#main > footer .avatar {
   position: absolute;
@@ -812,6 +802,19 @@ section.profile div#card span.provider img {
   height: 1rem;
   margin-right: .3rem;
 }
+section#me.profile[data-features~=avatarChange]  div#card span.avatar:after {
+    content: "Change";
+    display: block;
+    position: absolute;
+    top: 5rem;
+    left: 0;
+    font-size: .8em;
+    padding: .2rem .5rem;
+    background-color: #FFF;
+    color: #444;
+    border-radius: .4rem;
+    opacity: .7;
+}
 section#me:not([data-features~=statusChange]) div#status {
   display: none!important;
 }
@@ -831,6 +834,9 @@ section#chat:not([data-features~=audioSend]) a.audio {
   display: none!important;
 }
 section#chat:not([data-features~=locationSend]) a.location {
+  display: none!important;
+}
+section#chat:not([data-features~=attention]) a.bolt {
   display: none!important;
 }
 section#me div#status input {
@@ -971,11 +977,19 @@ section[data-show=na] header .backchange,
 section:not([data-show]) header .backchange
 section[data-show=na] footer .backchange,
 section:not([data-show]) footer .backchange {
-  background-color: #BDC3C7;
+  display: none!important;
 }
 
 .disHide section#main article#contacts li[data-show='na'] {
   display: none;
+}
+
+section#main article#contacts li[data-show='na'] .status {
+  display: none!important;
+}
+
+section#main article#contacts li[data-muc='true'] .show {
+  display: none!important;
 }
 
 section#settings nav a#developer {

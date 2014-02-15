@@ -6945,15 +6945,15 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
   
   function parseGetStatuses(node) {
     var jabberId = node.getAttributeValue("from");
-    var groupNode = node.getChild("status");
-    var child, children = groupNode.getAllChildren("user");
+    var statusNode = node.getChild("status");
+    var child, children = statusNode.getAllChildren("user");
 
     for (var i = 0, l = children.length; i < l; i++) {
       child = children[i];
-      if (child.getAttributeValue('id') !== null) {
+      if (child.getAttributeValue('t') !== null) {
         _signalInterface.send(
           "contact_gotStatus",
-          [child.getAttributeValue("jid"), child.getAttributeValue("t"), child.getText()]
+          [child.getAttributeValue("jid"), child.getAttributeValue("t"), stringFromUtf8(child.data)]
         );
       }
     }

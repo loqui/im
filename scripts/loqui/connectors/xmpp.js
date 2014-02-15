@@ -171,6 +171,10 @@ App.connectors['XMPP'] = function (account) {
     this.connection.Messaging.send(to, text, delay);
   }.bind(this);
   
+  this.attentionSend = function (to) {
+    this.connection.attention.request(to);
+  }
+  
   this.avatar = function (callback, jid) {
     var extract = function (vcard) {
       if (vcard.find('BINVAL').length) {
@@ -230,19 +234,9 @@ App.connectors['XMPP'] = function (account) {
     if (!this.handlers.onSubRequest) {
       this.handlers.onSubRequest = this.connection.addHandler(this.events.onSubRequest, null, 'presence', 'subscribe', null, null);
     }
-    if (!this.handlers.onAttention) {
-      this.attention = new AttentionPlugin(this.connection);
-      this.handlers.onAttention = this.attention.setCallback(this.events.onAttention);
-    }
     if (!this.handlers.onTime) {
       this.time = new TimePlugin(this.connection);
       this.handlers.onTime = this.time.setCallback(this.events.onTime);
-    }
-    if (!this.handlers.onDiscoInfo) {
-      this.handlers.onDiscoInfo = this.connection.addHandler(this.connection.disco._onDiscoInfo.bind(this.connection.disco), Strophe.NS.DISCO_INFO, 'iq', 'get', null, null);
-    }
-    if (!this.handlers.onDiscoItems) {
-      this.handlers.onDiscoItems = this.connection.addHandler(this.connection.disco._onDiscoItems.bind(this.connection.disco), Strophe.NS.DISCO_ITEMS, 'iq', 'get', null, null);
     }
   }.bind(this);
   
@@ -304,8 +298,10 @@ App.connectors['XMPP'] = function (account) {
           cb(null, {
             jid: entry.jid,
             name: entry.name,
-            show: show,
-            status: status
+            presence: {
+              show: show,
+              status: status
+            }
           });
         }
         async.map(connector.roster, map.bind(account), function (err, result) {
@@ -336,7 +332,7 @@ App.connectors['XMPP'] = function (account) {
       window.navigator.vibrate([100,30,100,30,100,200,200,30,200,30,200,200,100,30,100,30,100]);
       App.notify({
         subject: chat.core.title,
-        text: _('HasSentYouABolt'),
+        text: _('SentYou', { type: _('MediaType_bolt') }),
         pic: 'img/bolt.png',
         callback: function () {
           chat.show();
@@ -412,7 +408,7 @@ App.emoji['XMPP'] = {
   fy: function (text) {
     var mapped = text;
     var map = this.map;
-    if (map.length != undefined) {
+    if (mapped && map.length != undefined) {
       for (var i in map) {
         var original = map[i][0];
         for (var j in map[i].slice(1)) {
@@ -470,7 +466,7 @@ App.emoji['FB'] = {
   fy: function (text) {
     var mapped = text;
     var map = this.map;
-    if (map.length != undefined) {
+    if (mapped && map.length != undefined) {
       for (var i in map) {
         var original = map[i][0];
         for (var j in map[i].slice(1)) {
@@ -526,7 +522,7 @@ App.emoji['GTALK'] = {
   fy: function (text) {
     var mapped = text;
     var map = this.map;
-    if (map.length != undefined) {
+    if (mapped && map.length != undefined) {
       for (var i in map) {
         var original = map[i][0];
         for (var j in map[i].slice(1)) {
