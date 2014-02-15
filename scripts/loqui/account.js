@@ -39,7 +39,7 @@ var Account = function (core) {
         this.sync(cb);
       }.bind(this),
       authfail: function () {
-          Lungo.Notification.error(_('NoAuth'), _('NoAuthNotice'), 'signal', 5);
+        Lungo.Notification.error(_('NoAuth'), _('NoAuthNotice'), 'signal', 5);
       }
     });
   }
@@ -71,6 +71,7 @@ var Account = function (core) {
             if (failStamps.length > 2 && Math.floor((failStamps.slice(-1)[0] - failStamps.slice(-3)[0])/1000) < 30) {
               location.reload();
             }
+            Lungo.Notification.error(_('NoAuth'), _('NoAuthNotice'), 'signal', 5);
           }.bind(this),
           disconnected: function () {
             this.connector.connected = false;
