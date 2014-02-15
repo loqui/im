@@ -33,7 +33,6 @@ App.connectors['coseme'] = function (account) {
       Tools.log("AUTH FAIL");
       this.connected = false;
       callback.authfail();
-      Lungo.Notification.error(_('AuthInvalid'), _('AuthInvalidNotice'), 'warning-sign', 8);
     }.bind(this));
     SI.registerListener('disconnected', function () {
       if (callback.disconnected) {
