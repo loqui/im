@@ -59,20 +59,24 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.sync = function (callback) {
-    if (!('roster' in this.account.core)) {
-      this.account.core.roster = [];
-      this.contacts.sync(callback);
-    } else {
+    var getStatuses = function () {
       var method = 'contact_getStatuses';
       var list = this.account.core.roster.map(function(e){return e.jid;});
       MI.call(method, [list]);
-      callback();
+    }.bind(this);
+    if (!('roster' in this.account.core)) {
+      this.contacts.sync(function () {
+        callback(getStatuses);
+      });
+    } else {
+      callback(getStatuses);
     }
   }.bind(this);
   
   this.contacts.sync = function (cb) {
     Tools.log('SYNCING CONTACTS');
     var account = this.account;
+    this.account.core.roster = [];
     var allContacts = navigator.mozContacts.getAll({sortBy: 'givenName', sortOrder: 'ascending'});
     allContacts.onsuccess = function (event) {
       if (this.result) {
@@ -94,25 +98,26 @@ App.connectors['coseme'] = function (account) {
             var add = function (jid, name) {
               var contact = {
                 jid: jid,
-                name: fullname
+                name: fullname,
+                presence: {
+                  show: 'na',
+                  status: null
+                }
               }
               account.core.roster.push(contact);
-              Tools.log(name, 'did not exist, appending', contact);
             }
-            var update = function (existing, jid, name) {
-              existing.name = name;
-              Tools.log(name, 'already existed, updating to', existing);
+            var update = function (jid, name) {
+              var ci = account.chatFind(jid);
+              if (ci >= 0) {
+                account.core.chats[ci].title = name;
+              }
             }
             for (var i = 0; i < result.tel.length; i++) {
               var number = result.tel[i] ? Tools.numSanitize(account.core.cc, result.tel[i].value) : null;
               if (number) {
                 var jid = number + '@' + CoSeMe.config.domain;
-                var existing = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
-                if (existing) {
-                  update(existing, jid, fullname);
-                } else {
-                  add(jid, fullname);
-                }
+                update(jid, fullname);
+                add(jid, fullname);
               }
             }   
           }
@@ -567,7 +572,7 @@ App.connectors['coseme'] = function (account) {
       if (msg == 'Hey there! I am using WhatsApp.') {
         contact.presence.show = 'na';
       } else {
-        contact.presence.show = contact.presence.show || 'away';
+        contact.presence.show = contact.presence.show != 'na' ? contact.presence.show : 'away';
       }  
       account.presenceRender(jid);
     } else {
@@ -1341,7 +1346,7 @@ App.emoji['coseme'] = {
   },
    
   fy: function (text) {
-    if (text.match(/[\ue000-\ue999]/g)) {
+    if (text && text.match(/[\ue000-\ue999]/g)) {
       var mapped = text;
       var map = this.map;
       for (var i in map) {

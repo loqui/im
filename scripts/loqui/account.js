@@ -35,8 +35,8 @@ var Account = function (core) {
           } else {
             Lungo.Notification.error(_('DupliAccount'), _('DupliAccountNotice'), 'warning-sign', 5);
           }
-        }
-        this.sync(cb.bind(this));
+        }.bind(this);
+        this.sync(cb);
       }.bind(this),
       authfail: function () {
           Lungo.Notification.error(_('NoAuth'), _('NoAuthNotice'), 'signal', 5);
@@ -54,13 +54,16 @@ var Account = function (core) {
       if (navigator.onLine){
         this.connector.connect({
           connected: function () {
-            var cb = function () {
+            var cb = function (rcb) {
               App.audio('login');
               this.connector.start();
               this.sendQFlush();
               this.allRender();
-            }
-            this.sync(cb.bind(this));
+              if (rcb) {
+                rcb();
+              }
+            }.bind(this);
+            this.sync(cb);
           }.bind(this),
           authfail: function () {
             var failStamps = this.connector.failStamps || {};
@@ -279,13 +282,15 @@ var Account = function (core) {
       }
       var syncOnClick = function (event) {
         var account = Messenger.account();
-        account.connector.contacts.sync(function () {
-          account.connector.contacts.order(function () {
-            account.save();
-            account.allRender();
-          });
+        delete account.core.roster;
+        account.connector.sync(function (rcb) {
+          account.save();
+          account.allRender();
+          if (rcb) {
+            rcb();
+          }
         });
-        Lungo.Notification.show('download', _('Synchronizing'), 2);
+        Lungo.Notification.show('download', _('Synchronizing'), 10);
       };
       searchForm.bind('keyup', searchFormOnKeyUp);
       clear.bind('click', clearOnClick);
@@ -438,7 +443,6 @@ var Account = function (core) {
         break;
       }
     }
-    Tools.log(jid, '@', index);
     return index;
   }
     
