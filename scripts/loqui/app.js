@@ -63,6 +63,7 @@ var App = {
     // Load settings and data from storage
     App.load(function () {
       // Log in or show wizard 
+      App.upgrade();
       App.start();
     });
   },
@@ -110,6 +111,25 @@ var App = {
     ], function (err, results) {
       callback(null);
     });
+  },
+  
+  // Perform special processes if upgrading from older version
+  upgrade: function () {
+    var last = localStorage.getItem('version') || 'v0.2.5';
+    var from = {
+      'v0.2.5': function () {
+        for (var key in App.accounts) {
+          var account = App.accounts[key];
+          account.core.roster = [];
+          account.save();
+        }
+      }
+    };
+    if (last < App.version) {
+      Lungo.Notification.show('forward', _('Upgrading'), 10);
+      from[last]();
+      localStorage.setItem('version', App.version);
+    }
   },
   
   // Bootstrap logins and so on

@@ -290,7 +290,6 @@ var Account = function (core) {
             rcb();
           }
         });
-        Lungo.Notification.show('download', _('Synchronizing'), 10);
       };
       searchForm.bind('keyup', searchFormOnKeyUp);
       clear.bind('click', clearOnClick);

@@ -63,7 +63,7 @@ App.connectors['coseme'] = function (account) {
       var list = this.account.core.roster.map(function(e){return e.jid;});
       MI.call(method, [list]);
     }.bind(this);
-    if (!('roster' in this.account.core)) {
+    if (!('roster' in this.account.core) || !this.account.core.roster.length) {
       this.contacts.sync(function () {
         callback(getStatuses);
       });
@@ -74,6 +74,7 @@ App.connectors['coseme'] = function (account) {
   
   this.contacts.sync = function (cb) {
     Tools.log('SYNCING CONTACTS');
+    Lungo.Notification.show('download', _('Synchronizing'), 10);
     var account = this.account;
     this.account.core.roster = [];
     var allContacts = navigator.mozContacts.getAll({sortBy: 'givenName', sortOrder: 'ascending'});
