@@ -110,13 +110,18 @@ App.connectors['coseme'] = function (account) {
               if (ci >= 0) {
                 account.core.chats[ci].title = name;
               }
+              var existing = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
+              if (existing) {
+                existing.name = name;
+              } else {
+                add(jid, name);
+              }
             }
             for (var i = 0; i < result.tel.length; i++) {
               var number = result.tel[i] ? Tools.numSanitize(account.core.cc, result.tel[i].value) : null;
               if (number) {
                 var jid = number + '@' + CoSeMe.config.domain;
                 update(jid, fullname);
-                add(jid, fullname);
               }
             }   
           }
