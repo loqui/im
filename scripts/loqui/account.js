@@ -159,7 +159,6 @@ var Account = function (core) {
       var totalUnread = this.chats.reduceRight(function (prev, cur, i, all) {
         return prev + cur.core.unread;
       }, 0);
-      console.log(this.chats, totalUnread);
       Lungo.Element.count('aside li[data-jid="' + this.core.fullJid + '"]', totalUnread);
       if (ul.style('display') == 'block') {
         Lungo.Element.count('section#main header nav button[data-view-article="chats"]', totalUnread);
@@ -405,6 +404,7 @@ var Account = function (core) {
     
   // Push message to sendQ
   this.toSendQ = function (storageIndex) {
+    Tools.log('[sendQ] Queued', storageIndex);
     if (!this.core.sendQ) {
       this.core.sendQ = [];
     }
@@ -418,6 +418,7 @@ var Account = function (core) {
     if (this.core.sendQ.length) {
       var sendQ = this.core.sendQ;
       var block = sendQ[0][0];
+      Tools.log('[sendQ] Flushing', sendQ, sendQ[0]);
       Store.recover(block, function (data) {
         var content = data[sendQ[0][1]];
         var msg = new Message(account, {

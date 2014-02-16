@@ -31,7 +31,7 @@ var Messenger = {
   csn: function (state) {
     var to = $('section#chat').data('jid');
     var account = this.account();
-    if (account.supports('csn') && App.settings.csn) {
+    if (account.connector.isConnected() && account.supports('csn') && App.settings.csn) {
       account.connector.csnSend(to, state);
     }
   },

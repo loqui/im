@@ -99,7 +99,10 @@ var Message = function (account, core) {
     account.chats.push(chat);
     account.core.chats.push(chat.core);
 
-    chat.messageAppend.push({msg: message.core}, function (blockIndex) {
+    chat.messageAppend.push({
+      msg: message.core,
+      delay: !account.connector.isConnected()
+    }, function (blockIndex) {
       if ($('section#chat').data('jid') == to && $('section#chat').hasClass('show')) {
         var ul = $('section#chat ul#messages');
         var li = ul.children('li[data-chunk="' + blockIndex + '"]');

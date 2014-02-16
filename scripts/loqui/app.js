@@ -139,7 +139,9 @@ var App = {
   disconnect: function () {
     for (var i in this.accounts) {
       var account = this.accounts[i];
-      account.connector.disconnect();
+      if (account.connector.isConnected()) {
+        account.connector.disconnect();
+      }
       account.accountRender();
       account.presenceRender();
     }
