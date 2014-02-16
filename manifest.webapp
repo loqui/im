@@ -7,8 +7,8 @@
   "type": "privileged",
   "launch_path": "/index.html",
   "description": "Loqui Instant Messenger allows you to unify all your chat accounts in just one app.",
-  "version": "v0.2.5c",
-  "release_notes": "Sending and receiving WhatsApp pictures, audio, video and location\nAlways connected\nBetter WhatsApp groups support\nNew emoji for Facebook and Hangouts\nFaster interface\nPurchase WhatsApp account from Loqui\nAdds Dutch language and update other locales\nNew developer menu\nMany bugfixes. Such improvement. WoW :)",
+  "version": "v0.2.6",
+  "release_notes": "Always connected (really)\nChange WhatsApp profile picture\nChange WhatsApp status message\nChange XMPP and Hangouts profile picture\nAdd Hebrew language\nMany bugfixes. Such improvement. WoW :)",
   "icons": {
     "32": "/img/icon-32.png",
     "60": "/img/icon-60.png",
