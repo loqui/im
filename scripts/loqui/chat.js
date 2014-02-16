@@ -125,7 +125,7 @@ var Chat = function (core, account) {
       }
     } else {
       var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.jid);
-      var show = contact ? (contact.presence.show || 'na') : 'na';
+      var show = this.account.connector.isConnected() && contact ? (contact.presence.show || 'na') : 'na';
       var status = contact ? (contact.presence.status || _('show' + show)) : ' ';
       if (this.account.connector.presence.get) {
         this.account.connector.presence.get(this.core.jid);
