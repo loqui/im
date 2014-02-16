@@ -984,10 +984,8 @@ section:not([data-show]) footer .backchange {
   display: none;
 }
 
-section#main article#contacts li[data-show='na'] .status {
-  display: none!important;
-}
-
+section#main article#contacts li[data-show='na'] .status,
+section#main article#contacts li[data-show='na'] .show,
 section#main article#contacts li[data-muc='true'] .show {
   display: none!important;
 }

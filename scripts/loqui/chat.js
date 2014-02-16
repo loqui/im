@@ -5,7 +5,7 @@ var Chat = function (core, account) {
   // Holds only chat data and no functions
   this.core = core;
   this.core.unread = this.core.unread || 0;
-  this.core.last = this.core.last || [];
+  this.core.last = this.core.last || {};
   this.account = account;
   
   // Render last chunk of messages
