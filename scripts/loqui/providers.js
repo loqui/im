@@ -23,7 +23,7 @@ var Providers = {
       altname: 'Facebook',
       connector: {
         type: 'XMPP',
-        host: 'https://app.loqui.im/http-bind/',
+        host: 'https://bosh.loqui.im/',
         timeout: 300
       },
       autodomain: 'chat.facebook.com',
@@ -42,7 +42,7 @@ var Providers = {
       altname: 'Gmail',
       connector: {
         type: 'XMPP',
-        host: 'https://app.loqui.im/http-bind/',
+        host: 'https://bosh.loqui.im/',
         timeout: 300
       },
       autodomain: 'gmail.com',
@@ -61,7 +61,7 @@ var Providers = {
       longName: 'Nimbuzz',
       connector: {
         type: 'XMPP',
-        host: 'https://app.loqui.im/http-bind/',
+        host: 'https://bosh.loqui.im/',
         timeout: 300
       },
       autodomain: 'nimbuzz.com',
@@ -79,7 +79,7 @@ var Providers = {
       altname: 'ovi',
       connector: {
         type: 'XMPP',
-        host: 'https://app.loqui.im/http-bind/',
+        host: 'https://bosh.loqui.im/',
         timeout: 300
       },
       autodomain: 'chat.ovi.com',
@@ -97,7 +97,7 @@ var Providers = {
       altname: 'Lync',
       connector: {
         type: 'XMPP',
-        host: 'https://app.loqui.im/http-bind/',
+        host: 'https://bosh.loqui.im/',
         timeout: 300
       },
       autodomain: false,
@@ -115,7 +115,7 @@ var Providers = {
       longName: 'XMPP/Jabber',
       connector: {
         type: 'XMPP',
-        host: 'wss://app.loqui.im/ws/',
+        host: 'wss://websockets.loqui.im/',
         timeout: 300
       },
       autodomain: false,
