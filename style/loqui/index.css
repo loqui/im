@@ -224,6 +224,8 @@ section#main article ul li span.name {
   max-width: calc(100% - 4.7rem);
   max-height: 1.4em;
   overflow: hidden;
+  white-space: nowrap;
+  text-overflow: clip;
 }
 section#main article ul li span.status,
 section#main article ul li span.lastMessage {
@@ -236,6 +238,8 @@ section#main article ul li span.lastMessage {
   max-width: calc(100% - 6.5rem);
   max-height: 1.4em;
   overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 section#main article ul li span.status img,
 section#main article ul li span.lastMessage img {
@@ -432,8 +436,10 @@ section#chat header .status {
   line-height: 1.2em;
   font-weight: 300;
   height: 1.2em;
+  max-width: calc(100% - 7rem);
   overflow: hidden;
-  max-width: calc(100% - 7rem)
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 section#chat header .show {
   display: block;
@@ -984,10 +990,8 @@ section:not([data-show]) footer .backchange {
   display: none;
 }
 
-section#main article#contacts li[data-show='na'] .status {
-  display: none!important;
-}
-
+section#main article#contacts li[data-show='na'] .status,
+section#main article#contacts li[data-show='na'] .show,
 section#main article#contacts li[data-muc='true'] .show {
   display: none!important;
 }

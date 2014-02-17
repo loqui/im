@@ -301,8 +301,8 @@ App.connectors['coseme'] = function (account) {
       receipt_broadcastSent: null,
       status_dirty: this.events.onStatusDirty,
       presence_updated: this.events.onPresenceUpdated,
-      presence_available: null,
-      presence_unavailable: null,
+      presence_available: this.events.onPresenceAvailable,
+      presence_unavailable: this.events.onPresenceUnavailable,
       group_subjectReceived: null,
       group_createSuccess: null,
       group_createFail: null,
@@ -495,7 +495,7 @@ App.connectors['coseme'] = function (account) {
   this.events.onGroupGotPicture = function (jid, picId, blob) {
     var account = this.account;
     Tools.picThumb(blob, 96, 96, function (url) {
-      $('ul[data-provider="' + account.core.provider + '"][data-user="' + account.core.user + '"] [data-jid="' + jid + '"] span.avatar img').attr('src', url);
+      $('ul[data-jid="' + account.core.fullJid + '"] li[data-jid="' + jid + '"] span.avatar img').attr('src', url);
       $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', url);
       App.avatars[jid] = Store.save(url, function () {
         Store.put('avatars', App.avatars);
@@ -566,25 +566,39 @@ App.connectors['coseme'] = function (account) {
   
   this.events.onPresenceUpdated = function (jid, lastSeen, msg) {
     var account = this.account;
-    var time = Tools.convenientDate(Tools.localize(Tools.stamp( Math.floor((new Date).valueOf()/1000) - parseInt(lastSeen) )));
-    var chatSection = $('section#chat[data-jid="' + jid + '"]');
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
+    var time = Tools.convenientDate(Tools.localize(Tools.stamp( Math.floor((new Date).valueOf()/1000) - parseInt(lastSeen) )));
     if (!('presence' in contact)) {
       contact.presence = {};
     }
     if (msg) {
-      contact.presence.status = msg;
-      if (msg == 'Hey there! I am using WhatsApp.') {
-        contact.presence.show = 'na';
-      } else {
-        contact.presence.show = contact.presence.show != 'na' ? contact.presence.show : 'away';
-      }  
-      account.presenceRender(jid);
+      if (msg != contact.presence.status) {
+        contact.presence.status = msg;
+        if (msg == 'Hey there! I am using WhatsApp.') {
+          contact.presence.show = 'na';
+        } else {
+          contact.presence.show = contact.presence.show != 'na' ? contact.presence.show : 'away';
+        }
+        account.presenceRender(jid);
+      }
     } else {
-      contact.presence.show = parseInt(lastSeen) < 180 ? 'a' : 'away';
       account.presenceRender(jid);
-      chatSection.find('header .status').text(parseInt(lastSeen) < 180 ? _('showa') : _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})}));
+      var chatSection = $('section#chat[data-jid="' + jid + '"]');
+      var status = chatSection.find('header .status');
+      status.text((parseInt(lastSeen) < 300 ? _('showa') : _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})})) +  ' - ' + status.text());
     }
+  }
+  
+  this.events.onPresenceAvailable = function (jid) {
+    var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
+    contact.presence.show = 'a';
+    account.presenceRender(jid);
+  }
+  
+  this.events.onPresenceUnavailable = function (jid) {
+    var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
+    contact.presence.show = 'away';
+    account.presenceRender(jid);
   }
   
   this.events.onProfileSetPictureSuccess = function (pictureId) {
