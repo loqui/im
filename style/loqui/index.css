@@ -224,8 +224,6 @@ section#main article ul li span.name {
   max-width: calc(100% - 4.7rem);
   max-height: 1.4em;
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: clip;
 }
 section#main article ul li span.status,
 section#main article ul li span.lastMessage {
