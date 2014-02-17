@@ -584,7 +584,8 @@ App.connectors['coseme'] = function (account) {
     } else {
       account.presenceRender(jid);
       var chatSection = $('section#chat[data-jid="' + jid + '"]');
-      chatSection.find('header .status').text(parseInt(lastSeen) < 300 ? _('showa') : _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})}));
+      var status = chatSection.find('header .status');
+      status.text((parseInt(lastSeen) < 300 ? _('showa') : _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})})) +  ' - ' + status.text());
     }
   }
   
