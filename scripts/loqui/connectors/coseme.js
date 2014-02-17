@@ -120,7 +120,7 @@ App.connectors['coseme'] = function (account) {
             }
             for (var i = 0; i < result.tel.length; i++) {
               var number = result.tel[i] ? Tools.numSanitize(account.core.cc, result.tel[i].value) : null;
-              if (number) {
+              if (number && result.tel[i].type == 'mobile') {
                 var jid = number + '@' + CoSeMe.config.domain;
                 update(jid, fullname);
               }
