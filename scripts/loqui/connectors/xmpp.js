@@ -160,8 +160,10 @@ App.connectors['XMPP'] = function (account) {
       }
       msg.c('priority', {}, priority);
       msg.cnode(this.connection.caps.createCapsNode().tree()).up();
-      var photoNode = this.account.core.avatarHash ? $build('photo').t(this.account.core.avatarHash) : $build('photo');
-      msg.cnode(this.connection.vcard.createUpdateNode(photoNode.tree()).tree()).up();
+      if (this.account.core.avatarHash) {
+        var photoNode = this.account.core.avatarHash ? $build('photo').t(this.account.core.avatarHash) : $build('photo');
+        msg.cnode(this.connection.vcard.createUpdateNode(photoNode.tree()).tree()).up();
+      }
       this.connection.send(msg.tree());
     }
     $('section#main').attr('data-show', show);
@@ -228,16 +230,11 @@ App.connectors['XMPP'] = function (account) {
   }
   
   this.handlers.init = function () {
-    if (!this.handlers.onMessage) {
-      this.handlers.onMessage = this.connection.addHandler(this.events.onMessage, null, 'message', 'chat', null, null);
-    }
-    if (!this.handlers.onSubRequest) {
-      this.handlers.onSubRequest = this.connection.addHandler(this.events.onSubRequest, null, 'presence', 'subscribe', null, null);
-    }
-    if (!this.handlers.onTime) {
-      this.time = new TimePlugin(this.connection);
-      this.handlers.onTime = this.time.setCallback(this.events.onTime);
-    }
+    this.handlers.onMessage = this.connection.addHandler(this.events.onMessage, null, 'message', 'chat', null, null);
+    this.handlers.onSubRequest = this.connection.addHandler(this.events.onSubRequest, null, 'presence', 'subscribe', null, null);
+    this.handlers.onTime = this.connection.time.handlify(this.events.onTime);
+    this.handlers.onAttention = this.connection.attention.handlify(this.events.onAttention);
+    this.handlers.onDisco = this.connection.disco.handlify();
   }.bind(this);
   
   this.events.onDisconnected = function () {
@@ -275,7 +272,6 @@ App.connectors['XMPP'] = function (account) {
   }.bind(this);
   
   this.events.onPresence = function (items, item, to) {
-    console.log(items, item, to);
     var connector = this;
     var account = this.account;
     if (to) {
@@ -333,12 +329,12 @@ App.connectors['XMPP'] = function (account) {
       App.notify({
         subject: chat.core.title,
         text: _('SentYou', { type: _('MediaType_bolt') }),
-        pic: 'img/bolt.png',
+        pic: 'https://raw.github.com/loqui/im/master/img/bolt.png',
         callback: function () {
           chat.show();
           App.toForeground();
         }
-      }, 'thunder');
+      }, 'thunder', true);
     }
     Tools.log(from, 'sent you a bolt.');
     return true;

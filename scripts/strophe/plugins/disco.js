@@ -25,10 +25,13 @@ Strophe.addConnectionPlugin('disco',
         this._identities = [];
         this._features   = [];
         this._items      = [];
-        // disco info
-        conn.addHandler(this._onDiscoInfo.bind(this), Strophe.NS.DISCO_INFO, 'iq', 'get', null, null);
-        // disco items
-        conn.addHandler(this._onDiscoItems.bind(this), Strophe.NS.DISCO_ITEMS, 'iq', 'get', null, null);
+    },
+    handlify: function()
+    {
+        return [      
+          this._connection.addHandler(this._onDiscoInfo.bind(this), Strophe.NS.DISCO_INFO, 'iq', 'get', null, null),
+          this._connection.addHandler(this._onDiscoItems.bind(this), Strophe.NS.DISCO_ITEMS, 'iq', 'get', null, null)
+        ];
     },
     /** Function: addIdentity
      * See http://xmpp.org/registrar/disco-categories.html

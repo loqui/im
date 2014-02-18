@@ -259,17 +259,25 @@ var App = {
   },
   
   // Display a system notification or play a sound accordingly
-  notify: function (core, altSound) {
-    if (navigator.mozNotification && document.hidden) {
-      var notification = navigator.mozNotification.createNotification(core.subject, core.text, core.pic);
-      notification.onclick = function () {
-        core.callback();
-        App.notifications.length = 0;
+  notify: function (core, altSound, force) {
+    var alt = function () {
+      App.audio(altSound);    
+    }
+    if (force || navigator.mozNotification && document.hidden) {
+      if ('mozNotification' in navigator) {
+        var notification = navigator.mozNotification.createNotification(core.subject, core.text, core.pic);
+        notification.onclick = function () {
+          core.callback();
+          App.notifications.length = 0;
+        }
+        notification.show();
+        App.notifications.push(notification);
       }
-      notification.show();
-      App.notifications.push(notification);
+      if (force) {
+        alt();
+      }
     } else {
-      this.audio(altSound);
+      alt();
     }
   },
   
