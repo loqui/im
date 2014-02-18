@@ -585,7 +585,7 @@ App.connectors['coseme'] = function (account) {
       account.presenceRender(jid);
       var chatSection = $('section#chat[data-jid="' + jid + '"]');
       var status = chatSection.find('header .status');
-      status.text((parseInt(lastSeen) < 300 ? _('showa') : _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})})) +  ' - ' + status.text());
+      status.html((parseInt(lastSeen) < 300 ? _('showa') : _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})})) +  ' - ' + status.html());
     }
   }
   
@@ -1365,19 +1365,17 @@ App.emoji['coseme'] = {
   },
    
   fy: function (text) {
-    if (text && text.match(/[\ue000-\ue999]/g)) {
-      var mapped = text;
+    var mapped = text;
+    if (mapped && mapped.match(/[\ue000-\ue999]|[\u1f000-\u1f999]|[\u00aa-\uffff]/g)) {
       var map = this.map;
       for (var i in map) {
-        var code = String.fromCharCode(parseInt(map[i][0], 16));
-        var rexp = new RegExp('(' + code + ')', 'g');
+        var codeA = String.fromCharCode(parseInt(map[i][0], 16));
+        var codeB = map[i][1] instanceof Array ? (String.fromCharCode(parseInt(map[i][1][0], 16)) + String.fromCharCode(parseInt(map[i][1][1], 16))) : String.fromCharCode(parseInt(map[i][1], 16));
+        var rexp = new RegExp('(' + codeA + '|' + codeB + ')', 'g');
         mapped = mapped.replace(rexp, '<img src="data:image/gif;base64,' + map[i][2] + '" alt="$1" />');
-        if (mapped != text) {
-          return mapped;
-        }
       }
     }
-    return text;
+    return mapped;
   },
   
   render: function (img, emoji) {
