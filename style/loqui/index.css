@@ -236,6 +236,8 @@ section#main article ul li span.lastMessage {
   max-width: calc(100% - 6.5rem);
   max-height: 1.4em;
   overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 section#main article ul li span.status img,
 section#main article ul li span.lastMessage img {
@@ -311,20 +313,10 @@ section#main > footer {
 section#main > footer .address {
   position: absolute;
   top: 1.05rem;
-  left: 1.4rem;
+  left: .8rem;
   line-height: 1em;
   font-weight: 300;
   font-size: .9rem;
-}
-section#main > footer .status {
-  display: block;
-  position: absolute;
-  left: .4rem;
-  top: 1.05rem;
-  width: .8rem;
-  height: .8rem;
-  border: .15rem solid #2F2F2F;
-  border-radius: 50%;
 }
 section#main > footer .avatar {
   position: absolute;
@@ -372,7 +364,7 @@ section#main fieldset#searchForm input {
   border-radius: .2rem!important;
   width: calc(100% - .5rem);
 }
-section#main:not([data-lacks~='localContacts']) fieldset#searchForm input {
+section#main[data-features~='localContacts'] fieldset#searchForm input {
   width: calc(100% - 2rem);
 }
 section#main fieldset#searchForm span.sync {
@@ -383,7 +375,7 @@ section#main fieldset#searchForm span.sync {
   right: 0;
   padding: .5rem .4rem .5rem .4rem;
 }
-section#main[data-lacks~='localContacts'] fieldset#searchForm span.sync {
+section#main:not([data-features~='localContacts']) fieldset#searchForm span.sync {
   display: none;
 }
 section#main fieldset#searchForm span.clear {
@@ -396,7 +388,7 @@ section#main fieldset#searchForm span.clear {
   color: #CCC;
   font-size: 1.4rem;
 }
-section#main:not([data-lacks~='localContacts']) fieldset#searchForm span.clear {
+section#main[data-features~='localContacts'] fieldset#searchForm span.clear {
   right: 1.8rem;
 }
 
@@ -442,8 +434,10 @@ section#chat header .status {
   line-height: 1.2em;
   font-weight: 300;
   height: 1.2em;
+  max-width: calc(100% - 7rem);
   overflow: hidden;
-  max-width: calc(100% - 7rem)
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 section#chat header .show {
   display: block;
@@ -755,7 +749,7 @@ section#chat article#videocall button {
   width: 100%;
 }
 
-section[data-lacks~=presence] span.show {
+section:not([data-features~=presence]) span.show {
   display: none!important;
 }
 
@@ -812,25 +806,41 @@ section.profile div#card span.provider img {
   height: 1rem;
   margin-right: .3rem;
 }
-section#me[data-lacks~=statusChange] div#status {
+section#me.profile[data-features~=avatarChange]  div#card span.avatar:after {
+    content: "Change";
+    display: block;
+    position: absolute;
+    top: 5rem;
+    left: 0;
+    font-size: .8em;
+    padding: .2rem .5rem;
+    background-color: #FFF;
+    color: #444;
+    border-radius: .4rem;
+    opacity: .7;
+}
+section#me:not([data-features~=statusChange]) div#status {
   display: none!important;
 }
-section#me[data-lacks~=rosterMgmt] button.contactAdd {
+section#me:not([data-features~=rosterMgmt]) button.contactAdd {
   display: none!important;
 }
-section#me[data-lacks~=pay] button.accountPurchase {
+section#me:not([data-features~=pay]) button.accountPurchase {
   display: none!important;
 }
-section#chat[data-lacks~=imageSend] a.picture {
+section#chat:not([data-features~=imageSend]) a.picture {
   display: none!important;
 }
-section#chat[data-lacks~=videoSend] a.video {
+section#chat:not([data-features~=videoSend]) a.video {
   display: none!important;
 }
-section#chat[data-lacks~=audioSend] a.audio {
+section#chat:not([data-features~=audioSend]) a.audio {
   display: none!important;
 }
-section#chat[data-lacks~=locationSend] a.location {
+section#chat:not([data-features~=locationSend]) a.location {
+  display: none!important;
+}
+section#chat:not([data-features~=attention]) a.bolt {
   display: none!important;
 }
 section#me div#status input {
@@ -971,11 +981,21 @@ section[data-show=na] header .backchange,
 section:not([data-show]) header .backchange
 section[data-show=na] footer .backchange,
 section:not([data-show]) footer .backchange {
-  background-color: #BDC3C7;
+  display: none!important;
 }
 
 .disHide section#main article#contacts li[data-show='na'] {
   display: none;
+}
+
+section#main article#contacts li[data-show='na'] .status,
+section#main article#contacts li[data-show='na'] .show,
+section#main article#contacts li[data-muc='true'] .show {
+  display: none!important;
+}
+
+section#chat[data-muc='true'] header .show {
+  display: none!important;
 }
 
 section#settings nav a#developer {

@@ -5,7 +5,7 @@ var Chat = function (core, account) {
   // Holds only chat data and no functions
   this.core = core;
   this.core.unread = this.core.unread || 0;
-  this.core.last = this.core.last || [];
+  this.core.last = this.core.last || {};
   this.account = account;
   
   // Render last chunk of messages
@@ -113,7 +113,7 @@ var Chat = function (core, account) {
     var section = $('section#chat');
     var header = section.children('header');
     section.data('jid', this.core.jid);
-    section.data('lacks', $('section#main').data('lacks'));
+    section.data('features', $('section#main').data('features'));
     section.data('muc', this.core.muc || false);
     header.children('.title').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(this.core.title));
     if (this.core.muc) {
@@ -125,12 +125,12 @@ var Chat = function (core, account) {
       }
     } else {
       var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.jid);
-      var show = contact ? (contact.show || 'na') : 'na';
-      var status = contact ? (contact.status || _('show' + show)) : ' ';
-      if (this.account.connector.contactPresenceGet) {
-        this.account.connector.contactPresenceGet(this.core.jid);
+      var show = this.account.connector.isConnected() && contact ? (contact.presence.show || 'na') : 'na';
+      var status = contact ? (contact.presence.status || _('show' + show)) : ' ';
+      if (this.account.connector.presence.get) {
+        this.account.connector.presence.get(this.core.jid);
       }
-      header.children('.status').text(status);
+      header.children('.status').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(status));
       section.data('show', show);
     }
     if (App.avatars[this.core.jid]) {

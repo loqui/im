@@ -7,21 +7,20 @@
  * Implements http://xmpp.org/extensions/xep-0224.html
  */
  
-var AttentionPlugin = function (conn) {
+Strophe.addConnectionPlugin('attention', {
 
-  this._connection = conn;
-  this._callback = null;
+  _connection: null,
   
-  this.setCallback = function (callback) {
-    this._callback = callback;
-    return true;
-  }
+  init: function(conn) {
+    this._connection = conn;
+    Strophe.addNamespace('XEP0224', 'urn:xmpp:attention:0');
+  },
   
-  this.unsetCallback = function () {
-    this._callback = null;
-  }
+  handlify: function (callback) {
+    return this._connection.addHandler(callback, Strophe.NS.XEP0224, 'message', 'headline', null, null);
+  },
   
-  this.request = function (to, body) {
+  request: function (to, body) {
     var msg = $msg({to: to, type: 'headline'});
 	  if (body) {
 		  msg.c('body', {}, body);
@@ -30,16 +29,4 @@ var AttentionPlugin = function (conn) {
 	  this._connection.send(msg.tree());
   }
   
-  this._handler = function (stanza) {
-    if ($(stanza).children('attention').length) {
-      if (this._callback) {
-        this._callback(stanza);
-      }
-    }
-    return true;
-  }
-
-  Strophe.addNamespace('XEP0224', 'urn:xmpp:attention:0');
-  this._connection.addHandler(this._handler.bind(this), null, 'message', 'headline', null, null);
-  
-}
+});

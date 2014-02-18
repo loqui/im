@@ -17,7 +17,7 @@ $('document').ready(function(){
     });
     $('[data-menu-onclick]').each(function () {
       var menu = $(this).data('menu-onclick');
-      $(this).on('click', function () {
+      $(this).on('click', function (e) {
         Menu.show(menu, this);
       });
     });
@@ -26,7 +26,7 @@ $('document').ready(function(){
       platform: (Lungo.Core.environment().os ? Lungo.Core.environment().os.name : 'PC')
     });
     bindings();
-      App.run();
+    App.run();
   });
 });
 
@@ -155,9 +155,6 @@ var bindings = function () {
   });
   $('section#chat nav#plus a.cancel').on('click', function() {
     $(this).parent().removeClass('show');
-  });
-  $('section#chat nav#plus a.bolt').on('click', function() {
-    Plus.bolt();
   });
   $('section#welcome').on('click', function(){
      Menu.show('providers');

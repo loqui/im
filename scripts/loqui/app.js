@@ -4,7 +4,7 @@ var App = {
 
   name: 'Loqui IM',
   shortName: 'Loqui',
-  version: 'v0.2.5c',
+  version: 'v0.2.6',
   connectors: [],
   logForms: [],
   emoji: [],
@@ -15,7 +15,7 @@ var App = {
   devsettings: {},
   avatars: {},
   online: true,
-  lastNot: null,
+  notifications: [],
   pathFiles: 'loqui/files/',
   pathBackup: 'loqui/backup/',
   
@@ -27,6 +27,7 @@ var App = {
         sound: true,
         disHide: false,
         csn: true,
+        boltGet: true,
         devMode: false
       },
       devsettings: {
@@ -62,6 +63,7 @@ var App = {
     // Load settings and data from storage
     App.load(function () {
       // Log in or show wizard 
+      App.upgrade();
       App.start();
     });
   },
@@ -111,6 +113,25 @@ var App = {
     });
   },
   
+  // Perform special processes if upgrading from older version
+  upgrade: function () {
+    var last = localStorage.getItem('version') || 'v0.2.5';
+    var from = {
+      'v0.2.5': function () {
+        for (var key in App.accounts) {
+          var account = App.accounts[key];
+          account.core.roster = [];
+          account.save();
+        }
+      }
+    };
+    if (last < App.version) {
+      Lungo.Notification.show('forward', _('Upgrading'), 10);
+      from[last]();
+      localStorage.setItem('version', App.version);
+    }
+  },
+  
   // Bootstrap logins and so on
   start: function () {
     // If there is already a configured account
@@ -138,7 +159,9 @@ var App = {
   disconnect: function () {
     for (var i in this.accounts) {
       var account = this.accounts[i];
-      account.connector.disconnect();
+      if (account.connector.isConnected()) {
+        account.connector.disconnect();
+      }
       account.accountRender();
       account.presenceRender();
     }
@@ -170,7 +193,10 @@ var App = {
   switchesRender: function () {
     var ul = $('section#settings article#features ul').empty();
     var body = $('body');
-    for (var key in this.settings) {
+    for (var key in App.defaults.App.settings) {
+      if (!(key in this.settings)) {
+        this.settings[key] = App.defaults.App.settings[key];
+      }
       var value = this.settings[key];
       var li = $('<li><span></span><switch/></li>');
       li.children('span').text(_('Set' + key));
@@ -197,6 +223,7 @@ var App = {
         body.removeClass(key);
       }
     }
+    App.smartupdate('settings');
   },
 
   switchesDevRender: function () {
@@ -232,18 +259,25 @@ var App = {
   },
   
   // Display a system notification or play a sound accordingly
-  notify: function (core, altSound) {
-    if (navigator.mozNotification && document.hidden) {
-      App.lastNot = navigator.mozNotification.createNotification(core.subject, core.text, core.pic);
-      App.lastNot.onclick = function () {
-        core.callback();
-        this.onclick = function (e) {
-          // This is a trick for circumventing Gaia bug #949257 
-        };
+  notify: function (core, altSound, force) {
+    var alt = function () {
+      App.audio(altSound);    
+    }
+    if (force || navigator.mozNotification && document.hidden) {
+      if ('mozNotification' in navigator) {
+        var notification = navigator.mozNotification.createNotification(core.subject, core.text, core.pic);
+        notification.onclick = function () {
+          core.callback();
+          App.notifications.length = 0;
+        }
+        notification.show();
+        App.notifications.push(notification);
       }
-      App.lastNot.show();
+      if (force) {
+        alt();
+      }
     } else {
-      this.audio(altSound);
+      alt();
     }
   },
   

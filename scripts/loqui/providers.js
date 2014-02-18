@@ -9,7 +9,7 @@ var Providers = {
       connector: {
         type: 'coseme'
       },
-      lacks: ['attention', 'multi', 'presence', 'easyAvatars', 'avatarChange', 'statusChange'],
+      features: ['localContacts', 'receipts', 'imageSend', 'videoSend', 'audioSend', 'locationSend', 'pay', 'muc', 'csn', 'avatarChange', 'statusChange', 'presence'],
       color: '#254242',
       terms: {
         user: 'YourNumber',
@@ -23,11 +23,11 @@ var Providers = {
       altname: 'Facebook',
       connector: {
         type: 'XMPP',
-        host: 'https://app.loqui.im/http-bind/',
+        host: 'https://bosh.loqui.im/',
         timeout: 300
       },
       autodomain: 'chat.facebook.com',
-      lacks: ['multi', 'avatarChange', 'statusChange', 'attention', 'rosterMgmt', 'receipts', 'localContacts', 'imageSend', 'pay', 'videoSend', 'audioSend', 'locationSend'],
+      features: ['vcard', 'presence', 'easyAvatars', 'csn'],
       color: '#3D539F',
       terms: {
         user: 'ProviderUsername',
@@ -42,11 +42,11 @@ var Providers = {
       altname: 'Gmail',
       connector: {
         type: 'XMPP',
-        host: 'https://app.loqui.im/http-bind/',
+        host: 'https://bosh.loqui.im/',
         timeout: 300
       },
       autodomain: 'gmail.com',
-      lacks: ['avatarChange', 'receipts', 'localContacts', 'imageSend', 'pay', 'videoSend', 'audioSend', 'locationSend'],
+      features: ['multi', 'presence', 'vcard', 'easyAvatars', 'avatarChange', 'rosterMgmt', 'csn', 'delay', 'statusChange'],
       color: '#4EA43B',
       terms: {
         user: 'ProviderAddress',
@@ -61,11 +61,11 @@ var Providers = {
       longName: 'Nimbuzz',
       connector: {
         type: 'XMPP',
-        host: 'https://app.loqui.im/http-bind/',
+        host: 'https://bosh.loqui.im/',
         timeout: 300
       },
       autodomain: 'nimbuzz.com',
-      lacks: ['vcard', 'avatarChange', 'attention', 'receipts', 'localContacts', 'imageSend', 'pay', 'videoSend', 'audioSend', 'locationSend'],
+      features: ['multi', 'presence', 'easyAvatars', 'csn'],
       color: '#FF8702',
       terms: {
         user: 'Username',
@@ -79,11 +79,11 @@ var Providers = {
       altname: 'ovi',
       connector: {
         type: 'XMPP',
-        host: 'https://app.loqui.im/http-bind/',
+        host: 'https://bosh.loqui.im/',
         timeout: 300
       },
       autodomain: 'chat.ovi.com',
-      lacks: ['avatarChange', 'attention', 'receipts', 'localContacts', 'imageSend', 'pay', 'videoSend', 'audioSend', 'locationSend'],
+      features: ['multi', 'presence', 'easyAvatars', 'csn'],
       color: '#39B006',
       terms: {
         user: 'Username',
@@ -97,11 +97,11 @@ var Providers = {
       altname: 'Lync',
       connector: {
         type: 'XMPP',
-        host: 'https://app.loqui.im/http-bind/',
+        host: 'https://bosh.loqui.im/',
         timeout: 300
       },
       autodomain: false,
-      lacks: ['avatarChange', 'attention', 'receipts', 'localContacts', 'imageSend', 'pay', 'videoSend', 'audioSend', 'locationSend'],
+      features: ['multi', 'presence', 'easyAvatars', 'csn'],
       color: '#0071C5',
       terms: {
         user: 'ProviderAddress',
@@ -115,11 +115,11 @@ var Providers = {
       longName: 'XMPP/Jabber',
       connector: {
         type: 'XMPP',
-        host: 'https://app.loqui.im/http-bind/',
+        host: 'wss://websockets.loqui.im/',
         timeout: 300
       },
       autodomain: false,
-      lacks: ['receipts', 'localContacts', 'imageSend', 'pay', 'videoSend', 'audioSend', 'locationSend'],
+      features: ['multi', 'vcard', 'presence', 'easyAvatars', 'rosterMgmt', 'avatarChange', 'attention', 'csn', 'delay', 'time', 'statusChange'],
       color: '#149ED2',
       terms: {
         user: 'FullJID',

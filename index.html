@@ -22,7 +22,7 @@
   <section id='welcome' data-transition='simple'>
     <article id='main' class='scroll'>
       <img src='img/mascot.svg' alt='Loqui' />
-      <h1 data-l10n-id='WelcomeTo' data-l10n-args='{ "app": "Loqui" }'>Welcome to Loqui</h1>
+      <h1 data-l10n-id='WelcomeTo' data-l10n-args='{ "app": "Loqui" }'>Welcome to Loqui IM</h1>
     </article>
   </section>
   <section id='providers' data-transition='simple' class='form'>
@@ -63,7 +63,6 @@
     </article>
     <footer data-menu-onclick='me'>
       <span class='avatar'><img /></span>
-      <span class='status backchange'></span>
       <span class='address'></span>
     </footer>
   </section>
@@ -74,17 +73,12 @@
       </nav>
       <nav data-control='groupbar'>
         <a data-l10n-id='Features' data-view-article='features' class='active'>Features</a>
+        <a data-l10n-id='Developer' data-view-article='devmode' id='developer'>Developer</a>
         <a data-l10n-id='Info' data-view-article='info'>Info</a>
-        <a id="developer" data-l10n-id='Developer' data-view-article='devmode'>Developer</a>
       </nav>
     </header>
     <article id='features' class='scroll'>
       <ul></ul>
-    </article>
-    <article id='info' class='simple scroll'>
-      <h1><span data-var='name'></span> <span data-var='version'></span></h1>
-      <p data-l10n-id='Copyright'>© 2013-2014 LoquiIM. Some rights reserved.</p><br />
-      <small data-l10n-id='FreeSoftware'>This program is free software; you may redistribute and/or modify it under the terms of the GNU Affero General Public License (AGPL 3) as published by the Free Software Foundation.</small>
     </article>
     <article id='devmode' class='scroll'>
       <ul></ul>
@@ -96,6 +90,12 @@
         <button data-icon='down-sign'></button>
         <p data-l10n-id='Import'>Import data</p>
       </div>
+    </article>
+    <article id='info' class='simple scroll'>
+      <h1><span data-var='name'></span> <span data-var='version'></span></h1>
+      <p data-l10n-id='Copyright'>© 2013-2014 Loqui IM. Some rights reserved.</p>
+      <p><a target="_external" href="http://loqui.im/"><em data-l10n-id='Website'>Website</em></a></p><br />
+      <small data-l10n-id='FreeSoftware'>This program is free software; you may redistribute and/or modify it under the terms of the GNU Affero General Public License (AGPL 3) as published by the Free Software Foundation.</small>
     </article>
   </section>
   <section id='me' data-transition='simple' class='fix head profile'>
@@ -120,7 +120,7 @@
         <div class='buttongroup'>
           <button class='contactAdd' data-l10n-id='ContactAdd' data-menu-onclick='contactAdd' >Add a new contact</button>
           <button class='accountRemove' data-l10n-id='AccountRemove' data-menu-onclick='accountRemove'>Remove this account</button>
-          <button class='accountPurchase' data-l10n-id='Purchase' data-menu-onclick='purchase'>Purchase Whatsapp</button>
+          <button class='accountPurchase' data-l10n-id='Purchase' data-menu-onclick='purchase'>Purchase WhatsApp</button>
         </div>
       </div>
     </article>
@@ -167,13 +167,6 @@
         <h2 data-l10n-id='Participants'>Participants</h2>
         <ul></ul>
       </div>
-      <!--<div id='actions'>
-        <h2 data-l10n-id='Actions'>Actions</h2>
-        <div class='buttongroup'>
-          <button class='' data-l10n-id='ChatRemove' data-menu-onclick='chatRemove'>Clear chats with this contact</button>
-          <button data-l10n-id='ContactRemove' data-menu-onclick='contactRemove'>Remove this contact</button>
-        </div>
-      </div>-->
     </article>
   </section>
   <section id='contactAdd' data-transition='simple' class='fix head'>
@@ -240,8 +233,8 @@
         <a class='video' data-menu-onclick='videoSend' data-icon='video' data-l10n-id='Video'>Video</a>
         <a class='audio' data-menu-onclick='audioSend' data-icon='music' data-l10n-id='Audio'>Audio</a>
         <a class='location' data-menu-onclick='locationSend' data-icon='map-marker' data-l10n-id='Location'>Location</a>
-        <!--<a class='bolt' data-icon='bolt' data-l10n-id='Bolt'>Bolt</a>
-        <a class='call' data-menu-onclick='call' data-icon='mobile-phone' data-l10n-id='Call'>Call</a>
+        <a class='bolt' data-menu-onclick='bolt' data-icon='bolt' data-l10n-id='Bolt'>Bolt</a>
+        <!--<a class='call' data-menu-onclick='call' data-icon='mobile-phone' data-l10n-id='Call'>Call</a>
         <a class='videocall' data-menu-onclick='videocall' data-icon='video' data-l10n-id='VideoCall'>VideoCall</a>-->
     </nav>
   </section>
@@ -285,9 +278,7 @@
   <script type='text/javascript' src='scripts/mozilla/async_storage.js'></script>
   <script type='text/javascript' src='scripts/caolan/async.js'></script>
   <script type='text/javascript' src='scripts/paj/sha1.js'></script>
-  <script type='text/javascript;version=1.7' src='scripts/andreasgal/PhoneNumberMetadata.js'></script>
-  <script type='text/javascript;version=1.7' src='scripts/andreasgal/PhoneNumberNormalizer.js'></script>
-  <script type='text/javascript;version=1.7' src='scripts/andreasgal/PhoneNumber.js'></script>
+  <script type='text/javascript' src='scripts/albeebe/phoneformat.js'></script>
   <script type='text/javascript' src='scripts/strophe/strophe.js'></script>
   <script type='text/javascript' src='scripts/strophe/plugins/disco.js'></script>
   <script type='text/javascript' src='scripts/strophe/plugins/caps.js'></script>
@@ -295,6 +286,7 @@
   <script type='text/javascript' src='scripts/strophe/plugins/roster.js'></script>
   <script type='text/javascript' src='scripts/strophe/plugins/vcard.js'></script>
   <script type='text/javascript' src='scripts/strophe/plugins/attention.js'></script>
+  <script type='text/javascript' src='scripts/strophe/plugins/time.js'></script>
   <script type='text/javascript' src='scripts/anonymous/coseme.js'></script>
   <script type='text/javascript' src='scripts/loqui/store.js'></script>
   <script type='text/javascript' src='scripts/loqui/app.js'></script>

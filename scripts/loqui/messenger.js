@@ -31,7 +31,7 @@ var Messenger = {
   csn: function (state) {
     var to = $('section#chat').data('jid');
     var account = this.account();
-    if (account.supports('csn') && App.settings.csn) {
+    if (account.connector.isConnected() && account.supports('csn') && App.settings.csn) {
       account.connector.csnSend(to, state);
     }
   },
@@ -39,29 +39,7 @@ var Messenger = {
   avatarSet: function (blob) {
     var account = this.account();
     if (account.supports('avatarChange')) {
-      var reader = new FileReader();
-      var jid = Strophe.getBareJidFromJid(account.core.jid)
-      reader.onload = function (event) {
-        var img = new Image();
-        img.onload = function () {
-          var canvas = document.createElement('canvas');
-          canvas.width = 96;
-          canvas.height = 96;
-          canvas.getContext('2d').drawImage(img, 0, 0, 96, 96);
-          var url = canvas.toDataURL();
-          if (account.supports('vcard')) {
-            $(account.vcard).find('TYPE').text('image/png');
-            $(account.vcard).find('BINVAL').text(url.split(',')[1]);
-            account.connector.connection.vcard.set(function () {
-              $('section#main footer .avatar img').attr('src', url);
-            }, account.vcard, jid);
-          } else {
-            Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign', 3);
-          }
-        }
-        img.src = event.target.result;
-      }
-      reader.readAsDataURL(blob);
+      account.connector.avatarSet(blob);
     } else {
       Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign', 3);
     }
@@ -69,7 +47,7 @@ var Messenger = {
   
   presenceUpdate: function () {
     var account = this.account();
-    if (App.online && account.connector.connection.connected) {
+    if (App.online && account.connector.connected) {
       var status = $('section#me #status input').val();
       account.connector.presence.set(null, status);
     } else {
@@ -87,7 +65,7 @@ var Messenger = {
     section.find('#card .name').text(name == jid ? ' ' : name);
     section.find('#card .user').text(jid);
     section.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/' + account.core.provider + '.svg')).append(Providers.data[account.core.provider].longName);
-    section.find('#status p').text(contact.status || _('showna'));
+    section.find('#status p').html(App.emoji[Providers.data[account.core.provider].emoji].fy(contact.presence.status) || _('showna'));
     if (App.avatars[jid]) {
       Store.recover(App.avatars[jid], function (val) {
         section.find('#card .avatar').children('img').attr('src', val);

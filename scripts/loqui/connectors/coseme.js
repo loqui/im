@@ -9,8 +9,8 @@ App.connectors['coseme'] = function (account) {
   this.account = account;
   this.provider = Providers.data[account.core.provider];
   this.presence = {
-    show: App.defaults.Connector.presence.show,
-    status: App.defaults.Connector.presence.status
+    show: this.account.core.presence ? this.account.core.presence.show : App.defaults.Connector.presence.show,
+    status: this.account.core.presence ? this.account.core.presence.status : App.defaults.Connector.presence.status
   };
   this.handlers = {};
   this.events = {}
@@ -33,10 +33,11 @@ App.connectors['coseme'] = function (account) {
       Tools.log("AUTH FAIL");
       this.connected = false;
       callback.authfail();
-      Lungo.Notification.error(_('AuthInvalid'), _('AuthInvalidNotice'), 'warning-sign', 8);
     }.bind(this));
     SI.registerListener('disconnected', function () {
-      callback.disconnected();
+      if (callback.disconnected) {
+        callback.disconnected();
+      }
     });
     MI.call(method, params);
   }
@@ -57,17 +58,25 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.sync = function (callback) {
-    if (!('roster' in this.account.core)) {
-      this.account.core.roster = [];
-      this.contacts.sync(callback);
+    var getStatuses = function () {
+      var method = 'contact_getStatuses';
+      var list = this.account.core.roster.map(function(e){return e.jid;});
+      MI.call(method, [list]);
+    }.bind(this);
+    if (!('roster' in this.account.core) || !this.account.core.roster.length) {
+      this.contacts.sync(function () {
+        callback(getStatuses);
+      });
     } else {
-      callback();
+      callback(getStatuses);
     }
   }.bind(this);
   
   this.contacts.sync = function (cb) {
     Tools.log('SYNCING CONTACTS');
+    Lungo.Notification.show('download', _('Synchronizing'), 10);
     var account = this.account;
+    this.account.core.roster = [];
     var allContacts = navigator.mozContacts.getAll({sortBy: 'givenName', sortOrder: 'ascending'});
     allContacts.onsuccess = function (event) {
       if (this.result) {
@@ -89,25 +98,31 @@ App.connectors['coseme'] = function (account) {
             var add = function (jid, name) {
               var contact = {
                 jid: jid,
-                name: fullname
+                name: fullname,
+                presence: {
+                  show: 'na',
+                  status: null
+                }
               }
               account.core.roster.push(contact);
-              Tools.log(name, 'did not exist, appending', contact);
             }
-            var update = function (existing, jid, name) {
-              existing.name = name;
-              Tools.log(name, 'already existed, updating to', existing);
+            var update = function (jid, name) {
+              var ci = account.chatFind(jid);
+              if (ci >= 0) {
+                account.core.chats[ci].title = name;
+              }
+              var existing = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
+              if (existing) {
+                existing.name = name;
+              } else {
+                add(jid, name);
+              }
             }
             for (var i = 0; i < result.tel.length; i++) {
-              var number = result.tel[i] ? Tools.numSanitize(result.tel[i].value, account.core.cc) : null;
+              var number = result.tel[i] ? Tools.numSanitize(account.core.cc, result.tel[i].value) : null;
               if (number) {
                 var jid = number + '@' + CoSeMe.config.domain;
-                var existing = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
-                if (existing) {
-                  update(existing, jid, fullname);
-                } else {
-                  add(jid, fullname);
-                }
+                update(jid, fullname);
               }
             }   
           }
@@ -116,6 +131,7 @@ App.connectors['coseme'] = function (account) {
         }
         this.continue();
       } else if (cb){
+        Tools.log('CONTACT ACQUIRE ERROR');
         cb();
       }
     }
@@ -138,10 +154,20 @@ App.connectors['coseme'] = function (account) {
   this.contacts.remove = function () {
   }
   
+  this.presence.get = function (jid) {
+    var method = 'presence_request';
+    MI.call(method, [jid]);
+  }
+  
   this.presence.set = function (show, status) {
     this.presence.show = show || this.presence.show;
     this.presence.status = status || this.presence.status;
     this.presence.send();
+    this.account.core.presence = {
+      show: this.presence.show,
+      status: this.presence.status
+    }
+    this.account.save();
   }.bind(this);
   
   this.presence.send = function (show, status, priority) {
@@ -157,6 +183,7 @@ App.connectors['coseme'] = function (account) {
         chat: 'presence_sendAvailableForChat'
       };
       MI.call(method[show], []);
+      MI.call('profile_setStatus', [status]);
     }
   }.bind(this);
   
@@ -174,7 +201,9 @@ App.connectors['coseme'] = function (account) {
     var method = 'contact_getProfilePicture';
     var params = id ? [id] : [this.account.core.fullJid];
     MI.call(method, params);
-    callback('img/foovatar.png');
+    if (callback) {
+      callback('img/foovatar.png');
+    }
   }.bind(this);
   
   this.groupAvatar = function (callback, id) {
@@ -198,11 +227,6 @@ App.connectors['coseme'] = function (account) {
   
   this.groupParticipantsGet = function (jid) {
     var method = 'group_getParticipants';
-    MI.call(method, [jid]);
-  }
-  
-  this.contactPresenceGet = function (jid) {
-    var method = 'presence_request';
     MI.call(method, [jid]);
   }
   
@@ -237,6 +261,28 @@ App.connectors['coseme'] = function (account) {
     });
   }
   
+  this.avatarSet = function (blob) {
+    function UrlToBin (url, cb) {
+      var reader = new FileReader();
+      reader.addEventListener('loadend', function() {
+        cb(reader.result);
+      });
+      reader.readAsBinaryString(Tools.b64ToBlob(url.split(',').pop(), 'image/jpg'));
+    }
+    Tools.picThumb(blob, 480, 480, function (url) {
+      UrlToBin(url, function (bin) {
+        var picBin = bin;
+        Tools.picThumb(blob, 96, 96, function (url) {
+          UrlToBin(url, function (bin) {
+            var thumbBin = bin;
+            var method = 'profile_setPicture';
+            MI.call(method, [thumbBin, picBin]);
+          });
+        });
+      });
+    });
+  }
+  
   this.handlers.init = function () {
     Tools.log('HANDLERS INIT');
     var signals = {
@@ -253,10 +299,10 @@ App.connectors['coseme'] = function (account) {
       receipt_messageDelivered: this.events.onMessageDelivered,
       receipt_visible: this.events.onMessageVisible,
       receipt_broadcastSent: null,
-      status_dirty: null,
+      status_dirty: this.events.onStatusDirty,
       presence_updated: this.events.onPresenceUpdated,
-      presence_available: null,
-      presence_unavailable: null,
+      presence_available: this.events.onPresenceAvailable,
+      presence_unavailable: this.events.onPresenceUnavailable,
       group_subjectReceived: null,
       group_createSuccess: null,
       group_createFail: null,
@@ -285,12 +331,13 @@ App.connectors['coseme'] = function (account) {
       notification_groupParticipantRemoved: null,
       contact_gotProfilePictureId: null,
       contact_gotProfilePicture: this.events.onAvatar,
+      contact_gotStatus: this.events.onPresenceUpdated,
       contact_typing: this.events.onContactTyping,
       contact_paused: this.events.onContactPaused,
-      profile_setPictureSuccess: null,
-      profile_setPictureError: null,
-      profile_setStatusSuccess: null,
-      ping: this.events.onPing,
+      profile_setPictureSuccess: this.events.onProfileSetPictureSuccess,
+      profile_setPictureError: this.events.onProfileSetPictureError,
+      profile_setStatusSuccess: this.events.onMessageDelivered,
+      ping: Tools.log,
       pong: null,
       disconnected: null,
       media_uploadRequestSuccess: this.events.onUploadRequestSuccess,
@@ -306,10 +353,10 @@ App.connectors['coseme'] = function (account) {
       }
     }.bind(this));
   }.bind(this);
-  
-  this.events.onPing = function (idx) {
-    var method = 'pong';
-    MI.call(method, [idx]);
+
+  this.events.onStatusDirty = function (categories) {
+    var method = 'cleardirty';
+    MI.call(method, [categories]);
   }
   
   this.events.onDisconnected = function () {
@@ -368,6 +415,7 @@ App.connectors['coseme'] = function (account) {
     if (jid == this.account.core.fullJid) {
       Tools.picThumb(blob, 96, 96, function (url) {
         $('section#main[data-jid="' + jid + '"] footer span.avatar img').attr('src', url);
+        $('section#me .avatar img').attr('src', url);
         App.avatars[jid] = Store.save(url, function () {
           Store.put('avatars', App.avatars);
         });
@@ -406,17 +454,19 @@ App.connectors['coseme'] = function (account) {
   this.events.onMessageDelivered = function (from, msgId) {
     Tools.log('DELIVERED', from, msgId);
     $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"][data-type="out"]').data('receipt', 'delivered');
+    MI.call('delivered_ack', [from, msgId]);
   }
   
   this.events.onMessageVisible = function (from, msgId) {
     Tools.log('VISIBLE', from, msgId);
     $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"][data-type="out"]').data('receipt', 'visible');
+    MI.call('visible_ack', [from, msgId]);
   }
 
   this.events.onGroupInfoError = function (jid, owner, subject, subjectOwner, subjectTime, creation) {
     Tools.log('ERROR GETTING GROUP INFO', jid, owner, subject, subjectOwner, subjectTime, creation);
   }
-  
+
   this.events.onGroupGotInfo = function (jid, owner, subject, subjectOwner, subjectTime, creation) {
     var account = this.account;
     var ci = account.chatFind(jid);
@@ -436,14 +486,16 @@ App.connectors['coseme'] = function (account) {
         owner: owner,
         chunks: []
       }, account);
-      chat.save(ci, true);
+      account.chats.push(chat);
+      account.core.chats.push(chat.core);
+      chat.save(ci);
     }
   }
   
   this.events.onGroupGotPicture = function (jid, picId, blob) {
     var account = this.account;
     Tools.picThumb(blob, 96, 96, function (url) {
-      $('ul[data-provider="' + account.core.provider + '"][data-user="' + account.core.user + '"] [data-jid="' + jid + '"] span.avatar img').attr('src', url);
+      $('ul[data-jid="' + account.core.fullJid + '"] li[data-jid="' + jid + '"] span.avatar img').attr('src', url);
       $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', url);
       App.avatars[jid] = Store.save(url, function () {
         Store.put('avatars', App.avatars);
@@ -512,10 +564,51 @@ App.connectors['coseme'] = function (account) {
     return this.mediaProcess('url', fromAttribute, to, [mlatitude, mlongitude, name], null, null, true);
   }
   
-  this.events.onPresenceUpdated = function (jid, lastSeen) {
+  this.events.onPresenceUpdated = function (jid, lastSeen, msg) {
     var account = this.account;
+    var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
     var time = Tools.convenientDate(Tools.localize(Tools.stamp( Math.floor((new Date).valueOf()/1000) - parseInt(lastSeen) )));
-    $('section#chat[data-jid="' + jid + '"] header .status').text(parseInt(lastSeen) < 180 ? _('showa') : _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})}));
+    if (!('presence' in contact)) {
+      contact.presence = {};
+    }
+    if (msg) {
+      if (msg != contact.presence.status) {
+        contact.presence.status = msg;
+        if (msg == 'Hey there! I am using WhatsApp.') {
+          contact.presence.show = 'na';
+        } else {
+          contact.presence.show = contact.presence.show != 'na' ? contact.presence.show : 'away';
+        }
+        account.presenceRender(jid);
+      }
+    } else {
+      contact.presence.show = parseInt(lastSeen) < 300 ? 'a' : 'away';
+      account.presenceRender(jid);
+      var chatSection = $('section#chat[data-jid="' + jid + '"]');
+      var status = chatSection.find('header .status');
+      status.html((parseInt(lastSeen) < 300 ? _('showa') : _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})})) +  ' - ' + status.html());
+    }
+  }
+  
+  this.events.onPresenceAvailable = function (jid) {
+    var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
+    contact.presence.show = 'a';
+    account.presenceRender(jid);
+  }
+  
+  this.events.onPresenceUnavailable = function (jid) {
+    var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
+    contact.presence.show = 'away';
+    account.presenceRender(jid);
+  }
+  
+  this.events.onProfileSetPictureSuccess = function (pictureId) {
+    Tools.log('CHANGED AVATAR TO', pictureId);
+    this.avatar();
+  }
+  
+  this.events.onProfileSetPictureError = function (err) {
+    Lungo.Notification.error(_('NotUploaded'), _('ErrorUploading'), 'warning-sign', 5);
   }
   
   this.events.onUploadRequestSuccess = function (hash, url, resumeFrom) {
@@ -1273,19 +1366,17 @@ App.emoji['coseme'] = {
   },
    
   fy: function (text) {
-    if (text.match(/[\ue000-\ue999]/g)) {
-      var mapped = text;
+    var mapped = text;
+    if (mapped && mapped.match(/[\ue000-\ue999]|[\u1f000-\u1f999]|[\u00aa-\uffff]/g)) {
       var map = this.map;
       for (var i in map) {
-        var code = String.fromCharCode(parseInt(map[i][0], 16));
-        var rexp = new RegExp('(' + code + ')', 'g');
+        var codeA = String.fromCharCode(parseInt(map[i][0], 16));
+        var codeB = map[i][1] instanceof Array ? (String.fromCharCode(parseInt(map[i][1][0], 16)) + String.fromCharCode(parseInt(map[i][1][1], 16))) : String.fromCharCode(parseInt(map[i][1], 16));
+        var rexp = new RegExp('(' + codeA + '|' + codeB + ')', 'g');
         mapped = mapped.replace(rexp, '<img src="data:image/gif;base64,' + map[i][2] + '" alt="$1" />');
-        if (mapped != text) {
-          return mapped;
-        }
       }
     }
-    return text;
+    return mapped;
   },
   
   render: function (img, emoji) {

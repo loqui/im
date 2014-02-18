@@ -5,8 +5,8 @@ App.connectors['XMPP'] = function (account) {
   this.account = account;
   this.provider = Providers.data[account.core.provider];
   this.presence = {
-    show: App.defaults.Connector.presence.show,
-    status: App.defaults.Connector.presence.status
+    show: this.account.core.presence ? this.account.core.presence.show : App.defaults.Connector.presence.show,
+    status: this.account.core.presence ? this.account.core.presence.status : App.defaults.Connector.presence.status
   };
   this.handlers = {};
   this.events = {}
@@ -17,7 +17,7 @@ App.connectors['XMPP'] = function (account) {
   this.connection = new Strophe.Connection(this.provider.connector.host);
   
   this.connect = function (callback) {
-    var user = this.account.core.user;
+    var user = this.account.core.user + '/' + App.shortName;
     var pass = this.account.core.pass;
     var handler = function (status) {
      switch (status) {
@@ -81,8 +81,9 @@ App.connectors['XMPP'] = function (account) {
   }
   
   this.start = function () {
-    this.presence.set();
     this.handlers.init();
+    this.capabilize();
+    this.presence.set();
   }
   
   this.sync = function (callback) {
@@ -93,41 +94,9 @@ App.connectors['XMPP'] = function (account) {
       account.core.fullJid = fullJid;
       account.save();
     }
-    var rosterCb = function (items, item, to) {
-      if (to) {
-        var sameOrigin = Strophe.getDomainFromJid(to) == Providers.data[account.core.provider].autodomain;
-        var noMulti = !account.supports('multi');
-        if (to == account.core.user || (noMulti && sameOrigin)) {
-          connector.roster = items;
-          connector.roster.sort(function (a,b) {
-            var aname = a.name ? a.name : a.jid;
-            var bname = b.name ? b.name : b.jid;
-            return aname > bname;
-          });
-          var map = function (entry, cb) {
-            var show, status;
-            for (var j in entry.resources) {
-              show = entry.resources[Object.keys(entry.resources)[0]].show || 'a';
-              status = entry.resources[Object.keys(entry.resources)[0]].status || _('show' + show);
-              break;
-            }
-            cb(null, {
-              jid: entry.jid,
-              name: entry.name,
-              show: show,
-              status: status
-            });
-          }
-          async.map(connector.roster, map.bind(account), function (err, result) {
-            account.core.roster = result;
-            account.presenceRender();
-          });
-        }
-      }
-    }
-    connector.connection.roster.registerCallback(rosterCb.bind(account));
+    connector.connection.roster.registerCallback(connector.events.onPresence);
     connector.connection.roster.get( function (ret) {
-      rosterCb(ret, null, account.core.user);
+      connector.events.onPresence(ret, null, account.core.user);
       if (account.supports('vcard')) {
         connector.connection.vcard.get( function (data) {
           connector.vcard = $(data).find('vCard').get(0);
@@ -139,10 +108,30 @@ App.connectors['XMPP'] = function (account) {
     });
   }.bind(this);
   
+  this.capabilize = function () {
+    var caps = [
+      ['attention', Strophe.NS.XEP0224],
+      ['csn', Strophe.NS.XEP0085],
+      ['delay', Strophe.NS.XEP0203],
+      ['time', Strophe.NS.XEP0202],
+      ['vcard', Strophe.NS.VCARD]
+    ];
+    for (var i in caps) {
+      if (this.account.supports(caps[i][0])) {
+        this.connection.caps.addFeature(caps[i][1]);
+      }
+    }
+  }
+  
   this.presence.set = function (show, status) {
     this.presence.show = show || this.presence.show;
     this.presence.status = status || this.presence.status;
     this.presence.send();
+    this.account.core.presence = {
+      show: this.presence.show,
+      status: this.presence.status
+    }
+    this.account.save();
   }.bind(this);
   
   this.presence.send = function (show, status) {
@@ -170,6 +159,11 @@ App.connectors['XMPP'] = function (account) {
         msg.c('status', {}, status);
       }
       msg.c('priority', {}, priority);
+      msg.cnode(this.connection.caps.createCapsNode().tree()).up();
+      if (this.account.core.avatarHash) {
+        var photoNode = this.account.core.avatarHash ? $build('photo').t(this.account.core.avatarHash) : $build('photo');
+        msg.cnode(this.connection.vcard.createUpdateNode(photoNode.tree()).tree()).up();
+      }
       this.connection.send(msg.tree());
     }
     $('section#main').attr('data-show', show);
@@ -178,6 +172,10 @@ App.connectors['XMPP'] = function (account) {
   this.send = function (to, text, delay) {
     this.connection.Messaging.send(to, text, delay);
   }.bind(this);
+  
+  this.attentionSend = function (to) {
+    this.connection.attention.request(to);
+  }
   
   this.avatar = function (callback, jid) {
     var extract = function (vcard) {
@@ -200,7 +198,23 @@ App.connectors['XMPP'] = function (account) {
     } else {
       extract($(this.vcard));
     }
-  }.bind(this);
+  }
+  
+  this.avatarSet = function(blob) {
+    Tools.picThumb(blob, 96, 96, function (url) {
+      var b64 = url.split(',').pop();
+      var vCardEl = $build('PHOTO');
+      vCardEl.c('TYPE', {}, 'image/jpg');
+      vCardEl.c('BINVAL', {}, b64);
+      this.connection.vcard.set(function (stanza) {
+        this.account.core.avatarHash = b64_sha1(b64);
+        this.account.save();
+        this.presence.send();
+        $('section#main footer .avatar img').attr('src', url);
+        $('section#me .avatar img').attr('src', url);
+      }.bind(this), vCardEl.tree());
+    }.bind(this));
+  }
   
   this.csnSend = function (to, state) {
       this.connection.Messaging.csnSend(to, state);
@@ -216,16 +230,11 @@ App.connectors['XMPP'] = function (account) {
   }
   
   this.handlers.init = function () {
-    if (!this.handlers.onMessage) {
-      this.handlers.onMessage = this.connection.addHandler(this.events.onMessage, null, 'message', 'chat', null, null);
-    }
-    if (!this.handlers.onSubRequest) {
-      this.handlers.onSubRequest = this.connection.addHandler(this.events.onSubRequest, null, 'presence', 'subscribe', null, null);
-    }
-    if (!this.handlers.onAttention) {
-      this.attention = new AttentionPlugin(this.connection);
-      this.handlers.onAttention = this.attention.setCallback(this.events.onAttention);
-    }
+    this.handlers.onMessage = this.connection.addHandler(this.events.onMessage, null, 'message', 'chat', null, null);
+    this.handlers.onSubRequest = this.connection.addHandler(this.events.onSubRequest, null, 'presence', 'subscribe', null, null);
+    this.handlers.onTime = this.connection.time.handlify(this.events.onTime);
+    this.handlers.onAttention = this.connection.attention.handlify(this.events.onAttention);
+    this.handlers.onDisco = this.connection.disco.handlify();
   }.bind(this);
   
   this.events.onDisconnected = function () {
@@ -262,6 +271,43 @@ App.connectors['XMPP'] = function (account) {
     return true;
   }.bind(this);
   
+  this.events.onPresence = function (items, item, to) {
+    var connector = this;
+    var account = this.account;
+    if (to) {
+      var sameOrigin = Strophe.getDomainFromJid(to) == Providers.data[account.core.provider].autodomain;
+      var noMulti = !account.supports('multi');
+      if (to == account.core.user || (noMulti && sameOrigin)) {
+        connector.roster = items;
+        connector.roster.sort(function (a,b) {
+          var aname = a.name ? a.name : a.jid;
+          var bname = b.name ? b.name : b.jid;
+          return aname > bname;
+        });
+        var map = function (entry, cb) {
+          var show, status;
+          for (var j in entry.resources) {
+            show = entry.resources[Object.keys(entry.resources)[0]].show || 'a';
+            status = entry.resources[Object.keys(entry.resources)[0]].status || _('show' + show);
+            break;
+          }
+          cb(null, {
+            jid: entry.jid,
+            name: entry.name,
+            presence: {
+              show: show,
+              status: status
+            }
+          });
+        }
+        async.map(connector.roster, map.bind(account), function (err, result) {
+          account.core.roster = result;
+          account.presenceRender();
+        });
+      }
+    }
+  }.bind(this);
+  
   this.events.onSubRequest = function (stanza) {
     this.connection.roster.authorize(Strophe.getBareJidFromJid($(stanza).attr('from')));
     return true;
@@ -282,13 +328,13 @@ App.connectors['XMPP'] = function (account) {
       window.navigator.vibrate([100,30,100,30,100,200,200,30,200,30,200,200,100,30,100,30,100]);
       App.notify({
         subject: chat.core.title,
-        text: _('HasSentYouABolt'),
-        pic: 'img/bolt.png',
+        text: _('SentYou', { type: _('MediaType_bolt') }),
+        pic: 'https://raw.github.com/loqui/im/dev/img/bolt.png',
         callback: function () {
           chat.show();
           App.toForeground();
         }
-      }, 'thunder');
+      }, 'thunder', true);
     }
     Tools.log(from, 'sent you a bolt.');
     return true;
@@ -358,7 +404,7 @@ App.emoji['XMPP'] = {
   fy: function (text) {
     var mapped = text;
     var map = this.map;
-    if (map.length != undefined) {
+    if (mapped && map.length != undefined) {
       for (var i in map) {
         var original = map[i][0];
         for (var j in map[i].slice(1)) {
@@ -416,7 +462,7 @@ App.emoji['FB'] = {
   fy: function (text) {
     var mapped = text;
     var map = this.map;
-    if (map.length != undefined) {
+    if (mapped && map.length != undefined) {
       for (var i in map) {
         var original = map[i][0];
         for (var j in map[i].slice(1)) {
@@ -472,7 +518,7 @@ App.emoji['GTALK'] = {
   fy: function (text) {
     var mapped = text;
     var map = this.map;
-    if (map.length != undefined) {
+    if (mapped && map.length != undefined) {
       for (var i in map) {
         var original = map[i][0];
         for (var j in map[i].slice(1)) {

@@ -103,24 +103,9 @@ var Tools = {
    * @param cc country code
    * @returns {string|void}
    */
-  numSanitize: function (num, cc) {
-    var region =  PHONE_NUMBER_META_DATA[cc] instanceof Array
-                  ? (
-                    PHONE_NUMBER_META_DATA[cc][0] instanceof Object
-                    ? 
-                      PHONE_NUMBER_META_DATA[cc][0].region
-                    :
-                      PHONE_NUMBER_META_DATA[cc][0].slice(2, 4)
-                    )
-                  : (
-                    PHONE_NUMBER_META_DATA[cc] instanceof Object
-                    ?
-                      PHONE_NUMBER_META_DATA[cc].region
-                    :
-                      PHONE_NUMBER_META_DATA[cc].slice(2, 4)
-                    );
-    var parsed = PhoneNumber.Parse(num.replace(/[\s\-\+]/g, ''), region);
-    return parsed ? parsed.internationalFormat.replace(/[\s\-\+]/g, '') : null;
+  numSanitize: function (cc, num) {
+    var country = i18n.phonenumbers.metadata.countryCodeToRegionCodeMap[cc][0];
+    return formatE164(country, num).replace(/[\s\-\+]/g, '');
   },
   
   countries: function () {
@@ -153,7 +138,7 @@ var Tools = {
         canvas.width = width;
         canvas.height = height;
         canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-        var url = canvas.toDataURL();
+        var url = canvas.toDataURL('image/jpeg');
         callback(url);
       }
       img.src = reader.result;
