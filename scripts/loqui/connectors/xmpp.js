@@ -329,7 +329,7 @@ App.connectors['XMPP'] = function (account) {
       App.notify({
         subject: chat.core.title,
         text: _('SentYou', { type: _('MediaType_bolt') }),
-        pic: 'https://raw.github.com/loqui/im/master/img/bolt.png',
+        pic: 'https://raw.github.com/loqui/im/dev/img/bolt.png',
         callback: function () {
           chat.show();
           App.toForeground();
