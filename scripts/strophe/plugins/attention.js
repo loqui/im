@@ -14,16 +14,10 @@ Strophe.addConnectionPlugin('attention', {
   init: function(conn) {
     this._connection = conn;
     Strophe.addNamespace('XEP0224', 'urn:xmpp:attention:0');
-    conn.addHandler(this._handler.bind(this), null, 'message', 'headline', null, null);
   },
   
-  setCallback: function (callback) {
-    this._callback = callback;
-    return true;
-  },
-  
-  unsetCallback: function () {
-    this._callback = null;
+  handlify: function (callback) {
+    return this._connection.addHandler(callback, Strophe.NS.XEP0224, 'message', 'headline', null, null);
   },
   
   request: function (to, body) {
@@ -33,16 +27,6 @@ Strophe.addConnectionPlugin('attention', {
 	  }
 	  msg.c('attention', {xmlns: Strophe.NS.XEP0224});
 	  this._connection.send(msg.tree());
-  },
-  
-  _handler: function (stanza) {
-    if ($(stanza).children('attention').length) {
-      if (this._callback) {
-        this._callback(stanza);
-      }
-    }
-    return true;
   }
-
   
 });
