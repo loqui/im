@@ -582,6 +582,7 @@ App.connectors['coseme'] = function (account) {
         account.presenceRender(jid);
       }
     } else {
+      contact.presence.show = parseInt(lastSeen) < 300 ? 'a' : 'away';
       account.presenceRender(jid);
       var chatSection = $('section#chat[data-jid="' + jid + '"]');
       var status = chatSection.find('header .status');
