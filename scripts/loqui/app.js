@@ -24,15 +24,15 @@ var App = {
     App: {
       settings: {
         reconnect: true,
-        sound: true,
-        disHide: false,
-        csn: true,
         boltGet: true,
+        disHide: false,
+        sound: true,
+        csn: true,
         devMode: false
       },
       devsettings: {
-		    devConsole: false,
-        debug: false        
+      	debug: false,
+      	devConsole: false
       },
       online: true
     },
