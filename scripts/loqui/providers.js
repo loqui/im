@@ -140,6 +140,7 @@ var Providers = {
       var a = $('<a/>').data('view-section', provider);
       a.text(data.longName);
       var img = $('<img/>').attr('src', 'img/providers/' + provider + '.svg');
+      img.attr('alt', longName);
       a.prepend(img);
       li.append(a);
       ul.append(li);
