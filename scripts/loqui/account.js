@@ -251,7 +251,7 @@ var Account = function (core) {
   }
 
   // List all contacts for this account
-  this.contactsRender = function (f) {
+  this.contactsRender = function (f, click) {
     var ul = $("<ul />").addClass('list');
     var frag = f;
     var account = this;
@@ -264,24 +264,9 @@ var Account = function (core) {
         + '<span class=\'name\'>' + name + '</span>'
         + '<span class=\'show backchange\'></span>'
         + '<span class=\'status\'></span>';
-      li.addEventListener('click', function () {
-        var ci = account.chatFind(this.dataset.jid);
-        if (ci >= 0) {
-          var chat = account.chats[ci];
-        } else { 
-          var chat = new Chat({
-            jid: this.dataset.jid,
-            title: $(this).children('.name').text(),
-            chunks: []
-          }, account);
-        }
-        Lungo.Router.section('back');
-        chat.show();
+      li.addEventListener('click', function (e) {
+        click(this);
       });
-      /*li.addEventListener('hold', function () {
-        window.navigator.vibrate([100]);
-        Messenger.contactProfile(this.dataset.jid);
-      });*/
       ul[0].appendChild(li);
     });
     frag.appendChild(ul[0]);
@@ -440,6 +425,22 @@ var Account = function (core) {
       }
     }
     return index;
+  }
+  
+  // Get a chat for a jid (create if none)
+  this.chatGet = function (jid, title) {
+console.log(jid, title)
+    var ci = this.chatFind(jid);
+    if (ci >= 0) {
+      var chat = this.chats[ci];
+    } else { 
+      var chat = new Chat({
+        jid: jid,
+        title: title || jid,
+        chunks: []
+      }, this);
+    }
+    return chat;
   }
     
   // Check for feature support

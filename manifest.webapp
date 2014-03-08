@@ -59,5 +59,15 @@
     "geolocation": {
       "description": "Required for sending location messages to other users"
     }
+  },
+  "activities": {
+    "share": {
+      "href": "./index.html",
+      "disposition": "window",
+      "filters": {
+        "type": ["image/*", "video/*", "audio/*"]
+      },
+      "returnValue": false
+    }
   }
 }

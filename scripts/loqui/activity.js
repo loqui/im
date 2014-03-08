@@ -4,7 +4,31 @@ var Activity = function (action, account, content) {
   
   var actions = {
     chat: function (f, account, content) {
-      account.contactsRender(f);
+      account.contactsRender(f, function (t) {
+        var chat = account.chatGet(t.dataset.jid, $(t).children('.name').text());
+        Lungo.Router.section('back');
+        chat.show();
+      });
+    },
+    file: function (f, account, content) {
+      account.contactsRender(f, function (t) {
+        var jid = t.dataset.jid;
+        var title = $(t).children('.name').text();
+        var chat = account.chatGet(jid, title);
+        for (var i in content.blobs) {
+          var r = confirm(_('ConfirmMediaSend', {file: content.filenames[i], chat: title}));
+          if (r) {
+            if ('fileSend' in account.connector && account.supports(content.type.split('/')[0] + 'Send')) {
+              account.connector.fileSend(jid, content.blobs[i]);
+              Lungo.Router.section('back');
+              chat.show();
+            } else {
+              Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign');
+              Lungo.Router.section('back');
+            }
+          }
+        }
+      });
     }
   }
   
@@ -12,8 +36,9 @@ var Activity = function (action, account, content) {
     var ul = document.createElement('ul');
     ul.classList.add('accounts');
     
-    for (let [i, account] in Iterator(App.accounts)) {
+    for (var [i, account] in Iterator(App.accounts)) {
       let li = document.createElement('li');
+      let ai = i;
 
       let icon = document.createElement('img');
       icon.src = 'img/providers/squares/' + account.core.provider + '.svg';
@@ -34,7 +59,7 @@ var Activity = function (action, account, content) {
       li.appendChild(name);
       
       li.addEventListener('click', function (e) {
-        Activity(action, App.accounts[i], content);
+        Activity(action, App.accounts[ai], content);
       });
       
       ul.appendChild(li);
@@ -45,7 +70,9 @@ var Activity = function (action, account, content) {
   var f = document.createDocumentFragment();
   
   if (account) {
-    actions[action](f, account, content);
+    if (action in actions) {
+      actions[action](f, account, content);
+    }
   } else {
     accountSelect(f);
   }
@@ -55,3 +82,11 @@ var Activity = function (action, account, content) {
   Lungo.Router.section('activity');
   
 }
+
+navigator.mozSetMessageHandler('activity', function(a) {
+  if (a.source.name === "share") {
+    console.log(a);
+    var file = a.source.data;
+    Activity('file', null, a.source.data);
+  }
+});
