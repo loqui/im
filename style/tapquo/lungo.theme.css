@@ -1,0 +1,1160 @@
+/**
+ * Stylesheet
+ *
+ * @namespace Lungo.Theme
+ * @class Base
+ *
+ * @author Javier Jimenez Villar <javi@tapquo.com> || @soyjavi
+ */
+@media screen and (orientation:portrait) {
+  html{
+    font-size: 5vw!important;
+  }
+}
+@media screen and (orientation:landscape) {
+  html{
+    font-size: 5vh!important;
+  }
+}
+@media only screen and (min-resolution: 90dpi) and (min-width: 480px) {
+  html{
+    font-size: 3vw!important;
+  }
+}
+@font-face {
+  font-family:'mozTT';
+  src:url('../fonts/MozTT-Bold.ttf');
+  font-weight: 700;
+}
+@font-face {
+  font-family:'mozTT';
+  src:url('../fonts/MozTT-Medium.ttf');
+  font-weight: 500;
+}
+@font-face {
+  font-family:'mozTT';
+  src:url('../fonts/MozTT-Regular.ttf');
+  font-weight: 300;
+}
+@font-face {
+  font-family:'mozTT';
+  src:url('../fonts/MozTT-Light.ttf');
+  font-weight: 100;
+}
+body {
+  background-color: #000;
+  color: #f4f4f4;
+  font-weight: bold;
+  letter-spacing: -0.05em;
+  position: fixed;
+  font-family: mozTT, Open Sans, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 100;
+}
+body * {
+  -webkit-font-smoothing: antialiased;
+}
+body .text.thin {
+  font-weight: 300;
+}
+body .text.normal {
+  font-weight: 400;
+}
+body .text.bold {
+  font-weight: 700;
+}
+body .theme {
+  background-color: THEME-light;
+}
+body .theme:active {
+  background-color: #00afe3;
+}
+a {
+  font-weight: 100!important;
+  cursor: pointer;
+}
+
+/**
+ * Stylesheet
+ *
+ * @namespace Lungo.Theme
+ * @class Layout
+ *
+ * @author Javier Jimenez Villar <javi@tapquo.com> || @soyjavi
+ */
+section > article {
+  position: relative;
+  background-color: #F4F4F4!important;
+}
+section .list li {
+  background: #fff;
+  font-weight: 300;
+}
+section .list li:not(.anchor) {
+  border-bottom: inset 1px #cfcfcf;
+}
+section .list li.color {
+  -webkit-box-shadow: inset 4px 0 #f4f4f4;
+  -moz-box-shadow: inset 4px 0 #f4f4f4;
+  -ms-box-shadow: inset 4px 0 #f4f4f4;
+  -o-box-shadow: inset 4px 0 #f4f4f4;
+  box-shadow: inset 4px 0 #f4f4f4;
+}
+section .list li.accept {
+  -webkit-box-shadow: inset 4px 0 #2ecc71;
+  -moz-box-shadow: inset 4px 0 #2ecc71;
+  -ms-box-shadow: inset 4px 0 #2ecc71;
+  -o-box-shadow: inset 4px 0 #2ecc71;
+  box-shadow: inset 4px 0 #2ecc71;
+}
+section .list li.cancel {
+  -webkit-box-shadow: inset 4px 0 #e74c3c;
+  -moz-box-shadow: inset 4px 0 #e74c3c;
+  -ms-box-shadow: inset 4px 0 #e74c3c;
+  -o-box-shadow: inset 4px 0 #e74c3c;
+  box-shadow: inset 4px 0 #e74c3c;
+}
+section .list li.warning {
+  -webkit-box-shadow: inset 4px 0 #edba22;
+  -moz-box-shadow: inset 4px 0 #edba22;
+  -ms-box-shadow: inset 4px 0 #edba22;
+  -o-box-shadow: inset 4px 0 #edba22;
+  box-shadow: inset 4px 0 #edba22;
+}
+section .list li.arrow::after {
+  border-color: #cfcfcf;
+}
+section .list li.contrast,
+section .list li a.contrast {
+  background: #cfcfcf;
+}
+section .list li.selectable:active,
+section .list li a.selectable:active,
+section .list li.theme,
+section .list li a.theme,
+section .list li.active,
+section .list li a.active {
+  background: #0ec8ff;
+}
+section .list li.light,
+section .list li a.light {
+  background: #cfcfcf;
+  color: #808080;
+}
+section .list li.contrast,
+section .list li a.contrast,
+section .list li.selectable:active,
+section .list li a.selectable:active,
+section .list li.theme,
+section .list li a.theme,
+section .list li.contrast small,
+section .list li a.contrast small,
+section .list li.selectable:active small,
+section .list li a.selectable:active small,
+section .list li.theme small,
+section .list li a.theme small,
+section .list li.contrast .on-right:not(.tag),
+section .list li a.contrast .on-right:not(.tag),
+section .list li.selectable:active .on-right:not(.tag),
+section .list li a.selectable:active .on-right:not(.tag),
+section .list li.theme .on-right:not(.tag),
+section .list li a.theme .on-right:not(.tag),
+section .list li.contrast strong,
+section .list li a.contrast strong,
+section .list li.selectable:active strong,
+section .list li a.selectable:active strong,
+section .list li.theme strong,
+section .list li a.theme strong,
+section .list li.contrast .arrow::after,
+section .list li a.contrast .arrow::after,
+section .list li.selectable:active .arrow::after,
+section .list li a.selectable:active .arrow::after,
+section .list li.theme .arrow::after,
+section .list li a.theme .arrow::after {
+  color: #fff;
+}
+section .list li.contrast.arrow::after,
+section .list li a.contrast.arrow::after,
+section .list li.selectable:active.arrow::after,
+section .list li a.selectable:active.arrow::after,
+section .list li.theme.arrow::after,
+section .list li a.theme.arrow::after {
+  border-color: #fff;
+}
+section .list li small,
+section .list li a small,
+section .list li .on-right:not(.tag),
+section .list li a .on-right:not(.tag) {
+  color: #808080;
+}
+section .list li .on-right,
+section .list li a .on-right {
+  font-weight: 400;
+}
+section .list li:not(.big) img {
+  -webkit-border-radius: 1px;
+  -moz-border-radius: 1px;
+  -ms-border-radius: 1px;
+  -o-border-radius: 1px;
+  border-radius: 1px;
+}
+.list:not(.indented) li.dark,
+.list:not(.indented) li.theme,
+.list:not(.indented) li.light {
+  border-bottom-color: rgba(0,0,0,0.1);
+}
+aside .list li {
+  background: none;
+}
+aside .list li,
+aside .list li a {
+  color: #979797;
+}
+aside .list li:not(.active) .tag:not(.icon),
+aside .list li a:not(.active) .tag:not(.icon) {
+  background-color: #2f2f2f;
+}
+aside .list li.active .tag:not(.icon),
+aside .list li a.active .tag:not(.icon) {
+  background-color: #444;
+}
+aside .list li .icon {
+  color: #c1c1c1;
+}
+aside .list li small {
+  color: #636363;
+}
+aside .list li.active,
+aside .list li:active {
+  background-color: #2d2d2d;
+}
+aside .list li:hover {
+  background-color: #2a2a2a;
+}
+aside .list li.active,
+aside .list li:active,
+aside .list li:hover,
+aside .list li.active a,
+aside .list li:active a,
+aside .list li:hover a {
+  color: WHITE;
+}
+aside .list li.active .icon,
+aside .list li:active .icon,
+aside .list li:hover .icon {
+  color: #00afe3;
+}
+aside .list li.active small,
+aside .list li:active small,
+aside .list li:hover small {
+  color: #979797;
+}
+
+/**
+ * Stylesheet
+ *
+ * @namespace Lungo.Theme
+ * @class Layout
+ *
+ * @author Javier Jimenez Villar <javi@tapquo.com> || @soyjavi
+ */
+section header > nav:not(.on-right) a,
+section header > nav:not(.on-right) button {
+  color: #FFF;
+  -webkit-text-shadow: 0 0.1em #00c5ff;
+  -moz-text-shadow: 0 0.1em #00c5ff;
+  -ms-text-shadow: 0 0.1em #00c5ff;
+  -o-text-shadow: 0 0.1em #00c5ff;
+  text-shadow: 0 0.1em rgba(0, 0, 0, .2);
+}
+section header > nav.on-right a,
+section header > nav.on-right button {
+  color: #f1fcff;
+  -webkit-text-shadow: 0 0.1em #009ecc;
+  -moz-text-shadow: 0 0.1em #009ecc;
+  -ms-text-shadow: 0 0.1em #009ecc;
+  -o-text-shadow: 0 0.1em #009ecc;
+  text-shadow: 0 0.1em rgba(0, 0, 0, .2);
+}
+aside header > nav a,
+aside header > nav button {
+  color: #636363;
+  -webkit-text-shadow: 0 0.1em #2a2a2a;
+  -moz-text-shadow: 0 0.1em #2a2a2a;
+  -ms-text-shadow: 0 0.1em #2a2a2a;
+  -o-text-shadow: 0 0.1em #2a2a2a;
+  text-shadow: 0 0.1em #2a2a2a;
+}
+header > nav a:active,
+header > nav button:active,
+header > nav a.active,
+header > nav button.active {
+  color: WHITE !important;
+  -webkit-text-shadow: 0 0 0.5em WHITE;
+  -moz-text-shadow: 0 0 0.5em WHITE;
+  -ms-text-shadow: 0 0 0.5em WHITE;
+  -o-text-shadow: 0 0 0.5em WHITE;
+  text-shadow: 0 0 0.5em WHITE;
+}
+section > footer > nav > a,
+nav[data-control=groupbar] > a {
+  color: #595959;
+  -webkit-transition-property: color, box-shadow;
+  -moz-transition-property: color, box-shadow;
+  -ms-transition-property: color, box-shadow;
+  -o-transition-property: color, box-shadow;
+  transition-property: color, box-shadow;
+  -webkit-transition-duration: 400ms;
+  -moz-transition-duration: 400ms;
+  -ms-transition-duration: 400ms;
+  -o-transition-duration: 400ms;
+  transition-duration: 400ms;
+  -webkit-transition-timing-function: ease;
+  -moz-transition-timing-function: ease;
+  -ms-transition-timing-function: ease;
+  -o-transition-timing-function: ease;
+  transition-timing-function: ease;
+}
+section > footer > nav > a abbr,
+nav[data-control=groupbar] > a abbr {
+  font-weight: 400;
+}
+section > footer > nav > a.active,
+nav[data-control=groupbar] > a.active,
+section > footer > nav > a:active,
+nav[data-control=groupbar] > a:active {
+  color: #fff;
+}
+nav[data-control=groupbar] > a.active,
+nav[data-control=groupbar] > a:active {
+  -webkit-box-shadow: inset 0 -0.3em #00afe3;
+  -moz-box-shadow: inset 0 -0.3em #00afe3;
+  -ms-box-shadow: inset 0 -0.3em #00afe3;
+  -o-box-shadow: inset 0 -0.3em #00afe3;
+  box-shadow: inset 0 -0.3em #00afe3;
+}
+section > footer > nav > a.active,
+section > footer > nav > a:active {
+  -webkit-box-shadow: inset 0 0.3em #00afe3;
+  -moz-box-shadow: inset 0 0.3em #00afe3;
+  -ms-box-shadow: inset 0 0.3em #00afe3;
+  -o-box-shadow: inset 0 0.3em #00afe3;
+  box-shadow: inset 0 0.3em #00afe3;
+}
+nav[data-control=menu] {
+  background-color: rgba(0,0,0,0.9);
+  -webkit-box-shadow: 0 2px 0 rgba(0,0,0,0.1);
+  -moz-box-shadow: 0 2px 0 rgba(0,0,0,0.1);
+  -ms-box-shadow: 0 2px 0 rgba(0,0,0,0.1);
+  -o-box-shadow: 0 2px 0 rgba(0,0,0,0.1);
+  box-shadow: 0 2px 0 rgba(0,0,0,0.1);
+}
+nav[data-control=menu].icons > a,
+nav[data-control=menu].icons > a > abbr {
+  color: #595959;
+}
+nav[data-control=menu].icons > a > .icon {
+  color: #fff;
+}
+nav[data-control=menu].icons > a:active > .icon,
+nav[data-control=menu].icons > a:hover > .icon {
+  -webkit-text-shadow: 0 0 2em #fff;
+  -moz-text-shadow: 0 0 2em #fff;
+  -ms-text-shadow: 0 0 2em #fff;
+  -o-text-shadow: 0 0 2em #fff;
+  text-shadow: 0 0 2em #fff;
+}
+nav[data-control=menu]:not(.icons) > a,
+nav[data-control=menu]:not(.icons) > a > abbr {
+  color: #fff;
+}
+nav[data-control=menu]:not(.icons) > a > .icon {
+  color: #595959;
+}
+nav[data-control=menu]:not(.icons) > a:active,
+nav[data-control=menu]:not(.icons) > a:hover {
+  background-color: rgba(255,255,255,0.2);
+}
+nav[data-control=menu]:not(.icons) > a:active > .icon,
+nav[data-control=menu]:not(.icons) > a:hover > .icon {
+  color: #00afe3;
+}
+
+/**
+ * Stylesheet
+ *
+ * @namespace Lungo.Theme
+ * @class Layout
+ *
+ * @author Javier Jimenez Villar <javi@tapquo.com> || @soyjavi
+ */
+body > section > header {
+  background-color: #444;
+  -webkit-box-shadow: inset 0 -1px #009ecc, 0 1px rgba(0,0,0,0.1);
+  -moz-box-shadow: inset 0 -1px #009ecc, 0 1px rgba(0,0,0,0.1);
+  -ms-box-shadow: inset 0 -1px #009ecc, 0 1px rgba(0,0,0,0.1);
+  -o-box-shadow: inset 0 -1px #009ecc, 0 1px rgba(0,0,0,0.1);
+  box-shadow: inset 0 -1px rgba(0, 0, 0, .2), 0 1px rgba(0,0,0,0.1);
+}
+body > section > header .title {
+  -webkit-text-shadow: 0 0.1em #009ecc;
+  -moz-text-shadow: 0 0.1em #009ecc;
+  -ms-text-shadow: 0 0.1em #009ecc;
+  -o-text-shadow: 0 0.1em #009ecc;
+  text-shadow: 0 0.1em rgba(0, 0, 0, .2);
+}
+body > section > nav[data-control=groupbar] {
+  -webkit-box-shadow: 0 1px rgba(0,0,0,0.1);
+  -moz-box-shadow: 0 1px rgba(0,0,0,0.1);
+  -ms-box-shadow: 0 1px rgba(0,0,0,0.1);
+  -o-box-shadow: 0 1px rgba(0,0,0,0.1);
+  box-shadow: 0 1px rgba(0,0,0,0.1);
+}
+body > section > nav[data-control=groupbar],
+body > section > footer {
+  background-color: #2f2f2f;
+}
+body > section > footer {
+  -webkit-box-shadow: 0 -1px rgba(0,0,0,0.1);
+  -moz-box-shadow: 0 -1px rgba(0,0,0,0.1);
+  -ms-box-shadow: 0 -1px rgba(0,0,0,0.1);
+  -o-box-shadow: 0 -1px rgba(0,0,0,0.1);
+  box-shadow: 0 -1px rgba(0,0,0,0.1);
+}
+body > section > article,
+body > section > [data-control="pull"] {
+  background-color: #e7e7e7;
+}
+body > section > article,
+body > section > [data-control="pull"],
+body > section > article a,
+body > section > [data-control="pull"] a {
+  color: #000;
+}
+body > section > article.splash,
+body > section > [data-control="pull"].splash {
+  background-color: #00afe3;
+  color: #fff;
+}
+body > section.aside:not(.right) {
+  -webkit-box-shadow: -1px 0 8px rgba(0,0,0,0.1);
+  -moz-box-shadow: -1px 0 8px rgba(0,0,0,0.1);
+  -ms-box-shadow: -1px 0 8px rgba(0,0,0,0.1);
+  -o-box-shadow: -1px 0 8px rgba(0,0,0,0.1);
+  box-shadow: -1px 0 8px rgba(0,0,0,0.1);
+}
+body > section.aside.right {
+  -webkit-box-shadow: 1px 0 8px rgba(0,0,0,0.1);
+  -moz-box-shadow: 1px 0 8px rgba(0,0,0,0.1);
+  -ms-box-shadow: 1px 0 8px rgba(0,0,0,0.1);
+  -o-box-shadow: 1px 0 8px rgba(0,0,0,0.1);
+  box-shadow: 1px 0 8px rgba(0,0,0,0.1);
+}
+body > section[data-pull] > article.active {
+  -webkit-box-shadow: 0 -1px 0 rgba(0,0,0,0.05);
+  -moz-box-shadow: 0 -1px 0 rgba(0,0,0,0.05);
+  -ms-box-shadow: 0 -1px 0 rgba(0,0,0,0.05);
+  -o-box-shadow: 0 -1px 0 rgba(0,0,0,0.05);
+  box-shadow: 0 -1px 0 rgba(0,0,0,0.05);
+}
+body > aside {
+  background-color: #232323;
+  color: WHITE;
+}
+
+/* ==== Any tablet ==== */
+@media only screen and (min-width: 768px) {
+  body > section[data-children] {
+    margin-right: 0.5em;
+  }
+}
+/* ==== Any phone ==== */
+@media only screen and (max-width: 767px) {
+  body > section > header {
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    -ms-border-radius: 0;
+    -o-border-radius: 0;
+    border-radius: 0;
+  }
+  body > aside {
+    -webkit-box-shadow: 0 0 0 6px #232323;
+    -moz-box-shadow: 0 0 0 6px #232323;
+    -ms-box-shadow: 0 0 0 6px #232323;
+    -o-box-shadow: 0 0 0 6px #232323;
+    box-shadow: 0 0 0 6px #232323;
+  }
+}
+
+/**
+ * Stylesheet
+ *
+ * @namespace Lungo.Theme
+ * @class Layout
+ *
+ * @author Javier Jimenez Villar <javi@tapquo.com> || @soyjavi
+ */
+article .button,
+article button {
+  -webkit-border-radius: 1px;
+  -moz-border-radius: 1px;
+  -ms-border-radius: 1px;
+  -o-border-radius: 1px;
+  border-radius: 1px;
+  -webkit-box-shadow: inset 0 -1px rgba(0,0,0,0.1), 0 1px rgba(0,0,0,0.075);
+  -moz-box-shadow: inset 0 -1px rgba(0,0,0,0.1), 0 1px rgba(0,0,0,0.075);
+  -ms-box-shadow: inset 0 -1px rgba(0,0,0,0.1), 0 1px rgba(0,0,0,0.075);
+  -o-box-shadow: inset 0 -1px rgba(0,0,0,0.1), 0 1px rgba(0,0,0,0.075);
+  box-shadow: inset 0 -1px rgba(0,0,0,0.1), 0 1px rgba(0,0,0,0.075);
+  -webkit-box-shadow: inset 0 -1px rgba(0,0,0,0.1);
+  -moz-box-shadow: inset 0 -1px rgba(0,0,0,0.1);
+  -ms-box-shadow: inset 0 -1px rgba(0,0,0,0.1);
+  -o-box-shadow: inset 0 -1px rgba(0,0,0,0.1);
+  box-shadow: inset 0 -1px rgba(0,0,0,0.1);
+}
+article .button,
+article button,
+article .button abbr,
+article button abbr {
+  color: #fff;
+  font-weight: 600;
+  -webkit-text-shadow: 0 1px rgba(0,0,0,0.1);
+  -moz-text-shadow: 0 1px rgba(0,0,0,0.1);
+  -ms-text-shadow: 0 1px rgba(0,0,0,0.1);
+  -o-text-shadow: 0 1px rgba(0,0,0,0.1);
+  text-shadow: 0 1px rgba(0,0,0,0.1);
+}
+article .button:hover,
+article button:hover {
+  -webkit-box-shadow: inset 0 0 5em rgba(0,0,0,0.1), inset 0 -1px rgba(0,0,0,0.15), 0 1px rgba(0,0,0,0.075);
+  -moz-box-shadow: inset 0 0 5em rgba(0,0,0,0.1), inset 0 -1px rgba(0,0,0,0.15), 0 1px rgba(0,0,0,0.075);
+  -ms-box-shadow: inset 0 0 5em rgba(0,0,0,0.1), inset 0 -1px rgba(0,0,0,0.15), 0 1px rgba(0,0,0,0.075);
+  -o-box-shadow: inset 0 0 5em rgba(0,0,0,0.1), inset 0 -1px rgba(0,0,0,0.15), 0 1px rgba(0,0,0,0.075);
+  box-shadow: inset 0 0 5em rgba(0,0,0,0.1), inset 0 -1px rgba(0,0,0,0.15), 0 1px rgba(0,0,0,0.075);
+}
+article .button:active,
+article button:active {
+  -webkit-box-shadow: inset 0 0 5em rgba(0,0,0,0.2), inset 0 1px rgba(0,0,0,0.2);
+  -moz-box-shadow: inset 0 0 5em rgba(0,0,0,0.2), inset 0 1px rgba(0,0,0,0.2);
+  -ms-box-shadow: inset 0 0 5em rgba(0,0,0,0.2), inset 0 1px rgba(0,0,0,0.2);
+  -o-box-shadow: inset 0 0 5em rgba(0,0,0,0.2), inset 0 1px rgba(0,0,0,0.2);
+  box-shadow: inset 0 0 5em rgba(0,0,0,0.2), inset 0 1px rgba(0,0,0,0.2);
+}
+article .button .icon,
+article button .icon {
+  opacity: 0.65;
+  -webkit-text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
+  -moz-text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
+  -ms-text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
+  -o-text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
+}
+article button,
+article .button {
+  background-color: #E95644;
+}
+article button.color,
+article .button.color {
+  background-color: #f5f5f5;
+}
+article button.accept,
+article .button.accept {
+  background-color: #2ecc71;
+}
+article button.cancel,
+article .button.cancel {
+  background-color: #e74c3c;
+}
+article button.warning,
+article .button.warning {
+  background-color: #edba22;
+}
+article button[disabled],
+article .button[disabled],
+article button :disabled,
+article .button :disabled,
+article button.disabled,
+article .button.disabled {
+  background: #dadada;
+  color: #999 !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  -ms-box-shadow: none !important;
+  -o-box-shadow: none !important;
+  box-shadow: none !important;
+  -webkit-text-shadow: none !important;
+  -moz-text-shadow: none !important;
+  -ms-text-shadow: none !important;
+  -o-text-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/**
+ * Stylesheet
+ *
+ * @namespace Lungo.Theme
+ * @class Layout
+ *
+ * @author Javier Jimenez Villar <javi@tapquo.com> || @soyjavi
+ */
+form label,
+.form label {
+  color: #6d6d6d;
+  font-weight: 300;
+}
+form fieldset,
+.form fieldset {
+  background: #fff;
+  border-bottom: 1px solid #e7e7e7;
+}
+form fieldset .icon,
+.form fieldset .icon {
+  color: #ccc;
+}
+form fieldset.radius-top,
+.form fieldset.radius-top {
+  -webkit-border-radius: 2px 2px 0 0;
+  -moz-border-radius: 2px 2px 0 0;
+  -ms-border-radius: 2px 2px 0 0;
+  -o-border-radius: 2px 2px 0 0;
+  border-radius: 2px 2px 0 0;
+}
+form fieldset.radius-bottom,
+.form fieldset.radius-bottom {
+  -webkit-border-radius: 0 0 2px 2px;
+  -moz-border-radius: 0 0 2px 2px;
+  -ms-border-radius: 0 0 2px 2px;
+  -o-border-radius: 0 0 2px 2px;
+  border-radius: 0 0 2px 2px;
+}
+form fieldset.radius,
+.form fieldset.radius {
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -ms-border-radius: 2px;
+  -o-border-radius: 2px;
+  border-radius: 2px;
+}
+form fieldset.shadow,
+.form fieldset.shadow {
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+form input[type="text"],
+.form input[type="text"],
+form input[type="password"],
+.form input[type="password"],
+form input[type="date"],
+.form input[type="date"],
+form input[type="datetime"],
+.form input[type="datetime"],
+form input[type="email"],
+.form input[type="email"],
+form input[type="number"],
+.form input[type="number"],
+form input[type="search"],
+.form input[type="search"],
+form input[type="tel"],
+.form input[type="tel"],
+form input[type="time"],
+.form input[type="time"],
+form input[type="url"],
+.form input[type="url"],
+form select,
+.form select,
+form textarea,
+.form textarea,
+form label.select,
+.form label.select {
+  background-color: #fff;
+  color: rgba(0,0,0,0.75);
+}
+form input[type="text"].border,
+.form input[type="text"].border,
+form input[type="password"].border,
+.form input[type="password"].border,
+form input[type="date"].border,
+.form input[type="date"].border,
+form input[type="datetime"].border,
+.form input[type="datetime"].border,
+form input[type="email"].border,
+.form input[type="email"].border,
+form input[type="number"].border,
+.form input[type="number"].border,
+form input[type="search"].border,
+.form input[type="search"].border,
+form input[type="tel"].border,
+.form input[type="tel"].border,
+form input[type="time"].border,
+.form input[type="time"].border,
+form input[type="url"].border,
+.form input[type="url"].border,
+form select.border,
+.form select.border,
+form textarea.border,
+.form textarea.border,
+form label.select.border,
+.form label.select.border {
+  border: 2px solid #dadada;
+  -webkit-border-radius: 0.2em;
+  -moz-border-radius: 0.2em;
+  -ms-border-radius: 0.2em;
+  -o-border-radius: 0.2em;
+  border-radius: 0.2em;
+}
+form input[type="text"].error,
+.form input[type="text"].error,
+form input[type="password"].error,
+.form input[type="password"].error,
+form input[type="date"].error,
+.form input[type="date"].error,
+form input[type="datetime"].error,
+.form input[type="datetime"].error,
+form input[type="email"].error,
+.form input[type="email"].error,
+form input[type="number"].error,
+.form input[type="number"].error,
+form input[type="search"].error,
+.form input[type="search"].error,
+form input[type="tel"].error,
+.form input[type="tel"].error,
+form input[type="time"].error,
+.form input[type="time"].error,
+form input[type="url"].error,
+.form input[type="url"].error,
+form select.error,
+.form select.error,
+form textarea.error,
+.form textarea.error,
+form label.select.error,
+.form label.select.error,
+form input[type="text"]:required,
+.form input[type="text"]:required,
+form input[type="password"]:required,
+.form input[type="password"]:required,
+form input[type="date"]:required,
+.form input[type="date"]:required,
+form input[type="datetime"]:required,
+.form input[type="datetime"]:required,
+form input[type="email"]:required,
+.form input[type="email"]:required,
+form input[type="number"]:required,
+.form input[type="number"]:required,
+form input[type="search"]:required,
+.form input[type="search"]:required,
+form input[type="tel"]:required,
+.form input[type="tel"]:required,
+form input[type="time"]:required,
+.form input[type="time"]:required,
+form input[type="url"]:required,
+.form input[type="url"]:required,
+form select:required,
+.form select:required,
+form textarea:required,
+.form textarea:required,
+form label.select:required,
+.form label.select:required {
+  color: #666 !important;
+  border-color: #CCC !important;
+}
+form input[type="text"].success,
+.form input[type="text"].success,
+form input[type="password"].success,
+.form input[type="password"].success,
+form input[type="date"].success,
+.form input[type="date"].success,
+form input[type="datetime"].success,
+.form input[type="datetime"].success,
+form input[type="email"].success,
+.form input[type="email"].success,
+form input[type="number"].success,
+.form input[type="number"].success,
+form input[type="search"].success,
+.form input[type="search"].success,
+form input[type="tel"].success,
+.form input[type="tel"].success,
+form input[type="time"].success,
+.form input[type="time"].success,
+form input[type="url"].success,
+.form input[type="url"].success,
+form select.success,
+.form select.success,
+form textarea.success,
+.form textarea.success,
+form label.select.success,
+.form label.select.success {
+  color: #2ecc71 !important;
+  border-color: #2ecc71 !important;
+}
+form input[type="text"]:focus,
+.form input[type="text"]:focus,
+form input[type="password"]:focus,
+.form input[type="password"]:focus,
+form input[type="date"]:focus,
+.form input[type="date"]:focus,
+form input[type="datetime"]:focus,
+.form input[type="datetime"]:focus,
+form input[type="email"]:focus,
+.form input[type="email"]:focus,
+form input[type="number"]:focus,
+.form input[type="number"]:focus,
+form input[type="search"]:focus,
+.form input[type="search"]:focus,
+form input[type="tel"]:focus,
+.form input[type="tel"]:focus,
+form input[type="time"]:focus,
+.form input[type="time"]:focus,
+form input[type="url"]:focus,
+.form input[type="url"]:focus,
+form select:focus,
+.form select:focus,
+form textarea:focus,
+.form textarea:focus,
+form label.select:focus,
+.form label.select:focus,
+form input[type="text"]:active,
+.form input[type="text"]:active,
+form input[type="password"]:active,
+.form input[type="password"]:active,
+form input[type="date"]:active,
+.form input[type="date"]:active,
+form input[type="datetime"]:active,
+.form input[type="datetime"]:active,
+form input[type="email"]:active,
+.form input[type="email"]:active,
+form input[type="number"]:active,
+.form input[type="number"]:active,
+form input[type="search"]:active,
+.form input[type="search"]:active,
+form input[type="tel"]:active,
+.form input[type="tel"]:active,
+form input[type="time"]:active,
+.form input[type="time"]:active,
+form input[type="url"]:active,
+.form input[type="url"]:active,
+form select:active,
+.form select:active,
+form textarea:active,
+.form textarea:active,
+form label.select:active,
+.form label.select:active,
+form input[type="text"]:hover,
+.form input[type="text"]:hover,
+form input[type="password"]:hover,
+.form input[type="password"]:hover,
+form input[type="date"]:hover,
+.form input[type="date"]:hover,
+form input[type="datetime"]:hover,
+.form input[type="datetime"]:hover,
+form input[type="email"]:hover,
+.form input[type="email"]:hover,
+form input[type="number"]:hover,
+.form input[type="number"]:hover,
+form input[type="search"]:hover,
+.form input[type="search"]:hover,
+form input[type="tel"]:hover,
+.form input[type="tel"]:hover,
+form input[type="time"]:hover,
+.form input[type="time"]:hover,
+form input[type="url"]:hover,
+.form input[type="url"]:hover,
+form select:hover,
+.form select:hover,
+form textarea:hover,
+.form textarea:hover,
+form label.select:hover,
+.form label.select:hover {
+  color: #00afe3;
+  border-color: #00afe3;
+}
+form input[type="text"][disabled],
+.form input[type="text"][disabled],
+form input[type="password"][disabled],
+.form input[type="password"][disabled],
+form input[type="date"][disabled],
+.form input[type="date"][disabled],
+form input[type="datetime"][disabled],
+.form input[type="datetime"][disabled],
+form input[type="email"][disabled],
+.form input[type="email"][disabled],
+form input[type="number"][disabled],
+.form input[type="number"][disabled],
+form input[type="search"][disabled],
+.form input[type="search"][disabled],
+form input[type="tel"][disabled],
+.form input[type="tel"][disabled],
+form input[type="time"][disabled],
+.form input[type="time"][disabled],
+form input[type="url"][disabled],
+.form input[type="url"][disabled],
+form select[disabled],
+.form select[disabled],
+form textarea[disabled],
+.form textarea[disabled],
+form label.select[disabled],
+.form label.select[disabled] {
+  background: #dadada;
+  border-color: #dadada;
+  color: #a3a3a3;
+}
+form select:after,
+.form select:after,
+form label.select:after,
+.form label.select:after {
+  color: #dadada;
+}
+form select:focus:after,
+.form select:focus:after,
+form label.select:focus:after,
+.form label.select:focus:after,
+form select:active:after,
+.form select:active:after,
+form label.select:active:after,
+.form label.select:active:after,
+form select:hover:after,
+.form select:hover:after,
+form label.select:hover:after,
+.form label.select:hover:after {
+  color: #00afe3;
+}
+form input[type=range],
+.form input[type=range] {
+  background-color: #dadada;
+  color: #a3a3a3;
+  -webkit-border-radius: 1px;
+  -moz-border-radius: 1px;
+  -ms-border-radius: 1px;
+  -o-border-radius: 1px;
+  border-radius: 1px;
+}
+form input[type=range]:active,
+.form input[type=range]:active {
+  background-color: #00afe3 !important;
+  color: #fff;
+}
+form input[type=range]::-webkit-slider-thumb,
+.form input[type=range]::-webkit-slider-thumb {
+  -webkit-border-radius: 1em;
+  -moz-border-radius: 1em;
+  -ms-border-radius: 1em;
+  -o-border-radius: 1em;
+  border-radius: 1em;
+  background-color: #fafafa;
+  border: 1px solid #dadada;
+  -webkit-box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  -moz-box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  -ms-box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  -o-box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+form [data-progress],
+.form [data-progress] {
+  background-color: #ddd;
+}
+form [data-progress] .value,
+.form [data-progress] .value {
+  background-color: #00afe3;
+}
+form [data-progress],
+.form [data-progress],
+form [data-progress] .value,
+.form [data-progress] .value {
+  -webkit-border-radius: 1px;
+  -moz-border-radius: 1px;
+  -ms-border-radius: 1px;
+  -o-border-radius: 1px;
+  border-radius: 1px;
+}
+form input[type=checkbox],
+.form input[type=checkbox] {
+  background-color: #fafafa;
+  border: 1px solid #dadada;
+  -webkit-box-shadow: inset 0 0 0 1px #dadada;
+  -moz-box-shadow: inset 0 0 0 1px #dadada;
+  -ms-box-shadow: inset 0 0 0 1px #dadada;
+  -o-box-shadow: inset 0 0 0 1px #dadada;
+  box-shadow: inset 0 0 0 1px #dadada;
+}
+form input[type=checkbox]:after,
+.form input[type=checkbox]:after {
+  background-color: #fff;
+  border: 1px solid #dadada;
+}
+form input[type=checkbox]:checked,
+.form input[type=checkbox]:checked {
+  border-color: #2ecc71;
+  -webkit-box-shadow: inset 0 0 0 13px #2ecc71;
+  -moz-box-shadow: inset 0 0 0 13px #2ecc71;
+  -ms-box-shadow: inset 0 0 0 13px #2ecc71;
+  -o-box-shadow: inset 0 0 0 13px #2ecc71;
+  box-shadow: inset 0 0 0 13px #2ecc71;
+}
+form input[type=checkbox]:checked:after,
+.form input[type=checkbox]:checked:after {
+  border-color: #2ecc71;
+}
+
+/**
+ * Stylesheet
+ *
+ * @namespace Lungo.Theme
+ * @class Layout
+ *
+ * @author Javier Jimenez Villar <javi@tapquo.com> || @soyjavi
+ */
+/* -------------------------- NOTIFICATION -------------------------- */
+.notification {
+  color: #fff;
+}
+.notification:not(.push) {
+  background-color: rgba(0,0,0,0.5);
+}
+.notification .window {
+  -webkit-box-shadow: 0 0 0 3px rgba(0,0,0,0.1);
+  -moz-box-shadow: 0 0 0 3px rgba(0,0,0,0.1);
+  -ms-box-shadow: 0 0 0 3px rgba(0,0,0,0.1);
+  -o-box-shadow: 0 0 0 3px rgba(0,0,0,0.1);
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.1);
+}
+.notification .window.growl {
+  position: fixed;
+  height: 6.6rem;
+  left: calc(50% - 3.3rem);
+  top: calc(50% - 3.3rem);
+  background-color: rgba(0,0,0,0.8);
+}
+.notification .window.growl strong {
+  color: #bfbfbf;
+  font-weight: 700;
+}
+.notification .window.confirm button,
+.notification .window.html button {
+  background-color: #fff;
+  color: #3d3d3d;
+  font-weight: 400;
+}
+.notification .window.confirm button[data-callback=cancel],
+.notification .window.html button[data-callback=cancel],
+.notification .window.confirm button[data-action=close],
+.notification .window.html button[data-action=close] {
+  color: #e74c3c;
+}
+.notification .window.html,
+.notification .window.confirm {
+  background-color: #f4f4f4;
+  color: #000;
+}
+.notification .window.confirm > small,
+.notification .window.confirm > .icon {
+  color: #808080;
+}
+.notification .window.confirm > button:nth-child(1) {
+  color: #e74c3c !important;
+}
+.notification .window.error,
+.notification .window.success {
+  position: fixed;
+  width: 100%;
+  background-color: rgba(0,0,0,0.8);
+  border-bottom: solid 0.4em;
+  color: #fff;
+}
+.notification .window.error small,
+.notification .window.success small {
+  color: #bfbfbf;
+}
+.notification .window.error {
+  border-bottom-color: #e74c3c;
+}
+.notification .window.error > .icon {
+  color: #e74c3c;
+}
+.notification .window.success {
+  border-bottom-color: #2ecc71;
+}
+.notification .window.success > .icon {
+  color: #2ecc71;
+}
+.notification .window.html .title {
+  background-color: #00afe3;
+  color: #fff;
+}
+.notification .window.push {
+  background-color: #f4f4f4;
+  -webkit-box-shadow: inset 0 -0.1em #000;
+  -moz-box-shadow: inset 0 -0.1em #000;
+  -ms-box-shadow: inset 0 -0.1em #000;
+  -o-box-shadow: inset 0 -0.1em #000;
+  box-shadow: inset 0 -0.1em #000;
+}
+.notification .window small {
+  font-weight: 300;
+}
+
+/**
+ * Stylesheet
+ *
+ * @namespace Lungo.Theme
+ * @class Layout
+ *
+ * @author Javier Jimenez Villar <javi@tapquo.com> || @soyjavi
+ */
+/* =================================  TAG  ================================= */
+.tag:not(.icon) {
+  color: #fff;
+  font-weight: bold;
+  -webkit-text-shadow: none;
+  -moz-text-shadow: none;
+  -ms-text-shadow: none;
+  -o-text-shadow: none;
+  text-shadow: none;
+}
+.tag:not(.icon):not(.count) {
+  -webkit-border-radius: 0.2em;
+  -moz-border-radius: 0.2em;
+  -ms-border-radius: 0.2em;
+  -o-border-radius: 0.2em;
+  border-radius: 0.2em;
+}
+.tag:not(.icon).count {
+  -webkit-border-radius: 0.3em;
+  -moz-border-radius: 0.3em;
+  -ms-border-radius: 0.3em;
+  -o-border-radius: 0.3em;
+  border-radius: 0.3em;
+  -webkit-box-shadow: 0 0 1px rgba(0,0,0,0.25);
+  -moz-box-shadow: 0 0 1px rgba(0,0,0,0.25);
+  -ms-box-shadow: 0 0 1px rgba(0,0,0,0.25);
+  -o-box-shadow: 0 0 1px rgba(0,0,0,0.25);
+  box-shadow: 0 0 1px rgba(0,0,0,0.25);
+  background-color: #e74c3c;
+}
+/* =================================  PULL  =============================== */
+body > section > [data-control="pull"] {
+  background-color: #c4c4c4;
+  color: #747474;
+  -webkit-text-shadow: 0 0.1em 1em #e7e7e7;
+  -moz-text-shadow: 0 0.1em 1em #e7e7e7;
+  -ms-text-shadow: 0 0.1em 1em #e7e7e7;
+  -o-text-shadow: 0 0.1em 1em #e7e7e7;
+  text-shadow: 0 0.1em 1em #e7e7e7;
+}
+body > section > [data-control="pull"].rotate {
+  color: #3a3a3a;
+}
+/* ===============================  EMPTY  =============================== */
+body > section > article > .empty > .icon,
+body > section > article > .empty > strong,
+body > section > article > .empty > small {
+  -webkit-text-shadow: 0 1px 0 #fefefe;
+  -moz-text-shadow: 0 1px 0 #fefefe;
+  -ms-text-shadow: 0 1px 0 #fefefe;
+  -o-text-shadow: 0 1px 0 #fefefe;
+  text-shadow: 0 1px 0 #fefefe;
+}
+body > section > article > .empty > .icon,
+body > section > article > .empty > small {
+  color: #b9b9b9;
+}
+body > section > article > .empty > strong {
+  color: #8b8b8b;
+}

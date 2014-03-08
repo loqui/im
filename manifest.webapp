@@ -1,0 +1,63 @@
+{
+  "name": "Loqui REVOLUTION",
+  "developer": {
+    "name": "LoquiIM",
+    "url": "http://loqui.im"
+  },
+  "type": "privileged",
+  "launch_path": "/index.html",
+  "description": "Loqui Instant Messenger allows you to unify all your chat accounts in just one app.",
+  "version": "v0.3.0",
+  "release_notes": "Always connected (really)\nChange WhatsApp profile picture\nChange WhatsApp status message\nChange XMPP and Hangouts profile picture\nAdd Hebrew language\nMany bugfixes. Such improvement. WoW :)",
+  "icons": {
+    "32": "/img/icon-32.png",
+    "60": "/img/icon-60.png",
+    "90": "/img/icon-90.png",
+    "120": "/img/icon-120.png",
+    "128": "/img/icon-128.png",
+    "256": "/img/icon-256.png"
+  },
+  "default_locale": "en",
+  "messages": [
+    {
+      "alarm": "/index.html"
+    }
+  ],
+  "permissions": {
+    "alarms": {
+      "description": "Required for keeping the app always connected to server."
+    },
+    "desktop-notification": {
+      "description": "Required for displaying alerts when app is on background."
+    },
+    "tcp-socket": {
+      "description": "CoSeMe requires TCP for connecting to server."
+    },
+    "systemXHR": {
+      "description": "CoSeMe requires XHR for some secondary operations."
+    },
+    "contacts": {
+      "description": "Required for looking for new contacts.",
+      "access": "readonly"
+    },
+    "device-storage:sdcard": {
+      "description": "Required for file handling",
+      "access": "readwrite"
+    },
+    "device-storage:pictures": {
+      "description": "Required for image handling",
+      "access": "readwrite"
+    },
+    "device-storage:videos": {
+      "description": "Required for video handling",
+      "access": "readwrite"
+    },
+    "device-storage:music": {
+      "description": "Required for audio handling",
+      "access": "readwrite"
+    },
+    "geolocation": {
+      "description": "Required for sending location messages to other users"
+    }
+  }
+}

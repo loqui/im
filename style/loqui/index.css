@@ -1,0 +1,1332 @@
+body{
+  background-color: #312F34;
+}
+button {
+  border-radius: .2rem!important;
+}
+button::-moz-focus-inner {
+  border: 0;
+}
+input {
+  pointer-events: auto!important;
+}
+small {
+  font-size: .9rem;
+  font-weight: 100;
+}
+article.form {
+  overflow: auto;
+}
+input[type='search'] {
+  width: 100%;
+  border-radius: .0rem!important;
+}
+.spaced {
+  margin-right: .5rem!important;
+}
+.buttongroup {
+  margin: 1.5rem 0;
+}
+.buttongroup > button {
+  margin-bottom: .4rem;
+  width: 100%;
+}
+article.form button[data-view-section='back'],
+article.form button[data-role='back'] {
+  width: 100%;
+  background-color: #DDD;
+  color: #666;
+}
+article.form button[data-role='submit'] {
+  width: 100%;
+}
+article.form label {
+  width: 100%;
+}
+
+section > article.simple {
+  padding: 2rem;
+  color: #333;
+}
+section > article.simple > h1 {
+  position: relative;
+  width: 11rem;
+  font-size: 1.6rem;
+  line-height: 2rem;
+  margin: 0 0 1rem 0;
+  font-weight: 100;
+  color: #E95644;
+}
+section > article.simple > p {
+  font-weight: 100;
+}
+section > article.simple > div > p {
+  font-weight: 300;
+  font-size: 1em;
+  margin-bottom: .5rem;
+}
+section#welcome {
+  color: #E95644;
+  text-align: center;
+}
+section#welcome > div {
+  margin: 5rem 2rem;
+}
+section#welcome img[src$='devised.svg'] {
+  position: absolute;
+  width: 10rem;
+  top: 1rem;
+  right: 1rem;
+}
+section#welcome img[src$='mascot.svg'] {
+  position: absolute;
+  width: 8rem;
+  top: calc(50% - 5.5rem);
+  left: calc(50% - 4rem);
+}
+section#welcome h1 {
+  position: absolute;
+  font-size: 1.5rem;
+  font-weight: 100;
+  top: calc(50% + 3rem);
+  text-align: center;
+  width: 100%;
+}
+section.setup img[src^='img/providers']{
+  position: absolute;
+  top: 2rem; right: 2rem;
+  width: 4rem;
+}
+section#success img#avatar {
+  position: relative;
+  width: 8rem;
+  left: calc(50% - 4rem);
+  padding: .2rem;
+  border: .1rem solid #DDD;
+  background-color: #FFF;
+  margin: 1rem 0 0 0;
+  border-radius: 50%;
+}
+section > header {
+  background-color: #312F34;
+}
+section > header > nav {
+  overflow: hidden;
+  float: right;
+  display: block;
+}
+section > header > nav button.tab {
+  background: none;
+  border: none;
+  height: 2.5rem;
+  margin-top: .5rem;
+  border-radius: 0!important;
+  width: 3.2rem;
+}
+section > header > nav button.up {
+  border: none;
+  background: none;
+  color: white;
+}
+section > header > nav.on-right button.tab {
+  background-image: url('/img/tab-decoration-right.svg');
+  background-size: 3.2rem 2.5rem;
+  padding: 0 0 0 1.2rem;
+}
+section > header > nav.on-left button.tab {
+  background-image: url('/img/tab-decoration-left.svg');
+  background-size: 3.2rem 2.5rem;
+  padding: 0 1.2rem 0 0rem;
+}
+section > header > nav.discreet {
+  margin-right: -.5rem;
+}
+section > header > nav.discreet button {
+  border: none;
+  border-radius: 50%;
+  background: none;
+  background-color: transparent;
+  color: white;
+  width: 2.6rem;
+}
+
+section.extended article {
+  top: 5.5rem;
+  height: calc(100% - 3.7rem)!important;
+}
+section nav[data-control="groupbar"] {
+  position: absolute;
+  top: 3rem;
+  width: 100%;
+  height: 2.5rem;
+  background-color: #222;
+  color: white;
+}
+section nav[data-control="groupbar"] a {
+  float: left;
+  height: 2.5rem!important;
+  padding: .8rem .7rem;
+  font-size: .8em;
+}
+[data-view-menu]:after {
+  content: none;
+}
+section.aside {
+  transform: translateX(5rem); 
+}
+section > nav[data-control="menu"] {
+  position: absolute;
+  width: 3.5rem;
+  height: calc(100% - 7.9rem);
+  background-color: rgba(0, 0, 0, .8);
+  right: 0;
+  padding: .6rem 0 .6rem .2rem;
+  z-index: -1;
+}
+section > nav[data-control="menu"].show {
+  visibility: visible;
+}
+section > nav[data-control="menu"] a {
+  float: left;
+  height: inherit;
+  width: 3.5rem;
+  height: 3rem;
+  font-size: .8em;
+  font-weight: 100;
+  color: #FFF;
+  padding: .5rem 0 0 0;
+  text-align: center;
+}
+section > nav[data-control="menu"] a:active {
+  background-color: #444;
+}
+section > nav[data-control="menu"] a:before {
+  display: block;
+  font-size: 1.5rem!important;
+}
+
+section#main > header div.account,
+section#main > header div.account * {
+  position: absolute;
+  color: white;
+  display: block;
+}
+section#main > header div.account img {
+  top: .5rem;
+  left: .3rem;
+  height: 2rem;
+}
+section#main > header div.account .provider {
+  top: .5rem;
+  left: 2.6rem;
+  text-transform: uppercase;
+  font-size: .6em;
+  font-weight: 300;
+  width: calc(100vw - 11.2rem);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+section#main > header div.account .jid {
+  top: 1.3rem;
+  left: 2.6rem;
+  font-size: .8em;
+  width: calc(100vw - 11.2rem);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+section#main > header span.counter {
+  display: block;
+  position: absolute;
+  top: 1.2rem;
+  right: .3rem;
+  background-color: #E74C3C;
+  color: #FFF;
+  padding: .4rem .5rem;
+  font-size: .6em;
+  line-height: .6em;
+  border-radius: .6rem;
+  animation: blink .5s infinite alternate;
+}
+section#chat > header span.counter {
+  display: block;
+  position: absolute;
+  top: 1.2rem;
+  left: .3rem;
+  background-color: #E74C3C;
+  color: #FFF;
+  padding: .4rem .5rem;
+  font-size: .6em;
+  line-height: .6em;
+  border-radius: .6rem;
+  animation: blink .5s infinite alternate;
+}
+section#main > header span.counter[data-value='0'],
+section#chat > header span.counter[data-value='0'] {
+  display: none;
+}
+section#main article ul {
+  list-style-type: none;
+  background-color: #FFF;
+}
+section#main article ul li,
+section#activity article ul li {
+  position: relative;
+  border-bottom: .05rem solid #E6E6E6;
+  height: 4rem;
+  cursor: pointer;
+}
+section#main article ul li[data-muc="true"],
+section#activity article ul li[data-muc="true"] {
+  background-color: #EBE9DD;
+}
+section#main article ul li[data-muc="true"] span.avatar img:not([src]),
+section#activity article ul li[data-muc="true"] span.avatar img:not([src]) {
+  background-image: url('../../img/goovatar.png');
+  background-size: 100%;
+  background-color: #D4D2C5;
+}
+section#main article ul li:active,
+section#activity article ul li:active {
+  background-color: #DDD;
+}
+section#main article ul li span.name,
+section#activity article ul li span.name {
+  position: absolute;
+  left: 4.2rem;
+  top: .6rem;
+  color: #444;
+  max-width: calc(100% - 4.7rem);
+  max-height: 1.4em;
+  overflow: hidden;
+}
+section#main article ul li span.status,
+section#main article ul li span.lastMessage,
+section#activity article ul li span.status {
+  position: absolute;
+  left: 4.2rem;
+  top: 2rem;
+  color: #444;
+  font-weight: 100;
+  font-size: .8em;
+  max-width: calc(100% - 6.5rem);
+  max-height: 1.4em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+section#main article ul li span.status img,
+section#main article ul li span.lastMessage img,
+section#activity article ul li span.status img {
+  height: 1.2rem!important;
+}
+section#main article ul li span.lastStamp {
+  position: absolute;
+  right: .5rem;
+  top: 2rem;
+  color: #999;
+  font-weight: 100;
+  line-height: .9em;
+  font-size: .65em;
+  max-width: calc(100% - 4.7rem);
+  text-align: right;
+}
+section#main article ul li .show {
+  display: block;
+  position: absolute;
+  left: 3rem;
+  top: .5rem;
+  width: .6rem;
+  height: .6rem;
+  border: .25rem solid #F9F9F9;
+  border-radius: 50%;
+}
+section#main article ul li:active .show {
+  border-color: #DDD;
+}
+section#main article ul li span.avatar {
+  position: absolute;
+  display: block;
+  height: 3.2rem;
+  width: 3.2rem;
+  top: .4rem;
+  left: .4rem;
+}
+section#main article ul li span.avatar img {
+  display: block;
+  width: inherit;
+  height: inherit;
+  border-radius: 50%;
+  overflow: hidden;
+}
+section#main article ul li span.avatar img:not([src]) {
+  height: 3.2rem;
+  width: 3.2rem;
+  background-image: url('../../img/foovatar.png');
+  background-size: 100%;
+  background-color: #D4D2C5;
+}
+section#main article ul li span.unread {
+  display: none;
+}
+section#main article ul li[data-unread="1"] span.unread {
+  display: block;
+  position: absolute;
+  top: .6rem;
+  right: .4rem;
+  background-color: #E74C3C;
+  color: #FFF;
+  padding: .4rem .5rem;
+  font-size: .6em;
+  line-height: .6em;
+  border-radius: .6rem;
+}
+section#main article ul li[data-unread="1"] span.name {
+  max-width: calc(100% - 6.8rem);
+}
+section#main .noChats {
+  position: absolute;
+  display: block;
+  text-align: center;
+  width: 16rem;
+  left: calc(50% - 8rem);
+  top: calc(50% - 2rem);
+}
+section#main .noChats strong {
+  color: #444;
+}
+section#main .noChats p {
+  color: #999;
+  font-size: .9em;
+}
+
+section#main fieldset#searchForm {
+  padding: .3rem .25rem;
+  background-color: #555;
+  height: 2.6rem;
+}
+section#main fieldset#searchForm input {
+  position: absolute;
+  font-size: 1rem;
+  border-radius: .2rem!important;
+  width: calc(100% - .5rem);
+}
+section#main[data-features~='localContacts'] fieldset#searchForm input {
+  width: calc(100% - 2rem);
+}
+section#main fieldset#searchForm span.sync {
+  display; block;
+  color: #FFF;
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: .5rem .4rem .5rem .4rem;
+}
+section#main:not([data-features~='localContacts']) fieldset#searchForm span.sync {
+  display: none;
+}
+section#main fieldset#searchForm span.clear {
+  position: absolute;
+  display: none;
+  padding: .3rem .6rem;
+  top: 0;
+  right: .4rem;
+  text-align: center;
+  color: #CCC;
+  font-size: 1.4rem;
+}
+section#main[data-features~='localContacts'] fieldset#searchForm span.clear {
+  right: 1.8rem;
+}
+
+section#settings article#devmode div p {
+  position: relative;
+  padding: 1rem;
+  border-bottom: .1rem solid #CCC;
+  list-style-type: none;
+  cursor: pointer;
+  font-weight: 300;
+  font-size: .9em;
+}
+
+section#settings ul li {
+  position: relative;
+  padding: 1rem;
+  border-bottom: .1rem solid #CCC;
+  list-style-type: none;
+  cursor: pointer;
+}
+section#settings ul li span {
+  display: block;
+  max-width: calc(100% - 4rem);
+  font-weight: 300;
+  font-size: .9em;
+}
+section#chat header span {
+  color: white;
+  text-align: right;
+  display: block;
+}
+section#chat header .title {
+  position: absolute;
+  top: .4rem;
+  left: 3rem;
+  font-weight: 300;
+  font-size: 1em;
+  line-height: 1em;
+  height: 1.1em;
+  overflow: hidden;
+  width: calc(100% - 7.5rem)
+}
+section#chat header .status {
+  position: absolute;
+  top: 1.6rem;
+  left: 3rem;
+  font-size: .8em;
+  line-height: 1.2em;
+  font-weight: 100
+  height: 1.2em;
+  width: calc(100% - 7.5rem);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+section#chat header .status img{
+  height: .8em;
+}
+section#chat header .show {
+  display: block;
+  position: absolute;
+  right: 3.3rem;
+  top: 0rem;
+  width: .6rem;
+  height: .6rem;
+  border: .3rem solid #312F34;
+  border-radius: 50%;
+}
+section#chat header .avatar {
+  position: absolute;
+  top: -.6rem;
+  right: -.3rem;
+  width: 4.2rem;
+  height: 4.2rem;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #DDD;
+  transition: all 1s;
+}
+section#chat header .avatar img {
+  width: 100%;
+}
+section#chat #footbox {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: .6rem;
+  background-color: #F9F9F9;
+  border-top: .1rem solid #E6E6E6;
+}
+section#chat #footbox #typing {
+  position: absolute;
+  top: -1.3rem;
+  left: 0;
+  height: 1.05rem;
+  padding: .2rem .7rem 0 .5rem;
+  border: .1rem solid #E6E6E6;
+  border-bottom: none;
+  border-left: none;
+  background-color: inherit;
+  font-size: .8rem;
+  font-weight: 100;
+  color: #999;
+  z-index: 1;
+  border-top-right-radius: .5rem;
+}
+section#chat #footbox button {
+  position: relative;
+  float: right;
+  top: 0.05rem;
+  font-size: .9rem;
+  line-height: 1.5rem;
+  padding: .1rem 1rem .2rem 1rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: 0;
+  margin-left: 0.5rem;
+  font-weight: bold;
+  background: #E95644;
+  border: none;
+  color: white;
+}
+section#chat #footbox button#say {
+  display: none;
+}
+section#chat #footbox div#text {
+  position: relative;
+  padding: .7rem .5rem .5rem .5rem;
+  min-height: 1.2rem;
+  max-height: 4rem;
+  background: none;
+  border: none;
+  border-bottom: .1rem solid #BBB;
+  border-radius: .2rem;
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.2rem;
+  color: #666;
+  outline: none;
+  overflow: auto;
+  transition: all .2s;
+}
+section#chat #footbox div#text:focus {
+  border-bottom: .1rem solid #E95644;
+}
+
+section#chat ul#messages {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 4rem;
+  overflow-x: hidden;
+  list-style-type: none;
+  background-color: #FFF;
+  padding-top: 1.5rem;
+}
+section#chat ul#messages > .more {
+  width: calc(100vw - 1rem);
+  background: #E95644;
+  border: none;
+  padding: .5rem;
+  color: white;
+  font-weight: 300;
+  margin: -1rem .5rem 1rem .5rem;
+}
+section#chat ul#messages > li {
+  display: block;
+  overflow: auto;
+}
+section#chat ul#messages > li > div {
+  position: relative;
+  display: block;
+  padding: .5rem .5rem;
+  clear: both;
+  max-width: calc(100vw - 3.5rem);
+  animation: fadeIn .5s;
+}
+section#chat ul#messages > li > div a{
+  color: #E95644;
+}
+section#chat ul#messages > li > div[data-type='out'] {
+  float: right;
+}
+section#chat ul#messages > li > div[data-type='in'] {
+  float: left;
+  text-align: left;
+}
+section#chat ul#messages > li > div[data-type='out'] + div[data-type='out'],
+section#chat ul#messages > li > div[data-type='in'] + div[data-type='in'] {
+  margin-top: -.6rem;
+}
+section#chat ul#messages > li > div .avatar img {
+  position: absolute;
+  top: 1rem;
+  border-radius: 100%;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+section#chat[data-muc='true'] ul#messages > li > div.extended .avatar img {
+  top: 2.2rem;
+}
+section#chat ul#messages > li > div[data-type='in'] .avatar img {
+  left: .3rem;
+}
+section#chat ul#messages > li > div > span.name {
+  display: block;
+  margin-bottom: .2rem;
+  margin-left: -.1rem;
+  font-size: .8em;
+  font-weight: 100;
+  color: #AAA;
+}
+section#chat:not([data-muc='true']) ul#messages > li > div > span.name {
+  display: none!important;
+}
+section#chat ul#messages > li > div > span.text {
+  position: relative;
+  display: block;
+  padding: .5rem 1rem;
+  font-weight: 100;
+  font-size: .9em;
+  word-wrap: break-word;
+  border-radius: .3rem;
+}
+section#chat ul#messages > li > div[data-type='out'] > span.text {
+  background-color: #E95644;
+  color: white;
+}
+section#chat ul#messages > li > div[data-type='in'] > span.text {
+  left: 1.8rem;
+  background-color: #EEE;
+  color: #333;
+}
+section#chat ul#messages > li > div[data-type='in'] .avatar:after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 1.4rem;
+  left: 2rem;
+  width: .7rem;
+  height: .7rem;
+  background-color: #EEE;
+  border-radius: .2rem;
+  transform: rotate(45deg);
+}
+section#chat[data-muc='true'] ul#messages > li > div[data-type='in'].extended .avatar:after {
+  top: 2.7rem;
+}
+section#chat ul#messages > li > div > span.text > img{
+  vertical-align: middle;
+  height: 1.2em;
+}
+section#chat ul#messages > li > div[data-type='out'][data-receipt='sent']:after {
+  content: "";
+  display: block;
+  width: .5rem;
+  height: .5rem;
+  border-radius: 50%;
+  background-color: #3498DF;
+  position: absolute;
+  top: .3rem;
+  left: -1.9rem;
+  opacity: .3;
+}
+section#chat ul#messages > li > div[data-type='out'][data-receipt='delivered']:after {
+  content: "";
+  display: block;
+  width: .5rem;
+  height: .5rem;
+  border-radius: 50%;
+  background-color: #2ECC71;
+  position: absolute;
+  top: .3rem;
+  right: 1.9rem;
+}
+section#chat ul#messages > li:last-child {
+  margin-bottom: 3.5rem;
+}
+section#chat ul#messages span.text img.image {
+    width: 100%;
+    border-radius: .4rem;
+}
+section#chat ul#messages span.text img.audio{
+    width: 0;
+}
+section#chat ul#messages span.text img.maps{
+    width: 0;
+}
+section#chat ul#messages span.text img.image[data-downloaded=false] {
+    opacity: .4;
+}
+section#chat ul#messages span.text img.video {
+    width: calc(100%);
+    border-radius: .4rem;
+}
+section#chat ul#messages span.text img.video[data-downloaded=false] {
+    opacity: .4;
+}
+section#chat ul#messages li div[data-media-type='video']:after {
+  content: url(../../img/play.png);
+  position: absolute;
+  width: 4rem;
+  left: calc(50% - 2rem);
+  top: calc(50% - 2rem);
+}
+section#chat ul#messages li div[data-media-type='audio']:after {
+  display: block;
+  content: url(../../img/audio.png);
+  height: 6.8rem;
+  margin: -2.15rem -.7rem -.85rem -.7rem;
+  text-align: center;
+}
+section#chat ul#messages li div[data-media-type='url']:after {
+  display: block;
+  content: url(../../img/location.png);
+  height: 6.8rem;
+  margin: -2.15rem -.7rem -.85rem -.7rem;
+  text-align: center;
+}
+section#chat article#emoji {
+  padding: 1rem;
+}
+section#chat article#emoji h1 {
+  font-size: 1.2rem;
+  border-bottom: .1rem solid #AAA;
+  color: #444;
+}
+section#chat article#emoji ul {
+  height: calc(100% - 5.5rem);
+  margin-bottom: .8rem;
+  overflow: scroll;
+  list-style-type: none;
+}
+section#chat article#emoji ul li {
+  padding: 1rem;
+  float: left;
+  cursor: pointer;
+}
+section#chat article#emoji ul li img {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+section#chat article#emoji button {
+  width: 100%;
+}
+section#chat article#call {
+  padding: 1rem;
+}
+section#chat article#call h1 {
+  font-size: 1.2rem;
+  border-bottom: .1rem solid #AAA;
+  color: #444;
+}
+section#chat article#call ul {
+  height: calc(100% - 5.5rem);
+  margin-bottom: .8rem;
+  overflow: scroll;
+  list-style-type: none;
+}
+section#chat article#call ul li {
+  padding: 1rem;
+  float: left;
+  cursor: pointer;
+}
+section#chat article#call ul li img {
+  width: 2rem;
+  height: 2rem;
+}
+section#chat article#call button {
+  width: 100%;
+}
+
+section#chat article#videocall {
+  padding: 1rem;
+}
+section#chat article#videocall h1 {
+  font-size: 1.2rem;
+  border-bottom: .1rem solid #AAA;
+  color: #444;
+}
+section#chat article#videocall ul {
+  height: calc(100% - 5.5rem);
+  margin-bottom: .8rem;
+  overflow: scroll;
+  list-style-type: none;
+}
+section#chat article#videocall ul li {
+  padding: 1rem;
+  float: left;
+  cursor: pointer;
+}
+section#chat article#videocall ul li img {
+  width: 2rem;
+  height: 2rem;
+}
+section#chat article#videocall button {
+  width: 100%;
+}
+
+section#chat[data-otr=true] ul#messages:after {
+  content: "\f023";
+  position: fixed;
+  font-family: lungojsicon;
+  font-weight: 700;
+  font-size: 12rem;
+  color: #E95644;
+  top: calc(50vh - 6rem);
+  left: calc(50vw - 4rem);
+  transform: rotate(-20deg);
+  opacity: .2;
+  pointer-events: none;
+}
+
+section:not([data-features~=presence]) span.show {
+  display: none!important;
+}
+
+section.profile div#card {
+  background-color: #FFF;
+  color: #FFF;
+  padding: 2rem;
+  min-height: 8rem;
+  color: #333;
+}
+section.profile div#card span.avatar {
+  position: absolute;
+  display: block;
+  height: 7rem;
+  width: 7rem;
+  top: 2rem;
+  left: calc(50vw - 3.5rem);
+}
+section.profile div#card span.avatar img {
+  display: block;
+  width: inherit;
+  height: inherit;
+  border-radius: 50%;
+  overflow: hidden;
+}
+section.profile div#card span.name {
+  display: block;
+  margin: 8rem 1rem 0 1rem;
+  max-width: calc(100% - 2rem);
+  text-align: center;
+  font-size: 1.1rem;
+  line-height: 1rem;
+  color: #222;
+  font-weight: 300;
+}
+section.profile div#card span.user {
+  display: block;
+  margin: .5rem 1rem 1rem 1rem;
+  max-width: calc(100% - 2rem);
+  text-align: center;
+  margin-bottom: .5rem;
+  font-size: .9rem;
+  line-height: 1rem;
+  font-weight: 200;
+  word-break: break-all;
+}
+section.profile div#card span.provider {
+  position: absolute;
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  top: 2rem;
+  left: calc(50% + 2rem);
+  border: .3rem solid white;
+  border-radius: .6rem;
+  background-color: white;
+}
+section.profile div#card span.provider img {
+  width: 100%;
+  border-radius: .3rem;
+}
+section#me.profile[data-features~=avatarChange]  div#card span.avatar:after {
+  content: "Change";
+  display: block;
+  position: absolute;
+  top: 6rem;
+  left: 0;
+  font-size: .8em;
+  padding: .2rem .5rem;
+  background-color: white;
+  color: #444;
+  border-radius: .4rem;
+  opacity: .7;
+}
+section#me:not([data-features~=statusChange]) div#status {
+  display: none!important;
+}
+section#me:not([data-features~=rosterMgmt]) button.contactAdd {
+  display: none!important;
+}
+section#me:not([data-features~=pay]) button.accountPurchase {
+  display: none!important;
+}
+section#chat:not([data-features~=imageSend]) a.picture {
+  display: none!important;
+}
+section#chat:not([data-features~=videoSend]) a.video {
+  display: none!important;
+}
+section#chat:not([data-features~=audioSend]) a.audio {
+  display: none!important;
+}
+section#chat:not([data-features~=locationSend]) a.location {
+  display: none!important;
+}
+section#chat:not([data-features~=attention]) a.bolt {
+  display: none!important;
+}
+section#me div#status input {
+  width: 100%;
+  height: 2.4rem;
+  font-size: 1rem;
+}
+section.profile article > div:not(#card) {
+  padding: 1rem;
+  border-top: .1rem solid #CCC;
+}
+section.profile article > div:not(#card) h2 {
+  font-size: 1.1rem;
+  color: #444;
+  margin-bottom: .5rem;
+}
+section.profile article > div:not(#card) p {
+  font-weight: 200;
+  font-size: .9rem;
+}
+section.profile article > div:not(#card) .buttongroup {
+  margin: 0;
+}
+section.profile article > div:not(#card) ul li {
+  list-style: none;
+  padding: .5rem;
+  border-bottom: .05rem solid #CCC;
+  font-weight: 300;
+  font-size: .9em;
+  color: #666;
+}
+section.profile article > div:not(#card) ul li:last-child {
+  border: none;
+}
+
+ul.mini {
+  margin-top: 1rem;
+  list-style-type: none;
+}
+ul.mini li {
+  border-bottom: .1rem solid #CCC;
+}
+ul.mini li:last-child {
+  border: none;
+}
+ul.mini li a {
+  display: block;
+  padding: .9rem .2rem .7rem .2rem;
+}
+ul.mini li img {
+  height: 1.3rem;
+  margin-right: .5rem;
+  margin-top: -.2rem;
+}
+
+aside#accounts header {
+  display: block;
+  padding: .7rem .4rem;
+  font-size: .9em;
+  font-weight: 300;
+  text-transform: uppercase;
+  color: #222;
+}
+aside#accounts header nav {
+  position: absolute;
+  top: .4rem;
+  right: .2rem;
+}
+aside#accounts header nav button {
+  height: 2rem;
+  width: 2rem;
+  border: none;
+}
+aside#accounts article ul li {
+  position: relative;
+  height: 3.6rem;
+  overflow: hidden;
+  border-top: .1rem solid #E6E6E6;
+}
+aside#accounts article ul li img.provIcon {
+  position: absolute;
+  top: .5rem;
+  left: .5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: .4rem;
+}
+aside#accounts article ul li span.provider {
+  position: absolute;
+  top: .7rem;
+  left: 3.6rem;
+  font-size: .7em;
+  text-transform: uppercase;
+  color: #666;
+}
+aside#accounts article ul li span.jid {
+  position: absolute;
+  top: 1.6rem;
+  left: 3.6rem;
+  max-width: calc(80vw - 3rem);
+  font-size: .9em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+aside#accounts article ul li span.counter {
+  display: block;
+  position: absolute;
+  top: .6rem;
+  right: .4rem;
+  background-color: #E74C3C;
+  color: #FFF;
+  padding: .4rem .5rem;
+  font-size: .6em;
+  line-height: .6em;
+  border-radius: .6rem;
+}
+aside#accounts article ul li span.counter[data-value='0'] {
+  display: none;
+}
+
+li[data-show=a] .backchange,
+li[data-show=chat] .backchange,
+section[data-show=a] header .backchange,
+section[data-show=chat] header .backchange,
+section[data-show=a] footer .backchange,
+section[data-show=chat] footer .backchange {
+  background-color: #2ECC71;
+}
+li[data-show=away] .backchange,
+section[data-show=away] header .backchange,
+section[data-show=away] footer .backchange {
+  background-color: #3498DF;
+}
+li[data-show=xa] .backchange,
+section[data-show=xa] header .backchange,
+section[data-show=xa] footer .backchange {
+  background-color: #F1C40F;
+}
+li[data-show=dnd] .backchange,
+section[data-show=dnd] header .backchange,
+section[data-show=dnd] footer .backchange {
+  background-color: #E95644;
+}
+li[data-show=na] .backchange,
+li:not([data-show]) .backchange,
+section[data-show=na] header .backchange,
+section:not([data-show]) header .backchange
+section[data-show=na] footer .backchange,
+section:not([data-show]) footer .backchange {
+  display: none!important;
+}
+
+.disHide section#main article#contacts li[data-show='na'] {
+  display: none;
+}
+
+section#main article#contacts li[data-show='na'] .status,
+section#main article#contacts li[data-show='na'] .show,
+section#main article#contacts li[data-muc='true'] .show {
+  display: none!important;
+}
+
+section#chat[data-muc='true'] header .show {
+  display: none!important;
+}
+
+section#settings nav a#developer {
+  display: none;
+}
+
+.devMode section#settings nav a#developer {
+  display: block;
+}
+
+div#debugConsole {
+  display: none;
+}
+
+.devConsole div#debugConsole {
+  display: block;
+}
+
+section#settings article#devmode div button {
+  position: absolute;
+  right: 1rem;
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  background-color: #00B8D6;
+  transition: all .2s;
+  overflow: hidden;
+}
+
+section#activity article ul.accounts {
+  padding: 2rem;
+}
+section#activity article ul.accounts li {
+  position: relative;
+  height: 3.6rem;
+  overflow: hidden;
+}
+section#activity article ul.accounts li:not(:first-child) {
+  border-top: .1rem solid #E6E6E6;
+}
+section#activity article ul.accounts li img.provIcon {
+  position: absolute;
+  top: .5rem;
+  left: .5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: .4rem;
+}
+section#activity article ul.accounts li span.provider {
+  position: absolute;
+  top: .7rem;
+  left: 3.6rem;
+  font-size: .7em;
+  text-transform: uppercase;
+  color: #666;
+}
+section#activity article ul.accounts li span.jid {
+  position: absolute;
+  top: 1.6rem;
+  left: 3.6rem;
+  max-width: calc(80vw - 3rem);
+  font-size: .9em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+div.switch {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: block;
+  width: 3rem;
+  height: 1.4rem;
+  border-radius: 1.4rem;
+  background-color: #BDC6C8;
+  transition: all .2s;
+  overflow: hidden;
+}
+div.switch img.tick {
+  display: none;
+  position: absolute;
+  height: .9rem;
+  left: .3rem;
+  top: .21rem;
+}
+div.switch div.ball {
+  position: absolute;
+  display: block;
+  top: -.4rem;
+  left: -.4rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  border: .5rem solid #ABB5B7;
+  border-radius: 50%;
+  background-color: #FFF;
+  transition: all .2s;
+}
+[data-value="true"] div.switch img.tick {
+  display: block;
+}
+[data-value="true"] div.switch {
+  background-color: #00B8D6;
+}
+[data-value="true"] div.switch div.ball {
+  left: 1.2rem;
+  border-color: #00D3F5;
+}
+/* KEYFRAMES */
+@keyframes blink {
+  from {
+    transform: scale(1.2);
+  }
+}
+
+/* MEDIA QUERIES */
+@media only screen and (orientation:landscape) and (max-height: 18vw) {
+  section#chat header {
+    display: none;
+  }
+  section#chat {    
+    height: 100%;
+  }
+  section#chat ul#messages {
+    display: none;
+  }
+  section#chat #footbox #text {
+    position: fixed!important;
+    top: 0!important;
+    left: 0!important;
+    width: 100%!important;
+    max-height: 100%!important;
+    bottom: 0!important;
+    border: none!important;
+    border-radius: 0!important;
+  }
+}
+
+/* PROGRESS BAR */
+
+div #progressBar {
+  position: absolute;
+  top: 0rem;
+  height: .3rem;
+  left: 0;
+  width: 100%;
+}
+div #progressBar > span.bar > span.value {
+  position: relative;
+  display: block;
+  width: 0;
+  background-color: #E95644;
+  height: .3rem;
+}
+
+/* CONSOLE */
+
+#console {
+  display:none;
+}
+#showConsole {
+  margin-left:50%; 
+  position:absolute;
+  z-index:1001; 
+  opacity:.50;
+  width:20px;
+  height:60px;
+}
+#hideConsole {
+  margin-left:50%; 
+  position:absolute;
+  z-index:1001; 
+  opacity:.50;
+  width:20px;
+  height:60px;
+  display:none;
+}
+#console #backgroundConsole {
+  top:3rem;
+  position:absolute;
+  z-index:1001; 
+  opacity:.70;
+  background-color:black;
+  width:100%;
+  height:100%;
+}
+#console #bodyConsole {
+  top:3rem;
+  position:absolute;
+  z-index:1002;
+  color:white;
+  width:100%;
+  height:100%;
+}
+#console #bodyConsole #consoleTitle {
+  float:left;
+  margin-left: .5rem;
+  color: red;
+} 
+#console #bodyConsole #consoleClear {
+  float:right;
+  margin-right: 1rem;
+  margin-top: .3rem;
+  background: white;
+  font-size: 1rem;
+}
+#console #bodyConsole #logConsole {
+  width:100%;
+  margin-left; 1rem;
+  padding: 0 1rem 1rem 1rem;
+  height:100%; 
+  overflow-y:scroll;
+  overflow-x:hidden;
+  word-wrap: break-word;
+  font-size: .9rem;
+}
