@@ -659,7 +659,7 @@ section#chat ul#messages > li > div {
   animation: fadeIn .5s;
 }
 section#chat ul#messages > li > div a{
-  color: #E95644;
+  color: #fff;
 }
 section#chat ul#messages > li > div[data-type='out'] {
   float: right;
