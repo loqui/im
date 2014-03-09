@@ -717,8 +717,10 @@ App.connectors['coseme'] = function (account) {
       if (isGroup) {
         msg.pushName = fromAttribute;
       }
-      var msg = new Message(this.account, msg);
-      msg.receive(isGroup);
+      var msg = new Message(this.account, msg, {
+        muc: isGroup
+      });
+      msg.receive();
       this.ack(msgId, fromAttribute);
       Tools.log('Finished processing file of type', fileType);
     }.bind(this);
