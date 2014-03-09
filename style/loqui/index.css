@@ -160,6 +160,9 @@ section > header > nav.discreet button {
 section.extended > header {
   background-color: #E74C3C;
 }
+section#me > header {
+  background-color: #E74C3C;
+}
 section.extended article {
   top: 6rem;
   height: calc(100% - 6rem)!important;
@@ -1070,6 +1073,10 @@ aside#accounts article ul li {
   overflow: hidden;
   border-top: .1rem solid #E6E6E6;
 }
+aside#accounts article ul li:first-child {
+  border-bottom: none;
+  border-top: none;
+}
 aside#accounts article ul li img.provIcon {
   position: absolute;
   top: .5rem;
@@ -1246,9 +1253,9 @@ div.switch div.ball {
   position: absolute;
   display: block;
   top: -.4rem;
-  left: -.4rem;
-  width: 2.2rem;
-  height: 2.2rem;
+  left: -.1rem;
+  width: 1.1rem;
+  height: 1.1rem;
   border: .5rem solid #ABB5B7;
   border-radius: 50%;
   background-color: #FFF;
@@ -1258,11 +1265,11 @@ div.switch div.ball {
   display: block;
 }
 [data-value="true"] div.switch {
-  background-color: #00B8D6;
+  background-color: #E9695B;
 }
 [data-value="true"] div.switch div.ball {
   left: 1.2rem;
-  border-color: #00D3F5;
+  border-color: #E74C3C;
 }
 /* KEYFRAMES */
 @keyframes blink {
