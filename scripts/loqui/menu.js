@@ -42,7 +42,10 @@ var Menu = {
     },
     chatAdd: function (obj) {
       var account = Messenger.account();
-      Activity('chat', account);
+      Activity('chat', account, null, {
+        chats: false,
+        groups: account.supports('muc')
+      });
     },
     chatRemove: function(obj) {
       var jid = $(obj).closest('section').data('jid');

@@ -1,17 +1,30 @@
 'use strict';
 
-var Activity = function (action, account, content) {
+var Activity = function (action, account, content, options) {
+
+  var options = {
+    chats: (options && 'chats' in options) ? options.chats : true,
+    groups: (options && 'groups' in options) ? options.groups : true
+  }
   
   var actions = {
     chat: function (f, account, content) {
-      account.contactsRender(f, function (t) {
+      var click = function (t) {
         var chat = account.chatGet(t.dataset.jid, $(t).children('.name').text());
         Lungo.Router.section('back');
+        account.show();
         chat.show();
-      });
+        if (content) {
+          $('#main #footbox #text').text(content).trigger('keydown');
+        }
+      }
+      if (options.chats) {
+        account.chatsRender(f, click);
+      }
+      account.contactsRender(f, click);
     },
     file: function (f, account, content) {
-      account.contactsRender(f, function (t) {
+      var click = function (t) {
         var jid = t.dataset.jid;
         var title = $(t).children('.name').text();
         var chat = account.chatGet(jid, title);
@@ -28,65 +41,90 @@ var Activity = function (action, account, content) {
             }
           }
         }
-      });
+      }
+      if (options.chats) {
+        account.chatsRender(f, click);
+      }
+      account.contactsRender(f, click);
     }
   }
   
-  var accountSelect = function (f) {
+  var accountSelect = function (f, title) {
+    var article = document.createElement('article');
+    article.id = 'accounts';
     var ul = document.createElement('ul');
     ul.classList.add('accounts');
-    
     for (var [i, account] in Iterator(App.accounts)) {
       let li = document.createElement('li');
       let ai = i;
-
       let icon = document.createElement('img');
       icon.src = 'img/providers/squares/' + account.core.provider + '.svg';
       icon.classList.add('provIcon');
-
       let provider = document.createElement('span');
       provider.textContent = account.connector.provider.longName;
       provider.classList.add('provider');
-
       let name = document.createElement('span');
       let vCard = $(account.connector.vcard);
       let address = ( vCard.length && vCard.find('FN').length ) ? vCard.find('FN').text() : account.core.user;
       name.textContent = address;
       name.classList.add('jid');
-
       li.appendChild(icon);
       li.appendChild(provider);
       li.appendChild(name);
-      
       li.addEventListener('click', function (e) {
-        Activity(action, App.accounts[ai], content);
+        Activity(action, App.accounts[ai], content, options);
       });
-      
       ul.appendChild(li);
+      article.appendChild(ul);
     }
-    f.appendChild(ul);
+    f.appendChild(article);
   }
   
+  var t = '';
   var f = document.createDocumentFragment();
+  var section = $('section#activity');
+  var article = section.children('article').empty();
+  section.children('article').remove();
   
   if (account) {
     if (action in actions) {
       actions[action](f, account, content);
+      section[0].appendChild(f);
+      section.find('h1').first().text(_('Action' + action));
+      section.addClass('extended');
+      if (options.groups) {
+        section.find('[data-view-article="groups"]').show();
+      } else {
+        section.find('[data-view-article="groups"]').hide();
+      }
+      if (options.chats) {
+        section.find('[data-view-article="chats"]').show();
+        section.find('[data-view-article="chats"]').trigger('click');
+      } else {
+        section.find('[data-view-article="chats"]').hide();
+        section.find('[data-view-article="contacts"]').trigger('click');
+      }
+    } else {
+      Tools.log('No such action!');
     }
   } else {
-    accountSelect(f);
+    accountSelect(f, t);
+    section[0].appendChild(f);
+    section.find('h1').first().text(t);
+    section.removeClass('extended');
+    Lungo.Router.article('activity', 'accounts');
   }
   
-  var article = $('section#activity article').empty();
-  article[0].appendChild(f);
   Lungo.Router.section('activity');
   
 }
 
-navigator.mozSetMessageHandler('activity', function(a) {
-  if (a.source.name === "share") {
-    console.log(a);
-    var file = a.source.data;
-    Activity('file', null, a.source.data);
-  }
-});
+if ('mozSetMessageHandler' in navigator) {
+  navigator.mozSetMessageHandler('activity', function(a) {
+    if (a.source.name === "share") {
+      console.log(a);
+      var file = a.source.data;
+      Activity('file', null, a.source.data);
+    }
+  });
+}

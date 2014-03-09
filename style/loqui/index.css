@@ -110,6 +110,13 @@ section#success img#avatar {
 section > header {
   background-color: #312F34;
 }
+section > header > h1 {
+  position: absolute;
+  right: 1rem;
+  top: -.1rem;
+  color: white;
+  text-transform: uppercase;
+}
 section > header > nav {
   overflow: hidden;
   float: right;
@@ -150,26 +157,36 @@ section > header > nav.discreet button {
   width: 2.6rem;
 }
 
+section.extended > header {
+  background-color: #E74C3C;
+}
 section.extended article {
-  top: 5.5rem;
-  height: calc(100% - 3.7rem)!important;
+  top: 6rem;
+  height: calc(100% - 6rem)!important;
+}
+section:not(.extended) nav[data-control="groupbar"] {
+  display: none;
 }
 section nav[data-control="groupbar"] {
   position: absolute;
   top: 3rem;
   width: 100%;
-  height: 2.5rem;
-  background-color: #222;
+  height: 3rem;
+  background-color: #37353A;
   color: white;
 }
 section nav[data-control="groupbar"] a {
   float: left;
-  height: 2.5rem!important;
-  padding: .8rem .7rem;
+  margin: .7rem 0 0 .5rem;
+  padding: .2rem .5rem .3rem .5rem;
   font-size: .8em;
+  border-radius: .2rem;
 }
 [data-view-menu]:after {
   content: none;
+}
+section nav[data-control="groupbar"] a.selected {
+  background-color: #E74C3C;
 }
 section.aside {
   transform: translateX(5rem); 
@@ -291,8 +308,7 @@ section#main article ul li:active,
 section#activity article ul li:active {
   background-color: #DDD;
 }
-section#main article ul li span.name,
-section#activity article ul li span.name {
+section#main article ul li span.name {
   position: absolute;
   left: 4.2rem;
   top: .6rem;
@@ -301,9 +317,17 @@ section#activity article ul li span.name {
   max-height: 1.4em;
   overflow: hidden;
 }
+section#activity article ul li span.name {
+  position: absolute;
+  left: 1rem;
+  top: .6rem;
+  color: #444;
+  max-width: calc(100% - 4.5rem);
+  max-height: 1.4em;
+  overflow: hidden;
+}
 section#main article ul li span.status,
-section#main article ul li span.lastMessage,
-section#activity article ul li span.status {
+section#main article ul li span.lastMessage {
   position: absolute;
   left: 4.2rem;
   top: 2rem;
@@ -311,6 +335,20 @@ section#activity article ul li span.status {
   font-weight: 100;
   font-size: .8em;
   max-width: calc(100% - 6.5rem);
+  max-height: 1.4em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+section#activity article ul li span.status,
+section#activity article ul li span.lastMessage {
+  position: absolute;
+  left: 1rem;
+  top: 2rem;
+  color: #444;
+  font-weight: 100;
+  font-size: .8em;
+  max-width: calc(100% - 4.5rem);
   max-height: 1.4em;
   overflow: hidden;
   white-space: nowrap;
@@ -331,6 +369,10 @@ section#main article ul li span.lastStamp {
   font-size: .65em;
   max-width: calc(100% - 4.7rem);
   text-align: right;
+}
+section#activity article ul li span.lastStamp,
+section#activity article ul li span.unread {
+  display: none;
 }
 section#main article ul li .show {
   display: block;

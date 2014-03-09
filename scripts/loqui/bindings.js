@@ -6,10 +6,6 @@ Lungo.init({
 
 $('document').ready(function(){
   setTimeout(function(){
-    $('[data-l10n-title]').each(function () {
-      $(this).attr('data-title', _(this.dataset.l10nTitle));
-      $(this).find('h1').text(_(this.dataset.l10nTitle));
-    });
     $('input[data-l10n-placeholder]').each(function () {
       var original = $(this).data('l10n-placeholder');
       var local = _(original);

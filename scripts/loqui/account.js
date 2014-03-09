@@ -145,7 +145,6 @@ var Account = function (core) {
   this.allRender = function () {
     this.accountRender();
     this.chatsRender();
-    //this.contactsRender();
     this.presenceRender();
     this.avatarsRender();
   }
@@ -183,13 +182,15 @@ var Account = function (core) {
   }
   
   // List all chats for this account
-  this.chatsRender = function () {
+  this.chatsRender = function (f, click, hold) {
     var account = this;
     var oldUl = $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"]');
     var ul = $("<ul />");
     var media = _('AttachedFile');
     ul.data('jid', account.core.fullJid);
-    ul.attr('style', oldUl.attr('style'));
+    if (!f) {
+      ul.attr('style', oldUl.attr('style'));
+    }
     var totalUnread = 0;
     if (this.core.chats && this.core.chats.length) {
       for (var i in this.core.chats) {
@@ -210,7 +211,7 @@ var Account = function (core) {
           account.chats[i].save();
         }
         li.data('muc', chat.muc ? true : false);
-        li.bind('click', function () {
+        li.bind('click', click ? function () {click(this)} : function () {
           var ci = account.chatFind(this.dataset.jid);
           if (ci >= 0) {
             var chat = account.chats[ci];
@@ -222,7 +223,7 @@ var Account = function (core) {
             }, account);
           }
           chat.show();
-        }).bind('hold', function () {
+        }).bind('hold', hold ? function () {hold(this)} : function () {
           window.navigator.vibrate([100]);
           if (this.dataset.jid.match(/\-/)) {
             Messenger.mucProfile(this.dataset.jid);
@@ -242,7 +243,11 @@ var Account = function (core) {
       });
       ul.prepend(span);
     }
-    oldUl.replaceWith(ul);
+    if (f) {
+      f.appendChild($('<article/>').attr('id', 'chats').addClass('scroll').append(ul)[0]);
+    } else {
+      oldUl.replaceWith(ul);    
+    }
     Lungo.Element.count('aside li[data-jid="' + this.core.fullJid + '"]', totalUnread);
     if (ul.style('display') == 'block') {
       Lungo.Element.count('section#main header nav button[data-view-article="chats"]', totalUnread);
@@ -252,7 +257,8 @@ var Account = function (core) {
 
   // List all contacts for this account
   this.contactsRender = function (f, click) {
-    var ul = $("<ul />").addClass('list');
+    var article = $("<article/>").attr('id', 'contacts').addClass('scroll');
+    var ul = $("<ul/>").addClass('list');
     var frag = f;
     var account = this;
     this.core.roster.forEach(function (contact, i, roster) {
@@ -260,16 +266,15 @@ var Account = function (core) {
       var li = document.createElement('li');
       li.dataset.jid = contact.jid;
       li.innerHTML = 
-          '<span class=\'avatar\'><img /></span>'
-        + '<span class=\'name\'>' + name + '</span>'
-        + '<span class=\'show backchange\'></span>'
-        + '<span class=\'status\'></span>';
+          '<span class=\'name\'>' + name + '</span>'
+        + '<span class=\'status\'>' + contact.jid + '</span>';
       li.addEventListener('click', function (e) {
         click(this);
       });
       ul[0].appendChild(li);
     });
-    frag.appendChild(ul[0]);
+    article.append(ul);
+    frag.appendChild(article[0]);
   }
   
   // Render presence for every contact

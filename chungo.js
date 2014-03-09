@@ -16,7 +16,7 @@ var Chungo = {
       
       Chungo.Router._stack = [$$('section').first().attr('id')];
       
-      setTimeout(function(){
+      setTimeout(function() {
         var sections = $$('section');
         sections.each(function () {
           $$(this).children('article').first().addClass('show');
@@ -44,7 +44,25 @@ var Chungo = {
           var image = this.dataset.image;
           $$(this).style('backgroundImage', 'url(' + image + ')');
         });
+        $$('[data-control="groupbar"]').each(function () {
+          var links = $$(this).children('[data-view-article]');
+          links.first().addClass('selected').siblings().removeClass('selected');
+          links.each(function () {
+            $$(this).on('click', function (e) {
+              $$(this).addClass('selected').siblings().removeClass('selected');
+            });  
+          });
+        });
       });
+      
+      setTimeout(function () {
+        $$('header[data-title]').each(function () {
+          var title = $$(this).data('l10n-title') && '_' in window ? _($$(this).data('l10n-title')) : $$(this).data('title');
+          $$(this).append(
+            $$('<h1/>').text(title)
+          );
+        });
+      }, 1000);
       
       $$('body').append(
         $$('<div>').addClass('chungo').append(
@@ -105,7 +123,6 @@ var Chungo = {
     _stack: [],
     
     section: function (to) {
-      console.log(to);
       if (to == 'back') {
         var from = this._stack.pop();
         var to = this._stack[this._stack.length - 1];
@@ -145,16 +162,17 @@ var Chungo = {
             .addClass('forth');
         }
       }
-      console.log(from, to);
+      console.log('SECTION', from, to);
       setTimeout(function () {
         Chungo.Aside.hide();
-      }, 300);
+      }, to != from ? 300 : 0);
     },
     
     article: function (section, article) {
       this.section(section);
       var to = $$('section#' + section).children('article#' + article);
       to.addClass('show').siblings('article').removeClass('show');
+      console.log('ARTICLE', to);
     }
     
   },

@@ -242,6 +242,9 @@ var Message = function (account, core, options) {
     if (onDivClick !== undefined) {
       div[0].onclick = onDivClick;
     }
+    div.on('hold', function (e) {
+      Activity('chat', null, $(this).children('.text').text());
+    });
   	return div[0];
   }
   

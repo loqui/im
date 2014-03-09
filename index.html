@@ -47,14 +47,14 @@
     </article>
   </section>
   <section id='main' data-transition='horizontal' class='fix head foot'>
-    <header data-title='Chats' data-l10n-title='Chats'>
+    <header>
       <div class='account' data-menu-onclick='me'>
         <img/>
-        <strong class="provider"></strong>
-        <span class="jid"></span>
+        <strong class='provider'></strong>
+        <span class='jid'></span>
       </div>
       <nav class='on-right'>
-        <button data-view-aside='accounts' data-title='Accounts' data-icon='menu' class='tab'></button>
+        <button data-view-aside='accounts' data-icon='menu' class='tab'></button>
       </nav>
       <nav class='on-right discreet'>
         <button data-menu-onclick='search' data-icon='search' ></button>
@@ -255,9 +255,14 @@
     </div>
   </div>
   <section id='activity' data-transition='vertical'>
-    <header>
+    <header data-title='Activity'>
       <nav class='on-left'>
         <button data-view-section='back' data-icon='remove' class='up'></button>
+      </nav>
+      <nav data-control='groupbar'>
+        <a data-l10n-id='Chats' data-view-article='chats'>Chats</a>
+        <a data-l10n-id='Contacts' data-view-article='contacts'>Contacts</a>
+        <a data-l10n-id='Groups' data-view-article='groups'>Groups</a>
       </nav>
     </header>
     <article id='main' class='active scroll'></article>
