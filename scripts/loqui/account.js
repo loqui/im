@@ -239,7 +239,11 @@ var Account = function (core) {
         .append($('<strong/>').text(_('NoChats')))
         .append($('<p/>').text(_('NoChatsExplanation')));
       span.on('click', function () {
-        Lungo.Router.article('main', 'contacts');
+        var account = Messenger.account();
+        Activity('chat', account, null, {
+          chats: false,
+          groups: account.supports('muc')
+        });
       });
       ul.prepend(span);
     }
