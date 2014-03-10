@@ -659,6 +659,9 @@ section#chat ul#messages > li > div {
   animation: fadeIn .5s;
 }
 section#chat ul#messages > li > div a{
+  color: #E95644;
+}
+section#chat ul#messages > li > div[data-type='out'] a{
   color: #fff;
 }
 section#chat ul#messages > li > div[data-type='out'] {
