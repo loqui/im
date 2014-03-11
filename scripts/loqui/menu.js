@@ -47,6 +47,9 @@ var Menu = {
         groups: account.supports('muc')
       });
     },
+    doSearch: function (obj) {
+      Lungo.Router.section('searchBar');
+    },
     chatRemove: function(obj) {
       var jid = $(obj).closest('section').data('jid');
       Messenger.chatRemove(jid);
