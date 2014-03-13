@@ -257,8 +257,21 @@ var Account = function (core) {
 
   // List all contacts for this account
   this.contactsRender = function (f, click) {
-    var article = $("<article/>").attr('id', 'contacts').addClass('scroll');
-    var ul = $("<ul/>").addClass('list');
+    var account = this;
+    var article = $('<article/>').attr('id', 'contacts');
+    var header = $('<header/>').addClass('beige')
+      .append($('<button/>').addClass('new').text(_('ContactAdd')).on('click', Menu.show('contactAdd')))
+      .append($('<button/>').addClass('join').text(_('ContactsSync')).on('click', function (event) {
+        delete account.core.roster;
+        account.connector.sync(function (rcb) {
+          account.save();
+          account.allRender();
+          if (rcb) {
+            rcb();
+          }
+        });
+      }));
+    var ul = $('<ul/>').addClass('list').addClass('scroll');
     var frag = f;
     var account = this;
     this.core.roster.forEach(function (contact, i, roster) {
@@ -273,7 +286,35 @@ var Account = function (core) {
       });
       ul[0].appendChild(li);
     });
-    article.append(ul);
+    article.append(header).append(ul);
+    frag.appendChild(article[0]);
+  }
+  
+  // List all group chats for this account
+  this.groupsRender = function (f, click) {
+    var account = this;
+    var article = $('<article/>').attr('id', 'groups');
+    var header = $('<header/>').addClass('beige')
+      .append($('<button/>').addClass('new').text(_('GroupNew')).on('click', Menu.show('newGroup', account)))
+      .append($('<button/>').addClass('join').text(_('GroupJoin')).on('click', Menu.show('joinGroup', account)));
+    var ul = $('<ul/>').addClass('list').addClass('scroll');
+    var frag = f;
+    var account = this;
+    this.core.chats.forEach(function (chat, i, chats) {
+      if (chat.muc) {
+        var title = chat.title;
+        var li = document.createElement('li');
+        li.dataset.jid = chat.jid;
+        li.innerHTML = 
+            '<span class=\'name\'>' + title + '</span>'
+          + '<span class=\'status\'>' + _('NumParticipants', {number: chat.participants.length}) + '</span>';
+        li.addEventListener('click', function (e) {
+          click(this);
+        });
+        ul[0].appendChild(li);
+      }
+    });
+    article.append(header).append(ul);
     frag.appendChild(article[0]);
   }
   

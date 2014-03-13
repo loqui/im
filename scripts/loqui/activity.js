@@ -22,6 +22,9 @@ var Activity = function (action, account, content, options) {
         account.chatsRender(f, click);
       }
       account.contactsRender(f, click);
+      if (options.groups) {
+        account.groupsRender(f, click);
+      }
     },
     file: function (f, account, content) {
       var click = function (t) {
@@ -46,6 +49,9 @@ var Activity = function (action, account, content, options) {
         account.chatsRender(f, click);
       }
       account.contactsRender(f, click);
+      if (options.groups) {
+        account.groupsRender(f, click);
+      }
     }
   }
   
