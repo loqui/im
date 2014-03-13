@@ -57,7 +57,7 @@
         <button data-view-aside='accounts' data-icon='menu' class='tab'></button>
       </nav>
       <nav class='on-right discreet'>
-        <button data-menu-onclick='search' data-icon='search' ></button>
+        <button data-menu-onclick='doSearch' data-icon='search' ></button>
         <button data-menu-onclick='chatAdd' data-icon='pencil' ></button>
       </nav>
     </header>
@@ -258,6 +258,19 @@
     <header data-title='Activity'>
       <nav class='on-left'>
         <button data-view-section='back' data-icon='remove' class='up'></button>
+      </nav>
+      <nav data-control='groupbar'>
+        <a data-l10n-id='Chats' data-view-article='chats'>Chats</a>
+        <a data-l10n-id='Contacts' data-view-article='contacts'>Contacts</a>
+        <a data-l10n-id='Groups' data-view-article='groups'>Groups</a>
+      </nav>
+    </header>
+    <article id='main' class='active scroll'></article>
+  </section>
+  <section id='searchBar' data-transition='vertical'>
+    <header data-title='Search'>
+      <nav class='on-left'>
+        <button data-view-section='back' data-icon='remove' class='extended up'></button>
       </nav>
       <nav data-control='groupbar'>
         <a data-l10n-id='Chats' data-view-article='chats'>Chats</a>

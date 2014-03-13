@@ -161,7 +161,7 @@ section > header > nav.discreet button {
 section.extended > header {
   background-color: #E74C3C;
 }
-section#me > header {
+section#searchBar > header {
   background-color: #E74C3C;
 }
 section.extended article {
@@ -171,7 +171,18 @@ section.extended article {
 section:not(.extended) nav[data-control="groupbar"] {
   display: none;
 }
+section:not(.extended)#searchBar nav[data-control="groupbar"] {
+  display: none;
+}
 section nav[data-control="groupbar"] {
+  position: absolute;
+  top: 3rem;
+  width: 100%;
+  height: 3rem;
+  background-color: #37353A;
+  color: white;
+}
+section#searchBar nav[data-control="groupbar"] {
   position: absolute;
   top: 3rem;
   width: 100%;
