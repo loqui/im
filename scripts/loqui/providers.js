@@ -130,7 +130,7 @@ var Providers = {
       emoji: 'XMPP'
     }
   },
-  
+
   // Dinamically prints the provider list
   list: function () {
     var ul = $('section#providers ul');
@@ -140,7 +140,7 @@ var Providers = {
       var a = $('<a/>').data('view-section', provider);
       a.text(data.longName);
       var img = $('<img/>').attr('src', 'img/providers/' + provider + '.svg');
-      img.attr('alt', longName);
+      img.attr('alt', data.longName);
       a.prepend(img);
       li.append(a);
       ul.append(li);
@@ -151,7 +151,7 @@ var Providers = {
       $('body').append(section);
     }
   },
-  
+
   // Autocompletes adresses with default domain names
   autoComplete: function (user, provider) {
     var bits = user.split('@');
