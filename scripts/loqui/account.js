@@ -264,7 +264,9 @@ var Account = function (core) {
     var account = this;
     var article = $('<article/>').attr('id', 'contacts');
     var header = $('<header/>').addClass('beige')
-      .append($('<button/>').addClass('new').text(_('ContactAdd')).on('click', Menu.show('contactAdd')))
+      .append($('<button/>').addClass('new').text(_('ContactAdd')).on('click', function (event) {
+        Menu.show('contactAdd');
+      }))
       .append($('<button/>').addClass('join').text(_('ContactsSync')).on('click', function (event) {
         delete account.core.roster;
         account.connector.sync(function (rcb) {
@@ -299,8 +301,12 @@ var Account = function (core) {
     var account = this;
     var article = $('<article/>').attr('id', 'groups');
     var header = $('<header/>').addClass('beige')
-      .append($('<button/>').addClass('new').text(_('GroupNew')).on('click', Menu.show('newGroup', account)))
-      .append($('<button/>').addClass('join').text(_('GroupJoin')).on('click', Menu.show('joinGroup', account)));
+      .append($('<button/>').addClass('new').text(_('GroupNew')).on('click', function (event) {
+        Menu.show('newGroup', account);
+      }))
+      .append($('<button/>').addClass('join').text(_('GroupJoin')).on('click', function (event) {
+        Menu.show('joinGroup', account);
+      }));
     var ul = $('<ul/>').addClass('list').addClass('scroll');
     var frag = f;
     var account = this;
