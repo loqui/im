@@ -196,7 +196,7 @@ var Account = function (core) {
       for (var i in this.core.chats) {
         var chat = this.core.chats[i];
         var title = App.emoji[Providers.data[this.core.provider].emoji].fy(chat.title);
-        var lastMsg = chat.last.text ? (App.emoji[Providers.data[account.core.provider].emoji].fy(chat.last.text)) : (chat.last.media ? media : '');
+        var lastMsg = chat.last ? (chat.last.text ? (App.emoji[Providers.data[account.core.provider].emoji].fy(chat.last.text)) : (chat.last.media ? media : '')) : ' ';
         var lastStamp = chat.last.stamp ? Tools.convenientDate(chat.last.stamp).join('<br />') : '';
         var li = $('<li/>').data('jid', chat.jid);
         li.append($('<span/>').addClass('avatar').append('<img/>'));
@@ -316,7 +316,7 @@ var Account = function (core) {
         var li = document.createElement('li');
         li.dataset.jid = chat.jid;
         li.innerHTML = 
-            '<span class=\'name\'>' + title + '</span>'
+            '<span class=\'name\'>' + App.emoji[Providers.data[account.core.provider].emoji].fy(title) + '</span>'
           + '<span class=\'status\'>' + (chat.participants ? _('NumParticipants', {number: chat.participants.length}) : ' ') + '</span>';
         li.addEventListener('click', function (e) {
           click(this);
