@@ -228,14 +228,12 @@ var Chungo = {
       if (this._timeout[1]) {
         this._timeout[1]();
       }
-      if (seconds) {
-        this._timeout = [
-          setTimeout(function () {
-            this.hide();
-          }.bind(this), seconds ? seconds * 1000 : 0),
-          cb
-        ];
-      }
+      this._timeout = [
+        setTimeout(function () {
+          this.hide();
+        }.bind(this), seconds ? seconds * 1000 : 20000),
+        cb
+      ];
     },
     
     show: function (icon, title, seconds, cb) {
