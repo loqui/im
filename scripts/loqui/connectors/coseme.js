@@ -323,6 +323,7 @@ App.connectors['coseme'] = function (account) {
       group_setPictureError: null,
       group_gotPicture: this.events.onGroupGotPicture,
       group_gotGroups: null,
+      group_gotParticipating: this.events.onGroupGotParticipating,
       notification_contactProfilePictureUpdated: null,
       notification_contactProfilePictureRemoved: null,
       notification_groupPictureUpdated: null,
@@ -465,6 +466,31 @@ App.connectors['coseme'] = function (account) {
 
   this.events.onGroupInfoError = function (jid, owner, subject, subjectOwner, subjectTime, creation) {
     Tools.log('ERROR GETTING GROUP INFO', jid, owner, subject, subjectOwner, subjectTime, creation);
+  }
+
+  this.events.onGroupGotParticipating = function (groups, id) {
+    for (let [i, group] in Iterator(groups)) {
+      let account = this.account;
+      let ci = account.chatFind(group.gid);
+      if (ci >= 0) {
+        let chat = account.chats[ci];
+        let newTitle = decodeURIComponent(escape(group.subject));
+        if (chat.core.title != newTitle) {
+          chat.core.title = newTitle;
+          chat.save(ci, true);
+        }
+      } else {
+        let chat = new Chat({
+          jid: group.gid + '@g.us',
+          title: decodeURIComponent(escape(group.subject)),
+          muc: true,
+          chunks: []
+        }, account);
+        account.chats.push(chat);
+        account.core.chats.push(chat.core);
+        chat.save(ci);
+      }
+    }
   }
 
   this.events.onGroupGotInfo = function (jid, owner, subject, subjectOwner, subjectTime, creation) {

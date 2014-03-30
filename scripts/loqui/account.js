@@ -317,7 +317,7 @@ var Account = function (core) {
         li.dataset.jid = chat.jid;
         li.innerHTML = 
             '<span class=\'name\'>' + title + '</span>'
-          + '<span class=\'status\'>' + _('NumParticipants', {number: chat.participants.length}) + '</span>';
+          + '<span class=\'status\'>' + (chat.participants ? _('NumParticipants', {number: chat.participants.length}) : ' ') + '</span>';
         li.addEventListener('click', function (e) {
           click(this);
         });

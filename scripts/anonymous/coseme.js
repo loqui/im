@@ -6189,6 +6189,8 @@ CoSeMe.namespace('auth', (function() {
         return callback(err);
       }
 
+      if (!tree) { return; }
+
       switch (tree.tag) {
         case 'stream:error':
           var streamError = tree.getChild('text').data;
@@ -6541,8 +6543,10 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
     },
 
     error: function(iqType, idx, node) {
-      _requests[idx](node);
-      delete _requests[idx];
+      if (idx in _requests) {
+        _requests[idx](node);
+        delete _requests[idx];
+      }
     },
 
     get: function(iqType, idx, node) {
