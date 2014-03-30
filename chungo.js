@@ -114,6 +114,10 @@ var Chungo = {
           $$(el).append($$('<span>').addClass('counter').text(value).data('value', value));
         }
       }
+    },
+    
+    progress: function (value) {
+      console.log(value);
     }
     
   },

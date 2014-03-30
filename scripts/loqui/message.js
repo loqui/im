@@ -176,7 +176,8 @@ var Message = function (account, core, options) {
             var img = e.target;
             var url = img.dataset.url;
             var ext = url.split('.').pop();
-            var localUrl = App.pathFiles + $(e.target).parent().siblings('.stamp').data('stamp').replace(/[-:]/g, '') + url.split('/').pop().substring(0, 5).toUpperCase() + '.' + ext;
+            console.log($(e.target));
+            var localUrl = App.pathFiles + $(e.target).closest('[data-stamp]').data('stamp').replace(/[-:]/g, '') + url.split('/').pop().substring(0, 5).toUpperCase() + '.' + ext;
             if (img.dataset.downloaded == 'true') {
               Store.SD.recover(localUrl, function (blob) {
                 open(blob);
@@ -221,6 +222,7 @@ var Message = function (account, core, options) {
     var index = index || parseInt($('section#chat ul#messages li > div').last().data('index')) + 1;
     index = index >= App.defaults.Chat.chunkSize ? 0 : index;
     div.data('index', index);
+    div.data('stamp', this.core.stamp);
     if (this.core.id) {
       div.data('id', this.core.id);
     }
