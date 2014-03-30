@@ -123,46 +123,48 @@ var Chungo = {
     _stack: [],
     
     section: function (to) {
-      if (to == 'back') {
-        var from = this._stack.pop();
-        var to = this._stack[this._stack.length - 1];
-        $$('section#' + from)
-          .removeClass('show')
-          .removeClass('forth')
-          .addClass('prev')
-          .addClass('back');
-        if ($$('section#' + from).data('transition') != 'vertical') {
-          $$('section#' + to)
-            .removeClass('prev')
+      if (this._stack[this._stack.length - 1] != to) {
+        if (to == 'back') {
+          var from = this._stack.pop();
+          var to = this._stack[this._stack.length - 1];
+          $$('section#' + from)
+            .removeClass('show')
             .removeClass('forth')
-            .addClass('show')
+            .addClass('prev')
             .addClass('back');
-        } else {
-          setTimeout(function () {
-            $$('section#' + to).removeClass('fast');
-          }, 300);
-        }
-      } else {
-        var from = this._stack[this._stack.length - 1];
-        if (to != from) {
-          this._stack.push(to);
-          if ($$('section#' + to).data('transition') != 'vertical') {
-            $$('section#' + from)
-              .removeClass('show')
-              .removeClass('back')
-              .addClass('prev')
-              .addClass('forth');
+          if ($$('section#' + from).data('transition') != 'vertical') {
+            $$('section#' + to)
+              .removeClass('prev')
+              .removeClass('forth')
+              .addClass('show')
+              .addClass('back');
           } else {
-            $$('section#' + from).addClass('fast');
+            setTimeout(function () {
+              $$('section#' + to).removeClass('fast');
+            }, 300);
           }
-          $$('section#' + to)
-            .removeClass('prev')
-            .removeClass('back')
-            .addClass('show')
-            .addClass('forth');
+        } else {
+          var from = this._stack[this._stack.length - 1];
+          if (to != from) {
+            this._stack.push(to);
+            if ($$('section#' + to).data('transition') != 'vertical') {
+              $$('section#' + from)
+                .removeClass('show')
+                .removeClass('back')
+                .addClass('prev')
+                .addClass('forth');
+            } else {
+              $$('section#' + from).addClass('fast');
+            }
+            $$('section#' + to)
+              .removeClass('prev')
+              .removeClass('back')
+              .addClass('show')
+              .addClass('forth');
+          }
         }
+        console.log('SECTION', from, to);
       }
-      console.log('SECTION', from, to);
       setTimeout(function () {
         Chungo.Aside.hide();
       }, to != from ? 300 : 0);
