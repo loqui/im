@@ -471,7 +471,7 @@ App.connectors['coseme'] = function (account) {
   this.events.onGroupGotParticipating = function (groups, id) {
     for (let [i, group] in Iterator(groups)) {
       let account = this.account;
-      let ci = account.chatFind(group.gid);
+      let ci = account.chatFind(group.gid + '@g.us');
       if (ci >= 0) {
         let chat = account.chats[ci];
         let newTitle = decodeURIComponent(escape(group.subject));
