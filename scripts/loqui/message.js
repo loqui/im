@@ -100,11 +100,13 @@ var Message = function (account, core, options) {
       if ($('section#chat').data('jid') == chat.core.jid && $('section#chat').hasClass('show')) {
         var ul = $('section#chat ul#messages');
         var li = ul.children('li[data-chunk="' + blockIndex + '"]');
+        var last = li.children('div').last();
+        var avatarize = chat.core.muc && last.data('from') != message.core.from;
         if (li.length) {
-          li.append(message.preRender());
+          li.append(message.preRender(false, avatarize));
         } else {
           var li = $('<li/>').addClass('chunk').data('chunk', blockIndex);
-          li.append(message.preRender());
+          li.append(message.preRender(false, avatarize));
           ul.append(li);
         }
         ul[0].scrollTop = ul[0].scrollHeight;   
@@ -127,6 +129,7 @@ var Message = function (account, core, options) {
       if ($('section#chat').data('jid') == to && $('section#chat').hasClass('show')) {
         var ul = $('section#chat ul#messages');
         var li = ul.children('li[data-chunk="' + blockIndex + '"]');
+        var last = li.children('div').last();
         if (li.length) {
           li.append(message.preRender());
         } else {
@@ -140,7 +143,8 @@ var Message = function (account, core, options) {
   }
   
   // Represent this message in HTML
-  this.preRender = function (index, avatar) {
+  this.preRender = function (index, avatarize) {
+console.log('AVATARIZE', avatarize);
     var message = this;
     var account = this.account;
     if (this.core.text) {
@@ -223,6 +227,7 @@ var Message = function (account, core, options) {
     index = index >= App.defaults.Chat.chunkSize ? 0 : index;
     div.data('index', index);
     div.data('stamp', this.core.stamp);
+    div.data('from', this.core.from);
     if (this.core.id) {
       div.data('id', this.core.id);
     }
@@ -230,7 +235,7 @@ var Message = function (account, core, options) {
       div.data('media-type', this.core.media.type);
     }
     //var stampSpan = $('<span/>').addClass('stamp').html(Tools.convenientDate(this.core.stamp).join('<br/>')).data('stamp', this.core.stamp);
-    if (avatar) {
+    if (avatarize) {
       var pic = $('<span/>').addClass('avatar hideable').append(
         $('<img/>').data('jid', type == 'in' ? this.core.from : this.account.core.user)
       );

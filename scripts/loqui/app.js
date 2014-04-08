@@ -120,7 +120,7 @@ var App = {
   
   // Perform special processes if upgrading from older version
   upgrade: function () {
-    var last = localStorage.getItem('version') || 'v0.2.5';
+    var last = localStorage.getItem('version');
     var from = {
       'v0.2.5': function () {
         for (var key in App.accounts) {
@@ -128,10 +128,14 @@ var App = {
           account.core.roster = [];
           account.save();
         }
+      },
+      'v0.2.6': function () {
+        from['v0.2.5']();
+        /* TODO: clear avatars */
       }
     };
     if (last < App.version && last in from) {
-      Lungo.Notification.show('forward', _('Upgrading'), 10);
+      Lungo.Notification.show('forward', _('Upgrading'), 5);
       from[last]();
       localStorage.setItem('version', App.version);
     }
