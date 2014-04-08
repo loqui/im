@@ -22,23 +22,23 @@
   }
 }
 @font-face {
-  font-family:'mozTT';
-  src:url('../fonts/MozTT-Bold.ttf');
+  font-family:'FiraSans';
+  src:url('../fonts/FiraSans-Bold.ttf');
   font-weight: 700;
 }
 @font-face {
-  font-family:'mozTT';
-  src:url('../fonts/MozTT-Medium.ttf');
+  font-family:'FiraSans';
+  src:url('../fonts/FiraSans-Medium.ttf');
   font-weight: 500;
 }
 @font-face {
-  font-family:'mozTT';
-  src:url('../fonts/MozTT-Regular.ttf');
+  font-family:'FiraSans';
+  src:url('../fonts/FiraSans-Regular.ttf');
   font-weight: 300;
 }
 @font-face {
-  font-family:'mozTT';
-  src:url('../fonts/MozTT-Light.ttf');
+  font-family:'FiraSans';
+  src:url('../fonts/FiraSans-Light.ttf');
   font-weight: 100;
 }
 body {
@@ -47,7 +47,7 @@ body {
   font-weight: bold;
   letter-spacing: -0.05em;
   position: fixed;
-  font-family: mozTT, Open Sans, sans-serif;
+  font-family: FiraSans, Open Sans, sans-serif;
   font-size: 1.1rem;
   font-weight: 100;
 }

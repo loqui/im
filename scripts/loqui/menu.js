@@ -16,6 +16,7 @@ var Menu = {
       var last = App.accounts.length - 1;
       App.accounts[last || 0].show();
       Lungo.Router.section('main');
+      Lungo.Router._stack[0] = 'main';
     },
     settings: function () {
       Lungo.Router.section('settings');

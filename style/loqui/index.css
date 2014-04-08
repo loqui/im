@@ -113,10 +113,13 @@ section > header {
 }
 section > header > h1 {
   position: absolute;
-  right: 1rem;
-  top: -.1rem;
+  right: 3rem;
+  left: 3rem;
+  top: -.4rem;
   color: white;
-  text-transform: uppercase;
+  text-align: center;
+  font-style: italic;
+  font-size: 1.2em;
 }
 section > header > nav {
   overflow: hidden;
