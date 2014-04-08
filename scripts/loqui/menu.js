@@ -48,7 +48,7 @@ var Menu = {
       });
     },
     doSearch: function (obj) {
-      Lungo.Router.section('searchBar');
+      //Lungo.Router.section('searchBar');
     },
     chatRemove: function(obj) {
       var jid = $(obj).closest('section').data('jid');
