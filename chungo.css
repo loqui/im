@@ -116,7 +116,7 @@ header button {
 }
 
 section > article {
-  visibility: hidden;
+  display: none;
   position: absolute;
   top: 3rem;
   bottom: 0;
@@ -129,7 +129,7 @@ section > article.form {
   top: 0;
 }
 section.show > article.show{
-  visibility: visible;
+  display: block;
 }
 section.asided > article {
   opacity: .4;

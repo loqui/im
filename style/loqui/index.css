@@ -304,6 +304,7 @@ section#chat > header span.counter[data-value='0'] {
 section#main article ul {
   list-style-type: none;
   background-color: #FFF;
+  height: calc(100vh - 4 rem);
 }
 section#main article ul li,
 section#activity article ul li {
