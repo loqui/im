@@ -33,7 +33,7 @@ var Message = function (account, core, options) {
       this.account.core.chats.splice(ci, 1);
     }
     return chat;
-  }.bind(this));;
+  }.bind(this));
   
   // Try to send this message
   this.send = function (delay) {

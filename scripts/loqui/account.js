@@ -356,39 +356,30 @@ var Account = function (core) {
     var account = this;
     var avatars = App.avatars;
     $('span.avatar img:not([src])').each(function (i, el) {
-      var jid = Strophe.getBareJidFromJid($(el).closest('[data-jid]').data('jid'));
+      var jid = Strophe.getBareJidFromJid($(el).closest('[data-jid]').data('jid')) || account.core.fullJid;
+      var me = jid == account.core.fullJid;
       if (avatars[jid]) {
-        Store.recover(avatars[jid], function (val) {
-          if (val) {
-            $(el).attr('src', val);
+        (new Avatar(avatars[jid])).url.then(function (val) {
+          $(el).attr('src', val);
+          if (me) {
+            $('section#main footer .avatar img').attr('src', val);
+            $('section#me .avatar img').attr('src', val);
           }
         });
       } else if (account.connector.isConnected() && account.supports('easyAvatars')) {
-        account.connector.avatar(function (avatar) {
-          if (avatar) {
-            $(el).attr('src', avatar);
-            avatars[jid] = Store.save(avatar, function () {
-              Store.put('avatars', avatars);
-            });
-          }
+        account.connector.avatar(function (a) {
+          a.url.then(function (val) {
+            $(el).attr('src', val);
+            if (me) {
+              $('section#main footer .avatar img').attr('src', val);
+              $('section#me .avatar img').attr('src', val);
+            }
+            avatars[jid] = a.data;
+          });
         }, jid);
       }
     });
-    if ($('section#main').data('jid') == account.core.fullJid) {
-      Store.recover(avatars[account.core.fullJid], function (src) {
-        var show = function (src) {
-          $('section#main footer .avatar img').attr('src', src);
-          $('section#me .avatar img').attr('src', src);        
-        }
-        if (src) {
-          show(src);
-        } else {
-          account.connector.avatar(function (src) {
-            show(src);
-          });
-        }
-      });
-    }
+    App.smartupdate('avatars');
   }
   
   this.OTRMenu = function () {

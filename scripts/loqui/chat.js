@@ -142,10 +142,10 @@ var Chat = function (core, account) {
     } else {
       header.children('.avatar').children('img').attr('src', 'img/foovatar.png');
       var method = this.core.muc ? this.account.connector.groupAvatar : this.account.connector.avatar;
-      method(function (data) {
-        if (data) {
-          avatarize(data);
-        }
+      method(function (a) {
+        a.url.then(function (val) {
+          avatarize(val);
+        });
       }, this.core.jid);
     }
     setTimeout(function () {

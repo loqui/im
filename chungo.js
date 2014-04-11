@@ -128,7 +128,7 @@ var Chungo = {
     
     section: function (to) {
       if (this._stack[this._stack.length - 1] != to) {
-        if (to == 'back') {
+        if (to == 'back' && this._stack.length > 1) {
           var from = this._stack.pop();
           var to = this._stack[this._stack.length - 1];
           $$('section#' + from)

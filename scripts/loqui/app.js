@@ -132,6 +132,8 @@ var App = {
       'v0.2.6': function () {
         from['v0.2.5']();
         /* TODO: clear avatars */
+        Object.keys(App.avatars).map(function(key, i){App.avatars[key] = {chunk: App.avatars[key]}})
+        App.smartupdate('avatars');
       }
     };
     if (last < App.version && last in from) {
@@ -180,13 +182,13 @@ var App = {
   // Update an array and put it in storage
   smartpush: function (key, value, callback) {
     this[key].push(value);
-    Tools.log('SAVING ' + key);
+    Tools.log('PUSHING', value, 'TO', key, this[key]);
     Store.put(key, this[key], callback);
   },
   
   // Update an object and put it in storage
   smartupdate: function (key, callback) {
-    Tools.log('SAVING ' + key);
+    Tools.log('SAVING', key, this[key]);
     Store.put(key, this[key], callback);
   },
   

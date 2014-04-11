@@ -202,7 +202,7 @@ App.connectors['coseme'] = function (account) {
     var params = id ? [id] : [this.account.core.fullJid];
     MI.call(method, params);
     if (callback) {
-      callback('img/foovatar.png');
+      callback({url: 'img/foovatar.png'});
     }
   }.bind(this);
   
@@ -417,8 +417,8 @@ App.connectors['coseme'] = function (account) {
       Tools.picThumb(blob, 96, 96, function (url) {
         $('section#main[data-jid="' + jid + '"] footer span.avatar img').attr('src', url);
         $('section#me .avatar img').attr('src', url);
-        App.avatars[jid] = Store.save(url, function () {
-          Store.put('avatars', App.avatars);
+        Store.put('myAvatar', url, function () {
+          App.avatars[jid] = (new Avatar({id: picId, chunk: 'myAvatar'})).data;
         });
       });
     } else {
@@ -427,8 +427,9 @@ App.connectors['coseme'] = function (account) {
         Tools.picThumb(blob, 96, 96, function (url) {
           $('ul[data-jid="' + account.core.fullJid + '"] [data-jid="' + jid + '"] span.avatar img').attr('src', url);
           $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', url);
-          App.avatars[jid] = Store.save(url, function () {
-            Store.put('avatars', App.avatars);
+          Store.save(url, function (index) {
+            App.avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
+            App.smartupdate('avatars');
           });
         });
       }
