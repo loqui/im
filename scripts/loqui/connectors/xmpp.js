@@ -288,11 +288,31 @@ App.connectors['XMPP'] = function (account) {
           return aname > bname;
         });
         var map = function (entry, cb) {
-          var show, status;
+          var show, status, photo;
           for (var j in entry.resources) {
             show = entry.resources[Object.keys(entry.resources)[0]].show || 'a';
             status = entry.resources[Object.keys(entry.resources)[0]].status || _('show' + show);
+            photo = entry.resources[Object.keys(entry.resources)[0]].photo;
             break;
+          }
+          if (photo && entry.jid in App.avatars && App.avatars[entry.jid].id != photo) {
+            var avatar = new Avatar(App.avatars[entry.jid]);
+            connector.avatar(function (a) {
+              a.urlWritePromise.then(function (val) {
+                Store.drop(avatar.chunk, function () {
+                  avatar.id = photo;
+                  avatar.chunk = a.chunk;
+                  avatar.stamp = a.stamp;
+                  App.avatars[entry.jid] = avatar.data;
+                  var own = entry.jid == account.core.fullJid;
+                  if (own) {
+                  
+                  } else {
+                    $('[data-jid="' + entry.jid + '"] span.avatar img').attr('src', val);
+                  }
+                });
+              });
+            }, entry.jid);
           }
           cb(null, {
             jid: entry.jid,

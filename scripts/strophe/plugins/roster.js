@@ -345,7 +345,10 @@ Strophe.addConnectionPlugin('roster',
             item.resources[Strophe.getResourceFromJid(jid)] = {
                 show     : (presence.getElementsByTagName('show').length != 0) ? Strophe.getText(presence.getElementsByTagName('show')[0]) : "",
                 status   : (presence.getElementsByTagName('status').length != 0) ? Strophe.getText(presence.getElementsByTagName('status')[0]) : "",
-                priority : (presence.getElementsByTagName('priority').length != 0) ? Strophe.getText(presence.getElementsByTagName('priority')[0]) : ""
+                priority : (presence.getElementsByTagName('priority').length != 0) ? Strophe.getText(presence.getElementsByTagName('priority')[0]) : "",
+                photo    : (presence.getElementsByTagName('x').length != 0) ? (
+                            (presence.getElementsByTagName('x')[0].getElementsByTagName('photo').length != 0) ? Strophe.getText(presence.getElementsByTagName('x')[0].getElementsByTagName('photo')[0]) : "" 
+                           ) : ""
             };
         }
         else
