@@ -3749,14 +3749,14 @@ CoSeMe.namespace('utils', (function(){
      * Encodes a JS string into UTF-8.
      */
     utf8FromString: function(string) {
-      return unescape(encodeURIComponent(string));
+      return string?unescape(encodeURIComponent(string)):'';
     },
 
     /**
      * Decodes a UTF-8 message into a JS string.
      */
     stringFromUtf8: function(string) {
-      return decodeURIComponent(escape(string));
+      return string?decodeURIComponent(escape(string)):'';
     },
 
     /**
@@ -4829,17 +4829,16 @@ CoSeMe.namespace('protocol', (function(){
         realOutLength = HEADER_LENGTH + this.messageLength;
       }
 
-      var socketState = this._socket.readyState;
+      var error = null, socketState = this._socket.readyState;
       if (socketState === 'open') {
         // With these offset and length we omit the header and trailing
         // paddings.
         this._socket.send(out.buffer, offset, realOutLength);
-        if (typeof this._callback === 'function') {
-          this._callback(null, realOutLength);
-        }
       } else {
         logger.warn('Can not write. Socket state:', socketState);
+        error = 'socket-non-ready';
       }
+      (typeof this._callback === 'function') && this._callback(error);
     } catch (x) {
       var socketState = this._socket.readyState;
       if (typeof this._callback === 'function') {
@@ -6020,7 +6019,7 @@ CoSeMe.namespace('connection', (function() {
     return function() {
       var handler = _connection[event];
       if (typeof handler === 'function') {
-        handler.apply(this, arguments);
+        handler.apply(_connection, arguments);
       }
     };
   }
@@ -7309,13 +7308,13 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
       if (aSocket) {
         _connection = aSocket;
         _connection.reader.onTree = handleNode;
-        _connection.onconnectionclosed = onError;
         _connection.reader.resume();
         alive = true;
       } else {
         _connection.reader.onStreamStart = undefined;
         _connection.reader.onTree = undefined;
         _connection.onconnectionclosed = undefined;
+        _connection.onconnectionlost = undefined;
         _connection = aSocket;
         alive = false;
       }
@@ -7813,6 +7812,8 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
           try {
             if (!err && aConn) {
               self.socket = aConn;
+              self.socket.onconnectionclosed = self._onErrorSendDisconnected;
+              self.socket.onconnectionlost = self._onErrorSendDisconnected;
               self.readerThread.socket = self.socket;
               self.readerThread.autoPong = self.autoPong;
               self.readerThread.onPing = self.sendPong;
