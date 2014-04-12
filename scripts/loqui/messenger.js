@@ -68,7 +68,7 @@ var Messenger = {
       section.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + account.core.provider + '.svg'));
       section.find('#status p').html(App.emoji[Providers.data[account.core.provider].emoji].fy(contact.presence.status) || _('showna'));
       if (App.avatars[jid]) {
-        Store.recover(App.avatars[jid], function (val) {
+        Store.recover(App.avatars[jid].chunk, function (val) {
           section.find('#card .avatar').children('img').attr('src', val);
         });
       } else {
