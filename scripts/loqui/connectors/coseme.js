@@ -198,12 +198,15 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.avatar = function (callback, id) {
+    var method = 'picture_getIds';
+    var params = [id ? [id] : [this.account.core.fullJid]];
+    MI.call(method, params);
+  }.bind(this);
+  
+  this.avatarData = function (id) {
     var method = 'contact_getProfilePicture';
     var params = id ? [id] : [this.account.core.fullJid];
     MI.call(method, params);
-    if (callback) {
-      callback({url: 'img/foovatar.png'});
-    }
   }.bind(this);
   
   this.groupAvatar = function (callback, id) {
@@ -330,7 +333,7 @@ App.connectors['coseme'] = function (account) {
       notification_groupPictureRemoved: null,
       notification_groupParticipantAdded: null,
       notification_groupParticipantRemoved: null,
-      contact_gotProfilePictureId: null,
+      contact_gotProfilePictureId: this.events.onAvatarID,
       contact_gotProfilePicture: this.events.onAvatar,
       //contact_gotStatus: this.events.onPresenceUpdated,
       contact_typing: this.events.onContactTyping,
@@ -408,6 +411,13 @@ App.connectors['coseme'] = function (account) {
   this.events.onLocationReceived = function (msgId, fromAttribute, name, mediaPreview, mlatitude, mlongitude, wantsReceipt, isBroadcast) {
     var to = this.account.core.fullJid;
     return this.mediaProcess('url', msgId, fromAttribute, to, [mlatitude, mlongitude, name], null, null, false);
+  }
+  
+  this.events.onAvatarID = function (jid, picId) {
+    if (jid in App.avatars && App.avatars[jid].id != picId) {
+      this.avatar(jid);
+console.log(jid, App.avatars[jid].id, picId);
+    }
   }
   
   this.events.onAvatar = function (jid, picId, blob) {
