@@ -127,8 +127,10 @@ var Account = function (core) {
     meSection.find('#card .user').text(this.core.user);
     meSection.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + this.core.provider + '.svg'));
     Store.recover(App.avatars[account.core.fullJid], function (src) {
-      var show = function (src) {
-        $('section#me .avatar img').attr('src', src);        
+      var show = function (a) {
+        a.url.then(function (val) {
+          $('section#me .avatar img').attr('src', val);
+        });
       }
       if (src) {
         show(src);

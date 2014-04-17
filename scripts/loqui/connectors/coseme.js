@@ -202,7 +202,7 @@ App.connectors['coseme'] = function (account) {
     var params = id ? [id] : [this.account.core.fullJid];
     MI.call(method, params);
     if (callback) {
-      callback({url: 'img/foovatar.png'});
+      callback(new Avatar({url: 'img/foovatar.png'}));
     }
   }.bind(this);
   
