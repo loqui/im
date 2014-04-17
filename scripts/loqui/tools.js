@@ -86,7 +86,7 @@ var Tools = {
       if (event.lengthComputable) {
         var percentComplete = (event.loaded / event.total) * 100;
         percentComplete = percentComplete.toFixed(0);
-        Lungo.Element.progress("#progressBar", percentComplete, false);
+        $('progress').val(percentComplete.toString());
       }
     };
     var type = Tools.getFileType(url.split('.').pop());
@@ -97,7 +97,7 @@ var Tools = {
     xhr.open('GET', url);
     xhr.responseType = 'blob';
     xhr.onload = function (e) {
-      Lungo.Element.progress("#progressBar", 0, false);
+      $('progress').val('0');
       cb(xhr.response);
     }
     xhr.onprogress = progress;
