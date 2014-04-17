@@ -454,6 +454,8 @@ var Account = function (core) {
           to: content.to,
           text: content.text,
           stamp: content.stamp
+        }, {
+          render: false
         });
         msg.send(true, true);
         sendQ.splice(0, 1);
