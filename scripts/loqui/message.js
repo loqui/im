@@ -77,7 +77,7 @@ var Message = function (account, core, options) {
   this.postReceive = function() {
     var message = this;
     var chat = this.chat;
-    var pic = App.avatars[chat.core.jid];
+    var pic = new Avatar(App.avatars[chat.core.jid]);
     var callback = function () {
       message.account.show();
       chat.show();
@@ -90,7 +90,7 @@ var Message = function (account, core, options) {
       var altText = _('SentYou', {type: _('MediaType_' + this.core.media.type)});
     }
     if (pic) {
-      Store.recover(pic, function (src) {
+      pic.url.then(function (src) {
         App.notify({ subject: subject, text: message.core.text || altText, pic: src, callback: callback }, 'received');
       });
     } else {
