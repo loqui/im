@@ -129,7 +129,7 @@ var Chat = function (core, account) {
         App.toForeground();
       }
       var contact = Lungo.Core.findByProperty(chat.account.core.roster, 'jid', Strophe.getBareJidFromJid(last.from));
-      var subject = chat.core.title;
+      var subject = (muc && chat.core.unread < 2) ? ((contact ? (contact.name || last.pushName) : last.pushName) + ' @ ' + chat.core.title) : chat.core.title;
       var text = chat.core.unread > 1 ? _('NewMessages', {number: chat.core.unread}) : last.text;
       if (last.media) {
         var text = _('SentYou', {type: _('MediaType_' + last.media.type)});
