@@ -44,7 +44,7 @@ var Chat = function (core, account) {
             prevType = type;
             prevTime = time;
             if (timeDiff > 300000) {
-              var conv = Tools.convenientDate(Tools.localize(msg.core.stamp));
+              var conv = Tools.convenientDate(msg.core.stamp);
               frag.appendChild($('<time/>').attr('datetime', msg.core.stamp).text(_('DateTimeFormat', {date: conv[0], time: conv[1]}))[0]);
             }
             frag.appendChild(msg.preRender(i, avatarize));
