@@ -334,9 +334,9 @@ var Account = function (core) {
   this.presenceRender = function (jid) {
     if (this.connector.isConnected() && this.supports('presence')) {
       var contactPresenceRender = function (contact) {
-        var li = $('section#main article ul li[data-jid="'+contact.jid+'"]');
+        /*var li = $('section#main article ul li[data-jid="'+contact.jid+'"]');
         li.data('show', contact.presence.show || 'na');
-        li.find('.status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));
+        li.find('.status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));*/
         var section = $('section#chat');
         if (section.data('jid') == contact.jid) {
           section.data('show', contact.presence.show || 'na');
