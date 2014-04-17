@@ -115,14 +115,14 @@ var Chat = function (core, account) {
     var chat = this;
     var pic = new Avatar(App.avatars[chat.core.jid]);
     var last = chat.core.last;
-    if (chat.account.core.fullJid != last.from) {
+    if (chat.core.jid == last.from) {
       var callback = function () {
         chat.account.show();
         chat.show();
         App.toForeground();
       }
       var contact = Lungo.Core.findByProperty(chat.account.core.roster, 'jid', Strophe.getBareJidFromJid(last.from));
-      var subject = chat.core.muc ? ((contact ? (contact.name || last.pushName) : last.pushName) + ' @ ' + chat.core.title) : chat.core.title;
+      var subject = chat.core.title;
       var text = chat.core.unread > 1 ? _('NewMessages', {number: chat.core.unread}) : last.text;
       if (last.media) {
         var text = _('SentYou', {type: _('MediaType_' + last.media.type)});

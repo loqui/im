@@ -8,7 +8,7 @@ var Avatar = function (data) {
         if (this.chunk) {
           Store.recover(this.chunk, res);
         } else {
-          res('lol');
+          res('/img/foovatar.png');
         }
       }.bind(this)
     );
