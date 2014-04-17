@@ -125,7 +125,6 @@ var Message = function (account, core, options) {
   
   // Represent this message in HTML
   this.preRender = function (index, avatarize) {
-console.log('AVATARIZE', avatarize);
     var message = this;
     var account = this.account;
     if (this.core.text) {

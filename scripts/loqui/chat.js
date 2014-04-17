@@ -33,13 +33,20 @@ var Chat = function (core, account) {
           li.addClass('chunk');
           li.data('chunk', stIndex);
           li.data('index', index);
-          var prevType = null;
+          var prevType, prevTime = null;
           for (var i in chunk) {
             var core = chunk[i];
             var msg = new Message(chat.account, core);
             var type = msg.core.from == chat.account.core.fullJid ? undefined : msg.core.from;
+            var time = Tools.unstamp(msg.core.stamp);
+            var timeDiff = time - prevTime;
             var avatarize = type && type != prevType;
             prevType = type;
+            prevTime = time;
+            if (timeDiff > 300000) {
+              var conv = Tools.convenientDate(Tools.localize(msg.core.stamp));
+              frag.appendChild($('<time/>').attr('datetime', msg.core.stamp).text(_('DateTimeFormat', {date: conv[0], time: conv[1]}))[0]);
+            }
             frag.appendChild(msg.preRender(i, avatarize));
           }
           li[0].appendChild(frag);

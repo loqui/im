@@ -846,6 +846,17 @@ section#chat ul#messages li div[data-media-type='url']:after {
   margin: -2.15rem -.7rem -.85rem -.7rem;
   text-align: center;
 }
+section#chat ul#messages li time {
+  position: relative;
+  display: block;
+  clear: both;
+  width: calc(100vw);
+  text-align: center;  
+  font-size: .8rem;
+  font-weight: 100;
+  font-style: italic;
+  color: #666;
+}
 section#chat article#emoji {
   padding: 1rem;
 }
