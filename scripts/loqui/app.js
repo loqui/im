@@ -275,18 +275,24 @@ var App = {
       App.audio(altSound);    
     }
     if (force || navigator.mozNotification && document.hidden) {
-      if ('mozNotification' in navigator) {
+      if ('Notification' in window) {
+        var notification = new Notification(core.subject, {body: core.text, icon: core.pic});
+        notification.onclick = function () {
+          core.callback();
+          App.notifications.length = 0;
+        }
+      } else if ('mozNotification' in navigator) {
         var notification = navigator.mozNotification.createNotification(core.subject, core.text, core.pic);
         notification.onclick = function () {
           core.callback();
           App.notifications.length = 0;
         }
         notification.show();
-        App.notifications.push(notification);
       }
       if (force) {
         alt();
       }
+      return notification;
     } else {
       alt();
     }

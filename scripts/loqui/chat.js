@@ -7,6 +7,7 @@ var Chat = function (core, account) {
   this.core.unread = this.core.unread || 0;
   this.core.last = this.core.last || {};
   this.account = account;
+  this.notification = undefined;
   
   // Render last chunk of messages
   this.lastChunkRender = function () {
@@ -111,6 +112,32 @@ var Chat = function (core, account) {
   }.bind(this));
   
   this.messageAppend.drain = function () {
+    var chat = this;
+    var pic = new Avatar(App.avatars[chat.core.jid]);
+    var last = chat.core.last;
+    if (chat.account.core.fullJid != last.from) {
+      var callback = function () {
+        chat.account.show();
+        chat.show();
+        App.toForeground();
+      }
+      var contact = Lungo.Core.findByProperty(chat.account.core.roster, 'jid', Strophe.getBareJidFromJid(last.from));
+      var subject = chat.core.muc ? ((contact ? (contact.name || last.pushName) : last.pushName) + ' @ ' + chat.core.title) : chat.core.title;
+      var text = chat.core.unread > 1 ? _('NewMessages', {number: chat.core.unread}) : last.text;
+      if (last.media) {
+        var text = _('SentYou', {type: _('MediaType_' + last.media.type)});
+      }
+      if (chat.notification && 'close' in chat.notification) {
+        chat.notification.close();
+      }
+      if (pic) {
+        pic.url.then(function (src) {
+          chat.notification = App.notify({ subject: subject, text: text, pic: src, callback: callback }, 'received');
+        }.bind(chat));
+      } else {
+        chat.notification = App.notify({ subject: subject, text: text, pic: 'https://raw.github.com/loqui/im/master/img/foovatar.png', callback: callback }, 'received');
+      }
+    }
     this.save(true);
   }.bind(this);
   

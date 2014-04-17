@@ -77,25 +77,6 @@ var Message = function (account, core, options) {
   this.postReceive = function() {
     var message = this;
     var chat = this.chat;
-    var pic = new Avatar(App.avatars[chat.core.jid]);
-    var callback = function () {
-      message.account.show();
-      chat.show();
-      App.toForeground();
-    }
-    var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', Strophe.getBareJidFromJid(message.core.from));
-    var subject = muc ? ((contact ? (contact.name || message.core.pushName) : message.core.pushName) + ' @ ' + chat.core.title) : chat.core.title;
-    Tools.log(subject, muc, contact, message);
-    if (this.core.media) {
-      var altText = _('SentYou', {type: _('MediaType_' + this.core.media.type)});
-    }
-    if (pic) {
-      pic.url.then(function (src) {
-        App.notify({ subject: subject, text: message.core.text || altText, pic: src, callback: callback }, 'received');
-      });
-    } else {
-      App.notify({ subject: subject, text: message.core.text || altText, pic: 'https://raw.github.com/loqui/im/master/img/foovatar.png', callback: callback }, 'received');
-    }
     chat.messageAppend.push({msg: message.core}, function (blockIndex) {
       if ($('section#chat').data('jid') == chat.core.jid && $('section#chat').hasClass('show')) {
         var ul = $('section#chat ul#messages');
