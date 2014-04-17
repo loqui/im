@@ -1362,11 +1362,17 @@ div.switch div.ball {
 }
 #main #footbox progress[value] {
   position: absolute;
-  top: -.6rem;
+  top: -.5rem;
   height: .5rem;
   left: 0;
   width: 100%;
-  color: #E95644;
+  border: none;
+  background-color: #DDD;
+}
+#main #footbox progress[value]::-moz-progress-bar {
+  background-color: #E95644;
+  border-top-right-radius: .3rem;
+  border-bottom-right-radius: .3rem;
 }
 
 /* CONSOLE */
