@@ -237,13 +237,12 @@ App.connectors['coseme'] = function (account) {
       var aT = blob.type.split("/")[0];
       var aSize = blob.size;
       var type = blob.type;
-      Tools.blobToBase64(blob, function (aB64OrigHash){
-        Store.cache[aB64Hash] =
-        {
+      Tools.blobToBase64(blob, function (aB64OrigHash) {
+        Store.cache[aB64Hash] = {
           to: jid,
           data: aB64OrigHash
         },
-        Lungo.Notification.show('up-sign', '0% ' + _('Uploaded'));
+        Lungo.Notification.show('up-sign', _('Uploading'), 3);
         var method = 'media_requestUpload';
         MI.call(method, [aB64Hash, aT, aSize]);
       });
@@ -683,6 +682,7 @@ App.connectors['coseme'] = function (account) {
         delete Store.cache[hash];
       });
       Lungo.Notification.show('up-sign', _('Uploaded'), 1);
+      $('#main #footbox progress').val('0');
     };
     var onError = function (error) {
       Lungo.Notification.error(
@@ -691,11 +691,10 @@ App.connectors['coseme'] = function (account) {
         'warning-sign', 5
       );
       Tools.log(error);
+      $('#main #footbox progress').val('0');
     };
     var onProgress = function(value) {
-      if ($('div.notification').hasClass('show')) {
-        Tools.modifyLungoNotification(value.toFixed(0) + '% ' + _('Uploaded'));
-      }
+      $('#main #footbox progress').val(value.toString());
     };
     media.upload(toJID, blob, uploadUrl, onSuccess, onError, onProgress);
   }

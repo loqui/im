@@ -1357,19 +1357,16 @@ div.switch div.ball {
 
 /* PROGRESS BAR */
 
-div #progressBar {
+#main #footbox progress[value='0'] {
+  display: none;
+}
+#main #footbox progress[value] {
   position: absolute;
-  top: 0rem;
-  height: .3rem;
+  top: -.6rem;
+  height: .5rem;
   left: 0;
   width: 100%;
-}
-div #progressBar > span.bar > span.value {
-  position: relative;
-  display: block;
-  width: 0;
-  background-color: #E95644;
-  height: .3rem;
+  color: #E95644;
 }
 
 /* CONSOLE */
