@@ -122,7 +122,7 @@ var Chat = function (core, account) {
     var chat = this;
     var pic = new Avatar(App.avatars[chat.core.jid]);
     var last = chat.core.last;
-    if (chat.core.jid == last.from) {
+    if (muc ? (chat.core.jid == last.to && (last.from != chat.account.core.user)) : (chat.core.jid == last.from)) {
       var callback = function () {
         chat.account.show();
         chat.show();
