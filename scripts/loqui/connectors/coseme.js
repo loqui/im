@@ -449,18 +449,21 @@ App.connectors['coseme'] = function (account) {
   
   this.events.onMessageSent = function (from, msgId) {
     Tools.log('SENT', from, msgId);
-    $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"][data-type="out"]').data('receipt', 'sent');
   }
 
   this.events.onMessageDelivered = function (from, msgId) {
+    var account = this.account;
+    var chat = account.chats.find(function (e, i, a) {
+      return e.core.jid == from;
+    });
+    chat.core.lastAck = Tools.localize(Tools.stamp());
+    chat.save();
     Tools.log('DELIVERED', from, msgId);
-    $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"][data-type="out"]').data('receipt', 'delivered');
     MI.call('delivered_ack', [from, msgId]);
   }
   
   this.events.onMessageVisible = function (from, msgId) {
     Tools.log('VISIBLE', from, msgId);
-    $('section#chat[data-jid="' + from + '"] ul li div[data-id="' + msgId + '"][data-type="out"]').data('receipt', 'visible');
     MI.call('visible_ack', [from, msgId]);
   }
 

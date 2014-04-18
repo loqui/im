@@ -6,6 +6,8 @@ var Chat = function (core, account) {
   this.core = core;
   this.core.unread = this.core.unread || 0;
   this.core.last = this.core.last || {};
+  this.core.lastRead = 0;
+  this.core.lastAck = 0;
   this.account = account;
   this.notification = undefined;
   
@@ -206,8 +208,9 @@ var Chat = function (core, account) {
       this.account.unread -= this.core.unread;
       this.core.unread = 0;
       Accounts.unread();
-      this.save();
     }
+    this.core.lastRead = Tools.localize(Tools.stamp());
+    this.save();
   }
   
   this.goOTR = function () {
