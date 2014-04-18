@@ -1326,8 +1326,8 @@ div.switch img.tick {
 div.switch div.ball {
   position: absolute;
   display: block;
-  top: -.4rem;
-  left: -.1rem;
+  top: -.35rem;
+  left: -.3rem;
   width: 1.1rem;
   height: 1.1rem;
   border: .5rem solid #ABB5B7;
