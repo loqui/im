@@ -1321,7 +1321,7 @@ div.switch img.tick {
   position: absolute;
   height: .9rem;
   left: .3rem;
-  top: .21rem;
+  top: .25rem;
 }
 div.switch div.ball {
   position: absolute;
@@ -1339,11 +1339,18 @@ div.switch div.ball {
   display: block;
 }
 [data-value="true"] div.switch {
-  background-color: #E9695B;
+  background-color: #2EDF88;
 }
 [data-value="true"] div.switch div.ball {
   left: 1.2rem;
-  border-color: #E74C3C;
+  border-color: #2CC269;
+}
+[data-value="loading"] div.switch {
+  background-color: #F1D726;
+}
+[data-value="loading"] div.switch div.ball {
+  left: 1.2rem;
+  border-color: #EFBA07;
 }
 /* KEYFRAMES */
 @keyframes blink {
