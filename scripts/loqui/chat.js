@@ -47,7 +47,6 @@ var Chat = function (core, account) {
             var avatarize = type && type != prevType;
             // Append the message
             // New messages mark
-console.log(chat.unread, prevRead, time, lastRead, time - lastRead);
             if (chat.unread && prevRead && time > lastRead) {
               frag.appendChild($('<span/>').addClass('lastRead').text(_('NewMessages', {number: chat.unread}))[0]);
             }
