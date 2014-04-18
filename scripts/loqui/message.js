@@ -15,7 +15,6 @@ var Message = function (account, core, options) {
   this.__defineGetter__('chat', function () {
     var chatJid = this.options.muc ? this.core.to : (this.core.from == (account.core.user || account.core.fullJid) ? this.core.to : this.core.from);
     var ci = this.account.chatFind(chatJid);
-    console.log(ci, chatJid);
     if (ci < 0) {
       var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.from);
       var chat = new Chat({
@@ -214,7 +213,6 @@ var Message = function (account, core, options) {
     if (this.core.media) {
       div.data('media-type', this.core.media.type);
     }
-    //var stampSpan = $('<span/>').addClass('stamp').html(Tools.convenientDate(this.core.stamp).join('<br/>')).data('stamp', this.core.stamp);
     if (avatarize) {
       var pic = $('<span/>').addClass('avatar hideable').append(
         $('<img/>').data('jid', type == 'in' ? this.core.from : this.account.core.user)

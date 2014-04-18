@@ -10,7 +10,7 @@ var Messenger = {
   say: function (text) {
     var to = $('section#chat').data('jid');
     var account = this.account();
-    var text = text || $("section#chat div#text").text();
+    var text = text || $('section#chat div#text').text();
     if (text.length) {
       var msg = new Message(account, {
         from: account.core.user,
@@ -19,9 +19,10 @@ var Messenger = {
         stamp: Tools.localize(Tools.stamp())
       });
       msg.send();
-      $$("section#chat div#text").empty();
+      $('section#chat div#text').empty();
       var ul = $('section#chat ul#messages');
       ul[0].scrollTop = ul[0].scrollHeight;
+      $('#chat #messages span.lastRead').remove();
       App.audio('sent');
     }
     $('section#chat article#main button#plus').show();

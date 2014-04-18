@@ -855,7 +855,27 @@ section#chat ul#messages li time {
   font-size: .8rem;
   font-weight: 100;
   font-style: italic;
+  padding-top: .3rem;
   color: #666;
+}
+section#chat ul#messages li .lastRead {
+  position: relative;
+  display: block;
+  clear: both;
+  width: calc(100vw);
+  text-align: center;  
+  font-size: .8rem;
+  font-weight: 100;
+  font-style: italic;
+  margin: .5rem 0;
+  padding: .5rem 0;
+  border-bottom: .1rem solid #E95644;
+}
+section#chat ul#messages li .lastRead:before,
+section#chat ul#messages li .lastRead:after {
+  content: '↓';
+  margin: 0 .5rem;
+  font-style: normal;
 }
 section#chat article#emoji {
   padding: 1rem;

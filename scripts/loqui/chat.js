@@ -6,10 +6,11 @@ var Chat = function (core, account) {
   this.core = core;
   this.core.unread = this.core.unread || 0;
   this.core.last = this.core.last || {};
-  this.core.lastRead = 0;
   this.core.lastAck = 0;
   this.account = account;
   this.notification = undefined;
+  this.lastRead = Tools.localize(Tools.stamp());
+  this.unread = this.core.unread;
   
   // Render last chunk of messages
   this.lastChunkRender = function () {
@@ -35,20 +36,25 @@ var Chat = function (core, account) {
           li.addClass('chunk');
           li.data('chunk', stIndex);
           li.data('index', index);
-          var prevType, prevTime = null;
+          var prevType, prevTime;
+          var prevRead = true;
+          var lastRead = Tools.unstamp(chat.lastRead || chat.core.lastRead);
           for (var i in chunk) {
-            var core = chunk[i];
-            var msg = new Message(chat.account, core);
+            var msg = new Message(chat.account, chunk[i]);
             var type = msg.core.from == chat.account.core.fullJid ? undefined : msg.core.from;
             var time = Tools.unstamp(msg.core.stamp);
             var timeDiff = time - prevTime;
             var avatarize = type && type != prevType;
-            prevType = type;
-            prevTime = time;
+            if (chat.unread && prevRead && time > lastRead) {
+              frag.appendChild($('<span/>').addClass('lastRead').text(_('NewMessages', {number: chat.unread}))[0]);
+            }
             if (timeDiff > 300000) {
               var conv = Tools.convenientDate(msg.core.stamp);
               frag.appendChild($('<time/>').attr('datetime', msg.core.stamp).text(_('DateTimeFormat', {date: conv[0], time: conv[1]}))[0]);
             }
+            prevType = type;
+            prevTime = time;
+            prevRead = time < lastRead;
             frag.appendChild(msg.preRender(i, avatarize));
           }
           li[0].appendChild(frag);
@@ -147,6 +153,7 @@ var Chat = function (core, account) {
         chat.notification = App.notify({ subject: subject, text: text, pic: 'https://raw.github.com/loqui/im/master/img/foovatar.png', callback: callback }, 'received');
       }
     }
+    $('#chat #messages span.lastRead').remove();
     this.save(true);
   }.bind(this);
   
@@ -204,11 +211,13 @@ var Chat = function (core, account) {
       }
       this.lastChunkRender();
     }.bind(this), 500);
+    this.unread = this.core.unread;
     if (this.core.unread) {
       this.account.unread -= this.core.unread;
       this.core.unread = 0;
       Accounts.unread();
     }
+    this.lastRead = this.core.lastRead;
     this.core.lastRead = Tools.localize(Tools.stamp());
     this.save();
   }

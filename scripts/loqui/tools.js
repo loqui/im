@@ -48,10 +48,12 @@ var Tools = {
   },
   
   unstamp: function (stamp) {
-    var ymdhms = stamp.split('T');
-    var ymd = ymdhms[0].split('-');
-    var hms = ymdhms[1].substr(0, ymdhms[1].length-1).split(':');
-    return new Date(ymd[0], ymd[1]-1, ymd[2], hms[0], hms[1], hms[2]);
+    if (typeof stamp == 'string') {
+      var ymdhms = stamp.split('T');
+      var ymd = ymdhms[0].split('-');
+      var hms = ymdhms[1].substr(0, ymdhms[1].length-1).split(':');
+      return new Date(ymd[0], ymd[1]-1, ymd[2], hms[0], hms[1], hms[2]);
+    }
   },
   
   localize: function (utc) {
