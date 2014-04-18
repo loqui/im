@@ -106,6 +106,9 @@ var Chat = function (core, account) {
         } else {
           Tools.log('FITS');
           chunk.push(msg);
+          chunk.sort(function (a, b) {
+            return Tools.unstamp(a.stamp) > Tools.unstamp(b.stamp);
+          });
           blockIndex = chat.core.chunks[chunkListSize - 1];
           Tools.log('PUSHING', blockIndex, chunk);
           Store.update(blockIndex, chunk, callback);
@@ -129,6 +132,7 @@ var Chat = function (core, account) {
     }
   }.bind(this));
   
+  // This is runned when the message processing queue drains
   this.messageAppend.drain = function () {
     var chat = this;
     var pic = new Avatar(App.avatars[chat.core.jid]);
