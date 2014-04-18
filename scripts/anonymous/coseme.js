@@ -7372,7 +7372,8 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
     },
 
     terminate: function() {
-      throw 'NOT IMPLEMENTED!';
+      //throw 'NOT IMPLEMENTED!';
+      return 0;
     },
 
     sendDisconnected: function(reason) {

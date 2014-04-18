@@ -38,6 +38,7 @@ var App = {
     },
     Account: {
       core: {
+        enabled: true,
         resource: 'Loqui' + '-' + (Lungo.Core.environment().os ? Lungo.Core.environment().os.name : 'PC'),
         OTR: {
           enabled: false,
@@ -131,9 +132,12 @@ var App = {
       },
       'v0.2.6': function () {
         from['v0.2.5']();
-        /* TODO: clear avatars */
-        Object.keys(App.avatars).map(function(key, i){App.avatars[key] = {chunk: App.avatars[key]}})
+        Object.keys(App.avatars).map(function (key, i) { App.avatars[key] = {chunk: App.avatars[key]} })
+        App.accountsCores.forEach(function (account, i) {
+          account.enabled = App.defaults.Account.core.enabled;
+        });
         App.smartupdate('avatars');
+        App.smartupdate('accountCores');
       }
     };
     if (last < App.version && last in from) {
@@ -158,11 +162,13 @@ var App = {
     }
   },
   
-  // Connect with every account
+  // Connect with every enabled account
   connect: function () {
     for (var i in this.accounts) {
       var account = this.accounts[i];
-      account.connect();
+      if (account.core.enabled) {
+        account.connect();
+      }
     }
   },
   

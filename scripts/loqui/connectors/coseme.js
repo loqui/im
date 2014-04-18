@@ -40,10 +40,14 @@ App.connectors['coseme'] = function (account) {
       }
     });
     MI.call(method, params);
+    callback.connecting();
   }
   
   this.disconnect = function () {
     this.connected = false;
+    var method = 'disconnect';
+    var params = ['undefined'];
+    MI.call(method, params);
   }
   
   this.isConnected = function () {
@@ -54,7 +58,6 @@ App.connectors['coseme'] = function (account) {
     Tools.log('CONNECTOR START');
     this.handlers.init();
     this.presence.set();
-    //this.groupsGet('participating');
   }
   
   this.sync = function (callback) {
@@ -357,9 +360,6 @@ App.connectors['coseme'] = function (account) {
   this.events.onStatusDirty = function (categories) {
     var method = 'cleardirty';
     MI.call(method, [categories]);
-  }
-  
-  this.events.onDisconnected = function () {
   }
   
   this.events.onMessage = function (id, from, body, stamp, e, nick, g) {

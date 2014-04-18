@@ -151,8 +151,10 @@ aside.show {
   transform: translateX(3rem);
 }
 aside.show article.active {
+  background-color: white;
   visibility: visible;
   position: absolute;
+  height: calc(100vh - 3rem);
   left: -3rem;
   right: 0;
 }

@@ -63,6 +63,9 @@ var Account = function (core) {
     } else {
       if (navigator.onLine){
         this.connector.connect({
+          connecting: function () {
+            $('aside#accounts li[data-jid="' + (this.core.fullJid || this.core.user) + '"]').data('value', 'loading');
+          }.bind(this),
           connected: function () {
             var cb = function (rcb) {
               App.audio('login');
@@ -75,6 +78,9 @@ var Account = function (core) {
             }.bind(this);
             this.sync(cb);
           }.bind(this),
+          authenticating: function () {
+            $('aside#accounts li[data-jid="' + (this.core.fullJid || this.core.user) + '"]').data('value', 'loading');
+          }.bind(this),
           authfail: function () {
             var failStamps = this.connector.failStamps || {};
             failStamps.push(new Date);
@@ -86,7 +92,7 @@ var Account = function (core) {
           disconnected: function () {
             this.connector.connected = false;
             this.accountRender();
-            if (App.online && App.settings.reconnect) {
+            if (App.online && App.settings.reconnect && this.core.enabled) {
               this.connect();
             }
           }.bind(this)
@@ -154,7 +160,7 @@ var Account = function (core) {
   // Changes some styles based on presence and connection status
   this.accountRender = function () {
     var li = $('aside#accounts li[data-jid="' + (this.core.fullJid || this.core.user) + '"]');
-    li.data('connected', this.connector.isConnected());
+    li.data('value', this.connector.isConnected() ? true : (this.core.enabled ? 'loading' : false));
     li.data('show', this.connector.presence.show);
   }
   
@@ -473,7 +479,6 @@ var Account = function (core) {
   
   // Get a chat for a jid (create if none)
   this.chatGet = function (jid, title) {
-console.log(jid, title)
     var ci = this.chatFind(jid);
     if (ci >= 0) {
       var chat = this.chats[ci];
@@ -520,6 +525,20 @@ var Accounts = {
   
   // Create accounts icons
   aside: function () {
+    var accountSwitch = function (e) {
+      e.stopPropagation();
+      var sw = $(this);
+      var li = sw.closest('li');
+      var account = App.accounts[Accounts.find(li.data('jid'))];
+      if (li.data('value') == 'true') {
+        account.connector.disconnect();
+        account.core.enabled = false;
+      } else {
+        account.connect();
+        account.core.enabled = true;
+      }
+      account.save();
+    }
     var ul = $('aside#accounts ul');
     ul.empty();
     for (var i in App.accounts) {
@@ -528,7 +547,9 @@ var Accounts = {
         $('<span/>').addClass('provider').text(account.connector.provider.longName)
       ).append(
         $('<span/>').addClass('jid').text(account.core.user)
-      );
+      ).append(
+        $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>').bind('click', accountSwitch)
+      ).data('value', 'loading');
       li.on('click', function () {
         var index = Accounts.find(this.dataset.jid);
         if (index) {

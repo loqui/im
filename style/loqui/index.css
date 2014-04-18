@@ -1153,7 +1153,7 @@ aside#accounts article ul li:first-child {
 aside#accounts article ul li img.provIcon {
   position: absolute;
   top: .5rem;
-  left: .5rem;
+  left: .8rem;
   width: 2.5rem;
   height: 2.5rem;
   border-radius: .4rem;
@@ -1161,17 +1161,21 @@ aside#accounts article ul li img.provIcon {
 aside#accounts article ul li span.provider {
   position: absolute;
   top: .7rem;
-  left: 3.6rem;
+  left: 3.9rem;
   font-size: .7em;
   text-transform: uppercase;
   color: #666;
+  max-width: calc(80vw - 5.5rem);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 aside#accounts article ul li span.jid {
   position: absolute;
   top: 1.6rem;
-  left: 3.6rem;
-  max-width: calc(80vw - 3rem);
+  left: 3.9rem;
   font-size: .9em;
+  max-width: calc(80vw - 5.5rem);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -1179,8 +1183,8 @@ aside#accounts article ul li span.jid {
 aside#accounts article ul li span.counter {
   display: block;
   position: absolute;
-  top: .6rem;
-  right: .4rem;
+  top: 1.1rem;
+  right: 4.2rem;
   background-color: #E74C3C;
   color: #FFF;
   padding: .4rem .5rem;
@@ -1306,7 +1310,7 @@ section#activity article ul.accounts li span.jid {
 div.switch {
   position: absolute;
   top: 1rem;
-  right: 1rem;
+  right: .8rem;
   display: block;
   width: 3rem;
   height: 1.4rem;
