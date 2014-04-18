@@ -208,24 +208,23 @@ nav[data-control=menu] {
 }
 .chungo .notifier {
   display: none;
-  width: 60vmin;
-  height: 60vmin;
   position: fixed;
-  top: calc(50vh - 30vmin - .2rem);
-  left: calc(50vw - 30vmin - .2rem);
+  top: 0;
+  left: 0;
+  right: 0;
   background-color: #222;
   color: white;
-  border-radius: 100%;
   z-index: 101;
+  padding-bottom: .5rem;
 }
 .chungo .notifier[data-type='neutral'] {
-  border: .4rem solid #3498FD;
+  border-bottom: .4rem solid #3498FD;
 }
 .chungo .notifier[data-type='error'] {
-  border: .4rem solid #E95644;
+  border-bottom: .4rem solid #E95644;
 }
 .chungo .notifier[data-type='success'] {
-  border: .4rem solid #2ECC71;
+  border-bottom: .4rem solid #2ECC71;
 }
 .chungo .notifier.show {
   animation: popUp .5s;
@@ -236,20 +235,25 @@ nav[data-control=menu] {
 .chungo .notifier .icon {
   font-size: 4rem;
   display: block;
-  position: absolute;
-  top: 20%;
-  left: 10%;
-  width: 80%;
+  width: calc(100% - 4rem);
+  margin: 1rem 2rem 0 2rem;
   text-align: center;
 }
 .chungo .notifier .title {
   display: block;
-  position: absolute;
-  top: 60%;
-  left: 10%;
-  width: 80%;
+  width: calc(100% - 4rem);
+  margin: 0 2rem 0 2rem;
   font-size: 1.2rem;
   font-weight: 300;
+  font-style: italic;
+  text-align: center;
+}
+.chungo .notifier .caption {
+  display: block;
+  width: calc(100% - 4rem);
+  margin: .3rem 2rem 1rem 2rem;
+  font-size: 1rem;
+  font-weight: 100;
   text-align: center;
 }
 
@@ -288,18 +292,18 @@ section.fast .hideable {
 
 @keyframes popUp {
   from {
-    transform: scale(0);
+    transform: translateY(-100vh);
   }
   to {
-    transform: scale(1);
+    transform: translateY(0);
   }
 }
 @keyframes popDown {
   from {
-    transform: scale(1);
+    transform: translateY(0);
   }
   to {
-    transform: scale(0);
+    transform: translateY(-100vh);
   }
 }
 

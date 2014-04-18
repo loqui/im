@@ -227,7 +227,7 @@ var Chungo = {
       this._not.data('type', type);
       this._not.children('.icon')[0].className = icon + ' icon';
       this._not.children('.title').text(title);
-      this._not.children('.caption').text(' ');
+      this._not.children('.caption').html(description || ' ');
       this._sha.addClass('show').removeClass('hidden');
       this._not.addClass('show').removeClass('hidden');
       clearTimeout(this._timeout[0]);
@@ -247,11 +247,11 @@ var Chungo = {
     },
     
     error: function (title, description, icon, seconds, cb) {
-      this._unified('error', icon, title, null, seconds, cb);
+      this._unified('error', icon, title, description, seconds, cb);
     },
     
     success: function (title, description, icon, seconds, cb) {
-      this._unified('success', icon, title, null, seconds, cb);
+      this._unified('success', icon, title, description, seconds, cb);
     },
     
     hide: function () {
