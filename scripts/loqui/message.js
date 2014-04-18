@@ -89,7 +89,8 @@ var Message = function (account, core, options) {
           li.append(message.preRender(false, avatarize));
           ul.append(li);
         }
-        ul[0].scrollTop = ul[0].scrollHeight;   
+        ul[0].scrollTop = ul[0].scrollHeight;
+        chat.core.lastRead = Tools.localize(Tools.stamp());
       } else {
         chat.core.unread++;
         chat.account.unread++;
@@ -118,6 +119,7 @@ var Message = function (account, core, options) {
           ul.append(li);
         }
         ul[0].scrollTop = ul[0].scrollHeight;   
+        chat.core.lastRead = Tools.localize(Tools.stamp());
       }
     });
   }

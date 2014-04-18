@@ -45,17 +45,21 @@ var Chat = function (core, account) {
             var time = Tools.unstamp(msg.core.stamp);
             var timeDiff = time - prevTime;
             var avatarize = type && type != prevType;
+            // Append the message
+            // New messages mark
+console.log(chat.unread, prevRead, time, lastRead, time - lastRead);
             if (chat.unread && prevRead && time > lastRead) {
               frag.appendChild($('<span/>').addClass('lastRead').text(_('NewMessages', {number: chat.unread}))[0]);
             }
+            // Show time stamp if differs in more than 5m
             if (timeDiff > 300000) {
               var conv = Tools.convenientDate(msg.core.stamp);
               frag.appendChild($('<time/>').attr('datetime', msg.core.stamp).text(_('DateTimeFormat', {date: conv[0], time: conv[1]}))[0]);
             }
+            frag.appendChild(msg.preRender(i, avatarize));
             prevType = type;
             prevTime = time;
-            prevRead = time < lastRead;
-            frag.appendChild(msg.preRender(i, avatarize));
+            prevRead = time <= lastRead;
           }
           li[0].appendChild(frag);
           var more = ul.children('.more');
