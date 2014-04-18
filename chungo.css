@@ -145,12 +145,16 @@ aside {
   background-color: white;
   transform: translateX(100vw);
   transition: transform .3s;
+  z-index: 50!important;
 }
 aside.show {
   transform: translateX(3rem);
 }
-aside article.active {
+aside.show article.active {
   visibility: visible;
+  position: absolute;
+  left: -3rem;
+  right: 0;
 }
 
 ul {
