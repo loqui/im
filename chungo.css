@@ -194,10 +194,11 @@ nav[data-control=menu] {
   margin: 20px 0 0 0;
 }
 .buttongroup button {
-  padding: .5rem;
+  padding: .7rem;
   background: #E95644!important;
   color: white!important;
-  font-weight: bold!important;
+  font-weight: 100;
+  font-style: italic;
   border: none;
   border-radius: .2rem!important;
 }
