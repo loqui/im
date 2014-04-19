@@ -16,7 +16,9 @@ var Message = function (account, core, options) {
     var chatJid = this.options.muc ? this.core.to : (this.core.from == (account.core.user || account.core.fullJid) ? this.core.to : this.core.from);
     var ci = this.account.chatFind(chatJid);
     if (ci < 0) {
-      var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.from);
+      contact = this.account.core.roster.find(function (e, i, a) {
+        return e.jid == chatJid;
+      }.bind(this));
       var chat = new Chat({
         jid: chatJid, 
         title: contact ? contact.name || chatJid : chatJid,
