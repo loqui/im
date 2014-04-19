@@ -817,20 +817,25 @@ section#chat ul#messages span.text img.image {
     border-radius: .2rem;
 }
 section#chat ul#messages span.text img.audio{
-    width: 0;
+    width: calc(100%);
+    height: calc(100%);
 }
 section#chat ul#messages span.text img.maps{
-    width: 0;
+    width: calc(100%);
+    height: calc(100%);
 }
 section#chat ul#messages span.text img.image[data-downloaded=false] {
     opacity: .4;
 }
 section#chat ul#messages span.text img.video {
     width: calc(100%);
-    border-radius: .4rem;
+    height: calc(100%);
 }
 section#chat ul#messages span.text img.video[data-downloaded=false] {
     opacity: .4;
+}
+section#chat ul#messages li div[data-media-type='video'] {
+  width: calc(100% - 3.5rem);
 }
 section#chat ul#messages li div[data-media-type='video']:after {
   content: url(../../img/play.png);
@@ -839,20 +844,26 @@ section#chat ul#messages li div[data-media-type='video']:after {
   left: calc(50% - 2rem);
   top: calc(50% - 2rem);
 }
-section#chat ul#messages li div[data-media-type='audio']:after {
+section#chat ul#messages li div[data-media-type='audio'] {
+  width: calc(100% - 3.5rem);
+}
+/*section#chat ul#messages li div[data-media-type='audio']:after {
   display: block;
   content: url(../../img/audio.png);
   height: 6.8rem;
   margin: -2.15rem -.7rem -.85rem -.7rem;
   text-align: center;
+}*/
+section#chat ul#messages li div[data-media-type='url'] {
+  width: calc(100% - 3.5rem);
 }
-section#chat ul#messages li div[data-media-type='url']:after {
+/*section#chat ul#messages li div[data-media-type='url']:after {
   display: block;
   content: url(../../img/location.png);
   height: 6.8rem;
   margin: -2.15rem -.7rem -.85rem -.7rem;
   text-align: center;
-}
+}*/
 section#chat ul#messages li time {
   position: relative;
   display: block;
