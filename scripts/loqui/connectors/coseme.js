@@ -526,8 +526,9 @@ App.connectors['coseme'] = function (account) {
     Tools.picThumb(blob, 96, 96, function (url) {
       $('ul[data-jid="' + account.core.fullJid + '"] li[data-jid="' + jid + '"] span.avatar img').attr('src', url);
       $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', url);
-      App.avatars[jid] = Store.save(url, function () {
-        Store.put('avatars', App.avatars);
+      Store.save(url, function (index) {
+        App.avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
+        App.smartupdate('avatars');
       });
     });
   }
