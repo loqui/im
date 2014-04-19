@@ -19,27 +19,27 @@
 }
 @font-face {
   font-family:'FiraSans';
-  src: url('style/fonts/FiraSans-Bold.ttf');
+  src: url('/style/fonts/FiraSans-Bold.ttf');
   font-weight: 700;
 }
 @font-face {
   font-family:'FiraSans';
-  src: url('style/fonts/FiraSans-Medium.ttf');
+  src: url('/style/fonts/FiraSans-Medium.ttf');
   font-weight: 500;
 }
 @font-face {
   font-family:'FiraSans';
-  src: url('style/fonts/FiraSans-Regular.ttf');
+  src: url('/style/fonts/FiraSans-Regular.ttf');
   font-weight: 300;
 }
 @font-face {
   font-family:'FiraSans';
-  src: url('style/fonts/FiraSans-Light.ttf');
+  src: url('/style/fonts/FiraSans-Light.ttf');
   font-weight: 100;
 }
 @font-face {
   font-family:'FiraSans';
-  src: url('style/fonts/FiraSans-LightItalic.ttf');
+  src: url('/style/fonts/FiraSans-LightItalic.ttf');
   font-weight: 100;
   font-style: italic; 
 }
