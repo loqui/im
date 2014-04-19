@@ -6,7 +6,7 @@ var Chat = function (core, account) {
   this.core = core;
   this.core.unread = this.core.unread || 0;
   this.core.last = this.core.last || {};
-  this.core.lastAck = 0;
+  this.core.lastAck = this.core.lastAck || Tools.localize(Tools.stamp());
   this.account = account;
   this.notification = undefined;
   this.lastRead = Tools.localize(Tools.stamp());
@@ -36,7 +36,7 @@ var Chat = function (core, account) {
           li.addClass('chunk');
           li.data('chunk', stIndex);
           li.data('index', index);
-          var prevType, prevTime;
+          var prevType, prevTime, prevAck;
           var prevRead = true;
           var lastRead = Tools.unstamp(chat.lastRead || chat.core.lastRead);
           for (var i in chunk) {
@@ -44,6 +44,7 @@ var Chat = function (core, account) {
             var type = msg.core.from == chat.account.core.fullJid ? undefined : msg.core.from;
             var time = Tools.unstamp(msg.core.stamp);
             var timeDiff = time - prevTime;
+            var ack = time < Tools.unstamp(chat.core.lastAck);
             var avatarize = type && type != prevType;
             // Append the message
             // New messages mark
@@ -56,9 +57,18 @@ var Chat = function (core, account) {
               frag.appendChild($('<time/>').attr('datetime', msg.core.stamp).text(_('DateTimeFormat', {date: conv[0], time: conv[1]}))[0]);
             }
             frag.appendChild(msg.preRender(i, avatarize));
+console.log(chat.account.supports('receipts'), !chat.core.muc);
+console.log(chat.core.lastAck, ack, prevAck, !ack && prevAck);
+            if (chat.account.supports('receipts') && !chat.core.muc && !ack && prevAck) {
+              frag.appendChild($('<time/>').attr('datetime', msg.core.stamp).text('LAST ACK')[0]);
+            }
             prevType = type;
             prevTime = time;
+            prevAck = ack;
             prevRead = time <= lastRead;
+          }
+          if (chat.account.supports('receipts') && !chat.core.muc && prevAck) {
+            frag.appendChild($('<time/>').attr('datetime', msg.core.stamp).text('LAST ACK')[0]);
           }
           li[0].appendChild(frag);
           var more = ul.children('.more');
@@ -92,7 +102,8 @@ var Chat = function (core, account) {
     var chunkListSize = this.core.chunks.length;
     var blockIndex = this.core.chunks[chunkListSize - 1];
     var storageIndex;
-    this.core.last = msg;
+    chat.core.last = msg;
+    chat.core.lastAck = Tools.localize(msg.stamp);
     if (chunkListSize > 0) {
       Store.recover(blockIndex, function (chunk) {
         if (!chunk || chunk.length >= App.defaults.Chat.chunkSize) {
