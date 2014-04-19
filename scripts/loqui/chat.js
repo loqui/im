@@ -185,9 +185,11 @@ var Chat = function (core, account) {
       if (existant.length) {
         avatarize(existant.attr('src'));
       } else {
-        Store.recover(App.avatars[this.core.jid], function (val) {
-          avatarize(val);
-        });
+        if (this.core.jid in App.avatars) {
+          (new Avatar(App.avatars[this.core.jid])).url.then(function (val) {
+            avatarize(val);
+          });
+        }
       }
     } else {
       header.children('.avatar').children('img').attr('src', 'img/foovatar.png');
