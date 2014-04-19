@@ -183,8 +183,9 @@ section nav[data-control="groupbar"] {
   top: 3rem;
   width: 100%;
   height: 3rem;
-  background-color: #37353A;
-  color: white;
+  background-color: white;
+  color: #333;
+  border-bottom: .1rem solid #CECECE;
 }
 section#searchBar nav[data-control="groupbar"] {
   position: absolute;
@@ -197,15 +198,19 @@ section#searchBar nav[data-control="groupbar"] {
 section nav[data-control="groupbar"] a {
   float: left;
   margin: .55rem 0 0 .5rem;
-  padding: .4rem .5rem .3rem .5rem;
+  padding: .4rem .8rem .4rem .8rem;
   font-size: .8em;
-  border-radius: .2rem;
+  font-weight: 100;
+  font-style: italic;
+  border-radius: 1rem;
 }
 [data-view-menu]:after {
   content: none;
 }
 section nav[data-control="groupbar"] a.selected {
   background-color: #E74C3C;
+  padding: .4rem .8rem .4rem .8rem;
+  color: white;
 }
 section.aside {
   transform: translateX(5rem); 
@@ -504,18 +509,19 @@ section#main[data-features~='localContacts'] fieldset#searchForm span.clear {
 
 section#activity article header.beige {
   height: 3rem;
-  background-color: #EBE9DD;
+  background-color: #ECECEC;
+  border-bottom: .1rem solid #CECECE;
 }
 section#activity article header.beige button {
   margin: .7rem 0;
   padding: .3rem 1rem;
   border: none;
+  border-radius: 0!important;
   background: none;
   font-size: .8em;
-  border-radius: 0;
 }
 section#activity article header.beige button:not(:last-child) {
-  border-right: .1rem solid #D4D2C5;
+  border-right: .1rem solid #BBB;
 }
 section#activity.extended article ul.list {
   position: absolute;
@@ -528,7 +534,7 @@ section#activity.extended article ul.list {
 section#settings article#devmode div p {
   position: relative;
   padding: 1rem;
-  border-bottom: .1rem solid #CCC;
+  border-bottom: .1rem solid #DDD;
   list-style-type: none;
   cursor: pointer;
   font-weight: 300;
@@ -538,14 +544,14 @@ section#settings article#devmode div p {
 section#settings ul li {
   position: relative;
   padding: 1rem;
-  border-bottom: .1rem solid #CCC;
+  border-bottom: .1rem solid #DDD;
   list-style-type: none;
   cursor: pointer;
 }
 section#settings ul li span {
   display: block;
   max-width: calc(100% - 4rem);
-  font-weight: 300;
+  font-weight: 100;
   font-size: .9em;
 }
 section#chat header span {
