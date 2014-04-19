@@ -37,6 +37,12 @@
   src: url('style/fonts/FiraSans-Light.ttf');
   font-weight: 100;
 }
+@font-face {
+  font-family:'FiraSans';
+  src: url('style/fonts/FiraSans-LightItalic.ttf');
+  font-weight: 100;
+  font-style: italic; 
+}
 
 * {
   font-family: Fira, FiraSans, Open Sans, sans-serif;
