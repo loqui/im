@@ -138,6 +138,7 @@ section > header > nav button.up {
   border: none;
   background: none;
   color: white;
+  font-size: 1.2em;
 }
 section > header > nav.on-right button.tab {
   background-image: url('/img/tab-decoration-right.svg');
