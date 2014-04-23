@@ -895,6 +895,19 @@ section#chat ul#messages li .lastRead:after {
   margin: 0 .5rem;
   font-style: normal;
 }
+section#chat ul#messages li .lastACK {
+  position: relative;
+  display: block;
+  clear: both;
+  width: calc(100vw);
+  text-align: center;  
+  font-size: .8rem;
+  font-weight: 100;
+  font-style: italic;
+  margin: .5rem 0;
+  padding: .5rem 0;
+  border-bottom: .1rem solid #2ECC71;
+}
 section#chat article#emoji {
   padding: 1rem;
 }

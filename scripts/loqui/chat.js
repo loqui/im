@@ -6,7 +6,7 @@ var Chat = function (core, account) {
   this.core = core;
   this.core.unread = this.core.unread || 0;
   this.core.last = this.core.last || {};
-  this.core.lastAck = this.core.lastAck || Tools.localize(Tools.stamp());
+  this.core.lastAck = this.core.lastAck || '1970-01-01T00:00:00Z';
   this.account = account;
   this.notification = undefined;
   this.lastRead = Tools.localize(Tools.stamp());
@@ -60,7 +60,7 @@ var Chat = function (core, account) {
 console.log(chat.account.supports('receipts'), !chat.core.muc);
 console.log(chat.core.lastAck, ack, prevAck, !ack && prevAck);
             if (chat.account.supports('receipts') && !chat.core.muc && !ack && prevAck) {
-              frag.appendChild($('<time/>').attr('datetime', msg.core.stamp).text('LAST ACK')[0]);
+              frag.appendChild($('<span/>').addClass('lastACK')[0]);
             }
             prevType = type;
             prevTime = time;
@@ -68,7 +68,7 @@ console.log(chat.core.lastAck, ack, prevAck, !ack && prevAck);
             prevRead = time <= lastRead;
           }
           if (chat.account.supports('receipts') && !chat.core.muc && prevAck) {
-            frag.appendChild($('<time/>').attr('datetime', msg.core.stamp).text('LAST ACK')[0]);
+            frag.appendChild($('<span/>').addClass('lastACK')[0]);
           }
           li[0].appendChild(frag);
           var more = ul.children('.more');
