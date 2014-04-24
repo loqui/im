@@ -120,7 +120,7 @@ var Providers = {
         timeout: 300
       },
       autodomain: false,
-      features: ['multi', 'vcard', 'presence', 'easyAvatars', 'rosterMgmt', 'avatarChange', 'attention', 'csn', 'delay', 'time', 'statusChange', 'muc'],
+      features: ['multi', 'vcard', 'presence', 'easyAvatars', 'rosterMgmt', 'avatarChange', 'attention', 'csn', 'delay', 'time', 'statusChange'],
       color: '#149ED2',
       terms: {
         user: 'FullJID',
