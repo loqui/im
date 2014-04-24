@@ -458,6 +458,12 @@ App.connectors['coseme'] = function (account) {
     });
     chat.core.lastAck = Tools.localize(Tools.stamp());
     chat.save();
+    var section = $('section#chat');
+    if (section.hasClass('show') && section.data('jid') == from) {
+      var li = section.find('ul li').last();
+      li.find('span.lastACK').remove();
+      li.append($('<span/>').addClass('lastACK')[0]);
+    }
     Tools.log('DELIVERED', from, msgId);
     MI.call('delivered_ack', [from, msgId]);
   }
