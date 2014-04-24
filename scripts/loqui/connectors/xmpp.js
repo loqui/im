@@ -391,6 +391,7 @@ App.logForms['XMPP'] = function (article, provider, data) {
         pass: pass,
         provider: provider,
         resource: App.defaults.Account.core.resource,
+        enabled: true,
         chats: []
       });
       account.test();
