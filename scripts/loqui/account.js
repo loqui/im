@@ -274,17 +274,16 @@ var Account = function (core) {
     var header = $('<header/>').addClass('beige')
       .append($('<button/>').addClass('new').text(_('ContactAdd')).on('click', function (event) {
         Menu.show('contactAdd');
-      }))
-      .append($('<button/>').addClass('join').text(_('ContactsSync')).on('click', function (event) {
+      }));
+    if (account.supports('localContacts')) {
+      header.append($('<button/>').addClass('sync').text(_('ContactsSync')).on('click', function (event) {
         delete account.core.roster;
         account.connector.sync(function (rcb) {
           account.save();
-          account.allRender();
-          if (rcb) {
-            rcb();
-          }
+          Lungo.Router.section('main');
         });
       }));
+    }
     var ul = $('<ul/>').addClass('list').addClass('scroll');
     var frag = f;
     var account = this;
