@@ -244,7 +244,8 @@ App.connectors['coseme'] = function (account) {
         Store.cache[aB64Hash] = {
           to: jid,
           data: aB64OrigHash
-        },
+        };
+console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
         Lungo.Notification.show('up-sign', _('Uploading'), 3);
         var method = 'media_requestUpload';
         MI.call(method, [aB64Hash, aT, aSize]);
@@ -660,6 +661,7 @@ App.connectors['coseme'] = function (account) {
     var self = this;
     var media = CoSeMe.media;
     var account = this.account;
+console.log('TEMP_RETRIEVING', hash, Store.cache[hash].data);
     var obj = Store.cache[hash];
     var type, method, thumbnailer = null;
     if (obj.data.indexOf(':image') > 0) {

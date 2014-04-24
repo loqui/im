@@ -7600,7 +7600,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
         file: name,
         size: size,
         url: url
-      }, null);
+      }, null, thumbnail);
       return mmNode;
     },
 

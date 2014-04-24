@@ -275,9 +275,9 @@ var Tools = {
   
   blobToBase64: function (blob, cb) {
     var reader = new FileReader;
-    reader.onload = function (e) {
-        var res = e.target.result;
-        cb(res);
+    reader.onloadend = function (e) {
+      var res = e.target.result;
+      cb(res);
     }
     reader.readAsDataURL(blob);
   },
