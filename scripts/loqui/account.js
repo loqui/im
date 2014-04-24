@@ -532,8 +532,10 @@ var Accounts = {
       var li = sw.closest('li');
       var account = App.accounts[Accounts.find(li.data('jid'))];
       if (li.data('value') == 'true') {
-        account.connector.disconnect();
-        account.core.enabled = false;
+        if (confirm(_('AccountDisable', {account: account.core.fullJid}))) {
+          account.connector.disconnect();
+          account.core.enabled = false;
+        }
       } else {
         account.connect();
         account.core.enabled = true;
