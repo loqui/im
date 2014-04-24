@@ -39,7 +39,9 @@ var Account = function (core) {
             $('section.setup#' + this.core.provider + ' input').val('');
             $('section#success span#imported').text(_('Imported', {number: (this.core.roster && this.core.roster.length) ? this.core.roster.length : 0}));
             this.connector.avatar(function (avatar) {
-              $('section#success img#avatar').attr('src', avatar);
+              avatar.url.then(function (src) {
+                $('section#success img#avatar').attr('src', src);              
+              });
             });
             Lungo.Router.section('success');
           } else {
