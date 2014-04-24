@@ -201,6 +201,7 @@ var Messenger = {
         account.core.chats.splice(index, 1);
         account.save();
         account.allRender();
+        Lungo.Router.section('back');
         Lungo.Router.section('main');
         Lungo.Notification.success(_('Removed'), null, 'remove', 3);
       }
