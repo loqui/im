@@ -113,9 +113,17 @@ var Message = function (account, core, options) {
         var ul = $('section#chat ul#messages');
         var li = ul.children('li[data-chunk="' + blockIndex + '"]');
         var last = li.children('div').last();
+        var timeDiff = Tools.unstamp(message.core.stamp) - Tools.unstamp(last.data('stamp')) > 300000;
+        var conv = Tools.convenientDate(message.core.stamp);
         if (li.length) {
+          if (timeDiff) {
+            li.append($('<time/>').attr('datetime', message.core.stamp).text(_('DateTimeFormat', {date: conv[0], time: conv[1]}))[0]);
+          }
           li.append(message.preRender());
         } else {
+          if (timeDiff) {
+            li.append($('<time/>').attr('datetime', message.core.stamp).text(_('DateTimeFormat', {date: conv[0], time: conv[1]}))[0]);
+          }
           var li = $('<li/>').addClass('chunk').data('chunk', blockIndex);
           li.append(message.preRender());
           ul.append(li);

@@ -6,7 +6,7 @@ var Chat = function (core, account) {
   this.core = core;
   this.core.unread = this.core.unread || 0;
   this.core.last = this.core.last || {};
-  this.core.lastAck = this.core.lastAck || '1970-01-01T00:00:00Z';
+  this.core.lastAck = this.core.lastAck || undefined;
   this.account = account;
   this.notification = undefined;
   this.lastRead = Tools.localize(Tools.stamp());
@@ -44,7 +44,7 @@ var Chat = function (core, account) {
             var type = msg.core.from == chat.account.core.fullJid ? undefined : msg.core.from;
             var time = Tools.unstamp(msg.core.stamp);
             var timeDiff = time - prevTime;
-            var ack = time < Tools.unstamp(chat.core.lastAck);
+            var ack = chat.core.lastAck ? time < Tools.unstamp(chat.core.lastAck) : false;
             var avatarize = type && type != prevType;
             // Append the message
             // New messages mark
@@ -57,8 +57,6 @@ var Chat = function (core, account) {
               frag.appendChild($('<time/>').attr('datetime', msg.core.stamp).text(_('DateTimeFormat', {date: conv[0], time: conv[1]}))[0]);
             }
             frag.appendChild(msg.preRender(i, avatarize));
-console.log(chat.account.supports('receipts'), !chat.core.muc);
-console.log(chat.core.lastAck, ack, prevAck, !ack && prevAck);
             if (chat.account.supports('receipts') && !chat.core.muc && !ack && prevAck) {
               frag.appendChild($('<span/>').addClass('lastACK')[0]);
             }
@@ -67,7 +65,7 @@ console.log(chat.core.lastAck, ack, prevAck, !ack && prevAck);
             prevAck = ack;
             prevRead = time <= lastRead;
           }
-          if (chat.account.supports('receipts') && !chat.core.muc && prevAck) {
+          if (chat.account.supports('receipts') && !chat.core.muc && chat.core.lastAck && prevAck) {
             frag.appendChild($('<span/>').addClass('lastACK')[0]);
           }
           li[0].appendChild(frag);
@@ -103,7 +101,6 @@ console.log(chat.core.lastAck, ack, prevAck, !ack && prevAck);
     var blockIndex = this.core.chunks[chunkListSize - 1];
     var storageIndex;
     chat.core.last = msg;
-    chat.core.lastAck = Tools.localize(msg.stamp);
     if (chunkListSize > 0) {
       Store.recover(blockIndex, function (chunk) {
         if (!chunk || chunk.length >= App.defaults.Chat.chunkSize) {
@@ -170,6 +167,7 @@ console.log(chat.core.lastAck, ack, prevAck, !ack && prevAck);
       } else {
         chat.notification = App.notify({ subject: subject, text: text, pic: 'https://raw.github.com/loqui/im/master/img/foovatar.png', callback: callback }, 'received');
       }
+      chat.core.lastAck = last.stamp;
     }
     $('#chat #messages span.lastRead').remove();
     this.save(true);
