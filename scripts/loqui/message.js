@@ -83,7 +83,7 @@ var Message = function (account, core, options) {
         var ul = $('section#chat ul#messages');
         var li = ul.children('li[data-chunk="' + blockIndex + '"]');
         var last = li.children('div').last();
-        var avatarize = chat.core.muc && last.data('from') != message.core.from;
+        var avatarize = chat.core.muc || last.data('from') != message.core.from;
         var timeDiff = Tools.unstamp(message.core.stamp) - Tools.unstamp(last.data('stamp')) > 300000;
         var conv = Tools.convenientDate(message.core.stamp);
         if (li.length) {
@@ -98,6 +98,9 @@ var Message = function (account, core, options) {
           }
           li.append(message.preRender(false, avatarize));
           ul.append(li);
+        }
+        if (avatarize) {
+          account.avatarsRender();
         }
         ul[0].scrollTop = ul[0].scrollHeight;
         chat.core.lastRead = Tools.localize(Tools.stamp());
