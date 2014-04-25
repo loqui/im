@@ -11,7 +11,9 @@ var Chat = function (core, account) {
   this.notification = undefined;
   this.lastRead = Tools.localize(Tools.stamp());
   this.unread = this.core.unread;
-  this.core.settings = this.core.settings || App.defaults.Chat.core.settings;
+  if (!('settings' in this.core)) {
+    $.extend(this.core.settings, App.defaults.Chat.core.settings);
+  }
   
   // Render last chunk of messages
   this.lastChunkRender = function () {
