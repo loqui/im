@@ -112,10 +112,6 @@ var Account = function (core) {
   this.show = function () {
     var account = this;
     $('section#main').data('jid', this.core.fullJid);
-    /*$('section#main header').style('background', this.connector.provider.color);
-    $('section#me article button').style('background', this.connector.provider.color);
-    $('section#contact article button').style('background', this.connector.provider.color);
-    $('section#contactAdd article button').style('background', this.connector.provider.color);*/
     var vCard = $(this.connector.vcard);
     var address = ( vCard.length && vCard.find('FN').length ) ? vCard.find('FN').text() : this.core.user;
     $('section#main header img').attr('src', 'img/providers/' + this.core.provider + '.svg');
@@ -124,7 +120,6 @@ var Account = function (core) {
     $('section#main article ul[data-jid="' + this.core.fullJid + '"]').show().siblings('ul').hide();
     var index = Accounts.find(this.core.fullJid);
     $('aside#accounts [data-jid="' + this.core.fullJid  + '"]').addClass('active').siblings('li').removeClass('active');
-    //Lungo.Element.count('section#main header nav button[data-view-article="chats"]', this.unread);
     var features = Providers.data[this.core.provider].features;
     var meSection = $('section#me');
     var mainSection = $('section#main');
@@ -134,20 +129,22 @@ var Account = function (core) {
     meSection.find('#card .name').text(address == this.core.user ? '' : address);
     meSection.find('#card .user').text(this.core.user);
     meSection.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + this.core.provider + '.svg'));
-    Store.recover(App.avatars[account.core.fullJid], function (src) {
-      var show = function (a) {
-        a.url.then(function (val) {
-          $('section#me .avatar img').attr('src', val);
-        });
-      }
-      if (src) {
-        show(src);
-      } else {
-        account.connector.avatar(function (src) {
+    if (meSection.find('#card .avatar img').attr('src') == 'null') {
+      Store.recover(App.avatars[account.core.fullJid], function (src) {
+        var show = function (a) {
+          a.url.then(function (val) {
+            $('section#me .avatar img').attr('src', val);
+          });
+        }
+        if (src) {
           show(src);
-        });
-      }
-    });
+        } else {
+          account.connector.avatar(function (src) {
+            show(src);
+          });
+        }
+      });
+    }
     Accounts.unread(account.unread);
   }
   
