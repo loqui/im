@@ -75,6 +75,7 @@ var Message = function (account, core, options) {
     }
   }
   
+  // Incoming
   this.postReceive = function() {
     var message = this;
     var chat = this.chat;
@@ -111,6 +112,7 @@ var Message = function (account, core, options) {
     });
   }
 
+  //Outcoming
   this.addToChat = function () {
     var message = this;
     var chat = this.chat;

@@ -168,6 +168,12 @@ var Chat = function (core, account) {
         chat.notification = App.notify({ subject: subject, text: text, pic: 'https://raw.github.com/loqui/im/master/img/foovatar.png', callback: callback }, 'received');
       }
       chat.core.lastAck = last.stamp;
+      var section = $('section#chat');
+      if (section.hasClass('show') && section.data('jid') == last.from) {
+        var li = section.find('ul li').last();
+        section.find('span.lastACK').remove();
+        li.append($('<span/>').addClass('lastACK')[0]);
+      }
     }
     $('#chat #messages span.lastRead').remove();
     this.save(true);

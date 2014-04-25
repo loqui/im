@@ -462,7 +462,7 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
     var section = $('section#chat');
     if (section.hasClass('show') && section.data('jid') == from) {
       var li = section.find('ul li').last();
-      li.find('span.lastACK').remove();
+      section.find('span.lastACK').remove();
       li.append($('<span/>').addClass('lastACK')[0]);
     }
     Tools.log('DELIVERED', from, msgId);
