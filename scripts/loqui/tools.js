@@ -159,42 +159,15 @@ var Tools = {
   },
 
   vidThumb: function (blob, width, height, callback) {
-    var img = new Image();
-    img.onload = function () {
-      var canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-      var url = canvas.toDataURL();
-      callback(url);
-    }
-    img.src = 'img/video.png';
+    callback('img/video.png');
   },
 
   audThumb: function (blob, width, height, callback) {
-    var img = new Image();
-    img.onload = function () {
-      var canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-      var url = canvas.toDataURL();
-      callback(url);
-    }
-    img.src = 'img/audio.png';
+    callback('img/audio.png');
   },
   
   locThumb: function (blob, width, height, callback) {
-    var img = new Image();
-    img.onload = function () {
-      var canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-      var url = canvas.toDataURL();
-      callback(url);
-    }
-    img.src = 'img/location.png';
+    callback('img/location.png');
   },
 
   getFileType: function(type) {

@@ -764,11 +764,13 @@ console.log('TEMP_RETRIEVING', hash, Store.cache[hash].data);
     }.bind(this);
     switch (fileType) {
       case 'image':
-      case 'video':
         Tools.picThumb(CoSeMe.utils.aToBlob(payload, 'i'), 120, 120, process);
         break;
+      case 'video':
+        process('img/video.png');
+        break;
       case 'audio':
-        process('img/blank.jpg');
+        process('img/audio.png');
         break;
       case 'url':
         mediaUrl = 'https://maps.google.com/maps?q=' + payload[0] + ',' + payload[1],
