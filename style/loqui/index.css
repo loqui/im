@@ -908,6 +908,9 @@ section#chat ul#messages li .lastACK {
   padding: .5rem 0;
   border-bottom: .1rem solid #2ECC71;
 }
+section#chat ul#messages li:not(:last-of-type) .lastACK {
+  display: none;
+}
 section#chat article#emoji {
   padding: 1rem;
 }
