@@ -1046,7 +1046,7 @@ section.profile div#card span.user {
   margin: .5rem 1rem 1rem 1rem;
   max-width: calc(100% - 2rem);
   text-align: center;
-  margin-bottom: .5rem;
+  margin-bottom: 0;
   font-size: .9rem;
   line-height: 1rem;
   font-weight: 200;
@@ -1066,6 +1066,21 @@ section.profile div#card span.provider {
 section.profile div#card span.provider img {
   width: 100%;
   border-radius: .3rem;
+}
+section.profile div#settings ul {
+  margin-top: .5rem;
+}
+section.profile div#settings li {
+  display: block;
+  position: relative;
+  height: 2.2rem;
+}
+section.profile div#settings li span.caption {
+  display: block;
+  position: relative;
+  top: .6rem;
+  width: calc(100% - 4rem);
+  font-size: 1em;
 }
 section#me.profile[data-features~=avatarChange]  div#card span.avatar:after {
   content: "Change";
@@ -1110,20 +1125,21 @@ section#me div#status input {
   font-size: 1rem;
 }
 section.profile article > div:not(#card) {
-  padding: 1rem;
+  padding: 0 1rem;
   border-top: .1rem solid #CCC;
 }
 section.profile article > div:not(#card) h2 {
   font-size: 1.1rem;
   color: #444;
-  margin-bottom: .5rem;
+  margin-bottom: 0;
 }
 section.profile article > div:not(#card) p {
   font-weight: 200;
   font-size: .9rem;
+  margin: .5rem 0 1rem 0;
 }
 section.profile article > div:not(#card) .buttongroup {
-  margin: 0;
+  margin: .5rem 0;
 }
 section.profile article > div:not(#card) ul li {
   list-style: none;

@@ -48,7 +48,12 @@ var App = {
       }
     },
     Chat: {
-      chunkSize: 30
+      chunkSize: 30,
+      core: {
+        settings: {
+          muted: false
+        }
+      }
     },
     Connector: {
       presence: { 

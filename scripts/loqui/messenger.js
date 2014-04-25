@@ -60,6 +60,7 @@ var Messenger = {
     var account = this.account();
     var jid = jid || $('section#chat').data('jid');
     var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
+    var chat = account.chatGet(jid);
     if (contact) {
       var name = contact.name || jid;
       var section = $('section#contact');
@@ -68,6 +69,29 @@ var Messenger = {
       section.find('#card .user').text(jid);
       section.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + account.core.provider + '.svg'));
       section.find('#status p').html(App.emoji[Providers.data[account.core.provider].emoji].fy(contact.presence.status) || _('showna'));
+      var setUl = section.find('#settings ul').empty();
+      var settings = Iterator(chat.core.settings);
+      var accountSwitch = function (e) {
+        var sw = $(this);
+        var li = sw.closest('li');
+        var key = li.data('key');
+        var chat = account.chatGet(jid);
+        if (li.data('value') == 'true') {
+          chat.core.settings[key] = false;
+        } else {
+          chat.core.settings[key] = true;
+        }
+        li.data('value', chat.core.settings[key]);
+        account.save();
+      }
+      for (let [key, value] in settings) {
+        var li = $('<li/>').data('key', key).append(
+          $('<span/>').addClass('caption').text(_('AccountSet' + key))
+        ).append(
+          $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>')
+        ).data('value', value).bind('click', accountSwitch);
+        setUl.append(li);
+      }
       if (App.avatars[jid]) {
         Store.recover(App.avatars[jid].chunk, function (val) {
           section.find('#card .avatar').children('img').attr('src', val);
@@ -97,6 +121,29 @@ var Messenger = {
         var participantJid = chat.core.participants[i];
         var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', participantJid);
         partUl.append($('<li/>').text(contact ? contact.name : participantJid.split('@')[0]));
+      }
+      var setUl = section.find('#settings ul').empty();
+      var settings = Iterator(chat.core.settings);
+      var accountSwitch = function (e) {
+        var sw = $(this);
+        var li = sw.closest('li');
+        var key = li.data('key');
+        var chat = account.chatGet(jid);
+        if (li.data('value') == 'true') {
+          chat.core.settings[key] = false;
+        } else {
+          chat.core.settings[key] = true;
+        }
+        li.data('value', chat.core.settings[key]);
+        account.save();
+      }
+      for (let [key, value] in settings) {
+        var li = $('<li/>').data('key', key).append(
+          $('<span/>').addClass('caption').text(_('AccountSet' + key))
+        ).append(
+          $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>')
+        ).data('value', value).bind('click', accountSwitch);
+        setUl.append(li);
       }
     }
     if (App.avatars[jid]) {

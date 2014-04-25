@@ -11,6 +11,7 @@ var Chat = function (core, account) {
   this.notification = undefined;
   this.lastRead = Tools.localize(Tools.stamp());
   this.unread = this.core.unread;
+  this.core.settings = this.core.settings || App.defaults.Chat.core.settings;
   
   // Render last chunk of messages
   this.lastChunkRender = function () {
@@ -145,7 +146,7 @@ var Chat = function (core, account) {
     var chat = this;
     var pic = new Avatar(App.avatars[chat.core.jid]);
     var last = chat.core.last;
-    if (chat.core.muc ? (chat.core.jid == last.to && (last.from != chat.account.core.user)) : (chat.core.jid == last.from)) {
+    if (!chat.core.settings.muted && (chat.core.muc ? (chat.core.jid == last.to && (last.from != chat.account.core.user)) : (chat.core.jid == last.from))) {
       var callback = function () {
         chat.account.show();
         chat.show();
