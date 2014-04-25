@@ -62,9 +62,9 @@ App.connectors['coseme'] = function (account) {
   
   this.sync = function (callback) {
     var getStatuses = function () {
-      var method = 'contact_getStatuses';
+      var method = 'contacts_getStatus';
       var list = this.account.core.roster.map(function(e){return e.jid;});
-      //MI.call(method, [list]);
+      MI.call(method, [list]);
     }.bind(this);
     if (!('roster' in this.account.core) || !this.account.core.roster.length) {
       this.contacts.sync(function () {
@@ -335,9 +335,9 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
       notification_groupParticipantRemoved: null,
       contact_gotProfilePictureId: null,
       contact_gotProfilePicture: this.events.onAvatar,
-      //contact_gotStatus: this.events.onPresenceUpdated,
       contact_typing: this.events.onContactTyping,
       contact_paused: this.events.onContactPaused,
+      contacts_gotStatus: this.events.onContactsGotStatus,
       profile_setPictureSuccess: this.events.onProfileSetPictureSuccess,
       profile_setPictureError: this.events.onProfileSetPictureError,
       profile_setStatusSuccess: this.events.onMessageDelivered,
@@ -603,9 +603,18 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
     return this.mediaProcess('url', fromAttribute, to, [mlatitude, mlongitude, name], null, null, true);
   }
   
+  this.events.onContactsGotStatus = function (id, statuses) {
+    var i = Iterator(statuses);
+    for (let [jid, status] in i) {
+      this.events.onPresenceUpdated(jid, undefined, status);
+    }
+  }
+  
   this.events.onPresenceUpdated = function (jid, lastSeen, msg) {
     var account = this.account;
-    var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
+    var contact = account.core.roster.find(function (e, i, a) {
+      return e.jid == jid;
+    });
     if (contact) {
       var time = Tools.convenientDate(Tools.localize(Tools.stamp( Math.floor((new Date).valueOf()/1000) - parseInt(lastSeen) )));
       if (!('presence' in contact)) {
@@ -625,11 +634,13 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
         contact.presence.show = parseInt(lastSeen) < 300 ? 'a' : 'away';
         account.presenceRender(jid);
         var chatSection = $('section#chat[data-jid="' + jid + '"]');
-        var status = chatSection.find('header .status');
-        status.html((parseInt(lastSeen) < 300 ? _('showa') : _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})})) +  ' - ' + status.html());
+        if (chatSection.length) {
+          var status = chatSection.find('header .status');
+          status.html((parseInt(lastSeen) < 300 ? _('showa') : _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})})) +  ' - ' + status.html());
+        }
       }
     }
-  }
+  }.bind(this)
   
   this.events.onPresenceAvailable = function (jid) {
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
