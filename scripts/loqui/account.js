@@ -396,6 +396,8 @@ var Account = function (core) {
       Lungo.Router.article('otrMenu', 'otrSetup');
       $('button#setupOtr').on('click', function(e) {
         Lungo.Notification.success(_('OTRKeygen'), _('OTRWait'), 'key', 5);
+        Lungo.Router.section('back');
+        Lungo.Router.section('main');
         DSA.createInWebWorker({
           path: 'scripts/arlolra/dsa-webworker.js'
         }, function (key) {
