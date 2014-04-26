@@ -84,7 +84,7 @@ var Message = function (account, core, options) {
         var ul = $('section#chat ul#messages');
         var li = ul.children('li[data-chunk="' + blockIndex + '"]');
         var last = li.children('div').last();
-        var avatarize = chat.core.muc || last.data('from') != message.core.from;
+        var avatarize = last.data('from') != message.core.from;
         var timeDiff = Tools.unstamp(message.core.stamp) - Tools.unstamp(last.data('stamp')) > 300000;
         var conv = Tools.convenientDate(message.core.stamp);
         if (li.length) {
