@@ -271,7 +271,7 @@
     </div>
   </div>
   <section id='activity' data-transition='vertical'>
-    <header data-title='Activity'>
+    <header data-title='Activity' data-l10n-title='Activity'>
       <nav class='on-left'>
         <button data-view-section='back' data-icon='remove' class='up'></button>
       </nav>
@@ -292,24 +292,24 @@
     <article id='main' class='active scroll'></article>
   </section>
   <section id='otrMenu' data-transition='vertical'>
-    <header>
+    <header data-title='OTR Settings' data-l10n-title='OTRMenu'>
       <nav class='on-left'>
         <button data-view-section='back' data-icon='remove' class='up'></button>
       </nav>
     </header>
     <article id='otrSetup' class='scroll simple'>
-      <p data-l10n-id='OTRExplanation'>Off-The-Record (OTR) allows you to have private conversations over any instant messaging protocol.<br/>To start using OTR, you have to generate a secret key.</p>
+      <p data-l10n-id='OTRExplanation'>Off-The-Record (OTR) allows you to have private conversations over any instant messaging protocol.<br/><br/>To start using OTR, you have to generate a secret key.<br/><small>(This may take up to several minutes depending on your phone's capabilities).</small></p>
       <div class='buttongroup'>
         <button id='setupOtr' data-l10n-id='OTRSetup'>Generate my key</button>
       </div>
     </article>
     <article id='otrSettings' class='scroll simple'>
-      <p>You have OTR set up</p>
-      <p>Your fingerprint is: <span id='otrKeyFingerprint'></span></p>
-      <p>
+      <p>OTR is enabled for this account.</p>
+      <p>Your key's fingerprint is: <span id='otrKeyFingerprint'></span></p>
+      <!--<p>
         <input type='checkbox' name='logOtrChats' id='logOtrChats' value='yes'/>
         <label for='logOtrChats'>Log OTR-encrypted chats</label>
-      </p>
+      </p>-->
     </article>
   </section>
   <aside id='accounts'>

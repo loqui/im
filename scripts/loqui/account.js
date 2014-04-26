@@ -414,7 +414,9 @@ var Account = function (core) {
     }
     function OTRSettings() {
       Lungo.Router.article('otrMenu', 'otrSettings');
-      $('span#otrKeyFingerprint').html(account.OTR.key.fingerprint());
+      var fingerprint = account.OTR.key.fingerprint();
+      $('span#otrKeyFingerprint').html($('<small/>').html(Tools.explode(fingerprint, 8)));
+      $('span#otrKeyFingerprint').append($('<img/>').attr('src', Tools.fingerprintToImage(fingerprint)));
       if (account.core.OTR.logging) {
         $('input#logOtrChats').attr('checked', account.OTR.logging);
       }

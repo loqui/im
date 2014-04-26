@@ -275,6 +275,25 @@ var Tools = {
     var g = (hash.substr(segSize, segSize).split('').reduce(function (prev, cur) {return prev + parseInt(cur.charCodeAt(0));}, 0) % 255).toString(16);
     var b = (hash.substr(segSize * 2).split('').reduce(function (prev, cur) {return prev + parseInt(cur.charCodeAt(0));}, 0) % 255).toString(16);
     return '#' + (r.length < 2 ? '0' + r : r) + (g.length < 2 ? '0' + g : g) + (b.length < 2 ? '0' + b : b);
+  },
+  
+  explode: function (str, len) {
+    if (str.length < len) return str;
+    return str.slice(0, len) + '<br />' + Tools.explode(str.slice(len), len);
+  },
+  
+  fingerprintToImage: function (fingerprint) {
+    var canvas = document.createElement('canvas');
+    canvas.width = 160;
+    canvas.height = 100;
+    var ctx = canvas.getContext('2d');
+    for (var i = 0; i < 40; i++) {
+      let compo = fingerprint.substr(i, 1);
+      let color = '#' + compo + compo + compo + compo + 'ff';
+      ctx.fillStyle = color;
+      ctx.fillRect((i%8)*20, Math.floor(i/8)*20, 20, 20);
+    }
+    return canvas.toDataURL('image/png');
   }
 
 }

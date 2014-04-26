@@ -1319,6 +1319,17 @@ section#settings article#devmode div button {
   overflow: hidden;
 }
 
+section#otrMenu #otrKeyFingerprint {
+  display: block;
+  position: relative;
+  margin-top: .5rem;
+}
+section#otrMenu #otrKeyFingerprint img {
+  position: absolute;
+  top: .5rem;
+  right: 0;
+}
+
 section#activity article ul.accounts {
   padding: 2rem;
 }
