@@ -30,6 +30,14 @@ var Menu = {
     muc: function () {
       Messenger.mucProfile();
     },
+    mucClear: function (obj) {
+      var gid = $(obj).closest('section').data('jid');
+      Messenger.mucClear(gid);
+    },
+    mucExit: function (obj) {
+      var gid = $(obj).closest('section').data('jid');
+      Messenger.mucExit(gid);
+    },
     contactAdd: function (obj) {
       var account = Messenger.account();
       if (account.supports('rosterMgmt')) {
@@ -56,7 +64,7 @@ var Menu = {
     doSearch: function (obj) {
       //Lungo.Router.section('searchBar');
     },
-    chatRemove: function(obj) {
+    chatRemove: function (obj) {
       var jid = $(obj).closest('section').data('jid');
       Messenger.chatRemove(jid);
     },

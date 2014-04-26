@@ -16,6 +16,7 @@ App.connectors['coseme'] = function (account) {
   this.events = {}
   this.chat = {};
   this.contacts = {};
+  this.muc = {};
   this.connected = false;
   this.failStamps = [];
   
@@ -156,6 +157,12 @@ App.connectors['coseme'] = function (account) {
   
   this.contacts.remove = function () {
   }
+  
+  this.muc.expel = function (gid, jid) {
+    var method = 'group_removeParticipants';
+    var params = [gid, [jid || this.account.core.fullJid]];
+    MI.call(method, params);
+  }.bind(this);
   
   this.presence.get = function (jid) {
     var method = 'presence_request';
@@ -313,7 +320,7 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
       group_gotInfo: this.events.onGroupGotInfo,
       group_infoError: this.events.onGroupInfoError,
       group_addParticipantsSuccess: null,
-      group_removeParticipantsSuccess: null,
+      group_removeParticipantsSuccess: this.events.onGroupRemoveParticipantsSuccess,
       group_gotParticipants: this.events.onGroupGotParticipants,
       group_setSubjectSuccess: null,
       group_messageReceived: this.events.onGroupMessage,
@@ -552,6 +559,10 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
         $('section#chat[data-jid="' + chat.core.jid + '"] header .status').text(_('NumParticipants', {number: chat.core.participants.length}));
       }
     }
+  }
+  
+  this.events.onGroupRemoveParticipantsSuccess = function (gid, jids) {
+    Lungo.Notification.success(_('Removed'), null, 'trash', 3);
   }
   
   this.events.onGroupMessage = function (msgId, from, author, data, stamp, wantsReceipt, pushName) {

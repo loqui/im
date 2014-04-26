@@ -250,10 +250,49 @@ var Messenger = {
         account.allRender();
         Lungo.Router.section('back');
         Lungo.Router.section('main');
-        Lungo.Notification.success(_('Removed'), null, 'remove', 3);
+        Lungo.Notification.success(_('Removed'), null, 'trash', 3);
       }
     } else {
       Lungo.Notification.error(_('Error'), _('NoChatsForContact'), 'exclamation-sign', 3);
+    }
+  },
+  
+  mucClear: function (gid, force) {
+    var account = Messenger.account();
+    var chat = account.chatGet(gid);
+    if (chat) {
+      chat = chat.core;
+      var title = chat.title || gid;
+      var will = force || confirm(_('MucClearConfirm', {title: title}));
+      if (will) {
+        for (var i in chat.chunks) {
+          var chunk = chat.chunks[i];
+          Store.blockDrop(chunk);
+        }
+        chat.chunks = [];
+        if (force) {
+          account.chats.splice(index, 1);
+          account.core.chats.splice(index, 1);
+        }
+        account.save();
+        account.allRender();
+        Lungo.Router.section('back');
+        Lungo.Router.section('main');
+        Lungo.Notification.success(_('Cleared'), null, 'trash', 3);
+      }
+    } else {
+      Lungo.Notification.error(_('Error'), _('NoChatsForContact'), 'exclamation-sign', 3);
+    }
+  },
+  
+  mucExit: function (gid) {
+    var account = Messenger.account();
+    var chat = account.chatGet(gid).core;
+    var title = chat.title || gid;
+    var will = confirm(_('MucExitConfirm', {title: title}));
+    if (will) {
+      account.connector.muc.expel(gid);
+      this.mucClear(gid, true);
     }
   },
   
