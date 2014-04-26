@@ -12,6 +12,7 @@ var Chat = function (core, account) {
   this.lastRead = Tools.localize(Tools.stamp());
   this.unread = this.core.unread;
   if (!('settings' in this.core)) {
+    this.core.settings = {};
     $.extend(this.core.settings, App.defaults.Chat.core.settings);
   }
   
