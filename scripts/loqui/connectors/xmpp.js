@@ -233,11 +233,11 @@ App.connectors['XMPP'] = function (account) {
   }
   
   this.handlers.init = function () {
-    this.handlers.onMessage = this.connection.addHandler(this.events.onMessage, null, 'message', 'chat', null, null);
-    this.handlers.onSubRequest = this.connection.addHandler(this.events.onSubRequest, null, 'presence', 'subscribe', null, null);
-    this.handlers.onTime = this.connection.time.handlify(this.events.onTime);
-    this.handlers.onAttention = this.connection.attention.handlify(this.events.onAttention);
-    this.handlers.onDisco = this.connection.disco.handlify();
+    this.handlers.onMessage = this.handlers.onMessage || this.connection.addHandler(this.events.onMessage, null, 'message', 'chat', null, null);
+    this.handlers.onSubRequest = this.handlers.onSubRequest || this.connection.addHandler(this.events.onSubRequest, null, 'presence', 'subscribe', null, null);
+    this.handlers.onTime = this.handlers.onTime || this.connection.time.handlify(this.events.onTime);
+    this.handlers.onAttention = this.handlers.onAttention || this.connection.attention.handlify(this.events.onAttention);
+    this.handlers.onDisco = this.handlers.onDisco || this.connection.disco.handlify();
   }.bind(this);
   
   this.events.onDisconnected = function () {

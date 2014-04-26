@@ -173,7 +173,7 @@ var Chat = function (core, account) {
       }
       chat.core.lastAck = last.stamp;
       var section = $('section#chat');
-      if (section.hasClass('show') && section.data('jid') == last.from) {
+      if (chat.account.supports('receipts') && section.hasClass('show') && section.data('jid') == last.from) {
         var li = section.find('ul li').last();
         section.find('span.lastACK').remove();
         li.append($('<span/>').addClass('lastACK')[0]);
