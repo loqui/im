@@ -181,8 +181,8 @@ var Messenger = {
           });
           account.save();
           account.allRender();
-          Lungo.Router.back();
-          Lungo.Notification.success(_('ContactWasAdded', {name: name}), _('ContactWillAppear', {name: name}), 'check', 3);
+          Lungo.Router.section('main');
+          Lungo.Notification.success(_('ContactWasAdded', {name: name}), _('ContactWillAppear', {name: name}), 'check', 5);
         }
       } else {
         Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign', 3);

@@ -130,11 +130,10 @@ section > article {
   right: 0;
   z-index: -1;
 }
-section > article.full,
-section > article.form {
+section > article.headless {
   top: 0;
 }
-section.show > article.show{
+section.show > article.show {
   display: block;
 }
 section.asided > article {

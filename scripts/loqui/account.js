@@ -46,7 +46,7 @@ var Account = function (core) {
             Lungo.Router.section('success');
             this.connector.disconnect();
           } else {
-            Lungo.Notification.error(_('DupliAccount'), _('DupliAccountNotice'), 'warning-sign', 5);
+            //Lungo.Notification.error(_('DupliAccount'), _('DupliAccountNotice'), 'warning-sign', 5);
           }
         }.bind(this);
         this.sync(cb);

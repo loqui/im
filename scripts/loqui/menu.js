@@ -32,10 +32,15 @@ var Menu = {
     },
     contactAdd: function (obj) {
       var account = Messenger.account();
-      var selfDomain = Strophe.getDomainFromJid(account.core.user);
-      var placeholder = _('User').toLowerCase() + '@' + selfDomain;
-      $('section#contactAdd').find('[name=address]').attr('placeholder', placeholder);
-      Lungo.Router.section('contactAdd');
+      if (account.supports('rosterMgmt')) {
+        var selfDomain = Strophe.getDomainFromJid(account.core.user);
+        var placeholder = _('User').toLowerCase() + '@' + selfDomain;
+        $('section#contactAdd').find('[name=address]').attr('placeholder', placeholder);
+        Lungo.Router.section('main');
+        Lungo.Router.section('contactAdd');
+      } else {
+        Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign', 3);
+      }
     },
     contactRemove: function(obj) {
       var jid = $(obj).closest('section').data('jid');
