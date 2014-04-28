@@ -348,7 +348,7 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
       profile_setPictureSuccess: this.events.onProfileSetPictureSuccess,
       profile_setPictureError: this.events.onProfileSetPictureError,
       profile_setStatusSuccess: this.events.onMessageDelivered,
-      ping: Tools.log,
+      ping: this.events.onPing,
       pong: null,
       disconnected: null,
       media_uploadRequestSuccess: this.events.onUploadRequestSuccess,
@@ -365,6 +365,10 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
     }.bind(this));
   }.bind(this);
 
+  this.events.onPing = function (idx) {
+    MI.call('pong', [idx]);
+  }
+  
   this.events.onStatusDirty = function (categories) {
     var method = 'cleardirty';
     MI.call(method, [categories]);
