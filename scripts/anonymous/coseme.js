@@ -6095,6 +6095,13 @@ CoSeMe.namespace('auth', (function() {
 
       connection = validConnection;
       tryLogin(function _onLogin(err) {
+        // Try to authenticate if we have a one-shot-rejected error, instead of
+        // bubbling it up to the app
+        if (err === 'one-shot-rejected') {
+          authenticate(username, password, callback);
+          return;
+        }
+
         if (err) {
           return callback(err);
         }
@@ -6550,8 +6557,8 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
 
     get: function(iqType, idx, node) {
       var childNode = node.getChild(0);
-console.log(node);      
-      if (childNode.getAttributeValue('xmlns') === 'urn:xmpp:ping') {
+console.log(node);
+      if (childNode && childNode.getAttributeValue('xmlns') === 'urn:xmpp:ping') {
         if (_autoPong) {
           _onPing(idx);
         }
