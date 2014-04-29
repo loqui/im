@@ -831,13 +831,13 @@ App.logForms['coseme'] = function (article, provider, data) {
       .attr('type', 'number')
       .attr('name', 'country')
       .attr('disabled', 'true')
-      .style('width', '5rem')
+      .style('width', '3rem')
       .addClass('spaced')
     )
     .append($('<input/>')
       .attr('type', 'number')
       .attr('name', 'user')
-      .style('width', 'calc(100% - 5.5rem)')
+      .style('width', 'calc(100% - 4.5rem)')
     );
   countrySelect.bind('change', function () {
     sms.find('input[name="country"]').val(this.value);

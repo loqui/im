@@ -271,11 +271,12 @@ nav[data-control=menu] {
 
 article.form input,
 article.form select {
-  width: calc(100% - 1rem);
+  width: calc(100%);
 }
 article.form label {
   display: block;
   margin-top: .5rem;
+  padding-bottom: .2rem;
 }
 
 section .hideable {
