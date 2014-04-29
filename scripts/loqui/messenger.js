@@ -114,7 +114,7 @@ var Messenger = {
       var section = $('section#muc');
       section.data('jid', jid);
       section.find('#card .name').html(App.emoji[Providers.data[account.core.provider].emoji].fy(chat.core.title));
-      section.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/' + account.core.provider + '.svg')).append(Providers.data[account.core.provider].longName);
+      section.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + account.core.provider + '.svg'));
       section.find('#participants h2').text(_('NumParticipants', {number: chat.core.participants.length}));
       var partUl = section.find('#participants ul').empty();
       for (var i in chat.core.participants) {
@@ -147,11 +147,11 @@ var Messenger = {
       }
     }
     if (App.avatars[jid]) {
-      Store.recover(App.avatars[jid], function (val) {
+      Store.recover(App.avatars[jid].chunk, function (val) {
         section.find('#card .avatar').children('img').attr('src', val);
       });
     } else {
-      section.find('#card .avatar').children('img').attr('src', 'img/foovatar.png');
+      section.find('#card .avatar').children('img').attr('src', 'img/goovatar.png');
     }
     Lungo.Router.section('muc');
   },

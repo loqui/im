@@ -219,6 +219,9 @@ App.connectors['coseme'] = function (account) {
   this.groupAvatar = function (callback, id) {
     var method = 'group_getPicture';
     MI.call(method, [id]);
+    if (callback) {
+      callback(new Avatar({url: 'img/foovatar.png'}));
+    }
   }
   
   this.emojiRender = function (img, emoji) {
