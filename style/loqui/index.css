@@ -237,6 +237,7 @@ section > nav[data-control="menu"] a {
   color: #FFF;
   padding: .5rem 0 0 0;
   text-align: center;
+  text-transform: capitalize;
 }
 section > nav[data-control="menu"] a:active {
   background-color: #444;
