@@ -33,9 +33,21 @@ We would like to thank:
  * Javi Jimenez and Ignacio Olalde from Tapquo for creating Lungo, the framework supporting the UI.
  * Alastair Cameron (CameronMusic) for composing the notification sounds.
  * Fabien Cazenave for creating l10n.js, the library that helps to have Loqui in different languages.
- * Telefónica I+D for their promotion and support in addition to provide us the awesome Firefox OS Developer Preview devices from Geeksphone.
+ * Telefónica I+D for their promotion and support
+ * Geeksphone for the awesome Firefox OS Developer Preview devices.
  * Everyone who has kindly reported issues or made pull requests.
  * You for being about to stargaze or fork this project on GitHub ;)
+
+LICENSING
+===
+ * LoquiIM → AGPLv3
+ * CoSeMe → AGPLv3
+ * Strophe.js → MIT
+ * SHA1.js → BSD
+ * QuoJS → MIT
+ * Chungo.js → AGPLv3
+ * OTR.js → MPLv2.0
+ * libphonenumber → Apache License v2.0
 
 DISCLAIMER
 ===
