@@ -1,14 +1,14 @@
 {
-  "name": "Loqui REVOLUTION",
+  "name": "Loqui IM",
   "developer": {
     "name": "LoquiIM",
     "url": "http://loqui.im"
   },
   "type": "privileged",
   "launch_path": "/index.html",
-  "description": "Loqui Instant Messenger allows you to unify all your chat accounts in just one app.",
+  "description": "Loqui Instant Messenger unifies all your chat accounts in just one app.",
   "version": "v0.3.0",
-  "release_notes": "Always connected (really)\nChange WhatsApp profile picture\nChange WhatsApp status message\nChange XMPP and Hangouts profile picture\nAdd Hebrew language\nMany bugfixes. Such improvement. WoW :)",
+  "release_notes": "New interface \nHalf memory consumption \nMuch faster and more stable \nDisable accounts \nMute chats \nAbridged notifications \nUnread messages mark",
   "icons": {
     "32": "/img/icon-32.png",
     "60": "/img/icon-60.png",

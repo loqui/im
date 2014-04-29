@@ -60,6 +60,7 @@ var Activity = function (action, account, content, options) {
     article.id = 'accounts';
     var ul = document.createElement('ul');
     ul.classList.add('accounts');
+    title = _('Accounts');
     for (var [i, account] in Iterator(App.accounts)) {
       let li = document.createElement('li');
       let ai = i;
