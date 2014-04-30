@@ -7808,6 +7808,10 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
 
   var methodList = {
 
+    is_online: function () {
+      return self.socket && self.socket.socket.readyState === 'open';
+    },
+
     /*
      * Authentication
      */
