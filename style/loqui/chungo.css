@@ -99,7 +99,7 @@ section {
   background-color: white;
 }
 section.asided {
-  transform: translateX(calc(-100vw + 3rem))!important;
+  transform: translateX(calc(-100% + 3rem))!important;
 }
 
 section > header {
@@ -145,10 +145,10 @@ aside {
   position: fixed;
   top: .5rem;
   left: 0;
-  width: calc(100vw - 3rem);
-  height: calc(100vh - .5rem);
+  width: calc(100% - 3rem);
+  height: calc(100% - .5rem);
   background-color: white;
-  transform: translateX(100vw);
+  transform: translateX(120%);
   transition: transform .3s;
   z-index: 50!important;
 }
@@ -159,7 +159,7 @@ aside.show article.active {
   background-color: white;
   visibility: visible;
   position: absolute;
-  height: calc(100vh - 3rem);
+  height: calc(100% - 3rem);
   left: -3rem;
   right: 0;
 }
@@ -305,7 +305,7 @@ section.fast .hideable {
 
 @keyframes popUp {
   from {
-    transform: translateY(-100vh);
+    transform: translateY(-100%);
   }
   to {
     transform: translateY(0);
@@ -316,7 +316,7 @@ section.fast .hideable {
     transform: translateY(0);
   }
   to {
-    transform: translateY(-100vh);
+    transform: translateY(-100%);
   }
 }
 

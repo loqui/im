@@ -1023,7 +1023,7 @@ section.profile div#card span.avatar {
   height: 7rem;
   width: 7rem;
   top: 2rem;
-  left: calc(50vw - 3.5rem);
+  left: calc(50% - 3.5rem);
 }
 section.profile div#card span.avatar img {
   display: block;
