@@ -78,48 +78,51 @@ App.connectors['coseme'] = function (account) {
   
   
   this.contacts.sync = function (cb) {
-    Tools.log('SYNCING CONTACTS');
-    Lungo.Notification.show('download', _('Synchronizing'), 10);
-    var account = this.account;
-    this.account.core.roster = [];
-    var contacts = this.contacts;
-    contacts._pre = [];
-    var allContacts = navigator.mozContacts.getAll({sortBy: 'givenName', sortOrder: 'ascending'});
-    allContacts.onsuccess = function (event) {
-      if (this.result) {
-        try {
-          var result = this.result;
-          var fullname = (result.givenName[0] 
-            ? result.givenName[0] + ' ' + (result.familyName 
-              ? (result.familyName[0] || '') : 
-              ''
-            ) 
-            : (result.familyName ? 
-                result.familyName[0] 
-              : (result.tel 
-                ? result.tel[0] 
-                : ''
-              )
-            )).trim();
-          if (result.tel) {
-            for (var i = 0; i < result.tel.length; i++) {
-              contacts._pre[result.tel[i].value] = fullname;
+    if (App.online && Messenger.account().connector.isConnected()) {
+      Tools.log('SYNCING CONTACTS');
+      Lungo.Notification.show('download', _('Synchronizing'), 10);
+      var account = this.account;
+      var contacts = this.contacts;
+      contacts._pre = [];
+      var allContacts = navigator.mozContacts.getAll({sortBy: 'givenName', sortOrder: 'ascending'});
+      allContacts.onsuccess = function (event) {
+        if (this.result) {
+          try {
+            var result = this.result;
+            var fullname = (result.givenName[0] 
+              ? result.givenName[0] + ' ' + (result.familyName 
+                ? (result.familyName[0] || '') : 
+                ''
+              ) 
+              : (result.familyName ? 
+                  result.familyName[0] 
+                : (result.tel 
+                  ? result.tel[0] 
+                  : ''
+                )
+              )).trim();
+            if (result.tel) {
+              for (var i = 0; i < result.tel.length; i++) {
+                contacts._pre[result.tel[i].value] = fullname;
+              }
             }
+          } catch (e) {
+            Tools.log('CONTACT NORMALIZATION ERROR:', e);
           }
-        } catch (e) {
-          Tools.log('CONTACT NORMALIZATION ERROR:', e);
+          this.continue();
+        } else if (cb){
+          Tools.log('CONTACT ACQUIRE ERROR');
+          MI.call('contacts_sync', [Object.keys(contacts._pre)]);
+          contacts._cb = cb;
         }
-        this.continue();
-      } else if (cb){
-        Tools.log('CONTACT ACQUIRE ERROR');
-        MI.call('contacts_sync', [Object.keys(contacts._pre)]);
-        contacts._cb = cb;
       }
-    }
-    allContacts.onerror = function (event) {
-      Tools.log('CONTACTS ERROR:', event);
-      Lungo.Notification.error(_('ContactsGetError'), _('ContactsGetErrorExp'), 'exclamation-sign', 5);
-      cb();
+      allContacts.onerror = function (event) {
+        Tools.log('CONTACTS ERROR:', event);
+        Lungo.Notification.error(_('ContactsGetError'), _('ContactsGetErrorExp'), 'exclamation-sign', 5);
+        cb();
+      }
+    } else {
+      Lungo.Notification.error(_('ContactsGetError'), _('NoWhenOffline'), 'exclamation-sign', 5);
     }
   }.bind(this);
   
@@ -607,6 +610,7 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
   }
   
   this.events.onContactsSync = function (id, positive, negative) {
+    this.account.core.roster = [];
     for (var i in positive) {
       var contact = positive[i];
       this.account.core.roster.push({
