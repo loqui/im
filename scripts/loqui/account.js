@@ -278,7 +278,7 @@ var Account = function (core) {
     if (account.supports('localContacts')) {
       header.append($('<button/>').addClass('sync').text(_('ContactsSync')).on('click', function (event) {
         delete account.core.roster;
-        account.connector.sync(function (rcb) {
+        account.connector.contacts.sync(function (rcb) {
           account.save();
           Lungo.Router.section('main');
         });

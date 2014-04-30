@@ -76,11 +76,14 @@ App.connectors['coseme'] = function (account) {
     }
   }.bind(this);
   
+  
   this.contacts.sync = function (cb) {
     Tools.log('SYNCING CONTACTS');
     Lungo.Notification.show('download', _('Synchronizing'), 10);
     var account = this.account;
     this.account.core.roster = [];
+    var contacts = this.contacts;
+    contacts._pre = [];
     var allContacts = navigator.mozContacts.getAll({sortBy: 'givenName', sortOrder: 'ascending'});
     allContacts.onsuccess = function (event) {
       if (this.result) {
@@ -99,36 +102,9 @@ App.connectors['coseme'] = function (account) {
               )
             )).trim();
           if (result.tel) {
-            var add = function (jid, name) {
-              var contact = {
-                jid: jid,
-                name: fullname,
-                presence: {
-                  show: 'na',
-                  status: null
-                }
-              }
-              account.core.roster.push(contact);
-            }
-            var update = function (jid, name) {
-              var ci = account.chatFind(jid);
-              if (ci >= 0) {
-                account.core.chats[ci].title = name;
-              }
-              var existing = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
-              if (existing) {
-                existing.name = name;
-              } else {
-                add(jid, name);
-              }
-            }
             for (var i = 0; i < result.tel.length; i++) {
-              var number = result.tel[i] ? Tools.numSanitize(account.core.cc, result.tel[i].value) : null;
-              if (number) {
-                var jid = number + '@' + CoSeMe.config.domain;
-                update(jid, fullname);
-              }
-            }   
+              contacts._pre[result.tel[i].value] = fullname;
+            }
           }
         } catch (e) {
           Tools.log('CONTACT NORMALIZATION ERROR:', e);
@@ -136,7 +112,8 @@ App.connectors['coseme'] = function (account) {
         this.continue();
       } else if (cb){
         Tools.log('CONTACT ACQUIRE ERROR');
-        cb();
+        MI.call('contacts_sync', [Object.keys(contacts._pre)]);
+        contacts._cb = cb;
       }
     }
     allContacts.onerror = function (event) {
@@ -348,6 +325,7 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
       contact_typing: this.events.onContactTyping,
       contact_paused: this.events.onContactPaused,
       contacts_gotStatus: this.events.onContactsGotStatus,
+      contacts_sync: this.events.onContactsSync,
       profile_setPictureSuccess: this.events.onProfileSetPictureSuccess,
       profile_setPictureError: this.events.onProfileSetPictureError,
       profile_setStatusSuccess: this.events.onMessageDelivered,
@@ -626,6 +604,22 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
     for (let [jid, status] in i) {
       this.events.onPresenceUpdated(jid, undefined, status);
     }
+  }
+  
+  this.events.onContactsSync = function (id, positive, negative) {
+    for (var i in positive) {
+      var contact = positive[i];
+      this.account.core.roster.push({
+        jid: contact.jid,
+        name: this.contacts._pre[contact.phone],
+        presence: {
+          show: 'na',
+          status: null
+        }
+      });
+    }
+    this.contacts.order(this.contacts._cb());
+    this.account.save();
   }
   
   this.events.onPresenceUpdated = function (jid, lastSeen, msg) {
