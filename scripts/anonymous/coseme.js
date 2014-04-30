@@ -6157,10 +6157,6 @@ CoSeMe.namespace('auth', (function() {
 
           // Retry with no challenge
           case 'one-shot-rejected':
-            connection.writer.write(getAuth());
-            return;
-          break;
-
           // Authentication failed
           case 'auth-failed':
           case 'expired':
