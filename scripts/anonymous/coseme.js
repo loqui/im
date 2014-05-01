@@ -6527,7 +6527,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
   var _requests = [];
 
   var _lastPongTime = 0;
-  var _pingInterval = 120;
+  var _pingInterval = 300;
 
   // _connection.socket should be a socket though
   var _connection = null;
@@ -7742,7 +7742,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
     sendClientConfig('android', 'en', 'US');
     sendGetServerProperties();
     sendGetGroups();
-    sendGetPrivacyList();
+    //sendGetPrivacyList();
   }
 
   function sendClientConfig(platform, language, country) {
