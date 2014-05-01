@@ -132,20 +132,16 @@ var Account = function (core) {
     meSection.find('#card .name').text(address == this.core.user ? '' : address);
     meSection.find('#card .user').text(this.core.user);
     meSection.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + this.core.provider + '.svg'));
-    if (meSection.find('#card .avatar img').attr('src') == 'null') {
-      Store.recover(App.avatars[account.core.fullJid], function (src) {
-        var show = function (a) {
-          a.url.then(function (val) {
-            $('section#me .avatar img').attr('src', val);
-          });
-        }
-        if (src) {
-          show(src);
-        } else {
-          account.connector.avatar(function (src) {
-            show(src);
-          });
-        }
+    var show = function (a) {
+      a.url.then(function (val) {
+        $('section#me .avatar img').attr('src', val);
+      });
+    }
+    if (account.core.fullJid in App.avatars) {
+      show(new Avatar(App.avatars[account.core.fullJid]));
+    } else {
+      account.connector.avatar(function (src) {
+        show(src);
       });
     }
     Accounts.unread(account.unread);
@@ -341,14 +337,16 @@ var Account = function (core) {
   this.presenceRender = function (jid) {
     if (this.connector.isConnected() && this.supports('presence')) {
       var contactPresenceRender = function (contact) {
-        /*var li = $('section#main article ul li[data-jid="'+contact.jid+'"]');
-        li.data('show', contact.presence.show || 'na');
-        li.find('.status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));*/
-        var section = $('section#chat');
-        if (section.data('jid') == contact.jid) {
-          section.data('show', contact.presence.show || 'na');
-          section.find('header .status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));
-        }      
+        if (this.supports('show')) {
+          var li = $('section#main article ul li[data-jid="'+contact.jid+'"]');
+          li.data('show', contact.presence.show || 'na');
+          li.find('.status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));
+          var section = $('section#chat');
+          if (section.data('jid') == contact.jid) {
+            section.data('show', contact.presence.show || 'na');
+            section.find('header .status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));
+          }
+        }
       }.bind(this);
       if (jid) {
         contactPresenceRender(Lungo.Core.findByProperty(this.core.roster, 'jid', jid));

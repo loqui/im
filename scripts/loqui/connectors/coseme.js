@@ -414,8 +414,9 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
       Tools.picThumb(blob, 96, 96, function (url) {
         $('section#main[data-jid="' + jid + '"] footer span.avatar img').attr('src', url);
         $('section#me .avatar img').attr('src', url);
-        Store.put('myAvatar', url, function () {
-          App.avatars[jid] = (new Avatar({id: picId, chunk: 'myAvatar'})).data;
+        Store.save(url, function (index) {
+          App.avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
+          App.smartupdate('avatars');
         });
       });
     } else {

@@ -46,7 +46,7 @@ var Providers = {
         timeout: 300
       },
       autodomain: 'gmail.com',
-      features: ['multi', 'presence', 'vcard', 'easyAvatars', 'avatarChange', 'rosterMgmt', 'csn', 'delay', 'statusChange', 'attention'],
+      features: ['multi', 'presence', 'vcard', 'easyAvatars', 'avatarChange', 'rosterMgmt', 'csn', 'delay', 'statusChange', 'attention', 'show'],
       color: '#4EA43B',
       terms: {
         user: 'ProviderAddress',
@@ -120,7 +120,7 @@ var Providers = {
         timeout: 300
       },
       autodomain: false,
-      features: ['multi', 'vcard', 'presence', 'easyAvatars', 'rosterMgmt', 'avatarChange', 'attention', 'csn', 'delay', 'time', 'statusChange'],
+      features: ['multi', 'vcard', 'presence', 'easyAvatars', 'rosterMgmt', 'avatarChange', 'attention', 'csn', 'delay', 'time', 'statusChange', 'show'],
       color: '#149ED2',
       terms: {
         user: 'FullJID',
