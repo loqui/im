@@ -78,9 +78,9 @@ App.connectors['coseme'] = function (account) {
   
   
   this.contacts.sync = function (cb) {
-    if (App.online && Messenger.account().connector.isConnected()) {
+    if (App.online) {
       Tools.log('SYNCING CONTACTS');
-      Lungo.Notification.show('download', _('Synchronizing'), 10);
+      Lungo.Notification.show('download', _('Synchronizing'), 5);
       var account = this.account;
       var contacts = this.contacts;
       contacts._pre = [];
@@ -132,7 +132,9 @@ App.connectors['coseme'] = function (account) {
       var bname = b.name ? b.name : b.jid;
       return aname > bname;
     });
-    cb();
+    if (cb) {
+      cb();
+    }
   }.bind(this);
   
   this.contacts.remove = function () {
@@ -622,7 +624,7 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
         }
       });
     }
-    this.contacts.order(this.contacts._cb());
+    this.contacts.order(this.contacts._cb);
     this.account.save();
   }
   

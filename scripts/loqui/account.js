@@ -48,7 +48,9 @@ var Account = function (core) {
           } else {
             //Lungo.Notification.error(_('DupliAccount'), _('DupliAccountNotice'), 'warning-sign', 5);
           }
+          this.save();
         }.bind(this);
+        this.connector.start();
         this.sync(cb);
       }.bind(this),
       authfail: function () {

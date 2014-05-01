@@ -6527,7 +6527,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
   var _requests = [];
 
   var _lastPongTime = 0;
-  var _pingInterval = 300;
+  var _pingInterval = 120;
 
   // _connection.socket should be a socket though
   var _connection = null;
@@ -6553,7 +6553,6 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
 
     get: function(iqType, idx, node) {
       var childNode = node.getChild(0);
-console.log(node);
       if (childNode && childNode.getAttributeValue('xmlns') === 'urn:xmpp:ping') {
         if (_autoPong) {
           _onPing(idx);
@@ -7809,7 +7808,8 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
   var methodList = {
 
     is_online: function () {
-      return self.socket && self.socket.socket.readyState === 'open';
+      return self.socket && self.socket.socket &&
+             self.socket.socket.readyState === 'open';
     },
 
     /*
