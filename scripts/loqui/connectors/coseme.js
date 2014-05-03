@@ -452,9 +452,7 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
 
   this.events.onMessageDelivered = function (from, msgId) {
     var account = this.account;
-    var chat = account.chats.find(function (e, i, a) {
-      return e.core.jid == from;
-    });
+    var chat = Lungo.Core.findByProperty(this.account.core.chats, 'jid', from);
     chat.core.lastAck = Tools.localize(Tools.stamp());
     chat.save();
     var section = $('section#chat');
@@ -631,9 +629,7 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
   
   this.events.onPresenceUpdated = function (jid, lastSeen, msg) {
     var account = this.account;
-    var contact = account.core.roster.find(function (e, i, a) {
-      return e.jid == jid;
-    });
+    var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', chatJid);
     if (contact) {
       var time = Tools.convenientDate(Tools.localize(Tools.stamp( Math.floor((new Date).valueOf()/1000) - parseInt(lastSeen) )));
       if (!('presence' in contact)) {

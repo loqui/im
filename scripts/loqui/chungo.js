@@ -90,10 +90,16 @@ var Chungo = {
     
     findByProperty: function (list, key, value) {
       var ret = null;
-      for (var i in list) {
-        if (list[i] instanceof Object && list[i][key] && list[i][key] == value) {
-          ret = list[i];
-          break;
+      if ('find' in Array.prototype) {
+        ret = list.find(function (e, i, a) {
+          return e[key] == value;
+        });
+      } else {
+        for (var i in list) {
+          if (list[i] instanceof Object && list[i][key] && list[i][key] == value) {
+            ret = list[i];
+            break;
+          }
         }
       }
       return ret;
