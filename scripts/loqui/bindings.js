@@ -168,4 +168,14 @@ var bindings = function () {
   $('#debugConsole #consoleClear').on('click', function() {
     Plus.clearConsole();
   });
+  $('select').on('change', function () {
+    var select = $(this);
+    var option = select.find('option[value="' + select.val() + '"]');
+    if (option.data('reveal')) {
+      select.siblings('[name="' + option.data('reveal') + '"]').removeClass('hidden');
+    } else {
+      option = select.find('[data-reveal]')
+      select.siblings('[name="' + option.data('reveal') + '"]').addClass('hidden').val('');
+    }
+  });
 }

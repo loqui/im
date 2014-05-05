@@ -314,6 +314,44 @@
       </p>-->
     </article>
   </section>
+  <section id='mucCreate' data-transition='vertical'>
+    <header data-title='New Group' data-l10n-title='mucCreate'>
+      <nav class='on-left'>
+        <button data-view-section='back' data-icon='angle-up' class='up'></button>
+      </nav>
+    </header>
+    <article id='main' class='simple form scroll'>
+      <label for='name' data-l10n-id='Nickname'>Nickname</label>
+      <input type='text' name='name' data-l10n-placeholder='mucNamePH' placeholder='Old friends'/>
+      <div class='buttongroup'>
+        <button class='add' data-l10n-id='Add'>Create</button>
+      </div>
+    </article>
+  </section>
+  <section id='mucJoin' data-transition='vertical'>
+    <header data-title='Join Group' data-l10n-title='mucJoin'>
+      <nav class='on-left'>
+        <button data-view-section='back' data-icon='angle-up' class='up'></button>
+      </nav>
+    </header>
+    <article id='main' class='simple form scroll'>
+      <label for='server' data-l10n-id='Server'>Server</label>
+      <select name='server'>
+        <option value='groups.loqui.im' selected='selected'>loqui.im</option>
+        <option value='conference.dukgo.com'>dukgo.com</option>
+        <option value='rooms.blah.im'>blah.im</option>
+        <option value='conf.jabberes.org'>jabberes.org</option>
+        <option value='conference.jabber.ccc.de'>jabber.ccc.de</option>
+        <option value='muc.jappix.com'>jappix.com</option>
+        <option value='custom' data-l10n-id='Custom' data-reveal='custom'>Custom</option>
+      </select>
+      <input class='hidden' type='text' name='custom' />        
+      <div class='buttongroup'>
+        <button class='explore' data-l10n-id='mucExplore' data-menu-onclick='mucExplore'>Explore groups</button>
+      </div>
+      <output name='rooms'><ul></ul></output>
+    </article>
+  </section>
   <aside id='accounts'>
     <header data-l10n-id='Accounts'>
       <nav class="on-right">

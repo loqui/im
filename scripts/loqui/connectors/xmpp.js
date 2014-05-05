@@ -11,6 +11,7 @@ App.connectors['XMPP'] = function (account) {
   this.handlers = {};
   this.events = {}
   this.chat = {};
+  this.muc = {};
   this.contacts = {};
   this.connected = false;
   
@@ -236,6 +237,36 @@ App.connectors['XMPP'] = function (account) {
     this.connection.roster.remove(jid);
     this.connection.roster.get(function(){});
   }
+  
+  this.muc.explore = function (server, resolve, reject) {
+    var disco = this.connection.disco;
+    var process = function (s) {
+      if (typeof s == 'string') {
+        disco.items(s, null, process, reject);
+      } else {
+        s = $(s);
+        var identities = s.find('identity');
+        var items = s.find('item');
+        if (identities.length) {
+          var identity = identities.first();
+          process(s.attr('from'));
+        } else if (items.length) {
+          items.each(function () {
+            var item = $(this);
+            var jid = item.attr('jid');
+            if (jid.indexOf('@') > -1) {
+              resolve(jid, item.attr('name'));
+            } else {
+              disco.info(jid, null, process, reject);
+            }
+          });
+        } else {
+          reject(s);
+        }
+      }
+    }
+    process(server);    
+  }.bind(this)
   
   this.handlers.init = function () {
     this.handlers.onMessage = this.handlers.onMessage || this.connection.addHandler(this.events.onMessage, null, 'message', 'chat', null, null);

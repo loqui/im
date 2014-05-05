@@ -38,6 +38,28 @@ var Menu = {
       var gid = $(obj).closest('section').data('jid');
       Messenger.mucExit(gid);
     },
+    mucJoin: function (obj) {
+      Lungo.Router.section('mucJoin');
+    },
+    mucCreate: function (obj) {
+      Lungo.Router.section('mucCreate');
+    },
+    mucExplore: function (obj) {
+      var form = $('section#mucJoin article.form');
+      var server = form.find('[name=custom]').val() || form.find('[name=server]').val();
+      var ul = form.find('output').children('ul').first().empty();
+      Messenger.account().connector.muc.explore(server,
+        function (jid, name) {
+          console.log('GOT', jid, name);
+          ul.append($('<li/>').text(name));
+          Lungo.Notification.hide();
+        },
+        function (error) {
+          console.log('REJECTED', error);
+        }
+      );
+      Lungo.Notification.show('search', _('mucSearching', {server: server}), 30);
+    },
     contactAdd: function (obj) {
       var account = Messenger.account();
       if (account.supports('rosterMgmt')) {

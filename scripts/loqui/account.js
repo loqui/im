@@ -307,13 +307,15 @@ var Account = function (core) {
     var article = $('<article/>').attr('id', 'groups');
     var header = $('<header/>').addClass('beige');
     if (account.supports('mucCreate')) {
-      header.append($('<button/>').addClass('new').text(_('GroupNew')).on('click', function (event) {
-        Menu.show('newGroup', account);
+      header.append($('<button/>').addClass('new').text(_('GroupNew'))
+      .on('click', function (event) {
+        Menu.show('mucCreate', account);
       }))
     }
     if (account.supports('mucJoin')) {
-      header.append($('<button/>').addClass('join').text(_('GroupJoin')).on('click', function (event) {
-        Menu.show('joinGroup', account);
+      header.append($('<button/>').addClass('join').text(_('GroupJoin'))
+      .on('click', function (event) {
+        Menu.show('mucJoin', account);
       }));
     }
     var ul = $('<ul/>').addClass('list').addClass('scroll');
@@ -325,8 +327,14 @@ var Account = function (core) {
         var li = document.createElement('li');
         li.dataset.jid = chat.jid;
         li.innerHTML = 
-            '<span class=\'name\'>' + App.emoji[Providers.data[account.core.provider].emoji].fy(title) + '</span>'
-          + '<span class=\'status\'>' + (chat.participants ? _('NumParticipants', {number: chat.participants.length}) : ' ') + '</span>';
+            '<span class=\'name\'>'
+          +  App.emoji[Providers.data[account.core.provider].emoji].fy(title)
+          + '</span>'
+          + '<span class=\'status\'>'
+          + (chat.participants
+             ? _('NumParticipants', {number: chat.participants.length})
+             : ' ')
+          + '</span>';
         li.addEventListener('click', function (e) {
           click(this);
         });
