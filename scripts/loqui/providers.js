@@ -9,7 +9,9 @@ var Providers = {
       connector: {
         type: 'coseme'
       },
-      features: ['localContacts', 'receipts', 'imageSend', 'videoSend', 'audioSend', 'locationSend', 'pay', 'muc', 'csn', 'avatarChange', 'statusChange', 'presence'],
+      features: ['localContacts', 'receipts', 'imageSend', 'videoSend', 
+        'audioSend', 'locationSend', 'pay', 'muc', 'csn', 'avatarChange', 
+        'statusChange', 'presence'],
       color: '#254242',
       terms: {
         user: 'YourNumber',
@@ -46,7 +48,8 @@ var Providers = {
         timeout: 300
       },
       autodomain: 'gmail.com',
-      features: ['multi', 'presence', 'vcard', 'easyAvatars', 'avatarChange', 'rosterMgmt', 'csn', 'delay', 'statusChange', 'attention', 'show'],
+      features: ['multi', 'presence', 'vcard', 'easyAvatars', 'avatarChange', 
+        'rosterMgmt', 'csn', 'delay', 'statusChange', 'attention', 'show'],
       color: '#4EA43B',
       terms: {
         user: 'ProviderAddress',
@@ -120,7 +123,9 @@ var Providers = {
         timeout: 300
       },
       autodomain: false,
-      features: ['multi', 'vcard', 'presence', 'easyAvatars', 'rosterMgmt', 'avatarChange', 'attention', 'csn', 'delay', 'time', 'statusChange', 'show', 'muc'],
+      features: ['multi', 'vcard', 'presence', 'easyAvatars', 'rosterMgmt', 
+        'avatarChange', 'attention', 'csn', 'delay', 'time', 'statusChange', 
+        'show', 'muc', 'mucCreate', 'mucJoin'],
       color: '#149ED2',
       terms: {
         user: 'FullJID',
@@ -147,7 +152,8 @@ var Providers = {
         Lungo.Router.section(e.target.dataset.viewSection);      
       });
       ul.append(li);
-      var section = $('<section/>').attr('id', provider).addClass('setup').data('transition', 'horizontal');
+      var section = $('<section/>').attr('id', provider).addClass('setup')
+        .data('transition', 'horizontal');
       var article = $('<article/>').addClass('headless simple form show');
       App.logForms[data.connector.type](article, provider, data);
       section.append(article);
@@ -171,7 +177,9 @@ var Providers = {
     var bits = user.split('@');
     var autodomain = Providers.data[provider].autodomain;
     if (autodomain) {
-      user = bits.length > 1 ? (bits[0] + '@' + autodomain) : (user + '@' + autodomain);
+      user = bits.length > 1 ? 
+        (bits[0] + '@' + autodomain) : 
+        (user + '@' + autodomain);
     }
     return user;
   }

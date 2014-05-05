@@ -306,12 +306,16 @@ var Account = function (core) {
     var account = this;
     var article = $('<article/>').attr('id', 'groups');
     var header = $('<header/>').addClass('beige');
-      /*.append($('<button/>').addClass('new').text(_('GroupNew')).on('click', function (event) {
+    if (account.supports('mucCreate')) {
+      header.append($('<button/>').addClass('new').text(_('GroupNew')).on('click', function (event) {
         Menu.show('newGroup', account);
       }))
-      .append($('<button/>').addClass('join').text(_('GroupJoin')).on('click', function (event) {
+    }
+    if (account.supports('mucJoin')) {
+      header.append($('<button/>').addClass('join').text(_('GroupJoin')).on('click', function (event) {
         Menu.show('joinGroup', account);
-      }));*/
+      }));
+    }
     var ul = $('<ul/>').addClass('list').addClass('scroll');
     var frag = f;
     var account = this;
