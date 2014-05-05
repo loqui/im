@@ -44,14 +44,20 @@ var Menu = {
     mucCreate: function (obj) {
       Lungo.Router.section('mucCreate');
     },
-    mucExplore: function (obj) {
+    mucSearch: function (obj) {
+      var account = Messenger.account();
       var form = $('section#mucJoin article.form');
       var server = form.find('[name=custom]').val() || form.find('[name=server]').val();
       var ul = form.find('output').children('ul').first().empty();
-      Messenger.account().connector.muc.explore(server,
+      var mucJoin = function (e) {
+        var jid = $(this).parent().data('jid');
+        account.connector.muc.join(jid);
+      }
+      account.connector.muc.explore(server,
         function (jid, name) {
           console.log('GOT', jid, name);
-          ul.append($('<li/>').text(name));
+          var html = $('<li/>').data('jid', jid).append($('<span/>').text(name)).append($('<a/>').text(_('Join')).on('click', mucJoin));
+          ul.append(html);
           Lungo.Notification.hide();
         },
         function (error) {

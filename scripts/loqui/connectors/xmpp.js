@@ -268,6 +268,10 @@ App.connectors['XMPP'] = function (account) {
     process(server);    
   }.bind(this)
   
+  this.muc.join = function (jid) {
+    this.connection.muc.join(jid, Strophe.getNodeFromJid(this.account.core.fullJid), function(e){console.log('msg',e)}, function(e){console.log('pres',e)}, function(e){console.log('roster',e)});
+  }.bind(this)
+  
   this.handlers.init = function () {
     this.handlers.onMessage = this.handlers.onMessage || this.connection.addHandler(this.events.onMessage, null, 'message', 'chat', null, null);
     this.handlers.onSubRequest = this.handlers.onSubRequest || this.connection.addHandler(this.events.onSubRequest, null, 'presence', 'subscribe', null, null);
