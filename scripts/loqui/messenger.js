@@ -9,14 +9,19 @@ var Messenger = {
 
   say: function (text) {
     var to = $('section#chat').data('jid');
+    var muc = $('section#chat').data('muc') == "true";
     var account = this.account();
     var text = text || $('section#chat div#text').text();
     if (text.length) {
-      var msg = new Message(account, {
+      var msg = new Message(account, 
+      {
         from: account.core.user,
         to: to,
         text: text,
         stamp: Tools.localize(Tools.stamp())
+      },
+      {
+        muc: muc
       });
       msg.send();
       $('section#chat div#text').empty();
@@ -32,7 +37,8 @@ var Messenger = {
   csn: function (state) {
     var to = $('section#chat').data('jid');
     var account = this.account();
-    if (account.connector.isConnected() && account.supports('csn') && App.settings.csn) {
+    var muc = account.chatGet(to).core.muc;
+    if (account.connector.isConnected() && account.supports('csn') && App.settings.csn && !muc) {
       account.connector.csnSend(to, state);
     }
   },

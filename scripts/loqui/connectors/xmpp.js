@@ -86,6 +86,7 @@ App.connectors['XMPP'] = function (account) {
     this.handlers.init();
     this.capabilize();
     this.presence.set();
+    this.muc.init();
   }
   
   this.sync = function (callback) {
@@ -171,8 +172,12 @@ App.connectors['XMPP'] = function (account) {
     $('section#main').attr('data-show', show);
   }.bind(this);
   
-  this.send = function (to, text, delay) {
-    this.connection.Messaging.send(to, text, delay);
+  this.send = function (to, text, options) {
+    if (options.muc) {
+      this.connection.muc.message(to, Strophe.getNodeFromJid(this.account.core.fullJid), text, null, 'groupchat');
+    } else {
+      this.connection.Messaging.send(to, text, options.delay);
+    }
   }.bind(this);
   
   this.attentionSend = function (to) {
@@ -226,7 +231,7 @@ App.connectors['XMPP'] = function (account) {
   }
   
   this.csnSend = function (to, state) {
-      this.connection.Messaging.csnSend(to, state);
+    this.connection.Messaging.csnSend(to, state);
   }
   
   this.emojiRender = function (img, emoji) {
@@ -237,6 +242,14 @@ App.connectors['XMPP'] = function (account) {
     this.connection.roster.remove(jid);
     this.connection.roster.get(function(){});
   }
+  
+  this.muc.init = function () {
+    for (let [i, chat] in Iterator(this.account.core.chats)) {
+      if (chat.muc) {
+        this.muc._join(chat.jid);
+      }
+    }
+  }.bind(this)
   
   this.muc.explore = function (server, resolve, reject) {
     var disco = this.connection.disco;
@@ -268,9 +281,43 @@ App.connectors['XMPP'] = function (account) {
     process(server);    
   }.bind(this)
   
-  this.muc.join = function (jid) {
-    this.connection.muc.join(jid, Strophe.getNodeFromJid(this.account.core.fullJid), function(e){console.log('msg',e);return true;}, function(e){console.log('pres',e);return true;}, function(e){console.log('roster',e);return true;});
+  this.muc.join = function (jid, title) {
+    var account = this.account;
+    this.muc._join(jid);
+    var chat = new Chat({
+      jid: jid,
+      title: title,
+      muc: true,
+      chunks: []
+    }, account);
+    Lungo.Router.section('back');
+    Lungo.Router.section('back');
+    chat.show();
+    account.chats.push(chat);
+    account.core.chats.push(chat.core);
+    chat.save(true);
   }.bind(this)
+  
+  this.muc._join = function (jid) {
+    var account = this.account;
+    var chat = account.chatGet(jid);
+    this.connection.muc.join(jid, Strophe.getNodeFromJid(this.account.core.fullJid), 
+      function (e) {console.log('msg',e);return true;}, 
+      function (e) {console.log('pres',e);return true;}, 
+      function (e) {
+        chat.core.participants = Object.keys(e);
+        return true;
+      }
+    );
+  }.bind(this)
+  
+  this.muc.avatar = function (callback, id) {
+    callback(new Avatar({url: 'img/goovatar.png'}));
+  }
+  
+  this.muc.participantsGet = function (jid) {
+    // Not necessary
+  }
   
   this.handlers.init = function () {
     this.handlers.onMessage = this.handlers.onMessage || this.connection.addHandler(this.events.onMessage, null, 'message', 'chat', null, null);

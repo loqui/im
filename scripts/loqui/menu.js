@@ -51,7 +51,8 @@ var Menu = {
       var ul = form.find('output').children('ul').first().empty();
       var mucJoin = function (e) {
         var jid = $(this).parent().data('jid');
-        account.connector.muc.join(jid);
+        var title = $(this).siblings('span').text();
+        account.connector.muc.join(jid, title);
       }
       account.connector.muc.explore(server,
         function (jid, name) {

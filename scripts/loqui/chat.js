@@ -212,7 +212,7 @@ var Chat = function (core, account) {
       }
     } else {
       header.children('.avatar').children('img').attr('src', 'img/foovatar.png');
-      var method = this.core.muc ? this.account.connector.groupAvatar : this.account.connector.avatar;
+      var method = this.core.muc ? this.account.connector.muc.avatar : this.account.connector.avatar;
       method(function (a) {
         a.url.then(function (val) {
           avatarize(val);
@@ -224,7 +224,7 @@ var Chat = function (core, account) {
         if (this.core.participants) {
           header.children('.status').text(_('NumParticipants', {number: this.core.participants.length}));
         } else {
-          this.account.connector.groupParticipantsGet(this.core.jid);
+          this.account.connector.muc.participantsGet(this.core.jid);
           header.children('.status').text(' ');
         }
       } else {

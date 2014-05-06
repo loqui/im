@@ -179,7 +179,7 @@ App.connectors['coseme'] = function (account) {
     }
   }.bind(this);
   
-  this.send = function (to, text, delay) {
+  this.send = function (to, text, options) {
     var method = 'message_send';
     var params = [to, text];
     return MI.call(method, params);
@@ -198,11 +198,11 @@ App.connectors['coseme'] = function (account) {
     }
   }.bind(this);
   
-  this.groupAvatar = function (callback, id) {
+  this.muc.avatar = function (callback, id) {
     var method = 'group_getPicture';
     MI.call(method, [id]);
     if (callback) {
-      callback(new Avatar({url: 'img/foovatar.png'}));
+      callback(new Avatar({url: 'img/goovatar.png'}));
     }
   }
   
@@ -220,7 +220,7 @@ App.connectors['coseme'] = function (account) {
     MI.call(method, [type]);
   }
   
-  this.groupParticipantsGet = function (jid) {
+  this.muc.participantsGet = function (jid) {
     var method = 'group_getParticipants';
     MI.call(method, [jid]);
   }

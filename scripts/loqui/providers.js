@@ -119,7 +119,7 @@ var Providers = {
       longName: 'XMPP/Jabber',
       connector: {
         type: 'XMPP',
-        host: 'wss://websockets.loqui.im/',
+        host: 'https://bosh.loqui.im/',
         timeout: 300
       },
       autodomain: false,

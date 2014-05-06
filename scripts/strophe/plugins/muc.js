@@ -175,14 +175,14 @@
       type = type || (nick != null ? "chat" : "groupchat");
       msgid = this._connection.getUniqueId();
       msg = $msg({
-        to: room_nick,
+        to: room,
         from: this._connection.jid,
         type: type,
         id: msgid
       }).c("body", {
-        xmlns: Strophe.NS.CLIENT
+        /*xmlns: Strophe.NS.CLIENT*/
       }).t(message);
-      msg.up();
+      /*msg.up();
       if (html_message != null) {
         msg.c("html", {
           xmlns: Strophe.NS.XHTML_IM
@@ -196,10 +196,10 @@
         } else {
           msg.up().up();
         }
-      }
-      msg.c("x", {
+      }*/
+      /*msg.c("x", {
         xmlns: "jabber:x:event"
-      }).c("composing");
+      }).c("composing");*/
       this._connection.send(msg);
       return msgid;
     },

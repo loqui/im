@@ -21,6 +21,7 @@ var Message = function (account, core, options) {
         jid: chatJid, 
         title: contact ? contact.name || chatJid : chatJid,
         chunks: [],
+        muc: this.options.muc
       }, this.account);
       this.account.chats.push(chat);
       this.account.core.chats.push(chat.core);
@@ -49,7 +50,7 @@ var Message = function (account, core, options) {
   this.postSend = function () {
     console.log('SEND', this.core.text, this.options);
     if (this.account.connector.isConnected() && this.options.send) {
-      this.core.id = account.connector.send(this.core.to, this.core.text, (this.options && 'delay' in this.options) ? this.core.stamp : this.options.delay);
+      this.core.id = account.connector.send(this.core.to, this.core.text, {delay: (this.options && 'delay' in this.options) ? this.core.stamp : this.options.delay, muc: this.options.muc});
     }
     if (this.options.render) {
       this.addToChat();
