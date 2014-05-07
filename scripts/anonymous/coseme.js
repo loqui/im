@@ -6914,10 +6914,8 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
                                  author]);
         }
         else if (type === 'status') {
-          var notification = 'notification_status';
-console.log('R', from, msgId);
-
-          _signalInterface.send(notification, [from, msgId]);
+          
+          _signalInterface.send('notification_status', [from, msgId]);
           
         }
 

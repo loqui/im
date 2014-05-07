@@ -319,13 +319,13 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
       group_gotPicture: this.events.onGroupGotPicture,
       group_gotGroups: null,
       group_gotParticipating: this.events.onGroupGotParticipating,
-      notification_contactProfilePictureUpdated: this.events.notificationACK,
-      notification_contactProfilePictureRemoved: this.events.notificationACK,
-      notification_groupPictureUpdated: this.events.notificationACK,
-      notification_groupPictureRemoved: this.events.notificationACK,
-      notification_groupParticipantAdded: this.events.notificationACK,
-      notification_groupParticipantRemoved: this.events.notificationACK,
-      notification_status: this.events.notificationACK,
+      notification_contactProfilePictureUpdated: this.events.onNotification,
+      notification_contactProfilePictureRemoved: this.events.onNotification,
+      notification_groupPictureUpdated: this.events.onNotification,
+      notification_groupPictureRemoved: this.events.onNotification,
+      notification_groupParticipantAdded: this.events.onNotification,
+      notification_groupParticipantRemoved: this.events.onNotification,
+      notification_status: this.events.onNotification,
       contact_gotProfilePictureId: null,
       contact_gotProfilePicture: this.events.onAvatar,
       contact_typing: this.events.onContactTyping,
@@ -361,10 +361,9 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
     MI.call(method, [categories]);
   }
   
-  this.events.notificationACK = function (jid, mid) {
-console.log('A', jid, mid);
+  this.events.onNotification = function (jid, msgId) {
     var method = 'notification_ack';
-    MI.call(method, [jid, mid]);
+    MI.call(method, [jid, msgId]);
   }
   
   this.events.onMessage = function (id, from, body, stamp, e, nick, g) {
@@ -459,7 +458,7 @@ console.log('A', jid, mid);
 
   this.events.onMessageDelivered = function (from, msgId) {
     var account = this.account;
-    var chat = Lungo.Core.findByProperty(this.account.core.chats, 'jid', from);
+    var chat = account.chatGet(from);
     chat.core.lastAck = Tools.localize(Tools.stamp());
     chat.save();
     var section = $('section#chat');
