@@ -458,7 +458,7 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
 
   this.events.onMessageDelivered = function (from, msgId) {
     var account = this.account;
-    var chat = Lungo.Core.findByProperty(this.account.core.chats, 'jid', from);
+    var chat = account.chatGet(from);
     chat.core.lastAck = Tools.localize(Tools.stamp());
     chat.save();
     var section = $('section#chat');
