@@ -13,7 +13,7 @@ var Message = function (account, core, options) {
   };
   
   this.__defineGetter__('chat', function () {
-    var chatJid = this.options.muc ? this.core.to : (this.core.from == (account.core.user || account.core.fullJid) ? this.core.to : this.core.from);
+    var chatJid = Strophe.getBareJidFromJid(this.options.muc ? this.core.to : (this.core.from == (account.core.user || account.core.fullJid) ? this.core.to : this.core.from));
     var ci = this.account.chatFind(chatJid);
     if (ci < 0) {
       var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', chatJid);

@@ -299,10 +299,14 @@ App.connectors['XMPP'] = function (account) {
   }.bind(this)
   
   this.muc._join = function (jid) {
-    var account = this.account;
+    var connector = this;
+    var account = connector.account;
     var chat = account.chatGet(jid);
     this.connection.muc.join(jid, Strophe.getNodeFromJid(this.account.core.fullJid), 
-      function (e) {console.log('msg',e);return true;}, 
+      function (e) {
+        connector.events.onMessage(e);
+        return true;
+      }, 
       function (e) {console.log('pres',e);return true;}, 
       function (e) {
         chat.core.participants = Object.keys(e);
@@ -333,12 +337,13 @@ App.connectors['XMPP'] = function (account) {
   this.events.onMessage = function (stanza) {
     var account = this.account;
     var tree = $(stanza);
-    var from = Strophe.getBareJidFromJid(tree.attr('from'));
-    var to = Strophe.getBareJidFromJid(tree.attr('to'));
-    var body = tree.children("body").length ? tree.children("body").text() : null;
-    var composing = tree.children("composing").length;
-    var paused = tree.children("paused").length || tree.children("active").length;
-    if (body) {
+    var muc = tree.attr('type') == 'groupchat';
+    var from = tree.attr('from');
+    var to = muc ? Strophe.getBareJidFromJid(tree.attr('from')) : Strophe.getBareJidFromJid(tree.attr('to'));
+    var body = tree.children('body').length ? tree.children('body').text() : null;
+    var composing = tree.children('composing').length;
+    var paused = tree.children('paused').length || tree.children('active').length;
+    if (body && !(muc && from == to + '/' + Strophe.getNodeFromJid(account.core.fullJid))) {
       var date = new Date();
       var stamp = tree.children('delay').length
         ? Tools.localize(tree.children('delay').attr('stamp'))
@@ -348,7 +353,12 @@ App.connectors['XMPP'] = function (account) {
         to: to,
         text: body,
         stamp: stamp
+      }, {
+        muc: muc
       });
+      /*if (muc) {
+        msg.core.pushName = Strophe.getNodeFromJid(from);
+      }*/
       msg.receive();
     }
     if (account.supports('csn') && App.settings.csn) {

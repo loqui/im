@@ -2980,6 +2980,167 @@ code.google.com/p/crypto-js/wiki/License
     */
    C.HmacSHA1_IP = Hasher._createHmacHelper(SHA1_IP);
  }());
+/*
+ * Derived from
+CryptoJS v3.1.2
+code.google.com/p/crypto-js
+(c) 2009-2013 by Jeff Mott. All rights reserved.
+code.google.com/p/crypto-js/wiki/License
+*/
+(function (Math) {
+    // Shortcuts
+    var C = CryptoJS;
+    var C_lib = C.lib;
+    var WordArray = C_lib.WordArray;
+    var Hasher = C_lib.Hasher;
+    var C_algo = C.algo;
+
+    // Initialization and round constants tables
+    var H = [];
+    var K = [];
+
+    // Compute constants
+    (function () {
+        function isPrime(n) {
+            var sqrtN = Math.sqrt(n);
+            for (var factor = 2; factor <= sqrtN; factor++) {
+                if (!(n % factor)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        function getFractionalBits(n) {
+            return ((n - (n | 0)) * 0x100000000) | 0;
+        }
+
+        var n = 2;
+        var nPrime = 0;
+        while (nPrime < 64) {
+            if (isPrime(n)) {
+                if (nPrime < 8) {
+                    H[nPrime] = getFractionalBits(Math.pow(n, 1 / 2));
+                }
+                K[nPrime] = getFractionalBits(Math.pow(n, 1 / 3));
+
+                nPrime++;
+            }
+
+            n++;
+        }
+    }());
+
+    // Reusable object
+    var W = [];
+
+    /**
+     * SHA-256 hash algorithm.
+     */
+    var SHA256_IP = C_algo.SHA256_IP = C_algo.SHA1_IP.extend({
+
+        _doReset: function () {
+            this._hash = new WordArray.init(H.slice(0));
+        },
+
+        _doProcessBlock: function (M, offset) {
+            // Shortcut
+            var H = this._hash.words;
+
+            // Working variables
+            var a = H[0];
+            var b = H[1];
+            var c = H[2];
+            var d = H[3];
+            var e = H[4];
+            var f = H[5];
+            var g = H[6];
+            var h = H[7];
+
+            // Computation
+            for (var i = 0; i < 64; i++) {
+                if (i < 16) {
+                    W[i] = M[offset + i] | 0;
+                } else {
+                    var gamma0x = W[i - 15];
+                    var gamma0  = ((gamma0x << 25) | (gamma0x >>> 7))  ^
+                                  ((gamma0x << 14) | (gamma0x >>> 18)) ^
+                                   (gamma0x >>> 3);
+
+                    var gamma1x = W[i - 2];
+                    var gamma1  = ((gamma1x << 15) | (gamma1x >>> 17)) ^
+                                  ((gamma1x << 13) | (gamma1x >>> 19)) ^
+                                   (gamma1x >>> 10);
+
+                    W[i] = gamma0 + W[i - 7] + gamma1 + W[i - 16];
+                }
+
+                var ch  = (e & f) ^ (~e & g);
+                var maj = (a & b) ^ (a & c) ^ (b & c);
+
+                var sigma0 = ((a << 30) | (a >>> 2)) ^ ((a << 19) | (a >>> 13)) ^ ((a << 10) | (a >>> 22));
+                var sigma1 = ((e << 26) | (e >>> 6)) ^ ((e << 21) | (e >>> 11)) ^ ((e << 7)  | (e >>> 25));
+
+                var t1 = h + sigma1 + ch + K[i] + W[i];
+                var t2 = sigma0 + maj;
+
+                h = g;
+                g = f;
+                f = e;
+                e = (d + t1) | 0;
+                d = c;
+                c = b;
+                b = a;
+                a = (t1 + t2) | 0;
+            }
+
+            // Intermediate hash value
+            H[0] = (H[0] + a) | 0;
+            H[1] = (H[1] + b) | 0;
+            H[2] = (H[2] + c) | 0;
+            H[3] = (H[3] + d) | 0;
+            H[4] = (H[4] + e) | 0;
+            H[5] = (H[5] + f) | 0;
+            H[6] = (H[6] + g) | 0;
+            H[7] = (H[7] + h) | 0;
+        }
+
+
+    });
+
+    /**
+     * Shortcut function to the hasher's object interface.
+     *
+     * @param {WordArray|string} message The message to hash.
+     *
+     * @return {WordArray} The hash.
+     *
+     * @static
+     *
+     * @example
+     *
+     *     var hash = CryptoJS.SHA256('message');
+     *     var hash = CryptoJS.SHA256(wordArray);
+     */
+    C.SHA256_IP = Hasher._createHelper(SHA256_IP);
+
+    /**
+     * Shortcut function to the HMAC's object interface.
+     *
+     * @param {WordArray|string} message The message to hash.
+     * @param {WordArray|string} key The secret key.
+     *
+     * @return {WordArray} The HMAC.
+     *
+     * @static
+     *
+     * @example
+     *
+     *     var hmac = CryptoJS.HmacSHA256(message, key);
+     */
+    C.HmacSHA256_IP = Hasher._createHmacHelper(SHA256_IP);
+}(Math));
 
 (function(global) {
   'use strict';
@@ -5755,7 +5916,8 @@ CoSeMe.namespace('media', (function() {
     xhr.send();
   }
 
-  function upload(toJID, blob, uploadUrl, successCb, errorCb, progressCb) {
+  function upload(toJID, blob, uploadUrl,
+                  successCb, errorCb, progressCb, sizeToHash) {
     var TCPSocket = navigator.mozTCPSocket;
     if (!TCPSocket) {
       if (errorCb) {
@@ -5819,7 +5981,11 @@ CoSeMe.namespace('media', (function() {
 
       var reader = new FileReader();
       reader.addEventListener('loadend', function() {
-        var md5 = CoSeMe.crypto.MD5_IP(reader.result);
+        var buffer = reader.result;
+        sizeToHash = typeof sizeToHash === 'undefined' ?
+                     buffer.byteLength :
+                     Math.min(sizeToHash, buffer.byteLength);
+        var md5 = CoSeMe.crypto.MD5_IP(buffer.slice(0, sizeToHash));
         var crypto = md5 + '.' + filetype.split('/')[1];
         logger.log('MD5+ext:', crypto);
         onCryptoReady(crypto, reader.result);
@@ -5884,10 +6050,15 @@ CoSeMe.namespace('media', (function() {
           var chunksize = Math.min(1024, blob.size - offset);
           var waitForDrain = false;
 
-          while(offset < blob.size && !waitForDrain) {
+          var MAX_LOOP_TIME = 20; // 20ms (50fps)
+          var tooMuchTime = false;
+          var startTime = Date.now();
+
+          while(offset < blob.size && !waitForDrain && !tooMuchTime) {
             logger.log('Next', chunksize, 'bytes sent!');
             waitForDrain = !_socket.send(blobAsArrayBuffer, offset, chunksize);
             offset += chunksize;
+            tooMuchTime = (Date.now() - startTime) > MAX_LOOP_TIME;
           }
 
           var completed = 100 * Math.min(1, offset / blob.size);
@@ -5898,9 +6069,12 @@ CoSeMe.namespace('media', (function() {
             logger.log('All data sent!');
             _socket.ondrain = undefined;
             callback && setTimeout(callback);
-          } else {
+          } else if (waitForDrain) {
             logger.log('Waiting for drain before continuing...');
             _socket.ondrain = sendBody.bind(null, callback, offset);
+          } else {
+            logger.log('Too much time on the loop. Releasing CPU...');
+            setTimeout(sendBody, 0, callback, offset);
           }
         }
       }
@@ -6527,7 +6701,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
   var _requests = [];
 
   var _lastPongTime = 0;
-  var _pingInterval = 300;
+  var _pingInterval = 120;
 
   // _connection.socket should be a socket though
   var _connection = null;
@@ -6553,7 +6727,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
 
     get: function(iqType, idx, node) {
       var childNode = node.getChild(0);
-      if (childNode && childNode.getAttributeValue('xmlns') === 'urn:xmpp:ping') {
+      if (childNode.getAttributeValue('xmlns') === 'urn:xmpp:ping') {
         if (_autoPong) {
           _onPing(idx);
         }
@@ -6621,7 +6795,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
             _signalInterface.send('presence_available', [jid]);
           }
         } else if (xmlns == 'w' && jid) {
-          var status = node.getAttributeValue('status');
+          var status = stringFromUtf8(node.getAttributeValue('status'));
 
           if (status == 'dirty') {
             //categories = self.parseCategories(node); #@@TODO, send along with signal
@@ -6733,14 +6907,18 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
           notification += bodyNode.getAttributeValue('event') === 'add' ?
                           'Created' : 'SubjectUpdated';
 
-          var subject = bodyNode.data;
+          var subject = stringFromUtf8(bodyNode.data);
 
           _signalInterface
             .send(notification, [from, timestamp, msgId, subject, displayName,
                                  author]);
         }
         else if (type === 'status') {
-          // TODO: Not implemented in the current version
+          var notification = 'notification_status';
+console.log('R', from, msgId);
+
+          _signalInterface.send(notification, [from, msgId]);
+          
         }
 
       }
@@ -6753,7 +6931,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
 
   function parseMessage(messageNode) {
     var bodyNode = messageNode.getChild("body"),
-        newSubject = bodyNode ? bodyNode.data : "",
+        newSubject = bodyNode ? stringFromUtf8(bodyNode.data) : "",
         msgData = null,
         timestamp = Number(messageNode.getAttributeValue("t")).valueOf(),
         isGroup = false,
@@ -7035,7 +7213,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
     node.children.forEach(function (groupNode) {
       groups.push({
         gid: groupNode.getAttributeValue('id'),
-        subject: groupNode.getAttributeValue('subject')
+        subject: stringFromUtf8(groupNode.getAttributeValue('subject'))
       });
     });
     _signalInterface.send('group_gotParticipating', [groups, id]);
@@ -7375,8 +7553,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
     },
 
     terminate: function() {
-      //throw 'NOT IMPLEMENTED!';
-      return 0;
+      throw 'NOT IMPLEMENTED!';
     },
 
     sendDisconnected: function(reason) {
@@ -7458,6 +7635,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
       notification_groupPictureRemoved: [],
       notification_groupParticipantAdded: [],
       notification_groupParticipantRemoved: [],
+      notification_status: [],
 
       contact_gotProfilePictureId: [],
       contact_gotProfilePicture: [],
@@ -7742,7 +7920,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
     sendClientConfig('android', 'en', 'US');
     sendGetServerProperties();
     sendGetGroups();
-    //sendGetPrivacyList();
+    sendGetPrivacyList();
   }
 
   function sendClientConfig(platform, language, country) {
@@ -7949,7 +8127,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
       var idx = self.makeId('create_group_');
       var groupNode = newProtocolTreeNode('group', {
         action: 'create',
-        subject: aSubject
+        subject: utf8FromString(aSubject)
       });
       var iqNode = newProtocolTreeNode('iq', {
         id: idx,
@@ -8001,6 +8179,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
     },
 
     group_setSubject: function(aGjid, aSubject) {
+      aSubject = utf8FromString(aSubject);
       var idx = self.makeId('set_group_subject_');
       var subjectNode = newProtocolTreeNode('subject', { value: aSubject });
       var iqNode = newProtocolTreeNode('iq', {
@@ -8144,6 +8323,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
     },
 
     profile_setStatus: function(aStatus) {
+      aStatus = utf8FromString(aStatus);
       var id = self.makeId('sendsetstatus_');
       var statusNode =
         newProtocolTreeNode('status', undefined, undefined, aStatus);
@@ -8276,6 +8456,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
    },
 
    status_update: function(aStatus) {
+     aStatus = utf8FromString(aStatus);
      var bodyNode = newProtocolTreeNode('body', null, null, aStatus);
      var messageNode = self.getMessageNode('s.us', bodyNode);
      self._writeNode(messageNode);
