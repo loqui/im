@@ -6527,7 +6527,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
   var _requests = [];
 
   var _lastPongTime = 0;
-  var _pingInterval = 300;
+  var _pingInterval = 120;
 
   // _connection.socket should be a socket though
   var _connection = null;
