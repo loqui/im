@@ -705,7 +705,7 @@ section#chat ul#messages > li > div {
   display: block;
   padding: .5rem .5rem;
   clear: both;
-  max-width: calc(100vw - 3.5rem);
+  max-width: calc(100% - 3.5rem);
   animation: fadeIn .5s;
 }
 section#chat ul#messages > li > div a{
