@@ -7460,6 +7460,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
       notification_groupPictureRemoved: [],
       notification_groupParticipantAdded: [],
       notification_groupParticipantRemoved: [],
+      notification_status: [],
 
       contact_gotProfilePictureId: [],
       contact_gotProfilePicture: [],
