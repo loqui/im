@@ -6740,7 +6740,9 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
                                  author]);
         }
         else if (type === 'status') {
-          // TODO: Not implemented in the current version
+          
+          _signalInterface.send('notification_status', [from, msgId]);
+          
         }
 
       }

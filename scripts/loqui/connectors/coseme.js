@@ -319,12 +319,13 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
       group_gotPicture: this.events.onGroupGotPicture,
       group_gotGroups: null,
       group_gotParticipating: this.events.onGroupGotParticipating,
-      notification_contactProfilePictureUpdated: null,
-      notification_contactProfilePictureRemoved: null,
-      notification_groupPictureUpdated: null,
-      notification_groupPictureRemoved: null,
-      notification_groupParticipantAdded: null,
-      notification_groupParticipantRemoved: null,
+      notification_contactProfilePictureUpdated: this.events.onNotification,
+      notification_contactProfilePictureRemoved: this.events.onNotification,
+      notification_groupPictureUpdated: this.events.onNotification,
+      notification_groupPictureRemoved: this.events.onNotification,
+      notification_groupParticipantAdded: this.events.onNotification,
+      notification_groupParticipantRemoved: this.events.onNotification,
+      notification_status: this.events.onNotification,
       contact_gotProfilePictureId: null,
       contact_gotProfilePicture: this.events.onAvatar,
       contact_typing: this.events.onContactTyping,
@@ -358,6 +359,11 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
   this.events.onStatusDirty = function (categories) {
     var method = 'cleardirty';
     MI.call(method, [categories]);
+  }
+  
+  this.events.onNotification = function (jid, msgId) {
+    var method = 'notification_ack';
+    MI.call(method, [jid, msgId]);
   }
   
   this.events.onMessage = function (id, from, body, stamp, e, nick, g) {
@@ -629,7 +635,7 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
   
   this.events.onPresenceUpdated = function (jid, lastSeen, msg) {
     var account = this.account;
-    var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', chatJid);
+    var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
     if (contact) {
       var time = Tools.convenientDate(Tools.localize(Tools.stamp( Math.floor((new Date).valueOf()/1000) - parseInt(lastSeen) )));
       if (!('presence' in contact)) {
