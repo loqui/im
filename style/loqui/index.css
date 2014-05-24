@@ -484,7 +484,7 @@ section#main[data-features~='localContacts'] fieldset#searchForm input {
   width: calc(100% - 2rem);
 }
 section#main fieldset#searchForm span.sync {
-  display; block;
+  display: block;
   color: #FFF;
   position: absolute;
   top: 0;
@@ -577,7 +577,7 @@ section#chat header .status {
   left: 3rem;
   font-size: .8em;
   line-height: 1.2em;
-  font-weight: 100
+  font-weight: 100;
   height: 1.2em;
   width: calc(100% - 7.5rem);
   overflow: hidden;
@@ -1522,6 +1522,7 @@ div.switch div.ball {
 }
 #console #bodyConsole #logConsole {
   width:100%;
+  margin-left: 1rem;
   padding: 0 1rem 1rem 1rem;
   overflow-y:scroll;
   overflow-x:hidden;
