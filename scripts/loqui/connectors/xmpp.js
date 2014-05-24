@@ -98,7 +98,7 @@ App.connectors['XMPP'] = function (account) {
       account.save();
     }
     connector.connection.roster.registerCallback(connector.events.onPresence);
-    connector.connection.roster.get( function (ret) {
+    var iqId = connector.connection.roster.get( function (ret) {
       connector.events.onPresence(ret, null, account.core.user);
       if (account.supports('vcard')) {
         connector.connection.vcard.get( function (data) {
@@ -109,6 +109,12 @@ App.connectors['XMPP'] = function (account) {
         callback();
       }
     });
+    // Send initial vcard if none is present (#181)
+    connector.connection.addHandler(function () {
+      connector.connection.vcard.set(function () {
+        callback();
+      }, $build('JABBERID').t(fullJid).tree());
+    }, null, 'iq', 'error');
   }.bind(this);
   
   this.capabilize = function () {
@@ -324,11 +330,16 @@ App.connectors['XMPP'] = function (account) {
   }
   
   this.handlers.init = function () {
-    this.handlers.onMessage = this.handlers.onMessage || this.connection.addHandler(this.events.onMessage, null, 'message', 'chat', null, null);
-    this.handlers.onSubRequest = this.handlers.onSubRequest || this.connection.addHandler(this.events.onSubRequest, null, 'presence', 'subscribe', null, null);
-    this.handlers.onTime = this.handlers.onTime || this.connection.time.handlify(this.events.onTime);
-    this.handlers.onAttention = this.handlers.onAttention || this.connection.attention.handlify(this.events.onAttention);
-    this.handlers.onDisco = this.handlers.onDisco || this.connection.disco.handlify();
+    this.connection.deleteHandler(this.handlers.onMessage);
+    this.connection.deleteHandler(this.handlers.onSubRequest);
+    this.connection.deleteHandler(this.handlers.onTime);
+    this.connection.deleteHandler(this.handlers.onAttention);
+    this.connection.deleteHandler(this.handlers.onDisco);
+    this.handlers.onMessage = this.connection.addHandler(this.events.onMessage, null, 'message', 'chat', null, null);
+    this.handlers.onSubRequest = this.connection.addHandler(this.events.onSubRequest, null, 'presence', 'subscribe', null, null);
+    this.handlers.onTime = this.connection.time.handlify(this.events.onTime);
+    this.handlers.onAttention = this.connection.attention.handlify(this.events.onAttention);
+    this.handlers.onDisco = this.connection.disco.handlify();
   }.bind(this);
   
   this.events.onDisconnected = function () {
