@@ -244,7 +244,11 @@ App.connectors['XMPP'] = function (account) {
   }
   
   this.handlers.init = function () {
-    this.connection.handlers.length = 0;
+    this.connection.deleteHandler(this.handlers.onMessage);
+    this.connection.deleteHandler(this.handlers.onSubRequest);
+    this.connection.deleteHandler(this.handlers.onTime);
+    this.connection.deleteHandler(this.handlers.onAttention);
+    this.connection.deleteHandler(this.handlers.onDisco);
     this.handlers.onMessage = this.connection.addHandler(this.events.onMessage, null, 'message', 'chat', null, null);
     this.handlers.onSubRequest = this.connection.addHandler(this.events.onSubRequest, null, 'presence', 'subscribe', null, null);
     this.handlers.onTime = this.connection.time.handlify(this.events.onTime);
