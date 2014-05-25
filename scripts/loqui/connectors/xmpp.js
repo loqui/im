@@ -309,13 +309,18 @@ App.connectors['XMPP'] = function (account) {
           var bname = b.name ? b.name : b.jid;
           return aname > bname;
         });
+        var i = 0;
         var map = function (entry, cb) {
-          var show, status, photo;
-          for (var j in entry.resources) {
-            show = entry.resources[Object.keys(entry.resources)[0]].show || 'a';
-            status = entry.resources[Object.keys(entry.resources)[0]].status || _('show' + show);
-            photo = entry.resources[Object.keys(entry.resources)[0]].photo;
-            break;
+          var name, show, status, photo, caps, priority = null;
+          for (var [key, resource] in Iterator(entry.resources)) {
+            if (resource.priority >= priority) {
+              name = key;
+              show = resource.show || 'a';
+              status = resource.status || _('show' + show);
+              photo = resource.photo;
+              caps = resource.caps;
+              priority = resource.priority;
+            }
           }
           if (photo && entry.jid in App.avatars && App.avatars[entry.jid].id != photo) {
             var avatar = new Avatar(App.avatars[entry.jid]);
@@ -336,12 +341,19 @@ App.connectors['XMPP'] = function (account) {
               });
             }, entry.jid);
           }
+          if (caps && !(caps in App.caps)) {
+            console.log('QUERYING', connector.roster[i].jid + '/' + name, caps);
+            connector.connection.disco.info(connector.roster[i].jid + '/' + name, caps);  
+          }
+          i++;
           cb(null, {
             jid: entry.jid,
             name: entry.name,
             presence: {
+              name: name,
               show: show,
-              status: status
+              status: status,
+              caps: caps
             }
           });
         }
@@ -387,20 +399,18 @@ App.connectors['XMPP'] = function (account) {
   
   this.events.onDisco = function (stanza) {
     var stanza = $(stanza);
-    var from = stanza.attr('from');
-    var jid = Strophe.getBareJidFromJid(from);
-    var resource = Strophe.getResourceFromJid(from);
-    var identities = stanza.find('identity');
-    var features = stanza.find('feature');
-    var contact = Lungo.Core.findByProperty(this.roster, 'jid', jid);
-    if (resource in contact.resources) {
-      contact.resources[resource].identities = identities.map(function (i, e, a) {
-        return {category: $(e).attr('category'), type: $(e).attr('type'), name: $(e).attr('name')};
-      });
-      contact.resources[resource].features = features.map(function (i, e, a) {
+    var key = stanza.find('query').attr('node');
+    var value = {
+      identities: stanza.find('identity').map(function (i, e, a) {
+        return {type: $(e).attr('type'), name: $(e).attr('name'), category: $(e).attr('category')};
+      }),
+      features: stanza.find('feature').map(function (i, e, a) {
         return $(e).attr('var');
-      });
-    }
+      })
+    };
+    App.caps[key] = value;
+    App.smartupdate('caps');
+    return true;
   }.bind(this);
   
 }
