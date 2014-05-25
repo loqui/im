@@ -18,6 +18,7 @@ Strophe.addConnectionPlugin('Messaging', {
 		Strophe.addNamespace('XHTML', 'http://www.w3.org/1999/xhtml');
 		Strophe.addNamespace('XEP0085', 'http://jabber.org/protocol/chatstates');
 		Strophe.addNamespace('XEP0203', 'urn:xmpp:delay');
+		Strophe.addNamespace('XEP0184', 'urn:xmpp:receipts');
 	},
 
 	// Register message notifications when connected
@@ -28,16 +29,15 @@ Strophe.addConnectionPlugin('Messaging', {
 	},
 
 	send: function(to, body, stamp, wantsReceipt){
-		var msg = $msg({to: to, type: 'chat'});
+		var msg = $msg({to: to, type: 'chat', id: this._connection.getUniqueId()});
 		if(body){
 			msg.c('body', {}, body);
 			if(stamp)msg.c('delay', {xmlns: Strophe.NS.XEP0203, stamp: stamp});
 		}
 		if (wantsReceipt) {
-      this._connection.receipts.sendMessage(msg);
-		} else {
-  		this._connection.send(msg.tree());
+      msg.c('request', {xmlns: Strophe.NS.XEP0184});
 		}
+		this._connection.send(msg.tree());
 	},
 	
 	csnSend: function(to, state) {
