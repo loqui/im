@@ -112,7 +112,7 @@ App.connectors['XMPP'] = function (account) {
       connector.connection.vcard.set(function () {
         callback();
       }, $build('JABBERID').t(fullJid).tree());
-    }, null, 'iq', 'error');
+    }, null, 'iq', 'error', iqId);
   }.bind(this);
   
   this.capabilize = function () {
