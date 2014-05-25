@@ -1,6 +1,7 @@
 //	XMPP plugins for Strophe v0.2
 
 //	(c) 2012 Yiorgis Gozadinos.
+//	(c) 2014 Adán Sänchez de Pedro Crespo.
 //	strophe.plugins is distributed under the MIT license.
 //	http://github.com/ggozad/strophe.plugins
 
@@ -26,13 +27,17 @@ Strophe.addConnectionPlugin('Messaging', {
 		}
 	},
 
-	send: function(to, body, stamp){
+	send: function(to, body, stamp, wantsReceipt){
 		var msg = $msg({to: to, type: 'chat'});
 		if(body){
 			msg.c('body', {}, body);
 			if(stamp)msg.c('delay', {xmlns: Strophe.NS.XEP0203, stamp: stamp});
 		}
-		this._connection.send(msg.tree());
+		if (wantsReceipt) {
+      this._connection.receipts.sendMessage(msg);
+		} else {
+  		this._connection.send(msg.tree());
+		}
 	},
 	
 	csnSend: function(to, state) {
