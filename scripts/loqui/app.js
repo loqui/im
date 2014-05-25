@@ -19,6 +19,7 @@ var App = {
   notifications: [],
   pathFiles: 'loqui/files/',
   pathBackup: 'loqui/backup/',
+  caps: {},
   
   // Default values
   defaults: {
@@ -117,6 +118,12 @@ var App = {
       function (callback) {
         Store.get('avatars', function (val) {
           App.avatars = val || {};
+          callback(null);
+        });
+      },
+      function (callback) {
+        Store.get('caps', function (val) {
+          App.caps = val || {};
           callback(null);
         });
       }

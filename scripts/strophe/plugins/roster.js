@@ -348,7 +348,8 @@ Strophe.addConnectionPlugin('roster',
                 priority : (presence.getElementsByTagName('priority').length != 0) ? Strophe.getText(presence.getElementsByTagName('priority')[0]) : "",
                 photo    : (presence.getElementsByTagName('x').length != 0) ? (
                             (presence.getElementsByTagName('x')[0].getElementsByTagName('photo').length != 0) ? Strophe.getText(presence.getElementsByTagName('x')[0].getElementsByTagName('photo')[0]) : "" 
-                           ) : ""
+                           ) : "",
+                caps     : $(presence).find('c').length && $(presence).find('c').attr('node') + '#' + $(presence).find('c').attr('ver')
             };
         }
         else

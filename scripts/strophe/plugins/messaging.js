@@ -1,6 +1,7 @@
 //	XMPP plugins for Strophe v0.2
 
 //	(c) 2012 Yiorgis Gozadinos.
+//	(c) 2014 Adán Sänchez de Pedro Crespo.
 //	strophe.plugins is distributed under the MIT license.
 //	http://github.com/ggozad/strophe.plugins
 
@@ -17,6 +18,7 @@ Strophe.addConnectionPlugin('Messaging', {
 		Strophe.addNamespace('XHTML', 'http://www.w3.org/1999/xhtml');
 		Strophe.addNamespace('XEP0085', 'http://jabber.org/protocol/chatstates');
 		Strophe.addNamespace('XEP0203', 'urn:xmpp:delay');
+		Strophe.addNamespace('XEP0184', 'urn:xmpp:receipts');
 	},
 
 	// Register message notifications when connected
@@ -26,11 +28,14 @@ Strophe.addConnectionPlugin('Messaging', {
 		}
 	},
 
-	send: function(to, body, stamp){
-		var msg = $msg({to: to, type: 'chat'});
+	send: function(to, body, stamp, wantsReceipt){
+		var msg = $msg({to: to, type: 'chat', id: this._connection.getUniqueId()});
 		if(body){
 			msg.c('body', {}, body);
 			if(stamp)msg.c('delay', {xmlns: Strophe.NS.XEP0203, stamp: stamp});
+		}
+		if (wantsReceipt) {
+      msg.c('request', {xmlns: Strophe.NS.XEP0184});
 		}
 		this._connection.send(msg.tree());
 	},
