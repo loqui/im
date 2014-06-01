@@ -314,7 +314,6 @@ App.connectors['XMPP'] = function (account) {
     var account = connector.account;
     var chat = account.chatGet(jid);
     var history = chat.core.last && chat.core.last.stamp && {since: Tools.stamp(Tools.unstamp(chat.core.last.stamp).getTime()/1000 + 1)};
-console.log(history);
     this.connection.muc.join(
       jid,
       Strophe.getNodeFromJid(this.account.core.fullJid), 
