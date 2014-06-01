@@ -26,11 +26,13 @@ Strophe.addConnectionPlugin('disco',
         this._features   = [];
         this._items      = [];
     },
-    handlify: function()
+    handlify: function(handler)
     {
         return [      
           this._connection.addHandler(this._onDiscoInfo.bind(this), Strophe.NS.DISCO_INFO, 'iq', 'get', null, null),
-          this._connection.addHandler(this._onDiscoItems.bind(this), Strophe.NS.DISCO_ITEMS, 'iq', 'get', null, null)
+          this._connection.addHandler(this._onDiscoItems.bind(this), Strophe.NS.DISCO_ITEMS, 'iq', 'get', null, null),
+          this._connection.addHandler(handler, Strophe.NS.DISCO_INFO, 'iq', 'result', null, null),
+          this._connection.addHandler(handler, Strophe.NS.DISCO_ITEMS, 'iq', 'result', null, null)
         ];
     },
     /** Function: addIdentity

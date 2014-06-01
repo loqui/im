@@ -119,13 +119,13 @@ var Providers = {
       longName: 'XMPP/Jabber',
       connector: {
         type: 'XMPP',
-        host: 'https://bosh.loqui.im/',
+        host: 'wss://websockets.loqui.im/',
         timeout: 300
       },
       autodomain: false,
       features: ['multi', 'vcard', 'presence', 'easyAvatars', 'rosterMgmt', 
         'avatarChange', 'attention', 'csn', 'delay', 'time', 'statusChange', 
-        'show', 'muc', 'mucCreate', 'mucJoin'],
+        'show', 'muc', 'mucCreate', 'mucJoin', 'receipts'],
       color: '#149ED2',
       terms: {
         user: 'FullJID',

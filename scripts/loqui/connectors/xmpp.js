@@ -8,7 +8,7 @@ App.connectors['XMPP'] = function (account) {
     show: this.account.core.presence ? this.account.core.presence.show : App.defaults.Connector.presence.show,
     status: this.account.core.presence ? this.account.core.presence.status : App.defaults.Connector.presence.status
   };
-  this.handlers = {};
+  this.handlers = {onDisco: [], onTime: []};
   this.events = {}
   this.chat = {};
   this.muc = {};
@@ -114,7 +114,7 @@ App.connectors['XMPP'] = function (account) {
       connector.connection.vcard.set(function () {
         callback();
       }, $build('JABBERID').t(fullJid).tree());
-    }, null, 'iq', 'error');
+    }, null, 'iq', 'error', iqId);
   }.bind(this);
   
   this.capabilize = function () {
@@ -123,7 +123,8 @@ App.connectors['XMPP'] = function (account) {
       ['csn', Strophe.NS.XEP0085],
       ['delay', Strophe.NS.XEP0203],
       ['time', Strophe.NS.XEP0202],
-      ['vcard', Strophe.NS.VCARD]
+      ['vcard', Strophe.NS.VCARD],
+      ['receipts', Strophe.NS.XEP0184]
     ];
     for (var i in caps) {
       if (this.account.supports(caps[i][0])) {
@@ -182,7 +183,11 @@ App.connectors['XMPP'] = function (account) {
     if (options.muc) {
       this.connection.muc.message(to, Strophe.getNodeFromJid(this.account.core.fullJid), text, null, 'groupchat');
     } else {
-      this.connection.Messaging.send(to, text, options.delay);
+      var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', to);
+      var caps = contact && contact.presence.caps;
+      var features = caps in App.caps && App.caps[caps].features;
+      var wantsReceipt = features && features.indexOf(Strophe.NS.XEP0184);
+      this.connection.Messaging.send(to, text, options.delay, wantsReceipt);
     }
   }.bind(this);
   
@@ -332,18 +337,23 @@ App.connectors['XMPP'] = function (account) {
   this.handlers.init = function () {
     this.connection.deleteHandler(this.handlers.onMessage);
     this.connection.deleteHandler(this.handlers.onSubRequest);
-    this.connection.deleteHandler(this.handlers.onTime);
+    this.connection.deleteHandler(this.handlers.onTime[0]);
+    this.connection.deleteHandler(this.handlers.onTime[1]);
     this.connection.deleteHandler(this.handlers.onAttention);
-    this.connection.deleteHandler(this.handlers.onDisco);
-    this.handlers.onMessage = this.connection.addHandler(this.events.onMessage, null, 'message', 'chat', null, null);
-    this.handlers.onSubRequest = this.connection.addHandler(this.events.onSubRequest, null, 'presence', 'subscribe', null, null);
+    this.connection.deleteHandler(this.handlers.onDisco[0]);
+    this.connection.deleteHandler(this.handlers.onDisco[1]);
+    this.connection.deleteHandler(this.handlers.onDisco[2]);
+    this.connection.deleteHandler(this.handlers.onDisco[3]);
+    this.handlers.onMessage = this.connection.addHandler(this.events.onMessage, null, 'message');
+    this.handlers.onSubRequest = this.connection.addHandler(this.events.onSubRequest, null, 'presence', 'subscribe');
     this.handlers.onTime = this.connection.time.handlify(this.events.onTime);
     this.handlers.onAttention = this.connection.attention.handlify(this.events.onAttention);
-    this.handlers.onDisco = this.connection.disco.handlify();
+    this.handlers.onDisco = this.connection.disco.handlify(this.events.onDisco);
   }.bind(this);
   
-  this.events.onDisconnected = function () {
-  }
+  this.events.onDisconnected = function (stanza) {
+    console.log(stanza);
+  }.bind(this);
   
   this.events.onMessage = function (stanza) {
     var account = this.account;
@@ -354,30 +364,55 @@ App.connectors['XMPP'] = function (account) {
     var body = tree.children('body').length ? tree.children('body').text() : null;
     var composing = tree.children('composing').length;
     var paused = tree.children('paused').length || tree.children('active').length;
+    var request = tree.children('request').length;
+    var received = tree.children('received').length;
     if (body && !(muc && from == to + '/' + Strophe.getNodeFromJid(account.core.fullJid))) {
       var date = new Date();
       var stamp = tree.children('delay').length
         ? Tools.localize(tree.children('delay').attr('stamp'))
         : Tools.localize(Tools.stamp());
       var msg = new Message(account, {
-        from: from,
-        to: to,
+        from: Strophe.getBareJidFromJid(from),
+        to: Strophe.getBareJidFromJid(to),
         text: body,
         stamp: stamp
       }, {
         muc: muc
       });
-      /*if (muc) {
-        msg.core.pushName = Strophe.getNodeFromJid(from);
-      }*/
       msg.receive();
     }
     if (account.supports('csn') && App.settings.csn) {
-      if(composing && from == $('section#chat').data('jid')){
+      if(composing && Strophe.getBareJidFromJid(from) == $('section#chat').data('jid')){
         $("section#chat #typing").show();
-      }else if(paused && from == $('section#chat').data('jid')){
+      }else if(paused && Strophe.getBareJidFromJid(from) == $('section#chat').data('jid')){
         $("section#chat #typing").hide();
       }
+    }
+    if (request && !(composing) && !(paused)) {
+      var out = $msg({to: from, from: to, id: this.connection.getUniqueId()}),
+			request = Strophe.xmlElement('received', {'xmlns': Strophe.NS.XEP0184, 'id': id});
+			out.tree().appendChild(request);
+			this.connection.send(out);
+    }
+    if (received) {
+      this.events.onMessageDelivered(stanza);
+    }
+    return true;
+  }.bind(this);
+  
+  this.events.onMessageDelivered = function (stanza) {
+    var msg = $(stanza);
+    var msgId = msg.attr('id');
+    var from = Strophe.getBareJidFromJid(msg.attr('from'));
+    var account = this.account;
+    var chat = account.chatGet(from);
+    chat.core.lastAck = Tools.localize(Tools.stamp());
+    chat.save();
+    var section = $('section#chat');
+    if (section.hasClass('show') && section.data('jid') == from) {
+      var li = section.find('ul li').last();
+      section.find('span.lastACK').remove();
+      li.append($('<span/>').addClass('lastACK')[0]);
     }
     return true;
   }.bind(this);
@@ -395,13 +430,18 @@ App.connectors['XMPP'] = function (account) {
           var bname = b.name ? b.name : b.jid;
           return aname > bname;
         });
+        var i = 0;
         var map = function (entry, cb) {
-          var show, status, photo;
-          for (var j in entry.resources) {
-            show = entry.resources[Object.keys(entry.resources)[0]].show || 'a';
-            status = entry.resources[Object.keys(entry.resources)[0]].status || _('show' + show);
-            photo = entry.resources[Object.keys(entry.resources)[0]].photo;
-            break;
+          var name, show, status, photo, caps, priority = null;
+          for (var [key, resource] in Iterator(entry.resources)) {
+            if (resource.priority >= priority) {
+              name = key;
+              show = resource.show || 'a';
+              status = resource.status || _('show' + show);
+              photo = resource.photo;
+              caps = resource.caps;
+              priority = resource.priority;
+            }
           }
           if (photo && entry.jid in App.avatars && App.avatars[entry.jid].id != photo) {
             var avatar = new Avatar(App.avatars[entry.jid]);
@@ -422,12 +462,19 @@ App.connectors['XMPP'] = function (account) {
               });
             }, entry.jid);
           }
+          if (caps && !(caps in App.caps)) {
+            console.log('QUERYING', connector.roster[i].jid + '/' + name, caps);
+            connector.connection.disco.info(connector.roster[i].jid + '/' + name, caps);  
+          }
+          i++;
           cb(null, {
             jid: entry.jid,
             name: entry.name,
             presence: {
+              name: name,
               show: show,
-              status: status
+              status: status,
+              caps: caps
             }
           });
         }
@@ -468,6 +515,22 @@ App.connectors['XMPP'] = function (account) {
       }, 'thunder', true);
     }
     Tools.log(from, 'sent you a bolt.');
+    return true;
+  }.bind(this);
+  
+  this.events.onDisco = function (stanza) {
+    var stanza = $(stanza);
+    var key = stanza.find('query').attr('node');
+    var value = {
+      identities: stanza.find('identity').map(function (i, e, a) {
+        return {type: $(e).attr('type'), name: $(e).attr('name'), category: $(e).attr('category')};
+      }),
+      features: stanza.find('feature').map(function (i, e, a) {
+        return $(e).attr('var');
+      })
+    };
+    App.caps[key] = value;
+    App.smartupdate('caps');
     return true;
   }.bind(this);
   
