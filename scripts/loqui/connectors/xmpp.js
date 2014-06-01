@@ -313,7 +313,10 @@ App.connectors['XMPP'] = function (account) {
     var connector = this;
     var account = connector.account;
     var chat = account.chatGet(jid);
-    this.connection.muc.join(jid, Strophe.getNodeFromJid(this.account.core.fullJid), 
+    var history = chat.core.last && chat.core.last.stamp && {since: chat.core.last.stamp};
+    this.connection.muc.join(
+      jid,
+      Strophe.getNodeFromJid(this.account.core.fullJid), 
       function (e) {
         connector.events.onMessage(e);
         return true;
@@ -322,7 +325,9 @@ App.connectors['XMPP'] = function (account) {
       function (e) {
         chat.core.participants = Object.keys(e);
         return true;
-      }
+      },
+      null, //password
+      history
     );
   }.bind(this)
   

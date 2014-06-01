@@ -56,7 +56,7 @@
         xmlns: Strophe.NS.MUC
       });
       if (history_attrs != null) {
-        msg = msg.c("history", history_attrs).up;
+        msg = msg.c("history", history_attrs).up();
       }
       if (password != null) {
         msg.cnode(Strophe.xmlElement("password", [], password));
