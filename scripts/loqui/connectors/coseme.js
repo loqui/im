@@ -366,24 +366,26 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
     MI.call(method, [jid, msgId]);
   }
   
-  this.events.onMessage = function (id, from, body, stamp, e, nick, g) {
-    Tools.log('MESSAGE', id, from, body, stamp, e, nick, g);
+  this.events.onMessage = function (msgId, from, msgData, timeStamp, wantsReceipt, pushName, isBroadcast) {
+    Tools.log('MESSAGE', msgId, from, msgData, timeStamp, wantsReceipt, pushName, isBroadcast);
     var account = this.account;
     var from = from;
     var to = this.account.user + '@' + CoSeMe.config.domain;
-    var body = body;
+    var body = msgData;
     if (body) {
-      var date = new Date(stamp);
+      var date = new Date(timeStamp);
       var stamp = Tools.localize(Tools.stamp(stamp));
       var msg = new Message(account, {
-        id: id,
+        id: msgId,
         from: from,
         to: to,
         text: body,
         stamp: stamp
       });
       msg.receive();
-      this.ack(id, from);
+      if (wantsReceipt) {
+        this.ack(msgId, from);
+      }
     }
     return true;
   }
@@ -580,7 +582,9 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
       });
       Tools.log('RECEIVED', msg);
       msg.receive();
-      this.ack(msgId, to);
+      if (wantsReceipt) {
+        this.ack(msgId, to);
+      }
     }
     return true;
   }
@@ -588,25 +592,25 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
   this.events.onGroupImageReceived = function (msgId, fromAttribute, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt) {
     var to = fromAttribute;
     var fromAttribute = author;
-    return this.mediaProcess('image', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, true);
+    return this.mediaProcess('image', msgId, fromAttribute, to, null, mediaUrl, mediaSize, wantsReceipt, true);
   }
 
   this.events.onGroupVideoReceived = function (msgId, fromAttribute, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt) {
     var to = fromAttribute;
     var fromAttribute = author;
-    return this.mediaProcess('video', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, true);
+    return this.mediaProcess('video', msgId, fromAttribute, to, null, mediaUrl, mediaSize, wantsReceipt, true);
   }
 
   this.events.onGroupAudioReceived = function (msgId, fromAttribute, author, mediaUrl, mediaSize, wantsReceipt) {
     var to = fromAttribute;
     var fromAttribute = author;
-    return this.mediaProcess('audio', msgId, fromAttribute, to, null, mediaUrl, mediaSize, true);
+    return this.mediaProcess('audio', msgId, fromAttribute, to, null, mediaUrl, mediaSize, wantsReceipt, true);
   }
 
   this.events.onGroupLocationReceived = function (msgId, fromAttribute, author, name, mediaPreview, mlatitude, mlongitude, wantsReceipt) {
     var to = fromAttribute;
     var fromAttribute = author;
-    return this.mediaProcess('url', fromAttribute, to, [mlatitude, mlongitude, name], null, null, true);
+    return this.mediaProcess('url', fromAttribute, to, [mlatitude, mlongitude, name], null, null, wantsReceipt, true);
   }
   
   this.events.onContactsGotStatus = function (id, statuses) {
@@ -767,7 +771,7 @@ console.log('TEMP_RETRIEVING', hash, Store.cache[hash].data);
     msg.addToChat();
   }
 
-  this.mediaProcess = function (fileType, msgId, fromAttribute, to, payload, mediaUrl, mediaSize, isGroup) {
+  this.mediaProcess = function (fileType, msgId, fromAttribute, to, payload, mediaUrl, mediaSize, wantsReceipt, isGroup) {
     Tools.log('Processing file of type', fileType);
     var process = function (thumb) {
       var media = {
@@ -791,7 +795,9 @@ console.log('TEMP_RETRIEVING', hash, Store.cache[hash].data);
         muc: isGroup
       });
       msg.receive();
-      this.ack(msgId, fromAttribute);
+      if (wantsReceipt) {
+        this.ack(msgId, fromAttribute);
+      }
       Tools.log('Finished processing file of type', fileType);
     }.bind(this);
     switch (fileType) {
