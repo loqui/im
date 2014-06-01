@@ -313,15 +313,19 @@ App.connectors['XMPP'] = function (account) {
     var connector = this;
     var account = connector.account;
     var chat = account.chatGet(jid);
-    var history = chat.core.last && chat.core.last.stamp && {since: chat.core.last.stamp};
+    var history = chat.core.last && chat.core.last.stamp && {since: Tools.stamp(Tools.unstamp(chat.core.last.stamp).getTime()/1000 + 1)};
+console.log(history);
     this.connection.muc.join(
       jid,
       Strophe.getNodeFromJid(this.account.core.fullJid), 
       function (e) {
-        connector.events.onMessage(e);
+        //connector.events.onMessage(e);
         return true;
       }, 
-      function (e) {console.log('pres',e);return true;}, 
+      function (e) {
+        console.log('MUC PRES',e);
+        return true;
+      }, 
       function (e) {
         chat.core.participants = Object.keys(e);
         return true;
