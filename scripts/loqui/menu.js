@@ -65,7 +65,7 @@ var Menu = {
           console.log('REJECTED', error);
         }
       );
-      Lungo.Notification.show('search', _('mucSearching', {server: server}), 30);
+      Lungo.Notification.show('search', _('MucSearching', {server: server}), 30);
     },
     contactAdd: function (obj) {
       var account = Messenger.account();
