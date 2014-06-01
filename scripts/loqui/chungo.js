@@ -53,6 +53,7 @@ var Chungo = {
             });  
           });
         });
+        $$('.chungo .notifier').swipeUp(Chungo.Notification.hide.bind(Chungo.Notification));
       });
       
       setTimeout(function () {
