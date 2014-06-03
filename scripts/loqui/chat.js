@@ -166,7 +166,7 @@ var Chat = function (core, account) {
       }
       if (pic) {
         pic.url.then(function (src) {
-          if (chat.core.muc) {
+          if (src.slice(0, 1) == '/' && chat.core.muc) {
             src = 'https://raw.githubusercontent.com/loqui/im/dev/img/goovatar.png';
           }
           chat.notification = App.notify({ subject: subject, text: text, pic: src, callback: callback }, 'received');
