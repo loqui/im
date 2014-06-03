@@ -141,8 +141,9 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.muc.expel = function (gid, jid) {
-    var method = 'group_removeParticipants';
-    var params = [gid, [jid || this.account.core.fullJid]];
+    var [method, params] = jid ? 
+      ['group_removeParticipants', [gid, jid]] :
+      ['group_end', [gid]];
     MI.call(method, params);
   }.bind(this);
   
@@ -301,7 +302,7 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
       group_subjectReceived: null,
       group_createSuccess: null,
       group_createFail: null,
-      group_endSuccess: null,
+      group_endSuccess: this.events.onGroupEndSuccess,
       group_gotInfo: this.events.onGroupGotInfo,
       group_infoError: this.events.onGroupInfoError,
       group_addParticipantsSuccess: null,
@@ -488,7 +489,7 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
       let ci = account.chatFind(group.gid + '@g.us');
       if (ci >= 0) {
         let chat = account.chats[ci];
-        let newTitle = decodeURIComponent(escape(group.subject));
+        let newTitle = group.subject;
         if (chat.core.title != newTitle) {
           chat.core.title = newTitle;
           chat.save(ci, true);
@@ -496,7 +497,7 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
       } else {
         let chat = new Chat({
           jid: group.gid + '@g.us',
-          title: decodeURIComponent(escape(group.subject)),
+          title: group.subject,
           muc: true,
           chunks: []
         }, account);
@@ -559,6 +560,10 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
   }
   
   this.events.onGroupRemoveParticipantsSuccess = function (gid, jids) {
+    Lungo.Notification.success(_('Removed'), null, 'trash', 3);
+  }
+  
+  this.events.onGroupEndSuccess = function (gid) {
     Lungo.Notification.success(_('Removed'), null, 'trash', 3);
   }
   

@@ -266,6 +266,7 @@ var Messenger = {
   mucClear: function (gid, force) {
     var account = Messenger.account();
     var chat = account.chatGet(gid);
+    var index = account.chatFind(gid);
     if (chat) {
       chat = chat.core;
       var title = chat.title || gid;
