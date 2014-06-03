@@ -380,10 +380,15 @@ section#activity article ul li span.lastMessage {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+section#main article ul li span.name img,
 section#main article ul li span.status img,
 section#main article ul li span.lastMessage img,
+section#chat header span.title img,
+section#contact p#status img,
+section#muc .name img,
 section#activity article ul li span.status img {
-  height: 1.2rem!important;
+  height: 1em;
+   
 }
 section#main article ul li span.lastStamp {
   position: absolute;
