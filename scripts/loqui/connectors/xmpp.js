@@ -335,7 +335,7 @@ App.connectors['XMPP'] = function (account) {
   }.bind(this)
   
   this.muc.avatar = function (callback, id) {
-    callback(new Avatar({url: 'img/goovatar.png'}));
+    callback(new Avatar({url: 'https://raw.githubusercontent.com/loqui/im/dev/img/goovatar.png'}));
   }
   
   this.muc.participantsGet = function (jid) {

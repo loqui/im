@@ -166,10 +166,13 @@ var Chat = function (core, account) {
       }
       if (pic) {
         pic.url.then(function (src) {
+          if (chat.core.muc) {
+            src = 'https://raw.githubusercontent.com/loqui/im/dev/img/goovatar.png';
+          }
           chat.notification = App.notify({ subject: subject, text: text, pic: src, callback: callback }, 'received');
         }.bind(chat));
       } else {
-        chat.notification = App.notify({ subject: subject, text: text, pic: 'https://raw.github.com/loqui/im/master/img/foovatar.png', callback: callback }, 'received');
+        chat.notification = App.notify({ subject: subject, text: text, pic: 'img/foovatar.png', callback: callback }, 'received');
       }
       chat.core.lastAck = last.stamp;
       var section = $('section#chat');
