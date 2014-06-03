@@ -74,8 +74,8 @@ App.connectors['XMPP'] = function (account) {
   }
   
   this.disconnect = function () {
-    this.connection.disconnect();
     this.connected = false;
+    this.connection.disconnect();
   }
   
   this.isConnected = function () {

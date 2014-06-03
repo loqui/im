@@ -548,8 +548,8 @@ var Accounts = {
       var account = App.accounts[Accounts.find(li.data('jid'))];
       if (li.data('value') == 'true') {
         if (confirm(_('AccountDisable', {account: account.core.fullJid}))) {
-          account.connector.disconnect();
           account.core.enabled = false;
+          account.connector.disconnect();
         }
       } else {
         account.connect();
