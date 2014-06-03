@@ -387,6 +387,9 @@ App.connectors['XMPP'] = function (account) {
       }, {
         muc: muc
       });
+      if (muc) {
+        msg.core.pushName = Strophe.getResourceFromJid(from);
+      }
       msg.receive();
     }
     if (account.supports('csn') && App.settings.csn) {
