@@ -901,7 +901,8 @@ section#chat ul#messages li .lastRead:after {
   margin: 0 .5rem;
   font-style: normal;
 }
-section#chat ul#messages li .lastACK {
+section#chat[data-muc="false"][data-caps="false"] ul#messages li .lastACK,
+section#chat[data-muc="false"][data-caps~="urn:xmpp:receipts"] ul#messages li .lastACK {
   position: relative;
   display: block;
   clear: both;

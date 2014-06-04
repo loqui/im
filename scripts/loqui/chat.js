@@ -190,8 +190,10 @@ var Chat = function (core, account) {
   this.show = function () {
     var section = $('section#chat');
     var header = section.children('header');
+    var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.jid);
     section.data('jid', this.core.jid);
     section.data('features', $('section#main').data('features'));
+    section.data('caps', contact && contact.presence.caps in App.caps ? App.caps[contact.presence.caps].features.join(' ') : 'false');
     section.data('muc', this.core.muc || false);
     header.children('.title').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(this.core.title));
     section.find('#plus').removeClass('show');
@@ -231,7 +233,6 @@ var Chat = function (core, account) {
           header.children('.status').text(' ');
         }
       } else {
-        var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.jid);
         var show = this.account.connector.isConnected() && contact ? (contact.presence.show || 'na') : 'na';
         var status = contact ? (contact.presence.status || _('show' + show)) : ' ';
         if (this.account.connector.presence.get) {
