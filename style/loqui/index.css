@@ -386,6 +386,7 @@ section#main article ul li span.lastMessage img,
 section#chat header span.title img,
 section#contact p#status img,
 section#muc .name img,
+section#activity article ul li span.name img,
 section#activity article ul li span.status img {
   height: 1em;
    
@@ -853,23 +854,10 @@ section#chat ul#messages li div[data-media-type='video']:after {
 section#chat ul#messages li div[data-media-type='audio'] {
   width: calc(100% - 3.5rem);
 }
-/*section#chat ul#messages li div[data-media-type='audio']:after {
-  display: block;
-  content: url(../../img/audio.png);
-  height: 6.8rem;
-  margin: -2.15rem -.7rem -.85rem -.7rem;
-  text-align: center;
-}*/
+
 section#chat ul#messages li div[data-media-type='url'] {
   width: calc(100% - 3.5rem);
 }
-/*section#chat ul#messages li div[data-media-type='url']:after {
-  display: block;
-  content: url(../../img/location.png);
-  height: 6.8rem;
-  margin: -2.15rem -.7rem -.85rem -.7rem;
-  text-align: center;
-}*/
 section#chat ul#messages li time {
   position: relative;
   display: block;
