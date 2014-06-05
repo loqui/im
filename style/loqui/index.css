@@ -304,6 +304,10 @@ section#chat > header span.counter {
   border-radius: .6rem;
   animation: blink .5s infinite alternate;
 }
+section#chat[data-muc="true"] #plus .otr,
+section#chat[data-muc="true"] #plus .bolt {
+  display: none;
+}
 section#main > header span.counter[data-value='0'],
 section#chat > header span.counter[data-value='0'] {
   display: none;

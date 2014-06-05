@@ -7918,7 +7918,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
     sendClientConfig('android', 'en', 'US');
     sendGetServerProperties();
     sendGetGroups();
-    sendGetPrivacyList();
+    //sendGetPrivacyList();
   }
 
   function sendClientConfig(platform, language, country) {
