@@ -169,6 +169,12 @@ var App = {
       App.switchesDevRender();
       this.connect();
       Menu.show('main');
+      // If there is more than one account, open the account switcher by default
+      if (App.accounts.length > 1) {
+        setTimeout(function () {
+          Lungo.Aside.show('accounts');
+        }, 1500);
+      }
     } else {
       // Show wizard
       Menu.show('providers', null, 500);
