@@ -1367,7 +1367,7 @@ App.emoji['coseme'] = {
     var code = typeof emoji[1] == 'string' ? emoji[1] : emoji[1].join('-');
     img
       .attr('src', '/img/emoji/coseme/' + code + '.png')
-      .data('emoji', String.fromCharCode(parseInt(emoji[1], 16)));
+      .data('emoji', String.fromCodePoint(parseInt(emoji[1], 16)));
   }
   
 }
