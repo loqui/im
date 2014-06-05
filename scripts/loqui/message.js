@@ -183,6 +183,9 @@ var Message = function (account, core, options) {
             var img = e.target;
             var url = img.dataset.url;
             var ext = url.split('.').pop();
+            if (ext == 'aac') {
+              ext = 'mp3';
+            }
             console.log($(e.target));
             var localUrl = App.pathFiles + $(e.target).closest('[data-stamp]').data('stamp').replace(/[-:]/g, '') + url.split('/').pop().substring(0, 5).toUpperCase() + '.' + ext;
             if (img.dataset.downloaded == 'true') {

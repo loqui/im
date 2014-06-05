@@ -216,31 +216,17 @@ var Tools = {
       case 'ogg':
       	fileType = 'audio/ogg';
       	break;
-/*      How to specify when is video and when is audio?
-		case 'mp4':
-      	fileType = 'audio/mp4';
-      	break;*/
+    	case 'mp3':
+    	  fileType = 'audio/mp3'
+    	  break;
+    	case 'aac':
+    	  fileType = 'audio/mp3'
+    	  break;
       default:
         fileType = 'text/plain';
         break;
     }
     return fileType;
-  },
-
-  audioSave: function (audio, type, name, onSuccess, onError) {
-    var sdCard = navigator.getDeviceStorage('music');
-    onSuccess = function () {
-      Tools.log('El archivo "' + this.result + '" se escribio correctamente');
-    };
-    onError = function () {
-      Tools.log(this.error);
-    };
-    var fileType = this.getFileType(type);
-    var audioBlob = CoSeMe.utils.latin1ToBlob(audio, fileType);
-    name = App.pathFiles + name + '.' + type;
-    var request = sdCard.addNamed(audioBlob, name);
-    request.onsuccess = onSuccess;
-    request.onerror = onError;
   },
 
   b64ToBlob: function(b64Data, contentType, sliceSize) {
