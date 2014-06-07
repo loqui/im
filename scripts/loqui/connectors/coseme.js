@@ -806,6 +806,7 @@ console.log('TEMP_RETRIEVING', hash, Store.cache[hash].data);
         muc: isGroup
       });
       msg.receive();
+      Tools.log('MEDIA-RECEIPT', wantsReceipt, msgId, fromAttribute);
       if (wantsReceipt) {
         this.ack(msgId, fromAttribute);
       }
