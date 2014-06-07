@@ -597,13 +597,13 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
   this.events.onGroupImageReceived = function (msgId, fromAttribute, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt) {
     var to = fromAttribute;
     var fromAttribute = author;
-    return this.mediaProcess('image', msgId, fromAttribute, to, null, mediaUrl, mediaSize, wantsReceipt, true);
+    return this.mediaProcess('image', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, wantsReceipt, true);
   }
 
   this.events.onGroupVideoReceived = function (msgId, fromAttribute, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt) {
     var to = fromAttribute;
     var fromAttribute = author;
-    return this.mediaProcess('video', msgId, fromAttribute, to, null, mediaUrl, mediaSize, wantsReceipt, true);
+    return this.mediaProcess('video', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, wantsReceipt, true);
   }
 
   this.events.onGroupAudioReceived = function (msgId, fromAttribute, author, mediaUrl, mediaSize, wantsReceipt) {
