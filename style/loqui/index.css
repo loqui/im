@@ -69,29 +69,21 @@ section > article.simple > div > p {
 section#welcome {
   color: #E95644;
   text-align: center;
-}
-section#welcome > div {
-  margin: 5rem 2rem;
-}
-section#welcome img[src$='devised.svg'] {
-  position: absolute;
-  width: 10rem;
-  top: 1rem;
-  right: 1rem;
-}
-section#welcome img[src$='mascot.svg'] {
-  position: absolute;
-  width: 8rem;
-  top: calc(50% - 5.5rem);
-  left: calc(50% - 4rem);
+  background: url('https://loqui.im/img/background.jpg') no-repeat center center fixed; 
+  background-size: cover;
 }
 section#welcome h1 {
   position: absolute;
   font-size: 1.5rem;
-  font-weight: 100;
-  top: calc(50% + 3rem);
+  font-style: italic;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem;
+  margin-bottom: 3rem;
   text-align: center;
-  width: 100%;
+  color: white;
+  background-color: rgba(0, 0, 0, .7);
 }
 section.setup img[src^='img/providers']{
   position: absolute;
