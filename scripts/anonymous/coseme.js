@@ -7142,7 +7142,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
       },
 
       media: function() {
-        wantsReceipt = false;
+        wantsReceipt = true;
         var messageChildren = messageNode.children || [];
         messageChildren.forEach(processChildNode);
       }
