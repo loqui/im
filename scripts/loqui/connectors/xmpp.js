@@ -322,11 +322,12 @@ App.connectors['XMPP'] = function (account) {
         return true;
       }, 
       function (e) {
-        console.log('MUC PRES',e);
+        Tools.log('MUC PRES', e);
         return true;
       }, 
       function (e) {
-        chat.core.participants = Object.keys(e);
+        Tools.log('MUC ROSTER', e);
+        account.chatGet(jid).core.participants = Object.keys(e);
         return true;
       },
       null, //password
