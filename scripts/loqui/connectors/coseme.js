@@ -637,9 +637,15 @@ console.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
           status: null
         }
       });
+      var ci = this.account.chatFind(contact.jid);
+      if (ci > -1) {
+        var chat = this.account.chats[ci].core;
+        chat.title = this.contacts._pre[contact.phone]
+      }
     }
     this.contacts.order(this.contacts._cb);
     this.account.save();
+    this.account.allRender()
   }
   
   this.events.onPresenceUpdated = function (jid, lastSeen, msg) {
