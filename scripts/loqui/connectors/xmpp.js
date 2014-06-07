@@ -343,6 +343,16 @@ App.connectors['XMPP'] = function (account) {
     // Not necessary
   }
   
+  this.muc.expel = function (gid, jid) {
+    if (jid) {
+      
+    } else {
+      this.connection.muc.leave(gid, function (e) {
+        Tools.log('MUC LEAVE', e);
+      });
+    }
+  }.bind(this)
+  
   this.handlers.init = function () {
     this.connection.deleteHandler(this.handlers.onMessage);
     this.connection.deleteHandler(this.handlers.onSubRequest);
