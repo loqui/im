@@ -38,15 +38,42 @@ var Menu = {
       var gid = $(obj).closest('section').data('jid');
       Messenger.mucExit(gid);
     },
-    mucJoin: function (obj) {
-      Lungo.Router.section('mucJoin');
+    mucCreateForm: function (obj) {
+      Lungo.Router.section('mucCreateForm');
+      var account = Messenger.account();
+      var form = $('section#mucCreateForm article.form');
+      var server = Strophe.getDomainFromJid(account.core.fullJid);
+      var inList = form.find('option[value$="' + server + '"]');
+      if (inList.length < 1) {
+        form.find('option#self').val(server).text(server);
+      } else {
+        inList.parent().val(inList.attr('value'));
+      }
     },
     mucCreate: function (obj) {
-      Lungo.Router.section('mucCreate');
+      var account = Messenger.account();
+      var form = $('section#mucCreateForm article.form');
+      var domain = form.find('[name=custom]').val() || form.find('[name=server]').val();
+      var title = form.find('[name=title]').val().trim();
+      var node = title.toLowerCase().replace(/ /g, '').replace(/ñ/g, 'n');
+      var jid = node + '@' + domain;
+      account.connector.muc.create(jid, title);
+    },
+    mucSearchForm: function () {
+      Lungo.Router.section('mucSearchForm');
+      var account = Messenger.account();
+      var form = $('section#mucSearchForm article.form');
+      var server = Strophe.getDomainFromJid(account.core.fullJid);
+      var inList = form.find('option[value$="' + server + '"]');
+      if (inList.length < 1) {
+        form.find('option#self').val(server).text(server);
+      } else {
+        inList.parent().val(inList.attr('value'));
+      }
     },
     mucSearch: function (obj) {
       var account = Messenger.account();
-      var form = $('section#mucJoin article.form');
+      var form = $('section#mucSearchForm article.form');
       var server = form.find('[name=custom]').val() || form.find('[name=server]').val();
       var ul = form.find('output').children('ul').first().empty();
       var mucJoin = function (e) {
@@ -54,18 +81,20 @@ var Menu = {
         var title = $(this).siblings('span').text();
         account.connector.muc.join(jid, title);
       }
-      account.connector.muc.explore(server,
-        function (jid, name) {
-          console.log('GOT', jid, name);
-          var html = $('<li/>').data('jid', jid).append($('<span/>').text(name)).append($('<a/>').text(_('Join')).on('click', mucJoin));
-          ul.append(html);
-          Lungo.Notification.hide();
-        },
-        function (error) {
-          console.log('REJECTED', error);
-        }
-      );
-      Lungo.Notification.show('search', _('MucSearching', {server: server}), 30);
+      if (server) {
+        account.connector.muc.explore(server,
+          function (jid, name) {
+            console.log('GOT', jid, name);
+            var html = $('<li/>').data('jid', jid).append($('<span/>').text(name)).append($('<a/>').text(_('Join')).on('click', mucJoin));
+            ul.append(html);
+            Lungo.Notification.hide();
+          },
+          function (error) {
+            console.log('REJECTED', error);
+          }
+        );
+        Lungo.Notification.show('search', _('MucSearching', {server: server}), 30);
+      }
     },
     contactAdd: function (obj) {
       var account = Messenger.account();

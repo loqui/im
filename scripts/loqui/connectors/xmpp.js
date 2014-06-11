@@ -310,6 +310,7 @@ App.connectors['XMPP'] = function (account) {
   }.bind(this)
   
   this.muc._join = function (jid) {
+    Tools.log('JOINING', jid);
     var connector = this;
     var account = connector.account;
     var chat = account.chatGet(jid);
@@ -351,6 +352,10 @@ App.connectors['XMPP'] = function (account) {
         Tools.log('MUC LEAVE', e);
       });
     }
+  }.bind(this)
+  
+  this.muc.create = function (jid, title) {
+    this.muc.join(jid, title);
   }.bind(this)
   
   this.handlers.init = function () {

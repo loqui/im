@@ -309,13 +309,13 @@ var Account = function (core) {
     if (account.supports('mucCreate')) {
       header.append($('<button/>').addClass('new').text(_('GroupNew'))
       .on('click', function (event) {
-        Menu.show('mucCreate', account);
+        Menu.show('mucCreateForm', account);
       }))
     }
     if (account.supports('mucJoin')) {
       header.append($('<button/>').addClass('join').text(_('GroupJoin'))
       .on('click', function (event) {
-        Menu.show('mucJoin', account);
+        Menu.show('mucSearchForm', account);
       }));
     }
     var ul = $('<ul/>').addClass('list').addClass('scroll');

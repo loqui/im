@@ -313,21 +313,32 @@
       </p>-->
     </article>
   </section>
-  <section id='mucCreate' data-transition='vertical'>
-    <header data-title='New Group' data-l10n-title='MucCreate'>
+  <section id='mucCreateForm' data-transition='vertical'>
+    <header data-title='New Group' data-l10n-title='MucCreateForm'>
       <nav class='on-left'>
         <button data-view-section='back' data-icon='angle-up' class='up'></button>
       </nav>
     </header>
     <article id='main' class='simple form scroll'>
-      <label for='name' data-l10n-id='Nickname'>Nickname</label>
-      <input type='text' name='name' data-l10n-placeholder='mucNamePH' placeholder='Old friends'/>
+      <label for='server' data-l10n-id='Server'>Server</label>
+      <select name='server'>
+        <option id='self' selected='selected'></option>
+        <option value='groups.loqui.im'>loqui.im</option>
+        <option value='conference.dukgo.com'>dukgo.com</option>
+        <option value='conf.jabberes.org'>jabberes.org</option>
+        <option value='conference.jabber.ccc.de'>jabber.ccc.de</option>
+        <option value='muc.jappix.com'>jappix.com</option>
+        <option value='custom' data-l10n-id='Custom' data-reveal='custom'>Custom</option>
+      </select>
+      <label for='name' data-l10n-id='MucTitle'>Title</label>
+      <input class='hidden' type='text' name='custom' />
+      <input type='text' name='title' data-l10n-placeholder='MucTitlePH' placeholder='Old friends'/>
       <div class='buttongroup'>
-        <button class='add' data-l10n-id='Add'>Create</button>
+        <button class='create' data-l10n-id='Create' data-menu-onclick='mucCreate' >Create</button>
       </div>
     </article>
   </section>
-  <section id='mucJoin' data-transition='vertical'>
+  <section id='mucSearchForm' data-transition='vertical'>
     <header data-title='Join Group' data-l10n-title='MucJoin'>
       <nav class='on-left'>
         <button data-view-section='back' data-icon='angle-up' class='up'></button>
@@ -336,9 +347,9 @@
     <article id='main' class='simple form scroll'>
       <label for='server' data-l10n-id='Server'>Server</label>
       <select name='server'>
-        <option value='groups.loqui.im' selected='selected'>loqui.im</option>
+        <option id='self' selected='selected'></option>
+        <option value='groups.loqui.im'>loqui.im</option>
         <option value='conference.dukgo.com'>dukgo.com</option>
-        <option value='rooms.blah.im'>blah.im</option>
         <option value='conf.jabberes.org'>jabberes.org</option>
         <option value='conference.jabber.ccc.de'>jabber.ccc.de</option>
         <option value='muc.jappix.com'>jappix.com</option>

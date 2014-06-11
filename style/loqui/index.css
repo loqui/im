@@ -1359,22 +1359,22 @@ section#activity article ul.accounts li span.jid {
   text-overflow: ellipsis;
 }
 
-section#mucJoin output ul {
+section#mucSearchForm output ul {
   margin-bottom: 2rem;
 }
-section#mucJoin output ul li {
+section#mucSearchForm output ul li {
   position: relative;
   padding: 1rem .5rem;
 }
-section#mucJoin output ul li:not(:last-child) {
+section#mucSearchForm output ul li:not(:last-child) {
   border-bottom: .1rem solid #CCC;
 }
-section#mucJoin output ul li span {
+section#mucSearchForm output ul li span {
   display: block;
   width: calc(100% - 3rem);
   word-break: break-all;
 }
-section#mucJoin output ul li a {
+section#mucSearchForm output ul li a {
   position: absolute;
   top: 1rem;
   right: .5rem;
