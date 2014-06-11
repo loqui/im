@@ -180,6 +180,27 @@ var Plus = {
     }
   },
 
+  backChange: function() {
+    var account = Messenger.account();
+    var to = $('section#chat').data('jid');
+      var e = new MozActivity({
+        name: 'pick',
+        data: {
+          type: ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/bmp']
+        }
+      });
+      e.onsuccess = function () {
+        var blob = this.result.blob;
+        Tools.blobToBase64(blob, function (url) {
+          $('section#chat ul#messages').style('backgroundImage', 'url('+url+') no-repeat center center fixed'); 
+          Lungo.Notification.show('star', _('Test'));  
+        }); 
+      }
+      e.onerror = function () {
+        Tools.log('WTF??? Something wrong??');
+      }
+  },
+
   showConsole: function() {
     $('#console').show();
   },
