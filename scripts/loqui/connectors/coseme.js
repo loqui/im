@@ -853,8 +853,9 @@ App.logForms['coseme'] = function (article, provider, data) {
   });
   var smsButtons = $('<div/>').addClass('buttongroup');
   var smsReq = $('<button/>').data('role', 'submit').style('backgroundColor', data.color).text(_('SMSRequest'));
+  var codeReady = $('<button/>').data('role', 'submit').style('backgroundColor', data.color).text(_('codeReady'));
   var back = $('<button/>').data('view-section', 'back').text(_('GoBack'));
-  smsButtons.append(smsReq).append(back);
+  smsButtons.append(smsReq).append(codeReady).append(back);
   sms.append(smsButtons);
   var code = $('<div/>').addClass('code hidden')
     .append('<p>Enter the 6-digits code you have received by SMS.</p>')
@@ -875,13 +876,66 @@ App.logForms['coseme'] = function (article, provider, data) {
   codeButtons.append(validate);
   codeButtons.append(retry);
   code.append(codeButtons);
+  // Separe
+  var recode = $('<div/>').addClass('recode hidden')
+    .append($('<p/>').text(_('recodeSMS', { provider: data.longName })))
+    .append($('<label/>').attr('for', 'countrySelect').text(_(data.terms['country'])));
+  var countrySelect = $('<select/>').attr('name', 'countrySelect');
+  var countries = Tools.countries();
+  countrySelect.append($('<option/>').attr('value', '').text('-- ' + _('YourCountry')));
+  for (var i in countries) {
+    var country = countries[i];
+    countrySelect.append($('<option/>').attr('value', country.dial).text(country.name));
+  }
+  recode
+    .append(countrySelect)
+    .append($('<label/>').attr('for', 'user').text(_(data.terms['user'])))
+    .append($('<input/>')
+      .attr('type', 'number')
+      .attr('name', 'country')
+      .attr('disabled', 'true')
+      .style('width', '3rem')
+      .addClass('spaced')
+    )
+    .append($('<input/>')
+      .attr('type', 'number')
+      .attr('name', 'user')
+      .style('width', 'calc(100% - 4.5rem)')
+    )
+    .append($('<label/>').attr('for', 'user').text(_('recodeLabel')))
+    .append($('<input/>')
+      .attr('type', 'number')
+      .attr('name', 'rCode')
+      .attr('placeholder', '123456')
+    );
+  countrySelect.bind('change', function () {
+    recode.find('input[name="country"]').val(this.value);
+  });
+  var recodeButtons = $('<div/>').addClass('buttongroup');
+  var valCode = $('<button/>').data('role', 'submit').style('backgroundColor', data.color).text(_('recodeRequest'));
+  var sback = $('<button/>').text(_('GoBack'));
+  recodeButtons.append(valCode).append(sback);
+  recode.append(recodeButtons);
+
+  // Separe
   var progress = $('<div/>').addClass('progress hidden')
     .append('<span/>')
     .append($('<progress/>').attr('value', '0'));
   article
     .append(sms)
     .append(code)
+    .append(recode)
     .append(progress);
+  codeReady.bind('click', function () {
+    Tools.log('Move faster, we like Whatsapp right now!');
+    sms.addClass('hidden');
+    recode.removeClass('hidden');
+  });
+  sback.bind('click', function () {
+    Tools.log('Move faster, we like Whatsapp right now!');
+    recode.addClass('hidden');
+    sms.removeClass('hidden');
+  });
   smsReq.bind('click', function () {
     var article = this.parentNode.parentNode.parentNode;
     var provider = article.parentNode.id;
@@ -938,6 +992,37 @@ App.logForms['coseme'] = function (article, provider, data) {
   });
 
   validate.bind('click', function () {
+    var article = this.parentNode.parentNode.parentNode;
+    var provider = article.parentNode.id;
+    var user = $(article).find('[name="user"]').val();
+    var cc  = $(article).find('[name="country"]').val();
+    var rCode = $(article).find('[name="rCode"]').val().replace(/\D/g,'');
+    var deviceId = $(article).data('deviceId');
+    if (cc && user && rCode && deviceId) {
+      var onready = function (data) {
+        Tools.log(data);
+        if (data.type == 'existing') {
+          var account = new Account({
+            user: user,
+            cc: cc,
+            data: data,
+            provider: provider,
+            resource: App.defaults.Account.core.resource,
+            chats: []
+          });  
+          account.test();    
+        } else {
+          Tools.log('Not valid', 'Reason:', data.reason);
+          Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
+        }
+      }
+      var onerror = function (error) {}
+      Lungo.Notification.show('copy', _('CodeValidating'));
+      CoSeMe.registration.register(cc, user, rCode, onready, onerror, deviceId);
+    } 
+  });
+
+  valCode.bind('click', function () {
     var article = this.parentNode.parentNode.parentNode;
     var provider = article.parentNode.id;
     var user = $(article).find('[name="user"]').val();
