@@ -876,7 +876,6 @@ App.logForms['coseme'] = function (article, provider, data) {
   codeButtons.append(validate);
   codeButtons.append(retry);
   code.append(codeButtons);
-  // Separe
   var recode = $('<div/>').addClass('recode hidden')
     .append($('<p/>').text(_('recodeSMS', { provider: data.longName })))
     .append($('<label/>').attr('for', 'countrySelect').text(_(data.terms['country'])));
@@ -916,8 +915,6 @@ App.logForms['coseme'] = function (article, provider, data) {
   var sback = $('<button/>').text(_('GoBack'));
   recodeButtons.append(valCode).append(sback);
   recode.append(recodeButtons);
-
-  // Separe
   var progress = $('<div/>').addClass('progress hidden')
     .append('<span/>')
     .append($('<progress/>').attr('value', '0'));
