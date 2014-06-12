@@ -132,6 +132,7 @@ var Account = function (core) {
     meSection.find('#card .name').text(address == this.core.user ? '' : address);
     meSection.find('#card .user').text(this.core.user);
     meSection.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + this.core.provider + '.svg'));
+    meSection.find('#card .backButton').empty().append($('<img/>').attr('src', 'img/cb.svg'));
     var show = function (a) {
       a.url.then(function (val) {
         $('section#me .avatar img').attr('src', val);
