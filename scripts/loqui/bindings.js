@@ -121,8 +121,8 @@ $('section#me #card span.backButton').on('click', function (e) {
   e.onsuccess = function () {
     var blob = this.result.blob;
     Tools.blobToBase64(blob, function (url) {
-      $('section#chat ul#messages').style('backgroundImage', 'url('+url+') no-repeat center center fixed');
-      $('section.profile #card div#card').style('backgroundImage', 'url('+url+') no-repeat center center fixed'); 
+      $('section#chat ul#messages').style('background', 'url('+url+') no-repeat center center fixed');
+      $('section.profile div#card').style('background', 'url('+url+') no-repeat center center fixed'); 
       Lungo.Notification.show('star', _('Test'));  
     }); 
   }
