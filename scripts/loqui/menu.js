@@ -122,9 +122,6 @@ var Menu = {
     bolt: function () {
       Plus.bolt();
     },
-    changeBackground: function() {
-      Plus.backChange();
-    },
     call: function () {
       $('section#chat nav#plus').removeClass('show');
       Lungo.Router.article('chat', 'call');

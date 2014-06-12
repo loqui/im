@@ -1017,8 +1017,6 @@ section:not([data-features~=presence]) span.show {
 }
 
 section.profile div#card {
-  background-color: #FFF;
-  color: #FFF;
   padding: 2rem;
   min-height: 8rem;
   color: #333;
@@ -1077,14 +1075,14 @@ section.profile div#card span.provider img {
 section.profile div#card span.backButton {
   position: absolute;
   display: block;
-  width: 2rem;
-  height: 2rem;
-  top: 1rem;
-  right: 1rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  top: .4rem;
+  right: .6rem;
   border: .3rem solid white;
-  border-radius: .6rem;
-  background-color: #848484;
-  opacity: .1;
+  border-radius: .3rem;
+  background-color: white;
+  opacity: .5;
 }
 section.profile div#card span.backButton img {
   width: 100%;

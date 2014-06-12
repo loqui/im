@@ -110,6 +110,27 @@ $('section#me #card span.avatar').on('click', function (e) {
   }
 });
 
+// Change background
+$('section#me #card span.backButton').on('click', function (e) {
+  var e = new MozActivity({
+    name: 'pick',
+    data: {
+      type: ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/bmp']
+    }
+  });
+  e.onsuccess = function () {
+    var blob = this.result.blob;
+    Tools.blobToBase64(blob, function (url) {
+      $('section#chat ul#messages').style('backgroundImage', 'url('+url+') no-repeat center center fixed');
+      $('section.profile #card div#card').style('backgroundImage', 'url('+url+') no-repeat center center fixed'); 
+      Lungo.Notification.show('star', _('Test'));  
+    }); 
+  }
+  e.onerror = function () {
+    Tools.log('WTF??? Something wrong??');
+  }
+});
+
 $('section#me #status input').on('blur', function (e) {
   Messenger.presenceUpdate();
 }).on('keydown', function (e) {
