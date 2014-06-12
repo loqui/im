@@ -130,7 +130,7 @@ $('section#me #card span.backButton').on('click', function (e) {
       Store.recover(account.core.background, function (url) {
         $('section#chat ul#messages').style('background', 'url('+url+') no-repeat center center fixed');
         $('section.profile div#card').style('background', 'url('+url+') no-repeat center center fixed'); 
-        Lungo.Notification.show('star', _('backChanged'));  
+        Lungo.Notification.show('star', _('backChanged'), 3);  
       }.bind(this)); 
     });
   }
