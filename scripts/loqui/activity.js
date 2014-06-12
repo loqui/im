@@ -2,10 +2,10 @@
 
 var Activity = function (action, account, content, options) {
 
-  var options = {
+  $.extend(options, {
     chats: (options && 'chats' in options) ? options.chats : true,
     groups: (options && 'groups' in options) ? options.groups : true
-  }
+  });
   
   var actions = {
     chat: function (f, account, content) {
@@ -52,6 +52,14 @@ var Activity = function (action, account, content, options) {
       if (options.groups) {
         account.groupsRender(f, click);
       }
+    },
+    invite: function (f, account, content, options) {
+      var click = function (t) {
+        var t = $(t);
+        t.toggleClass('selected');
+        content(t.data('jid'), t.find('.name').text());
+      }
+      account.contactsRender(f, click, options.selected);
     }
   }
   
@@ -95,7 +103,7 @@ var Activity = function (action, account, content, options) {
   
   if (account) {
     if (action in actions) {
-      actions[action](f, account, content);
+      actions[action](f, account, content, options);
       section[0].appendChild(f);
       section.find('h1').first().text(_('Action' + action));
       section.addClass('extended');

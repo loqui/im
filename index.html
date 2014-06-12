@@ -314,25 +314,31 @@
     </article>
   </section>
   <section id='mucCreateForm' data-transition='vertical'>
-    <header data-title='New Group' data-l10n-title='MucCreateForm'>
+    <header data-title='New Group' data-l10n-title='MucCreate'>
       <nav class='on-left'>
         <button data-view-section='back' data-icon='angle-up' class='up'></button>
       </nav>
     </header>
     <article id='main' class='simple form scroll'>
-      <label for='server' data-l10n-id='Server'>Server</label>
-      <select name='server'>
-        <option id='self' selected='selected'></option>
-        <option value='groups.loqui.im'>loqui.im</option>
-        <option value='conference.dukgo.com'>dukgo.com</option>
-        <option value='conf.jabberes.org'>jabberes.org</option>
-        <option value='conference.jabber.ccc.de'>jabber.ccc.de</option>
-        <option value='muc.jappix.com'>jappix.com</option>
-        <option value='custom' data-l10n-id='Custom' data-reveal='custom'>Custom</option>
-      </select>
+      <div data-requires='federation'>
+        <label for='server' data-l10n-id='Server'>Server</label>
+        <select name='server'>
+          <option id='self' selected='selected'></option>
+          <option value='groups.loqui.im'>loqui.im</option>
+          <option value='conference.dukgo.com'>dukgo.com</option>
+          <option value='conf.jabberes.org'>jabberes.org</option>
+          <option value='conference.jabber.ccc.de'>jabber.ccc.de</option>
+          <option value='muc.jappix.com'>jappix.com</option>
+          <option value='custom' data-l10n-id='Custom' data-reveal='custom'>Custom</option>
+        </select>
+      </div>
       <label for='name' data-l10n-id='MucTitle'>Title</label>
       <input class='hidden' type='text' name='custom' />
       <input type='text' name='title' data-l10n-placeholder='MucTitlePH' placeholder='Old friends'/>
+      <label for='members' data-l10n-id='MucMembers'>Members</label>
+      <ul class='members listBox'>
+        <li class='add' data-l10n-id='MucInvite' data-icon='plus' data-menu-onclick='mucInvite'>Invite someone</li>
+      </ul>
       <div class='buttongroup'>
         <button class='create' data-l10n-id='Create' data-menu-onclick='mucCreate' >Create</button>
       </div>

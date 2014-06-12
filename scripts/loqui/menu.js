@@ -39,6 +39,7 @@ var Menu = {
       Messenger.mucExit(gid);
     },
     mucCreateForm: function (obj) {
+      Lungo.Router.section('back');
       Lungo.Router.section('mucCreateForm');
       var account = Messenger.account();
       var form = $('section#mucCreateForm article.form');
@@ -49,17 +50,24 @@ var Menu = {
       } else {
         inList.parent().val(inList.attr('value'));
       }
+      if (account.supports('federation')) {
+        form.find('[data-requires=federation]').show();
+      } else {
+        form.find('[data-requires=federation]').hide();
+      }
     },
     mucCreate: function (obj) {
       var account = Messenger.account();
       var form = $('section#mucCreateForm article.form');
       var domain = form.find('[name=custom]').val() || form.find('[name=server]').val();
       var title = form.find('[name=title]').val().trim();
-      var node = title.toLowerCase().replace(/ /g, '').replace(/ñ/g, 'n');
+      account.connector.muc.create(domain, title);
+      /*var node = title.toLowerCase().replace(/ /g, '').replace(/ñ/g, 'n');
       var jid = node + '@' + domain;
-      account.connector.muc.create(jid, title);
+      account.connector.muc.create(jid, title);*/
     },
     mucSearchForm: function () {
+      Lungo.Router.section('back');
       Lungo.Router.section('mucSearchForm');
       var account = Messenger.account();
       var form = $('section#mucSearchForm article.form');
@@ -95,6 +103,30 @@ var Menu = {
         );
         Lungo.Notification.show('search', _('MucSearching', {server: server}), 30);
       }
+    },
+    mucInvite: function (obj) {
+      var cb;
+      var account = Messenger.account();
+      if (typeof obj == 'object') {
+        var obj = $(obj);
+        var listBox = obj.parent();
+        cb = function (jid, name) {
+          var ex = listBox.find('li[data-jid="' + jid + '"]');
+          if (ex.length > 0) {
+            ex.remove();
+          } else {
+            listBox.prepend($('<li/>').data('jid', jid).text(name));
+          }
+        }
+      } else {
+        cb = obj;
+      }
+      var options = {
+        chats: false,
+        groups: false,
+        selected: listBox && listBox.children().map(function (i,e,a) {return e.dataset.jid})
+      };
+      Activity('invite', account, cb, options);
     },
     contactAdd: function (obj) {
       var account = Messenger.account();

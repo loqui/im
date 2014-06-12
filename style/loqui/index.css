@@ -239,6 +239,10 @@ section > nav[data-control="menu"] a:before {
   font-size: 1.5rem!important;
 }
 
+section#activity {
+  z-index: 52!important;
+}
+
 section#main > header div.account,
 section#main > header div.account * {
   position: absolute;
@@ -329,6 +333,20 @@ section#activity article ul li[data-muc="true"] span.avatar img:not([src]) {
 section#main article ul li:active,
 section#activity article ul li:active {
   background-color: #DDD;
+}
+section#activity article ul li.selected:after {
+  content: '✔';
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  background-color: #2CC269;
+  color: white;
+  border-radius: 100%;
+  width: 2rem;
+  padding: .5rem 0; 
+  font-size: 1.5rem;
+  line-height: 1rem;
+  text-align: center;
 }
 section#main article ul li span.name {
   position: absolute;
@@ -1433,6 +1451,24 @@ div.switch div.ball {
   left: 1.2rem;
   border-color: #EFBA07;
 }
+
+article.form ul.listBox {
+  border: .1rem solid #AAA;
+  border-radius: .2rem;
+}
+article.form ul.listBox li {
+  padding: .3rem 1rem;
+  font-size: 1rem;
+}
+article.form ul.listBox li.add {
+  color: white;
+  background-color: #2CC269;
+  font-style: italic;
+}
+article.form ul.listBox li.add:before {
+  margin-right: .5rem;
+}
+
 /* KEYFRAMES */
 @keyframes blink {
   from {

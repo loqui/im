@@ -125,7 +125,7 @@ var Providers = {
       autodomain: false,
       features: ['multi', 'vcard', 'presence', 'easyAvatars', 'rosterMgmt', 
         'avatarChange', 'attention', 'csn', 'delay', 'time', 'statusChange', 
-        'show', 'muc', 'mucCreate', 'mucJoin', 'receipts'],
+        'show', 'muc', 'mucCreate', 'mucJoin', 'receipts', 'federation'],
       color: '#149ED2',
       terms: {
         user: 'FullJID',

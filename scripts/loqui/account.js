@@ -266,7 +266,7 @@ var Account = function (core) {
   }
 
   // List all contacts for this account
-  this.contactsRender = function (f, click) {
+  this.contactsRender = function (f, click, selected) {
     var account = this;
     var article = $('<article/>').attr('id', 'contacts');
     var header = $('<header/>').addClass('beige')
@@ -289,6 +289,9 @@ var Account = function (core) {
       var name = contact.name || contact.jid;
       var li = document.createElement('li');
       li.dataset.jid = contact.jid;
+      if (selected && selected.indexOf(contact.jid) > -1) {
+        li.classList.add('selected');
+      }
       li.innerHTML = 
           '<span class=\'name\'>' + name + '</span>'
         + '<span class=\'status\'>' + contact.jid + '</span>';
