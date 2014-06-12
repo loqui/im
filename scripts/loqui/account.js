@@ -146,6 +146,10 @@ var Account = function (core) {
       });
     }
     Accounts.unread(account.unread);
+    Store.recover(account.core.background, function (url) {
+      $('section#chat ul#messages').style('background', 'url('+url+') no-repeat center center fixed');
+      $('section.profile div#card').style('background', 'url('+url+') no-repeat center center fixed'); 
+    }.bind(this)); 
   }
   
   // Render everything for this account
