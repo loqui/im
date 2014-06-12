@@ -691,7 +691,7 @@ section#chat ul#messages {
   list-style-type: none;
   background-color: #FFF;
   padding-top: 1.5rem;
-  background-size: cover;
+  background-size: cover!important;
 }
 section#chat ul#messages > .more {
   width: calc(100vw - 1rem);
@@ -882,6 +882,7 @@ section#chat ul#messages li time {
   font-style: italic;
   padding-top: .3rem;
   color: #666;
+  text-shadow: 0px 0px 4px rgba(255, 255, 255, 1);
 }
 section#chat ul#messages li .lastRead {
   position: relative;
@@ -1020,6 +1021,7 @@ section.profile div#card {
   padding: 2rem;
   min-height: 8rem;
   color: #333;
+  background-size: cover!important;
 }
 section.profile div#card span.avatar {
   position: absolute;
@@ -1045,6 +1047,7 @@ section.profile div#card span.name {
   line-height: 1rem;
   color: #222;
   font-weight: 300;
+  text-shadow: 0px 0px 4px rgba(255, 255, 255, 1);
 }
 section.profile div#card span.user {
   display: block;
@@ -1056,6 +1059,7 @@ section.profile div#card span.user {
   line-height: 1rem;
   font-weight: 200;
   word-break: break-all;
+  text-shadow: 0px 0px 4px rgba(255, 255, 255, 1);
 }
 section.profile div#card span.provider {
   position: absolute;
