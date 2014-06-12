@@ -691,6 +691,7 @@ section#chat ul#messages {
   list-style-type: none;
   background-color: #FFF;
   padding-top: 1.5rem;
+  background-size: cover;
 }
 section#chat ul#messages > .more {
   width: calc(100vw - 1rem);
@@ -1073,6 +1074,22 @@ section.profile div#card span.provider img {
   width: 100%;
   border-radius: .3rem;
 }
+section.profile div#card span.backButton {
+  position: absolute;
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  top: 1rem;
+  right: 1rem;
+  border: .3rem solid white;
+  border-radius: .6rem;
+  background-color: #848484;
+  opacity: .1;
+}
+section.profile div#card span.backButton img {
+  width: 100%;
+  border-radius: .3rem;
+}
 section.profile div#settings ul {
   margin-top: .5rem;
 }
@@ -1129,6 +1146,7 @@ section#me div#status input {
   width: 100%;
   height: 2.4rem;
   font-size: 1rem;
+  margin-bottom: 1.5rem;
 }
 section.profile article > div:not(#card) {
   padding: 0 1rem;

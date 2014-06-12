@@ -68,6 +68,7 @@ var Messenger = {
       section.find('#card .name').text(name == jid ? ' ' : name);
       section.find('#card .user').text(jid);
       section.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + account.core.provider + '.svg'));
+      section.find('#card .backButton').empty().append($('<img/>').attr('src', 'img/cb.svg'));
       section.find('#status p').html(App.emoji[Providers.data[account.core.provider].emoji].fy(contact.presence.status) || _('showna'));
       var setUl = section.find('#settings ul').empty();
       var settings = Iterator(chat.core.settings);
