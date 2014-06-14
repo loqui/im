@@ -122,10 +122,7 @@ $('section#me #card span.backButton').on('click', function (e) {
     var account = Messenger.account();
     var blob = this.result.blob;
     var sh = window.innerHeight;
-    var ph = ;
-    var pw = ;
-    var tw = sh / ph * pw;
-    Tools.picThumb(blob, tw, sh, function (url) {
+    Tools.picThumb(blob, null, sh, function (url) {
       account.core.background = Store.save(url)
       Store.recover(account.core.background, function (url) {
         $('section#chat ul#messages').style('background', 'url('+url+') no-repeat center center fixed');
