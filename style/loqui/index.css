@@ -1077,19 +1077,25 @@ section.profile div#card span.provider img {
   width: 100%;
   border-radius: .3rem;
 }
-section.profile div#card span.backButton {
+section.profile div#card button.background {
   position: absolute;
   display: block;
-  width: 1.5rem;
-  height: 1.5rem;
-  top: .4rem;
-  right: .6rem;
-  border: .3rem solid white;
+  width: 2rem;
+  height: 2rem;
+  right: .3rem;
+  padding: .3rem;
+  border: none;
   border-radius: .3rem;
-  background-color: white;
-  opacity: .5;
+  background: white;
+  opacity: .7;
 }
-section.profile div#card span.backButton img {
+section.profile div#card button.background.change {
+  top: .4rem;
+}
+section.profile div#card button.background.delete {
+  top: 2.7rem;
+}
+section.profile div#card button.background.change img {
   width: 100%;
   border-radius: .3rem;
 }

@@ -111,7 +111,7 @@ $('section#me #card span.avatar').on('click', function (e) {
 });
 
 // Change background
-$('section#me #card span.backButton').on('click', function (e) {
+$('section#me #card button.background.change').on('click', function (e) {
   var e = new MozActivity({
     name: 'pick',
     data: {
@@ -123,17 +123,33 @@ $('section#me #card span.backButton').on('click', function (e) {
     var blob = this.result.blob;
     var sh = window.innerHeight;
     Tools.picThumb(blob, null, sh, function (url) {
-      account.core.background = Store.save(url)
+      if (account.core.background) {
+        Store.update(account.core.background, url);
+      } else{
+        account.core.background = Store.save(url);
+      }
       Store.recover(account.core.background, function (url) {
         $('section#chat ul#messages').style('background', 'url('+url+') no-repeat center center fixed');
         $('section.profile div#card').style('background', 'url('+url+') no-repeat center center fixed'); 
-        Lungo.Notification.show('star', _('backChanged'), 3);  
+        Lungo.Notification.show('star', _('backChanged'), 3);
       }.bind(this)); 
     });
   }
   e.onerror = function () {
-    Tools.log('WTF??? Something wrong??');
+    Tools.log('Picture selection was canceled');
   }
+});
+
+$('section#me #card button.background.delete').on('click', function (e) {
+  var account = Messenger.account();
+  if (account.core.background) {
+    Store.blockDrop(account.core.background, function () {
+      $('section#chat ul#messages').style('background', 'none');
+      $('section.profile div#card').style('background', 'none');
+      Lungo.Notification.show('star', _('backChanged'), 3); 
+    });
+  }
+  account.core.background = null;
 });
 
 $('section#me #status input').on('blur', function (e) {
