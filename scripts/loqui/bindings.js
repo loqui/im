@@ -121,12 +121,12 @@ $('section#me #card span.backButton').on('click', function (e) {
   e.onsuccess = function () {
     var account = Messenger.account();
     var blob = this.result.blob;
-    Tools.picThumb(blob, 500, 500, function (url) {
+    var sh = window.innerHeight;
+    var ph = ;
+    var pw = ;
+    var tw = sh / ph * pw;
+    Tools.picThumb(blob, tw, sh, function (url) {
       account.core.background = Store.save(url)
-      //Store.save(url, function (index) {
-      //  account.core.background = index;
-      //  Tools.log('Second');
-      //}.bind(this));
       Store.recover(account.core.background, function (url) {
         $('section#chat ul#messages').style('background', 'url('+url+') no-repeat center center fixed');
         $('section.profile div#card').style('background', 'url('+url+') no-repeat center center fixed'); 
