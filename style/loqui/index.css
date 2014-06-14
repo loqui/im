@@ -706,6 +706,7 @@ section#chat ul#messages {
   list-style-type: none;
   background-color: #FFF;
   padding-top: 1.5rem;
+  background-size: cover!important;
 }
 section#chat ul#messages > .more {
   width: calc(100vw - 1rem);
@@ -765,6 +766,7 @@ section#chat ul#messages > li > div > span.name {
   font-size: .8em;
   font-weight: 100;
   color: #AAA;
+  text-shadow: 0 .05rem 0px white;
 }
 section#chat:not([data-muc='true']) ul#messages > li > div > span.name {
   display: none!important;
@@ -883,6 +885,7 @@ section#chat ul#messages li time {
   font-style: italic;
   padding-top: .3rem;
   color: #666;
+  text-shadow: 0 .05rem 0px white;
 }
 section#chat ul#messages li .lastRead {
   position: relative;
@@ -1019,11 +1022,10 @@ section:not([data-features~=presence]) span.show {
 }
 
 section.profile div#card {
-  background-color: #FFF;
-  color: #FFF;
   padding: 2rem;
   min-height: 8rem;
   color: #333;
+  background-size: cover!important;
 }
 section.profile div#card span.avatar {
   position: absolute;
@@ -1049,6 +1051,7 @@ section.profile div#card span.name {
   line-height: 1rem;
   color: #222;
   font-weight: 300;
+  text-shadow: 0 .05rem 0px white;
 }
 section.profile div#card span.user {
   display: block;
@@ -1060,6 +1063,7 @@ section.profile div#card span.user {
   line-height: 1rem;
   font-weight: 200;
   word-break: break-all;
+  text-shadow: 0 .05rem 0px white;
 }
 section.profile div#card span.provider {
   position: absolute;
@@ -1073,6 +1077,28 @@ section.profile div#card span.provider {
   background-color: white;
 }
 section.profile div#card span.provider img {
+  width: 100%;
+  border-radius: .3rem;
+}
+section.profile div#card button.background {
+  position: absolute;
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  right: .3rem;
+  padding: .3rem;
+  border: none;
+  border-radius: .3rem;
+  background: white;
+  opacity: .7;
+}
+section.profile div#card button.background.change {
+  top: .4rem;
+}
+section.profile div#card button.background.delete {
+  top: 2.7rem;
+}
+section.profile div#card button.background.change img {
   width: 100%;
   border-radius: .3rem;
 }
@@ -1132,6 +1158,7 @@ section#me div#status input {
   width: 100%;
   height: 2.4rem;
   font-size: 1rem;
+  margin-bottom: 1.5rem;
 }
 section.profile article > div:not(#card) {
   padding: 0 1rem;
