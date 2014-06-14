@@ -16,7 +16,9 @@ App.connectors['coseme'] = function (account) {
   this.events = {}
   this.chat = {};
   this.contacts = {};
-  this.muc = {};
+  this.muc = {
+    membersCache: []
+  };
   this.connected = false;
   this.failStamps = [];
   
@@ -224,7 +226,13 @@ App.connectors['coseme'] = function (account) {
   this.muc.participantsGet = function (jid) {
     var method = 'group_getParticipants';
     MI.call(method, [jid]);
-  }
+  }.bind(this)
+  
+  this.muc.create = function (subject, server, members) {
+    var method = 'group_create';
+    var idx = MI.call(method, [subject]);
+    this.muc.membersCache[idx] = members;
+  }.bind(this)
   
   this.fileSend = function (jid, blob) {
     var reader = new FileReader;
@@ -300,7 +308,7 @@ App.connectors['coseme'] = function (account) {
       presence_available: this.events.onPresenceAvailable,
       presence_unavailable: this.events.onPresenceUnavailable,
       group_subjectReceived: null,
-      group_createSuccess: null,
+      group_createSuccess: this.events.onGroupCreateSuccess,
       group_createFail: null,
       group_endSuccess: this.events.onGroupEndSuccess,
       group_gotInfo: this.events.onGroupGotInfo,
@@ -565,6 +573,15 @@ App.connectors['coseme'] = function (account) {
   
   this.events.onGroupEndSuccess = function (gid) {
     Lungo.Notification.success(_('Removed'), null, 'trash', 3);
+  }
+  
+  this.events.onGroupCreateSuccess = function (gid, idx) {
+    Lungo.Notification.show('download', _('Synchronizing'), 5);
+    Lungo.Router.section('back');
+    MI.call('group_getGroups', ['participating']);
+    var members = this.muc.membersCache[idx];
+    MI.call('group_addParticipants', [gid, members]);
+    delete this.muc.membersCache[idx];
   }
   
   this.events.onGroupMessage = function (msgId, from, author, data, stamp, wantsReceipt, pushName) {

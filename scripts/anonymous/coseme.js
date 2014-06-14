@@ -8431,8 +8431,8 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
      var idx = self.makeId('get_groups_');
      self.readerThread.requests[idx] = self.readerThread.parseGroups;
 
-     var queryNode = newProtocolTreeNode('list',{xmlns: 'w:g', type: aGtype});
-     var iqNode = newProtocolTreeNode('iq',{id: idx, type: 'get', to: 'g.us'},
+     var queryNode = newProtocolTreeNode('list',{type: aGtype});
+     var iqNode = newProtocolTreeNode('iq',{id: idx, type: 'get', to: 'g.us', xmlns: 'w:g'},
                                       [queryNode]);
 
      self._writeNode(iqNode);

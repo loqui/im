@@ -354,8 +354,18 @@ App.connectors['XMPP'] = function (account) {
     }
   }.bind(this)
   
-  this.muc.create = function (jid, title) {
+  this.muc.create = function (title, domain, members) {
+    var node = title.toLowerCase().replace(/ /g, '').replace(/ñ/g, 'n');
+    var jid = node + '@' + domain;
     this.muc.join(jid, title);
+    this.muc.invite(jid, members, title);
+  }.bind(this)
+  
+  this.muc.invite = function (gid, members, title) {
+    for (let i in members) {
+      let jid = members[i];
+      this.connection.muc.directInvite(gid, jid, _('MucInvitationText', {title: title}));
+    }
   }.bind(this)
   
   this.handlers.init = function () {
