@@ -146,7 +146,6 @@ var Tools = {
         var canvas = document.createElement('canvas');
         canvas.width = width || (height ? height / img.height * img.width : 150);
         canvas.height = height || (width ? width / img.width * img.height : 150);
-console.log(width, height, canvas.width, canvas.height);
         canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
         var url = canvas.toDataURL('image/jpeg');
         callback(url);
