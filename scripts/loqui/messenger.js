@@ -119,6 +119,7 @@ var Messenger = {
       var chat = account.chats[ci];
       var section = $('section#muc');
       section.data('jid', jid);
+      section.data('mine', chat.core.info && chat.core.info.owner == account.core.fullJid);
       section.find('#card .name').html(App.emoji[Providers.data[account.core.provider].emoji].fy(chat.core.title));
       section.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + account.core.provider + '.svg'));
       section.find('#participants h2').text(_('NumParticipants', {number: chat.core.participants.length}));

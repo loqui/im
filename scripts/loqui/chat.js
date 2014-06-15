@@ -15,6 +15,9 @@ var Chat = function (core, account) {
     this.core.settings = {};
     $.extend(this.core.settings, App.defaults.Chat.core.settings);
   }
+  if (!('info' in this.core)) {
+    this.core.info = {};
+  }
   
   // Render last chunk of messages
   this.lastChunkRender = function () {
@@ -188,6 +191,7 @@ var Chat = function (core, account) {
   
   // Create a chat window for this contact
   this.show = function () {
+console.log(this);
     var section = $('section#chat');
     var header = section.children('header');
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.jid);
@@ -195,6 +199,7 @@ var Chat = function (core, account) {
     section.data('features', $('section#main').data('features'));
     section.data('caps', contact && contact.presence.caps in App.caps ? App.caps[contact.presence.caps].features.join(' ') : 'false');
     section.data('muc', this.core.muc || false);
+    section.data('mine', this.core.muc && this.core.info && this.core.info.owner == this.account.core.fullJid);
     header.children('.title').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(this.core.title));
     section.find('#plus').removeClass('show');
     section.find('#typing').hide();
@@ -242,7 +247,7 @@ var Chat = function (core, account) {
         section.data('show', show);
       }
       this.lastChunkRender();
-    }.bind(this), 500);
+    }.bind(this), 0);
     this.unread = this.core.unread;
     if (this.core.unread) {
       this.account.unread -= this.core.unread;

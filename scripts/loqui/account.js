@@ -523,7 +523,7 @@ var Account = function (core) {
   // Save to store
   this.save = function () {
     var index = Accounts.find(this.core.fullJid || this.core.user);
-	  if(index!=-1){
+	  if(index > -1) {
 		  App.accountsCores[index] = this.core;
 		  App.smartupdate('accountsCores');
 	  }

@@ -91,7 +91,7 @@ var Chungo = {
     
     findByProperty: function (list, key, value) {
       var ret = null;
-      if ('find' in Array.prototype) {
+      if (list instanceof Array && 'find' in Array.prototype) {
         ret = list.find(function (e, i, a) {
           return e[key] == value;
         });

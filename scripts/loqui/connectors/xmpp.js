@@ -294,7 +294,6 @@ App.connectors['XMPP'] = function (account) {
   
   this.muc.join = function (jid, title) {
     var account = this.account;
-    this.muc._join(jid);
     var chat = new Chat({
       jid: jid,
       title: title,
@@ -303,10 +302,11 @@ App.connectors['XMPP'] = function (account) {
     }, account);
     Lungo.Router.section('back');
     Lungo.Router.section('back');
-    chat.show();
     account.chats.push(chat);
     account.core.chats.push(chat.core);
     chat.save(true);
+    chat.show();
+    this.muc._join(jid);
   }.bind(this)
   
   this.muc._join = function (jid) {
@@ -319,7 +319,6 @@ App.connectors['XMPP'] = function (account) {
       jid,
       Strophe.getNodeFromJid(this.account.core.fullJid), 
       function (e) {
-        //connector.events.onMessage(e);
         return true;
       }, 
       function (e) {
@@ -329,6 +328,20 @@ App.connectors['XMPP'] = function (account) {
       function (e) {
         Tools.log('MUC ROSTER', e);
         account.chatGet(jid).core.participants = Object.keys(e);
+        for (var [key, value] in Iterator(e)) {
+          if (value.affiliation == 'owner') {
+            chat.core.info.owner = Strophe.getBareJidFromJid(value.jid);
+            break;
+          }
+        }
+        if ($('section#chat').data('jid') == chat.core.jid) {
+          chat.show();
+        }
+        /*chat.save();
+          setTimeout(function () {
+            console.log(chat.core, account.chatGet(chat.core.jid).core);
+            account.chatGet(chat.core.jid).show();
+        }, 3000);*/
         return true;
       },
       null, //password
