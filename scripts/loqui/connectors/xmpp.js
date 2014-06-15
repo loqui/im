@@ -293,7 +293,7 @@ App.connectors['XMPP'] = function (account) {
     process(server);    
   }.bind(this)
   
-  this.muc.join = function (jid, title) {
+  this.muc.join = function (jid, title, password) {
     var account = this.account;
     var chat = new Chat({
       jid: jid,
@@ -307,10 +307,10 @@ App.connectors['XMPP'] = function (account) {
     account.core.chats.push(chat.core);
     chat.save(true);
     chat.show();
-    this.muc._join(jid);
+    this.muc._join(jid, password);
   }.bind(this)
   
-  this.muc._join = function (jid) {
+  this.muc._join = function (jid, password) {
     Tools.log('JOINING', jid);
     var connector = this;
     var account = connector.account;
@@ -341,7 +341,7 @@ App.connectors['XMPP'] = function (account) {
         chat.save();
         return true;
       },
-      null, //password
+      password,
       history
     );
   }.bind(this)
@@ -410,6 +410,7 @@ App.connectors['XMPP'] = function (account) {
     var paused = tree.children('paused').length || tree.children('active').length;
     var request = tree.children('request').length;
     var received = tree.children('received').length;
+    var x = tree.children('x').length;
     if (body && !(muc && from == to + '/' + Strophe.getNodeFromJid(account.core.fullJid))) {
       var date = new Date();
       var stamp = tree.children('delay').length
@@ -443,6 +444,13 @@ App.connectors['XMPP'] = function (account) {
     }
     if (received) {
       this.events.onMessageDelivered(stanza);
+    }
+    if (x) {
+      var invitation = tree.find('x');
+      console.log(tree, invitation);
+      if (invitation.length) {
+        this.muc.join(invitation.attr('jid'), invitation.attr('jid'), invitation.attr('password'));
+      }
     }
     return true;
   }.bind(this);
