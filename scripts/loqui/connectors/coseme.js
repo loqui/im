@@ -519,7 +519,7 @@ App.connectors['coseme'] = function (account) {
     var ci = account.chatFind(jid);
     if (ci >= 0) {
       var chat = account.chats[ci];
-      var newTitle = decodeURIComponent(escape(subject));
+      var newTitle = decodeURIComponent(subject);
       if (chat.core.title != newTitle) {
         chat.core.title = newTitle;
         chat.core.info = info;
@@ -528,7 +528,7 @@ App.connectors['coseme'] = function (account) {
     } else {
       var chat = new Chat({
         jid: jid,
-        title: decodeURIComponent(escape(subject)),
+        title: decodeURIComponent(subject),
         muc: true,
         creation: creation,
         owner: owner,
