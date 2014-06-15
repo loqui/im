@@ -924,12 +924,14 @@ section#chat ul#messages li:not(:last-of-type) .lastACK {
   display: none;
 }
 section#chat article#emoji {
-  padding: 1rem;
+  height: calc(100% - 6.8rem);
+  padding: .5rem;
 }
 section#chat article#emoji h1 {
   font-size: 1.2rem;
   border-bottom: .1rem solid #AAA;
   color: #444;
+  margin: 1rem;
 }
 section#chat article#emoji ul {
   height: calc(100% - 5.5rem);
