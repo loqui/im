@@ -334,14 +334,10 @@ App.connectors['XMPP'] = function (account) {
             break;
           }
         }
-        if ($('section#chat').data('jid') == chat.core.jid) {
+        if ($('section#chat').hasClass('show') && $('section#chat').data('jid') == chat.core.jid) {
           chat.show();
         }
-        /*chat.save();
-          setTimeout(function () {
-            console.log(chat.core, account.chatGet(chat.core.jid).core);
-            account.chatGet(chat.core.jid).show();
-        }, 3000);*/
+        chat.save();
         return true;
       },
       null, //password

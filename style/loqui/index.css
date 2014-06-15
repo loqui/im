@@ -1162,7 +1162,7 @@ section#me div#status input {
 }
 section.profile article > div:not(#card) {
   padding: 0 1rem;
-  border-top: .1rem solid #CCC;
+  //border-top: .1rem solid #CCC;
 }
 section.profile article > div:not(#card) h2 {
   font-size: 1.1rem;

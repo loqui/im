@@ -126,6 +126,27 @@ var Menu = {
       };
       Activity('invite', account, cb, options);
     },
+    mucDirectInvite: function (obj) {
+      var cb;
+      var account = Messenger.account();
+      if (typeof obj == 'object') {
+        var obj = $(obj);
+        cb = function (jid, name) {
+          console.log($('section#muc').data('jid'), [jid], $('section#muc').find('span.name').text())
+          account.connector.muc.invite($('section#muc').data('jid'), [jid], $('section#muc').find('span.name').text());
+          Lungo.Router.section('back');
+          Lungo.Router.section('back');
+          Lungo.Notification.success(_('MucInvited', {name: name}), null, 'check', 3);
+        }
+      } else {
+        cb = obj;
+      }
+      var options = {
+        chats: false,
+        groups: false,
+      };
+      Activity('invite', account, cb, options);
+    },
     contactAdd: function (obj) {
       var account = Messenger.account();
       if (account.supports('rosterMgmt')) {
