@@ -7,8 +7,7 @@
   "type": "privileged",
   "launch_path": "/index.html",
   "description": "Loqui Instant Messenger unifies all your chat accounts in just one app.",
-  "version": "v0.3.0e",
-  "release_notes": "New interface \nHalf memory consumption \nMuch faster and more stable \nDisable accounts \nMute chats \nAbridged notifications \nUnread messages mark \nShare from Gallery ",
+  "version": "v0.3.1",
   "icons": {
     "32": "/img/icon-32.png",
     "60": "/img/icon-60.png",

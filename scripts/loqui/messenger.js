@@ -238,13 +238,13 @@ var Messenger = {
     }
   },
   
-  chatRemove: function (jid) {
-    var account = Messenger.account();
+  chatRemove: function (jid, account, force) {
+    var account = account || Messenger.account();
     var index = account.chatFind(jid);
     if (index >= 0) {
       var chat = Lungo.Core.findByProperty(account.core.chats, 'jid', jid);
       var name = chat.title || jid;
-      var will = confirm(_('ConfirmChatRemove', {name: name}));
+      var will = force || confirm(_('ConfirmChatRemove', {name: name}));
       if (will) {
         var chat = account.chats[index];
         for (var i in chat.chunks) {
@@ -254,12 +254,14 @@ var Messenger = {
         account.chats.splice(index, 1);
         account.core.chats.splice(index, 1);
         account.save();
-        account.allRender();
-        Lungo.Router.section('back');
-        Lungo.Router.section('main');
-        Lungo.Notification.success(_('Removed'), null, 'trash', 3);
+        if (!force) {
+          account.allRender();
+          Lungo.Router.section('back');
+          Lungo.Router.section('main');
+          Lungo.Notification.success(_('Removed'), null, 'trash', 3);
+        }
       }
-    } else {
+    } else if (!force) {
       Lungo.Notification.error(_('Error'), _('NoChatsForContact'), 'exclamation-sign', 3);
     }
   },

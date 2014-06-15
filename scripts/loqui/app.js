@@ -4,8 +4,8 @@ var App = {
 
   name: 'Loqui IM',
   shortName: 'Loqui',
-  version: 'v0.3.0',
-  minorVersion: 'e',
+  version: 'v0.3.1',
+  minorVersion: 'a',
   connectors: [],
   logForms: [],
   emoji: [],
@@ -142,22 +142,36 @@ var App = {
           account.core.roster = [];
           account.save();
         }
+        from['v0.2.6']();
       },
       'v0.2.6': function () {
-        from['v0.2.5']();
         Object.keys(App.avatars).map(function (key, i) { App.avatars[key] = {chunk: App.avatars[key]} })
-        App.accountsCores.forEach(function (account, i) {
+        App.accountsCores.forEach(function (account) {
           account.enabled = App.defaults.Account.core.enabled;
         });
         App.smartupdate('avatars');
         App.smartupdate('accountCores');
+        from['v0.3.0']();
+      },
+      'v0.3.0': function () {
+        App.accountsCores.forEach(function (account) {
+          var i = 0;
+          account.chats.forEach(function (chat) {
+console.log('ISMUC', chat.muc);
+            if (chat.muc) {
+              Messenger.chatRemove(chat.jid, App.accounts[Accounts.find(account.fullJid)], true);
+            }
+            i++;
+          });
+        });
+        App.smartupdate('accountsCores');
       }
     };
     if (last < App.version && last in from) {
       Lungo.Notification.show('forward', _('Upgrading'), 5);
       from[last]();
-      localStorage.setItem('version', App.version);
     }
+    localStorage.setItem('version', App.version);
   },
   
   // Bootstrap logins and so on
