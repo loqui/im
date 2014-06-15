@@ -28,6 +28,7 @@
       Strophe.addNamespace('MUC_OWNER', Strophe.NS.MUC + "#owner");
       Strophe.addNamespace('MUC_ADMIN', Strophe.NS.MUC + "#admin");
       Strophe.addNamespace('MUC_USER', Strophe.NS.MUC + "#user");
+      Strophe.addNamespace('XEP0249', "jabber:x:conference");
       return Strophe.addNamespace('MUC_ROOMCONF', Strophe.NS.MUC + "#roomconfig");
     },
 

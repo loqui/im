@@ -124,7 +124,8 @@ App.connectors['XMPP'] = function (account) {
       ['delay', Strophe.NS.XEP0203],
       ['time', Strophe.NS.XEP0202],
       ['vcard', Strophe.NS.VCARD],
-      ['receipts', Strophe.NS.XEP0184]
+      ['receipts', Strophe.NS.XEP0184],
+      ['directInvite', Strophe.NS.XEP0249]
     ];
     for (var i in caps) {
       if (this.account.supports(caps[i][0])) {
