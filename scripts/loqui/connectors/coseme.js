@@ -503,20 +503,18 @@ App.connectors['coseme'] = function (account) {
           chat.save(ci, true);
         }
       } else {
-        let chat = new Chat({
-          jid: group.gid + '@g.us',
-          title: group.subject,
-          muc: true,
-          chunks: []
-        }, account);
-        account.chats.push(chat);
-        account.core.chats.push(chat.core);
-        chat.save(ci);
+        MI.call('group_getInfo', [group.gid + '@g.us']);
       }
     }
   }
 
   this.events.onGroupGotInfo = function (jid, owner, subject, subjectOwner, subjectTime, creation) {
+    var info = {
+      owner: owner,
+      subjectOwner: subjectOwner,
+      subjectTime: subjectTime,
+      creation: creation
+    };
     var account = this.account;
     var ci = account.chatFind(jid);
     if (ci >= 0) {
@@ -524,6 +522,7 @@ App.connectors['coseme'] = function (account) {
       var newTitle = decodeURIComponent(escape(subject));
       if (chat.core.title != newTitle) {
         chat.core.title = newTitle;
+        chat.core.info = info;
         chat.save(ci, true);
       }
     } else {
@@ -533,7 +532,8 @@ App.connectors['coseme'] = function (account) {
         muc: true,
         creation: creation,
         owner: owner,
-        chunks: []
+        chunks: [],
+        info: info
       }, account);
       account.chats.push(chat);
       account.core.chats.push(chat.core);
