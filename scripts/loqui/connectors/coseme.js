@@ -141,14 +141,7 @@ App.connectors['coseme'] = function (account) {
   
   this.contacts.remove = function () {
   }
-  
-  this.muc.expel = function (gid, jid) {
-    var [method, params] = jid ? 
-      ['group_removeParticipants', [gid, jid]] :
-      ['group_end', [gid]];
-    MI.call(method, params);
-  }.bind(this);
-  
+    
   this.presence.get = function (jid) {
     var method = 'presence_request';
     MI.call(method, [jid]);
@@ -234,6 +227,18 @@ App.connectors['coseme'] = function (account) {
     this.muc.membersCache[idx] = members;
   }.bind(this)
   
+  this.muc.expel = function (gid, jid) {
+    var [method, params] = jid ? 
+      ['group_removeParticipants', [gid, jid]] :
+      ['group_end', [gid]];
+    MI.call(method, params);
+  }.bind(this);
+  
+  this.muc.invite = function (gid, members, title) {
+    var method = 'group_addParticipants';
+    MI.call(method, [gid, members]);
+  }.bind(this)
+  
   this.fileSend = function (jid, blob) {
     var reader = new FileReader;
     reader.addEventListener("loadend", function () {
@@ -313,7 +318,7 @@ App.connectors['coseme'] = function (account) {
       group_endSuccess: this.events.onGroupEndSuccess,
       group_gotInfo: this.events.onGroupGotInfo,
       group_infoError: this.events.onGroupInfoError,
-      group_addParticipantsSuccess: null,
+      group_addParticipantsSuccess: this.events.onGroupAddParticipantsSuccess,
       group_removeParticipantsSuccess: this.events.onGroupRemoveParticipantsSuccess,
       group_gotParticipants: this.events.onGroupGotParticipants,
       group_setSubjectSuccess: null,
@@ -558,16 +563,30 @@ App.connectors['coseme'] = function (account) {
     var ci = account.chatFind(jid);
     if (ci >= 0) {
       var chat = account.chats[ci];
-      Tools.log('RECEIVED PARTICIPANTS FOR', jid, chat, participants);
       if (!chat.core.participants || (JSON.stringify(chat.core.participants) != JSON.stringify(participants))) {
         chat.core.participants = participants;
-        chat.save(ci);
-        $('section#chat[data-jid="' + chat.core.jid + '"] header .status').text(_('NumParticipants', {number: chat.core.participants.length}));
+        chat.save();
+        if ($('section#chat').hasClass('show') && $('section#chat').data('jid') == chat.core.jid) {
+          chat.show();
+        }
       }
     }
   }
   
-  this.events.onGroupRemoveParticipantsSuccess = function (gid, jids) {
+  this.events.onGroupAddParticipantsSuccess = function (jid, participants) {
+    var account = this.account;
+    var ci = account.chatFind(jid);
+    if (ci >= 0) {
+      var chat = account.chats[ci];
+      chat.core.participants = chat.core.participants.concat(participants);
+      chat.save();
+      if ($('section#chat').hasClass('show') && $('section#chat').data('jid') == chat.core.jid) {
+        chat.show();
+      }
+    }
+  }
+  
+  this.events.onGroupRemoveParticipantsSuccess = function (jid, participants) {
     Lungo.Notification.success(_('Removed'), null, 'trash', 3);
   }
   
