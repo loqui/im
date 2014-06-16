@@ -150,7 +150,7 @@ var Plus = {
           msg.postSend();
         });
         chat.OTR.on('error', function (err) {
-          console.log('OTR-ERROR', err);
+          Tools.log('OTR-ERROR', err);
         })
         chat.OTR.on('status', function (state) {
           switch (state) {

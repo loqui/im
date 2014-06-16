@@ -90,13 +90,13 @@ var Menu = {
       if (server) {
         account.connector.muc.explore(server,
           function (jid, name) {
-            console.log('GOT', jid, name);
+            Tools.log('GOT', jid, name);
             var html = $('<li/>').data('jid', jid).append($('<span/>').text(name)).append($('<a/>').text(_('Join')).on('click', mucJoin));
             ul.append(html);
             Lungo.Notification.hide();
           },
           function (error) {
-            console.log('REJECTED', error);
+            Tools.log('REJECTED', error);
           }
         );
         Lungo.Notification.show('search', _('MucSearching', {server: server}), 30);
@@ -132,7 +132,6 @@ var Menu = {
       if (typeof obj == 'object') {
         var obj = $(obj);
         cb = function (jid, name) {
-          console.log($('section#muc').data('jid'), [jid], $('section#muc').find('span.name').text())
           account.connector.muc.invite($('section#muc').data('jid'), [jid], $('section#muc').find('span.name').text());
           Lungo.Router.section('back');
           Lungo.Router.section('back');

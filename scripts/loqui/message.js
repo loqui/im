@@ -48,7 +48,7 @@ var Message = function (account, core, options) {
   }
   
   this.postSend = function () {
-    console.log('SEND', this.core.text, this.options);
+    Tools.log('SEND', this.core.text, this.options);
     if (this.account.connector.isConnected() && this.options.send) {
       this.core.id = account.connector.send(this.core.to, this.core.text, {delay: (this.options && 'delay' in this.options) ? this.core.stamp : this.options.delay, muc: this.options.muc});
     }
@@ -59,7 +59,7 @@ var Message = function (account, core, options) {
   
   // Receive this message, process and store it properly
   this.receive = function () {
-    console.log('RECEIVE', this.core.text, this.options);
+    Tools.log('RECEIVE', this.core.text, this.options);
     var message = this;
     var chat = this.chat;
     if (this.core.text && this.core.text.substr(0, 4) == "?OTR") {
@@ -186,7 +186,6 @@ var Message = function (account, core, options) {
             if (ext == 'aac') {
               ext = 'mp3';
             }
-            console.log($(e.target));
             var localUrl = App.pathFiles + $(e.target).closest('[data-stamp]').data('stamp').replace(/[-:]/g, '') + url.split('/').pop().substring(0, 5).toUpperCase() + '.' + ext;
             if (img.dataset.downloaded == 'true') {
               Store.SD.recover(localUrl, function (blob) {

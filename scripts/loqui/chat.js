@@ -191,7 +191,6 @@ var Chat = function (core, account) {
   
   // Create a chat window for this contact
   this.show = function () {
-console.log(this);
     var section = $('section#chat');
     var header = section.children('header');
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.jid);

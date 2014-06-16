@@ -124,7 +124,7 @@ var Chungo = {
     },
     
     progress: function (value) {
-      console.log(value);
+      Tools.log(value);
     }
     
   },
@@ -174,7 +174,6 @@ var Chungo = {
               .addClass('forth');
           }
         }
-        console.log('SECTION', from, to);
       }
       setTimeout(function () {
         Chungo.Aside.hide();
@@ -185,7 +184,6 @@ var Chungo = {
       this.section(section);
       var to = $$('section#' + section).children('article#' + article);
       to.addClass('show').siblings('article').removeClass('show');
-      console.log('ARTICLE', to);
     }
     
   },
@@ -198,7 +196,6 @@ var Chungo = {
     },
     
     show: function (id) {
-      console.log('SHOWING', id);
       $$('aside#' + id).addClass('show');
       $$('section.show').addClass('asided');
       this._current = {

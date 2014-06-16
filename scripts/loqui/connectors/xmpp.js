@@ -396,7 +396,6 @@ App.connectors['XMPP'] = function (account) {
   }.bind(this);
   
   this.events.onDisconnected = function (stanza) {
-    console.log(stanza);
   }.bind(this);
   
   this.events.onMessage = function (stanza) {
@@ -447,7 +446,6 @@ App.connectors['XMPP'] = function (account) {
     }
     if (x) {
       var invitation = tree.find('x');
-      console.log(tree, invitation);
       if (invitation.length) {
         this.muc.join(invitation.attr('jid'), invitation.attr('jid'), invitation.attr('password'));
       }
@@ -518,7 +516,6 @@ App.connectors['XMPP'] = function (account) {
             }, entry.jid);
           }
           if (caps && !(caps in App.caps)) {
-            console.log('QUERYING', connector.roster[i].jid + '/' + name, caps);
             connector.connection.disco.info(connector.roster[i].jid + '/' + name, caps);  
           }
           i++;

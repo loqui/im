@@ -384,7 +384,6 @@ var Account = function (core) {
     $('span.avatar img:not([src])').each(function (i, el) {
       var jid = Strophe.getBareJidFromJid($(el).closest('[data-jid]').data('jid')) || account.core.fullJid;
       var me = jid == account.core.fullJid;
-      console.log(jid, avatars[jid]);
       if (avatars[jid]) {
         (new Avatar(avatars[jid])).url.then(function (val) {
           $(el).attr('src', val);
