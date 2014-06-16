@@ -61,8 +61,10 @@ var Menu = {
       var form = $('section#mucCreateForm article.form');
       var domain = form.find('[name=custom]').val() || form.find('[name=server]').val();
       var title = form.find('[name=title]').val().trim();
-      var members = form.find('ul.listBox').children().map(function (i,e,a) {return e.dataset.jid})
-      account.connector.muc.create(title, domain, members);
+      var members = form.find('ul.listBox').children().map(function (i,e,a) {return e.dataset.jid});
+      if (title) {
+        account.connector.muc.create(title, domain, members);
+      }
     },
     mucSearchForm: function () {
       Lungo.Router.section('back');
