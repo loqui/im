@@ -401,7 +401,8 @@ section#chat header span.title img,
 section#contact p#status img,
 section#muc .name img,
 section#activity article ul li span.name img,
-section#activity article ul li span.status img {
+section#activity article ul li span.status img,
+section#activity article ul li span.lastMessage img  {
   height: 1em;
    
 }
