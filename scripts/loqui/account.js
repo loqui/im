@@ -174,7 +174,7 @@ var Account = function (core) {
         li.remove();
         ul.prepend(li);
       }
-      li.children('.lastMessage').html(chat.core.last.text ? App.emoji[Providers.data[this.core.provider].emoji].fy(chat.core.last.text) : _('AttachedFile'));
+      li.children('.lastMessage').html(chat.core.last.text ? App.emoji[Providers.data[this.core.provider].emoji].fy(chat.core.last.text) : (chat.core.media ? _('AttachedFile') : ''));
       li.children('.lastStamp').html(chat.core.last.stamp ? Tools.convenientDate(chat.core.last.stamp).join('<br />') : '');
       li.data('unread', chat.core.unread ? 1 : 0).children('.unread').text(chat.core.unread);
       var totalUnread = this.chats.reduceRight(function (prev, cur, i, all) {
