@@ -157,7 +157,6 @@ var App = {
         App.accountsCores.forEach(function (account) {
           var i = 0;
           account.chats.forEach(function (chat) {
-console.log('ISMUC', chat.muc);
             if (chat.muc) {
               Messenger.chatRemove(chat.jid, App.accounts[Accounts.find(account.fullJid)], true);
             }
