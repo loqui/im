@@ -445,9 +445,13 @@ App.connectors['XMPP'] = function (account) {
       this.events.onMessageDelivered(stanza);
     }
     if (x) {
-      var invitation = tree.find('x');
-      if (invitation.length) {
-        this.muc.join(invitation.attr('jid'), invitation.attr('jid'), invitation.attr('password'));
+      var x = tree.find('x');
+      switch (x.attr('xmlns')) {
+        case 'jabber:x:delay':
+          break;
+        case 'jabber:x:conference':
+          this.muc.join(x.attr('jid'), x.attr('jid'), x.attr('password'));
+          break;
       }
     }
     return true;
