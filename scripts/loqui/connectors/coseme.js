@@ -64,17 +64,17 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.sync = function (callback) {
-    var getStatuses = function () {
-      var method = 'contacts_getStatus';
-      var list = this.account.core.roster.map(function(e){return e.jid;});
-      MI.call(method, [list]);
+    var getStatusesAndPics = function () {
+      var contacts = this.account.core.roster.map(function(e){return e.jid;});
+      MI.call('contacts_getStatus', [contacts]);
+      this.avatar(null, [contacts]);
     }.bind(this);
     if (!('roster' in this.account.core) || !this.account.core.roster.length) {
       this.contacts.sync(function () {
-        callback(getStatuses);
+        callback(getStatusesAndPics);
       });
     } else {
-      callback(getStatuses);
+      callback(getStatusesAndPics);
     }
   }.bind(this);
   
