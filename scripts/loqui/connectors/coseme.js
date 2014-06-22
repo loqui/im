@@ -186,8 +186,8 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.avatar = function (callback, id) {
-    var method = 'contact_getProfilePicture';
-    var params = id ? [id] : [this.account.core.fullJid];
+    var method = 'picture_getIds';
+    var params = id instanceof Array ? id : [id || this.account.core.fullJid];
     MI.call(method, params);
     if (callback) {
       callback(new Avatar({url: 'img/foovatar.png'}));
@@ -340,7 +340,7 @@ App.connectors['coseme'] = function (account) {
       notification_groupParticipantAdded: this.events.onNotification,
       notification_groupParticipantRemoved: this.events.onNotification,
       notification_status: this.events.onNotification,
-      contact_gotProfilePictureId: null,
+      contact_gotProfilePictureId: this.events.onAvatar,
       contact_gotProfilePicture: this.events.onAvatar,
       contact_typing: this.events.onContactTyping,
       contact_paused: this.events.onContactPaused,
@@ -432,26 +432,36 @@ App.connectors['coseme'] = function (account) {
   this.events.onAvatar = function (jid, picId, blob) {
     var account = this.account;
     Tools.log(jid, picId, blob);
-    if (jid == this.account.core.fullJid) {
-      Tools.picThumb(blob, 96, 96, function (url) {
-        $('section#main[data-jid="' + jid + '"] footer span.avatar img').attr('src', url);
-        $('section#me .avatar img').attr('src', url);
-        Store.save(url, function (index) {
-          App.avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
-          App.smartupdate('avatars');
-        });
-      });
-    } else {
-      var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
-      if (contact) {
+    if (blob) {
+      if (jid == this.account.core.fullJid) {
         Tools.picThumb(blob, 96, 96, function (url) {
-          $('ul[data-jid="' + account.core.fullJid + '"] [data-jid="' + jid + '"] span.avatar img').attr('src', url);
-          $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', url);
+          $('section#main[data-jid="' + jid + '"] footer span.avatar img').attr('src', url);
+          $('section#me .avatar img').attr('src', url);
           Store.save(url, function (index) {
             App.avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
             App.smartupdate('avatars');
           });
         });
+      } else {
+        Tools.picThumb(blob, 96, 96, function (url) {
+          $('ul[data-jid="' + account.core.fullJid + '"] [data-jid="' + jid + '"] span.avatar img').attr('src', url);
+          $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', url);
+          var cb = function (index) {
+            App.avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
+            App.smartupdate('avatars');
+          }
+          if (jid in App.avatars) {
+            Store.update(App.avatars[jid].chunk, url, cb);
+          } else {
+            Store.save(url, cb);
+          }
+        });
+      }
+    } else {
+      if (App.avatars[jid] && App.avatars[jid].id != picId) {
+        var method = 'contact_getProfilePicture';
+        var params = [jid || this.account.core.fullJid];
+        MI.call(method, params);
       }
     }
   }
