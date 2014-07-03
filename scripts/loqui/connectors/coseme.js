@@ -852,9 +852,7 @@ App.connectors['coseme'] = function (account) {
         muc: isGroup
       });
       msg.receive();
-      if (wantsReceipt) {
-        this.ack(msgId, fromAttribute);
-      }
+      this.ack(msgId, fromAttribute);
       Tools.log('Finished processing file of type', fileType);
     }.bind(this);
     switch (fileType) {
