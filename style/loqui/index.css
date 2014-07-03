@@ -836,8 +836,9 @@ section#chat ul#messages > li:last-child {
   margin-bottom: 3.5rem;
 }
 section#chat ul#messages span.text img.image {
+    margin: -.5rem -1rem;
     width: calc(100vmin - 6rem);
-    height: calc(100vmin - 6rem);    
+    height: 100%;
     border-radius: .2rem;
 }
 section#chat ul#messages span.text img.audio{

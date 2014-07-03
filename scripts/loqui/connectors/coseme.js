@@ -774,7 +774,7 @@ App.connectors['coseme'] = function (account) {
     var blob = Tools.b64ToBlob(obj.data.split(',').pop(), obj.data.split(/[:;]/)[1]);
     var uploadUrl = url;
     var onSuccess = function (url) {
-      thumbnailer(blob, 120, 120, function(thumb) {
+      thumbnailer(blob, 120, null, function(thumb) {
         var id = MI.call(
           method,
           [toJID, url, hash, '0', thumb.split(',').pop()]
@@ -857,7 +857,7 @@ App.connectors['coseme'] = function (account) {
     }.bind(this);
     switch (fileType) {
       case 'image':
-        Tools.picThumb(CoSeMe.utils.aToBlob(payload, 'i'), 120, 120, process);
+        Tools.picThumb(CoSeMe.utils.aToBlob(payload, 'i'), 120, null, process);
         break;
       case 'video':
         process('img/video.png');
