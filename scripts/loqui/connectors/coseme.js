@@ -188,7 +188,7 @@ App.connectors['coseme'] = function (account) {
   this.avatar = function (callback, id) {
     var method = 'picture_getIds';
     var params = id instanceof Array ? id : [id || this.account.core.fullJid];
-    MI.call(method, params);
+    MI.call(method, [params]);
     if (callback) {
       callback(new Avatar({url: 'img/foovatar.png'}));
     }
