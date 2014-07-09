@@ -48,6 +48,7 @@ LICENSING
  * Chungo.js → AGPLv3
  * OTR.js → MPLv2.0
  * libphonenumber → Apache License v2.0
+ * L10n.js → BSD/MIT/WTFPL
 
 DISCLAIMER
 ===
