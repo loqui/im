@@ -257,7 +257,6 @@ section#main > header div.account img {
 section#main > header div.account .provider {
   top: .5rem;
   left: 2.6rem;
-  text-transform: uppercase;
   font-size: .6em;
   font-weight: 300;
   width: calc(100vw - 11.2rem);
@@ -1252,7 +1251,6 @@ aside#accounts article ul li span.provider {
   top: .7rem;
   left: 3.9rem;
   font-size: .7em;
-  text-transform: uppercase;
   color: #666;
   max-width: calc(80vw - 5.5rem);
   overflow: hidden;
@@ -1393,7 +1391,6 @@ section#activity article ul.accounts li span.provider {
   top: .7rem;
   left: 3.6rem;
   font-size: .7em;
-  text-transform: uppercase;
   color: #666;
 }
 section#activity article ul.accounts li span.jid {
