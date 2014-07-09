@@ -1120,19 +1120,6 @@ section.profile div#settings li span.caption {
   width: calc(100% - 4rem);
   font-size: 1em;
 }
-section#me.profile[data-features~=avatarChange]  div#card span.avatar:after {
-  content: "Change";
-  display: block;
-  position: absolute;
-  top: 6rem;
-  left: 0;
-  font-size: .8em;
-  padding: .2rem .5rem;
-  background-color: white;
-  color: #444;
-  border-radius: .4rem;
-  opacity: .7;
-}
 section#me:not([data-features~=statusChange]) div#status {
   display: none!important;
 }
