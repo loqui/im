@@ -7,6 +7,11 @@ var Messenger = {
     return App.accounts[index];
   },
 
+  add: function (emoji) {
+    var textBox = $('article#main div#footbox div#text');
+    textBox.append(" " + emoji);
+  },
+
   say: function (text) {
     var to = $('section#chat').data('jid');
     var muc = $('section#chat').data('muc') == "true";
