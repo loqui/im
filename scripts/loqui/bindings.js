@@ -5,6 +5,10 @@ Lungo.init({
 });
 
 $('document').ready(function(){
+  document.addEventListener('localized', function(e) {
+    $('section#welcome article#main h1').removeClass('hidden');
+  });
+  
   setTimeout(function(){
     $('input[data-l10n-placeholder]').each(function () {
       var original = $(this).data('l10n-placeholder');
