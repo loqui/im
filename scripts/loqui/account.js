@@ -64,7 +64,8 @@ var Account = function (core) {
     if (this.connector.isConnected()) {
       this.connector.start();
       this.sendQFlush();
-      this.allRender();
+      this.accountRender();
+      this.presenceRender();
     } else {
       if (navigator.onLine){
         this.connector.connect({
@@ -76,7 +77,8 @@ var Account = function (core) {
               App.audio('login');
               this.connector.start();
               this.sendQFlush();
-              this.allRender();
+              this.accountRender();
+              this.presenceRender();
               if (rcb) {
                 rcb();
               }
