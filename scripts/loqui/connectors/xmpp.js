@@ -393,6 +393,7 @@ App.connectors['XMPP'] = function (account) {
     this.handlers.onTime = this.connection.time.handlify(this.events.onTime);
     this.handlers.onAttention = this.connection.attention.handlify(this.events.onAttention);
     this.handlers.onDisco = this.connection.disco.handlify(this.events.onDisco);
+    this.handlers.onVersion = this.connection.disco.handlify(this.events.onVersion);
   }.bind(this);
   
   this.events.onDisconnected = function (stanza) {
@@ -587,6 +588,10 @@ App.connectors['XMPP'] = function (account) {
     };
     App.caps[key] = value;
     App.smartupdate('caps');
+    return true;
+  }.bind(this);
+  
+  this.events.onVersion = function (stanza) {
     return true;
   }.bind(this);
   
