@@ -438,7 +438,7 @@ App.connectors['XMPP'] = function (account) {
     }
     if (request && !(composing) && !(paused)) {
       var out = $msg({to: from, from: to, id: this.connection.getUniqueId()}),
-			request = Strophe.xmlElement('received', {'xmlns': Strophe.NS.XEP0184, 'id': id});
+			request = Strophe.xmlElement('received', {'xmlns': Strophe.NS.XEP0184, 'id': tree.attr('id')});
 			out.tree().appendChild(request);
 			this.connection.send(out);
     }
