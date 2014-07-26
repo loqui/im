@@ -616,6 +616,7 @@ section#chat header .show {
   height: .6rem;
   border: .3rem solid #312F34;
   border-radius: 50%;
+  z-index: 1;
 }
 section#chat header .avatar {
   position: absolute;
