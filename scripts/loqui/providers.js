@@ -11,7 +11,7 @@ var Providers = {
       },
       features: ['localContacts', 'receipts', 'imageSend', 'videoSend', 
         'audioSend', 'locationSend', 'pay', 'muc', 'csn', 'avatarChange', 
-        'statusChange', 'presence', 'mucCreate'],
+        'statusChange', 'presence', 'mucCreate', 'show'],
       color: '#254242',
       terms: {
         user: 'YourNumber',

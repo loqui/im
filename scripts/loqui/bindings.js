@@ -85,14 +85,6 @@ $('section#chat article#main div#text').on('keydown', function (e) {
   } else {
     $('section#chat article#main button#plus').hide();
     $('section#chat article#main button#say').show();
-    // I show only emoji icon
-//    $('section#chat nav#plus a.picture').hide();
-//    $('section#chat nav#plus a.video').hide();
-//    $('section#chat nav#plus a.audio').hide();
-//    $('section#chat nav#plus a.location').hide();
-//    $('section#chat nav#plus a.otr').hide();
-    $('section#chat nav#plus a').addClass('hidden');
-    $('section#chat nav#plus a.emoji').removeClass('hidden');
     $('section#chat nav#plus').addClass('show');
     var ul = $('section#chat ul#messages');
     ul[0].scrollTop = ul[0].scrollHeight;
@@ -101,15 +93,13 @@ $('section#chat article#main div#text').on('keydown', function (e) {
     }
   }
 }).on('tap', function (e) {
-  $('section#chat nav#plus').removeClass('show');
-  $('section#chat nav#plus a').addClass('hidden');
-  $('section#chat nav#plus a.emoji').removeClass('hidden');
   $('section#chat nav#plus').addClass('show');
   var ul = $('section#chat ul#messages');
   ul[0].scrollTop = ul[0].scrollHeight + 500;
 }).on('blur', function (e) {
-  $('section#chat nav#plus').removeClass('show');
-  $('section#chat nav#plus a').removeClass('hidden');
+  if ($(e.explicitOriginalTarget).closest('[data-control=menu]').length < 1) {
+    $('section#chat nav#plus').removeClass('show');
+  }
 });
 
 // Tap my avatar

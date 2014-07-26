@@ -10,6 +10,7 @@ var Messenger = {
   add: function (emoji) {
     var textBox = $('article#main div#footbox div#text');
     textBox.append(" " + emoji);
+    textBox.trigger('keydown');
   },
 
   say: function (text) {

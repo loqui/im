@@ -368,7 +368,11 @@ var Account = function (core) {
         }
       }.bind(this);
       if (jid) {
-        contactPresenceRender(Lungo.Core.findByProperty(this.core.roster, 'jid', jid));
+        if (typeof jid == 'object') {
+          contactPresenceRender(jid);
+        } else {
+          contactPresenceRender(Lungo.Core.findByProperty(this.core.roster, 'jid', jid));
+        }
       } else{
         for (var i in this.core.roster) {
           contactPresenceRender(this.core.roster[i]);
