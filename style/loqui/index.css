@@ -90,6 +90,9 @@ section.setup img[src^='img/providers']{
   top: 2rem; right: 2rem;
   width: 4rem;
 }
+section#providers {
+  z-index: 100;
+}
 section#success img#avatar {
   position: relative;
   width: 8rem;
