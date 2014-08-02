@@ -10,9 +10,7 @@ module.exports = function(grunt) {
         expand: true,
         cwd: 'src/',
         src: '**',
-        dest: '<%= meta.build %>/firefoxos/',
-        flatten: true,
-        filter: 'isFile'
+        dest: '<%= meta.build %>/firefoxos/'
       },
       firefoxosToDist: {
         expand: true,
@@ -57,13 +55,13 @@ module.exports = function(grunt) {
     },
     clean: {
       build: {
-        src: ['<%= meta.build %>/*', '<%= meta.compress %>/*', '<%= meta.build %>/**/*']
+        src: ['<%= meta.build %>/*', '<%= meta.compress %>/*', '<%= meta.build %>/**/*', 'cache/*', 'cache/**/*']
       }
     },
     compress: {
       firefoxos: {
         options: {
-          archive: '<%= meta.package %>/LoquiIM-<%= pkg.version %>-firefoxos.zip'
+          archive: '<%= meta.compress %>/LoquiIM-<%= pkg.version %>-firefoxos.zip'
         },
         files: [{
           expand: true, 
@@ -74,7 +72,7 @@ module.exports = function(grunt) {
       },
       ubuntutouch: {
         options: {
-          archive: '<%= meta.package %>/LoquiIM-<%= pkg.version %>-ubuntutouch.zip'
+          archive: '<%= meta.compress %>/LoquiIM-<%= pkg.version %>-ubuntutouch.zip'
         },
         files: [{
           expand: true, 
@@ -86,10 +84,10 @@ module.exports = function(grunt) {
     },
     nodewebkit: {
       options: {
-        platforms: ['win', 'osx', 'linux'],
-        buildDir: './package/desktop',
+        platforms: ['win', 'osx', 'linux32', 'linux64'],
+        buildDir: '<%= meta.compress %>/desktop',
       },
-      src: ['./platform/desktop'] 
+      src: ['dist/desktop/*'] 
     },
     connect: {
       server: {
