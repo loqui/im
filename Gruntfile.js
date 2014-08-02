@@ -87,7 +87,7 @@ module.exports = function(grunt) {
         platforms: ['win', 'osx', 'linux32', 'linux64'],
         buildDir: '<%= meta.compress %>/desktop',
       },
-      src: ['dist/desktop/*'] 
+      src: ['dist/desktop/**/*'] 
     },
     connect: {
       server: {
