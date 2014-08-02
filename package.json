@@ -1,7 +1,7 @@
 {
   "name": "LoquiIM",
-  "version": "0.3.1a",
-  "description": "Firefox OS IM chat client",
+  "version": "v0.3.1",
+  "description": "Loqui Instant Messenger unifies all your chat accounts in just one app",
   "author": {
     "name": "LoquiIM Community",
     "site": "loqui.im"
@@ -15,7 +15,11 @@
   },
   "devDependencies": {
     "grunt": "~0.4.1",
+    "grunt-contrib-compress": "~0.9.1",
+    "grunt-contrib-copy": "~0.5.0",
+    "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-watch": "~0.5.3",
-    "grunt-contrib-connect": "~0.6.0"
+    "grunt-contrib-connect": "~0.6.0",
+    "grunt-node-webkit-builder": "~0.2.0"
   }
 }

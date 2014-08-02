@@ -71,6 +71,7 @@ section#welcome {
   text-align: center;
   background: url('https://loqui.im/img/background.jpg') no-repeat center center fixed; 
   background-size: cover;
+  -webkit-background-size: cover;
 }
 section#welcome h1 {
   position: absolute;
@@ -138,11 +139,13 @@ section > header > nav button.up {
 section > header > nav.on-right button.tab {
   background-image: url('/img/tab-decoration-right.svg');
   background-size: 3.2rem 2.5rem;
+  -webkit-background-size: 3.2rem 2.5rem;
   padding: 0 0 0 1.2rem;
 }
 section > header > nav.on-left button.tab {
   background-image: url('/img/tab-decoration-left.svg');
   background-size: 3.2rem 2.5rem;
+  -webkit-background-size: 3.2rem 2.5rem;
   padding: 0 1.2rem 0 0rem;
 }
 section > header > nav.discreet {
@@ -209,6 +212,7 @@ section nav[data-control="groupbar"] a.selected {
 }
 section.aside {
   transform: translateX(5rem); 
+  -webkit-transform: translateX(5rem);
 }
 section > nav[data-control="menu"] {
   position: absolute;
@@ -288,6 +292,7 @@ section#main > header span.counter {
   line-height: .6em;
   border-radius: .6rem;
   animation: blink .5s infinite alternate;
+  -webkit-animation: blink .5s infinite alternate;
 }
 section#chat > header span.counter {
   display: block;
@@ -301,6 +306,7 @@ section#chat > header span.counter {
   line-height: .6em;
   border-radius: .6rem;
   animation: blink .5s infinite alternate;
+  -webkit-animation: blink .5s infinite alternate;
 }
 section#chat[data-muc="true"] #plus .otr,
 section#chat[data-muc="true"] #plus .bolt {
@@ -330,6 +336,7 @@ section#main article ul li[data-muc="true"] span.avatar img:not([src]),
 section#activity article ul li[data-muc="true"] span.avatar img:not([src]) {
   background-image: url('../../img/goovatar.png');
   background-size: 100%;
+  -webkit-background-size: 100%;
   background-color: #D4D2C5;
 }
 section#main article ul li:active,
@@ -456,6 +463,7 @@ section#main article ul li span.avatar img:not([src]) {
   width: 3.2rem;
   background-image: url('../../img/foovatar.png');
   background-size: 100%;
+  -webkit-background-size: 100%;
   background-color: #D4D2C5;
 }
 section#main article ul li span.unread {
@@ -631,6 +639,7 @@ section#chat header .avatar {
   overflow: hidden;
   background-color: #DDD;
   transition: all 1s;
+  -webkit-transition: all 1s;
 }
 section#chat header .avatar img {
   width: 100%;
@@ -695,6 +704,7 @@ section#chat #footbox div#text {
   outline: none;
   overflow: auto;
   transition: all .2s;
+  -webkit-transition: all .2s;
 }
 section#chat #footbox div#text:focus {
   border-bottom: .1rem solid #E95644;
@@ -711,6 +721,7 @@ section#chat ul#messages {
   background-color: #FFF;
   padding-top: 1.5rem;
   background-size: cover!important;
+  -webkit-background-size: cover!important;
 }
 section#chat ul#messages > .more {
   width: calc(100vw - 1rem);
@@ -732,6 +743,7 @@ section#chat ul#messages > li > div {
   clear: both;
   max-width: calc(100% - 3.5rem);
   animation: fadeIn .5s;
+  -webkit-animation: fadeIn .5s;
 }
 section#chat ul#messages > li > div a{
   color: #E95644;
@@ -804,6 +816,7 @@ section#chat ul#messages > li > div[data-type='in'] .avatar:after {
   background-color: #EEE;
   border-radius: .2rem;
   transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
 }
 section#chat[data-muc='true'] ul#messages > li > div[data-type='in'].extended .avatar:after {
   top: 2.7rem;
@@ -1020,6 +1033,7 @@ section#chat[data-otr=true] ul#messages:after {
   top: calc(50vh - 6rem);
   left: calc(50vw - 4rem);
   transform: rotate(-20deg);
+  -webkit-transform: rotate(-20deg);
   opacity: .2;
   pointer-events: none;
 }
@@ -1033,6 +1047,7 @@ section.profile div#card {
   min-height: 8rem;
   color: #333;
   background-size: cover!important;
+  -webkit-background-size: cover!important;
 }
 section.profile div#card span.avatar {
   position: absolute;
@@ -1345,6 +1360,7 @@ section#settings article#devmode div button {
   height: 2rem;
   background-color: #00B8D6;
   transition: all .2s;
+  -webkit-transition: all .2s;
   overflow: hidden;
 }
 
@@ -1432,6 +1448,7 @@ div.switch {
   border-radius: 1.4rem;
   background-color: #BDC6C8;
   transition: all .2s;
+  -webkit-transition: all .2s;
   overflow: hidden;
 }
 div.switch img.tick {
@@ -1452,6 +1469,7 @@ div.switch div.ball {
   border-radius: 50%;
   background-color: #FFF;
   transition: all .2s;
+  -webkit-transition: all .2s;
 }
 [data-value="true"] div.switch img.tick {
   display: block;
@@ -1492,6 +1510,7 @@ article.form ul.listBox li.add:before {
 @keyframes blink {
   from {
     transform: scale(1.2);
+    -webkit-transform: scale(1.2);
   }
 }
 
@@ -1604,4 +1623,23 @@ article.form ul.listBox li.add:before {
 #console #bodyConsole #logConsole div {
   word-wrap: break-word;
   font-size: .9rem;
+}
+
+@media (min-width: 1024px) {
+  article#main {
+    padding-top: 100px;
+    padding-left: 220px;
+    padding-right: 220px;
+  } 
+  
+  section.setup article {
+    padding-top: 100px;
+    padding-left: 220px;
+    padding-right: 220px;
+  } 
+  .buttongroup {
+    padding-left: 20%;
+    padding-right: 20%;
+    margin: 3rem 0;
+  }
 }

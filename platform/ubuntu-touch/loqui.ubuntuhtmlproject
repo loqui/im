@@ -1,0 +1,52 @@
+import QmlProject 1.1
+
+Project {
+    mainFile: "www/index.html"
+
+    /* Include .qml, .js, and image files from current directory and subdirectories */
+    QmlFiles {
+        directory: "."
+    }
+    JavaScriptFiles {
+        directory: "."
+    }
+    ImageFiles {
+        directory: "."
+    }
+    Files {
+        filter: "*.desktop"
+    }
+    Files {
+        filter: "www/*.html"
+    }
+    Files {
+        filter: "Makefile"
+    }
+    Files {
+        directory: "www"
+        filter: "*"
+    }
+    Files {
+        directory: "www/img/"
+        filter: "*"
+    }
+    Files {
+        directory: "www/css/"
+        filter: "*"
+    }
+    Files {
+        directory: "www/js/"
+        filter: "*"
+    }
+    Files {
+        directory: "tests/"
+        filter: "*"
+    }
+    Files {
+        directory: "debian"
+        filter: "*"
+    }
+    /* List of plugin directories passed to QML runtime */
+    importPaths: [ "." ,"/usr/bin","/usr/lib/x86_64-linux-gnu/qt5/qml" ]
+}
+
