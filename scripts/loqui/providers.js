@@ -26,7 +26,7 @@ var Providers = {
       connector: {
         type: 'XMPP',
         host: 'https://bosh.loqui.im/',
-        timeout: 300
+        timeout: 60
       },
       autodomain: 'chat.facebook.com',
       features: ['vcard', 'presence', 'easyAvatars', 'csn'],
