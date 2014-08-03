@@ -70,7 +70,11 @@ App.connectors['XMPP'] = function (account) {
       }
     }.bind(this);
     this.connection.reset();
-    this.connection.connect(user, pass, handler, this.provider.connector.timeout);
+    if (this.account.core.provider == 'facebook') {
+      this.connection.facebookConnect('null@chat.facebook.com', handler, this.provider.connector.timeout, 1, null, null, this.account.core.token);
+    } else {
+      this.connection.connect(user, pass, handler, this.provider.connector.timeout);
+    }
   }
   
   this.disconnect = function () {
@@ -630,6 +634,22 @@ App.logForms['XMPP'] = function (article, provider, data) {
     }
   });
   buttongroup.append(submit).append(back);
+  article.append(buttongroup);
+}
+
+App.logForms['facebook'] = function (article, provider, data) {
+  article
+    .append($('<h1/>').style('color', data.color).html(_('SettingUp', { provider: data.longName })))
+    .append($('<img/>').attr('src', 'img/providers/' + provider + '.svg'));
+  if (data.notice) {
+    article.append($('<small/>').html(_(provider + 'Notice')));
+  }
+  article.append(
+    $('<a/>').addClass('btn-auth btn-facebook large').text(_('LogIn')).attr('href', 'https://www.facebook.com/dialog/oauth?client_id=528942200534414&redirect_uri=https://app.loqui.im/facebookEP&scope=xmpp_login,read_mailbox&display=popup')
+  );
+  var buttongroup = $('<div/>').addClass('buttongroup');
+  var back = $('<button/>').data('view-section', 'back').text(_('GoBack'));
+  buttongroup.append(back);
   article.append(buttongroup);
 }
 

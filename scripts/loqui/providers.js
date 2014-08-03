@@ -36,6 +36,7 @@ var Providers = {
         pass: 'Password',
         userInputType: 'text'
       },
+      logForm: 'facebook',
       notice: true,
       emoji: 'FB'
     },
