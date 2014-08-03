@@ -25,7 +25,7 @@ var Account = function (core) {
         Lungo.Notification.show('globe', _('Connecting'));
       },
       authenticating: function () {
-        Lungo.Notification.show('key', _('SMSsending'));
+        Lungo.Notification.show('key', _('Authenticating'));
       },
       connected: function () {
         Lungo.Notification.show('download', _('Synchronizing'));

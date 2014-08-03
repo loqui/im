@@ -11,7 +11,6 @@ var FB = {
     if (code) {
       var token = this.getToken(code);
       if (token) {
-        alert('ACCESS TOKEN: ' + token);
         var account = new Account({
           token: token,
           provider: 'facebook',
@@ -28,15 +27,12 @@ var FB = {
   },
   
   getToken: function (code) {
-    var params = 'client_id=' + FB.appId
-               + '&client_secret=' + FB.appSecret
-               + '&redirect_uri=' + 'https://app.loqui.im/facebookEP'
-               + '&code=' + code;
+    var params = '?code=' + code;
     var req = new XMLHttpRequest({
       mozAnon: true,
       mozSystem: true
     });
-    req.open('POST', 'https://graph.facebook.com/oauth/access_token?' + params, false);
+    req.open('GET', 'https://app.loqui.im/fbToken' + params, false);
     req.send();
     var res = req.responseText.split('&');
     var vars = {};
