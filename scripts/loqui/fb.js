@@ -16,8 +16,7 @@ var FB = {
           provider: 'facebook',
           resource: 'LoquiIM',
           enabled: true,
-          chats: [],
-          roster: []
+          chats: []
         });
         account.test();
       } else {
