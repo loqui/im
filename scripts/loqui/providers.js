@@ -155,7 +155,7 @@ var Providers = {
       var section = $('<section/>').attr('id', provider).addClass('setup')
         .data('transition', 'horizontal');
       var article = $('<article/>').addClass('headless simple form show');
-      App.logForms[data.connector.type](article, provider, data);
+      App.logForms[data.logForm || data.connector.type](article, provider, data);
       section.append(article);
       section.find('[data-view-section]').each(function () {
         $(this).on('click', function (e) {
