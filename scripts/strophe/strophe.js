@@ -2388,6 +2388,54 @@ Strophe.Connection.prototype = {
 
         this._proto._connect(wait, hold, route)
     },
+    
+    /**
+     *  Starts the connection process with facebok XMPP Chat Server.
+     *
+     *  As the connection process proceeds, the user supplied callback will
+     *  be triggered multiple times with status updates.  The callback
+     *  should take two arguments - the status code and the error condition.
+     *
+     *  The status code will be one of the values in the Strophe.Status
+     *  constants.  The error condition will be one of the conditions
+     *  defined in RFC 3920 or the condition 'strophe-parsererror'.
+     *
+     *  Please see XEP 124 for a more detailed explanation of the optional
+     *  parameters below.
+     *
+     *  @param (String) jid - The user's JID. It must be facebookid@chat.facebook.com,
+     *  	where facebook id is the number id of the facebook profile
+     *  @param (Function) callback The connect callback function.
+     *  @param (Integer) wait - The optional HTTPBIND wait value.  This is the
+     *      time the server will wait before returning an empty result for
+     *      a request.  The default setting of 60 seconds is recommended.
+     *      Other settings will require tweaks to the Strophe.TIMEOUT value.
+     *  @param (Integer) hold - The optional HTTPBIND hold value.  This is the
+     *      number of connections the server will hold at one time.  This
+     *      should almost always be set to 1 (the default).
+     *  @param apiKey The API key of our Facebook Application
+     *  @param secretKey The secret key of our Facebbok Application
+     *  @param sessionKey The actual session key for the user who we are attempting to log in
+     */
+    facebookConnect: function (jid, callback, wait, hold, apiKey, secretKey, sessionKey)
+    {
+	      this.jid = jid;
+        this.connect_callback = callback;
+        this.disconnecting = false;
+        this.connected = false;
+        this.authenticated = false;
+        this.errors = 0;
+        this.apiKey = apiKey;
+        this.secretKey = secretKey;
+        this.sessionKey = sessionKey;
+
+        // parse jid for domain and resource
+        this.domain = Strophe.getDomainFromJid(this.jid);
+        
+        this._changeConnectStatus(Strophe.Status.CONNECTING, null);
+       
+        this._proto._connect_fb(wait, hold)
+    },
 
     /** Function: attach
      *  Attach to an already created and authenticated BOSH session.
@@ -2994,6 +3042,7 @@ Strophe.Connection.prototype = {
     _connect_cb: function (req, _callback)
     {
         Strophe.info("_connect_cb was called");
+        console.log("_connect_cb was called");
 
         this.connected = true;
 
@@ -3063,6 +3112,99 @@ Strophe.Connection.prototype = {
         }
         if (this.do_authentication !== false)
             this.authenticate(matched);
+    },
+    
+    _connect_cb_fb: function (req, _callback)
+    {
+        Strophe.info("_connect_cb_fb was called");
+        console.log("_connect_cb_fb was called");
+
+        this.connected = true;
+        var bodyWrap = req.getResponse();
+        if (!bodyWrap) { return; }
+
+        if (this.xmlInput !== Strophe.Connection.prototype.xmlInput) {
+            this.xmlInput(bodyWrap);
+        }
+        if (this.rawInput !== Strophe.Connection.prototype.rawInput) {
+            this.rawInput(Strophe.serialize(bodyWrap));
+        }
+
+        var conncheck = this._proto._connect_cb(bodyWrap);
+        if (conncheck === Strophe.Status.CONNFAIL) {
+            return;
+        }
+
+        var typ = bodyWrap.getAttribute("type");
+        var cond, conflict;
+        if (typ !== null && typ == "terminate") {
+            // an error occurred
+            cond = bodyWrap.getAttribute("condition");
+            conflict = bodyWrap.getElementsByTagName("conflict");
+            if (cond !== null) {
+                if (cond == "remote-stream-error" && conflict.length > 0) {
+                    cond = "conflict";
+                }
+                this._changeConnectStatus(Strophe.Status.CONNFAIL, cond);
+            } else {
+                this._changeConnectStatus(Strophe.Status.CONNFAIL, "unknown");
+            }
+            return;
+        }
+
+        // check to make sure we don't overwrite these if _connect_cb_fb is
+        // called multiple times in the case of missing stream:features
+        if (!this.sid) {
+            this.sid = bodyWrap.getAttribute("sid");
+        }
+        if (!this.stream_id) {
+            this.stream_id = bodyWrap.getAttribute("authid");
+        }
+        var wind = bodyWrap.getAttribute('requests');
+        if (wind) { this.window = wind; }
+        var hold = bodyWrap.getAttribute('hold');
+        if (hold) { this.hold = hold; }
+        var wait = bodyWrap.getAttribute('wait');
+        if (wait) { this.wait = wait; }
+
+        var mechanisms = bodyWrap.getElementsByTagName("mechanism");
+        var i, mech, auth_str, hashed_auth_str, xfacebook;
+        if (mechanisms.length == 0) {
+            // we didn't get stream:features yet, so we need wait for it
+            // by sending a blank poll request
+            console.log(this);
+            this._proto._no_auth_received_fb(_callback);
+            return;
+        } else {
+        	for (i = 0; i < mechanisms.length; i++) {
+                mech = Strophe.getText(mechanisms[i]);
+                if (mech == 'X-FACEBOOK-PLATFORM') {
+                	xfacebook = true;
+                	break;
+                }
+            }
+        }
+        
+        if (!xfacebook)	{
+        	return;
+        }
+        
+        /*this.send($build("starttls", {
+            xmlns: 'urn:ietf:params:xml:ns:xmpp-tls'
+        }).tree());*/
+        
+        this._changeConnectStatus(Strophe.Status.AUTHENTICATING, null);
+        this._sasl_challenge_handler = this._addSysHandler(
+            this._sasl_challenge1_fb.bind(this), null,
+            "challenge", null, null);
+        this._sasl_failure_handler = this._addSysHandler(
+            this._sasl_challenge_cb.bind(this), null,
+            "failure", null, null);
+
+        this.send($build("auth", {
+            xmlns: Strophe.NS.SASL,
+            mechanism: "X-FACEBOOK-PLATFORM"
+        }).tree());
     },
 
     /** Function: authenticate
@@ -3152,17 +3294,85 @@ Strophe.Connection.prototype = {
       }
 
     },
+    
+    _sasl_challenge1_fb: function (elem)
+    {
+        var challenge = Base64.decode(Strophe.getText(elem));
+        var nonce = "";
+        var method = "";
+        var version = "";
 
-    _sasl_challenge_cb: function(elem) {
-      var challenge = Base64.decode(Strophe.getText(elem));
-      var response = this._sasl_mechanism.onChallenge(this, challenge);
+        // remove unneeded handlers
+        this.deleteHandler(this._sasl_failure_handler);
 
-      this.send($build('response', {
-        xmlns: Strophe.NS.SASL
-      }).t(Base64.encode(response)).tree());
+        var challenges = explode("&", challenge);
+        for(i=0; i<challenges.length; i++) 
+        {
+        	map = explode("=", challenges[i]);
+        	switch (map[0]) 
+        	{
+        		case "nonce":
+        			nonce = map[1];
+        			break;
+        		case "method":
+        			method = map[1];
+        			break;
+        		case "version":
+        			version = map[1];
+        			break;
+          }
+        }
 
-      return true;
+        var responseText = "";
+        
+        responseText += 'api_key=' + this.apiKey;
+        responseText += '&call_id=' + (Math.floor(new Date().getTime()/1000));
+        responseText += '&method=' + method;
+        responseText += '&nonce=' + nonce;
+        responseText += '&access_token=' + this.sessionKey;
+        responseText += '&v=' + '1.0';
+        //responseText += '&sig=' + MD5.hexdigest(responseText.replace(/&/g,"")+this.secretKey);
+
+        this._sasl_challenge_handler = this._addSysHandler(
+            this._sasl_challenge2_cb.bind(this), null,
+            "challenge", null, null);
+        this._sasl_success_handler = this._addSysHandler(
+            this._sasl_success_cb.bind(this), null,
+            "success", null, null);
+        this._sasl_failure_handler = this._addSysHandler(
+            this._sasl_failure_cb.bind(this), null,
+            "failure", null, null);
+        
+        this.send($build('response', {
+            xmlns: Strophe.NS.SASL
+        }).t(Base64.encode(UTF8.encode(responseText))).tree());
+
+        return false;
     },
+
+    _sasl_challenge_cb: function(elem)
+    {
+        var challenge = Base64.decode(Strophe.getText(elem));
+        var response = this._sasl_mechanism.onChallenge(this, challenge);
+
+        this.send($build('response', {
+          xmlns: Strophe.NS.SASL
+        }).t(Base64.encode(response)).tree());
+
+        return true;
+    },
+    
+    _sasl_challenge2_cb: function(elem) {
+        this.deleteHandler(this._sasl_success_handler);
+        this.deleteHandler(this._sasl_failure_handler);
+        this._sasl_success_handler = this._addSysHandler(this._sasl_success_cb.bind(this), null, "success", null, null);
+        this._sasl_failure_handler = this._addSysHandler(this._sasl_failure_cb.bind(this), null, "failure", null, null);
+        this.send($build("response", {
+            xmlns: Strophe.NS.SASL
+        }).tree());
+        return false
+    },
+    
 
     /** PrivateFunction: _auth1_cb
      *  _Private_ handler for legacy authentication.
@@ -3982,6 +4192,33 @@ Strophe.Bosh.prototype = {
                                 body.tree().getAttribute("rid")));
         this._throttledRequestHandler();
     },
+    
+    _connect_fb: function (wait, hold)
+    {
+        this.wait = wait || this.wait;
+        this.hold = hold || this.hold;
+        
+        // build the body tag
+        var body = this._buildBody().attrs({
+            to: this._conn.domain,
+            "xml:lang": "en",
+            wait: this.wait,
+            hold: this.hold,
+            content: "text/xml; charset=utf-8",
+            ver: "1.6",
+            "xmpp:version": "1.0",
+            "xmlns:xmpp": Strophe.NS.BOSH
+        });
+        
+        var _connect_cb = this._conn._connect_cb_fb;
+        
+        this._requests.push(
+            new Strophe.Request(body.tree(),
+                            this._onRequestStateChange.bind(
+                                this, _connect_cb.bind(this._conn)),
+                             body.tree().getAttribute("rid")));
+        this._throttledRequestHandler();
+    },
 
     /** PrivateFunction: _connect_cb
      *  _Private_ handler for initial connection request.
@@ -4026,7 +4263,7 @@ Strophe.Bosh.prototype = {
         var wait = bodyWrap.getAttribute('wait');
         if (wait) { this.wait = parseInt(wait, 10); }
     },
-
+    
     /** PrivateFunction: _disconnect
      *  _Private_ part of Connection.disconnect for Bosh
      *
@@ -4093,14 +4330,30 @@ Strophe.Bosh.prototype = {
             _callback = this._conn._connect_cb.bind(this._conn);
         }
         var body = this._buildBody();
-        this._requests.push(
-                new Strophe.Request(body.tree(),
+        var r = new Strophe.Request(body.tree(),
                     this._onRequestStateChange.bind(
                         this, _callback.bind(this._conn)),
-                    body.tree().getAttribute("rid")));
+                    body.tree().getAttribute("rid"));
+        this._requests.push(r);
         this._throttledRequestHandler();
     },
-
+    
+    _no_auth_received_fb: function (_callback)
+    {
+        if (_callback) {
+            _callback = _callback.bind(this._conn);
+        } else {
+            _callback = this._conn._connect_cb_fb.bind(this._conn);
+        }
+        var body = this._buildBody();
+        var r = new Strophe.Request(body.tree(),
+                    this._onRequestStateChange.bind(
+                        this, _callback.bind(this._conn)),
+                    body.tree().getAttribute("rid"));
+        this._requests.push(r);
+        this._throttledRequestHandler();
+    },
+    
     /** PrivateFunction: _onDisconnectTimeout
      *  _Private_ timeout handler for handling non-graceful disconnection.
      *   
