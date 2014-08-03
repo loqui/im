@@ -16,6 +16,8 @@ App.connectors['XMPP'] = function (account) {
   this.connected = false;
   
   this.connection = new Strophe.Connection(this.provider.connector.host);
+  this.connection.rawInput = function (data) {Tools.log('RECV', this.account.core.fullJid, data);}.bind(this);
+  this.connection.rawOutput = function (data) {Tools.log('SENT', this.account.core.fullJid, data);}.bind(this);
   
   this.connect = function (callback) {
     //var user = this.account.core.user + '/' + App.shortName + '-' + Math.random().toString(36).substr(2, 5);
