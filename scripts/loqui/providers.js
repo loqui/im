@@ -29,7 +29,7 @@ var Providers = {
         timeout: 60
       },
       autodomain: 'chat.facebook.com',
-      features: ['vcard', 'presence', 'easyAvatars', 'csn'],
+      features: ['vcard', 'presence', 'easyAvatars', 'csn', 'show'],
       color: '#3D539F',
       terms: {
         user: 'ProviderUsername',
