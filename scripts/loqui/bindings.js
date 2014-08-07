@@ -5,6 +5,10 @@ Lungo.init({
 });
 
 $('document').ready(function(){
+  document.addEventListener('localized', function(e) {
+    $('section#welcome article#main h1').removeClass('hidden');
+  });
+  
   setTimeout(function(){
     $('input[data-l10n-placeholder]').each(function () {
       var original = $(this).data('l10n-placeholder');
@@ -74,11 +78,14 @@ $('section#chat article#main div#text').on('keydown', function (e) {
     if (this.textContent.length < 2) {
       $('section#chat article#main button#plus').show();
       $('section#chat article#main button#say').hide();
+      $('section#chat nav#plus a').show();
+      $('section#chat nav#plus').hide();
       Messenger.csn('paused');
     }
   } else {
     $('section#chat article#main button#plus').hide();
     $('section#chat article#main button#say').show();
+    $('section#chat nav#plus').addClass('show');
     var ul = $('section#chat ul#messages');
     ul[0].scrollTop = ul[0].scrollHeight;
     if ($(this).text().length == 0) {
@@ -86,9 +93,13 @@ $('section#chat article#main div#text').on('keydown', function (e) {
     }
   }
 }).on('tap', function (e) {
-  $('section#chat nav#plus').removeClass('show');
+  $('section#chat nav#plus').addClass('show');
   var ul = $('section#chat ul#messages');
   ul[0].scrollTop = ul[0].scrollHeight + 500;
+}).on('blur', function (e) {
+  if ($(e.explicitOriginalTarget).closest('[data-control=menu]').length < 1) {
+    $('section#chat nav#plus').removeClass('show');
+  }
 });
 
 // Tap my avatar
@@ -188,8 +199,11 @@ var bindings = function () {
   $('section#contactAdd button.add').on('click', function() {
     Messenger.contactAdd();
   });
-  $('section#chat #footbox #say').on('click', function() {
+  $('section#chat #footbox #say').on('click', function(e) {
     Messenger.say();
+  }).on('mousedown', function(e){
+    e.preventDefault();
+    e.target.classList.add('active');
   });
   $('section#chat nav#plus a.cancel').on('click', function() {
     $(this).parent().removeClass('show');

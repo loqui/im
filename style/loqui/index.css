@@ -90,6 +90,9 @@ section.setup img[src^='img/providers']{
   top: 2rem; right: 2rem;
   width: 4rem;
 }
+section#providers {
+  z-index: 100;
+}
 section#success img#avatar {
   position: relative;
   width: 8rem;
@@ -209,9 +212,9 @@ section.aside {
 }
 section > nav[data-control="menu"] {
   position: absolute;
-  width: 3.5rem;
-  height: calc(100% - 7.9rem);
   background-color: rgba(0, 0, 0, .8);
+  top: 3rem;
+  left: 0;
   right: 0;
   padding: .6rem 0 .6rem .2rem;
   z-index: -1;
@@ -616,6 +619,7 @@ section#chat header .show {
   height: .6rem;
   border: .3rem solid #312F34;
   border-radius: 50%;
+  z-index: 1;
 }
 section#chat header .avatar {
   position: absolute;

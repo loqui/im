@@ -20,7 +20,7 @@ var Plus = {
   
   emoji: function (emoji) {
     Lungo.Router.article('chat', 'main');
-    Messenger.say(emoji);
+    Messenger.add(emoji);
   },
   
   imageSend: function () {

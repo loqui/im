@@ -16,6 +16,8 @@ App.connectors['XMPP'] = function (account) {
   this.connected = false;
   
   this.connection = new Strophe.Connection(this.provider.connector.host);
+  this.connection.rawInput = function (data) {Tools.log('RECV', this.account.core.fullJid, data);}.bind(this);
+  this.connection.rawOutput = function (data) {Tools.log('SENT', this.account.core.fullJid, data);}.bind(this);
   
   this.connect = function (callback) {
     //var user = this.account.core.user + '/' + App.shortName + '-' + Math.random().toString(36).substr(2, 5);
@@ -393,6 +395,7 @@ App.connectors['XMPP'] = function (account) {
     this.handlers.onTime = this.connection.time.handlify(this.events.onTime);
     this.handlers.onAttention = this.connection.attention.handlify(this.events.onAttention);
     this.handlers.onDisco = this.connection.disco.handlify(this.events.onDisco);
+    this.handlers.onVersion = this.connection.disco.handlify(this.events.onVersion);
   }.bind(this);
   
   this.events.onDisconnected = function (stanza) {
@@ -437,7 +440,7 @@ App.connectors['XMPP'] = function (account) {
     }
     if (request && !(composing) && !(paused)) {
       var out = $msg({to: from, from: to, id: this.connection.getUniqueId()}),
-			request = Strophe.xmlElement('received', {'xmlns': Strophe.NS.XEP0184, 'id': id});
+			request = Strophe.xmlElement('received', {'xmlns': Strophe.NS.XEP0184, 'id': tree.attr('id')});
 			out.tree().appendChild(request);
 			this.connection.send(out);
     }
@@ -587,6 +590,10 @@ App.connectors['XMPP'] = function (account) {
     };
     App.caps[key] = value;
     App.smartupdate('caps');
+    return true;
+  }.bind(this);
+  
+  this.events.onVersion = function (stanza) {
     return true;
   }.bind(this);
   

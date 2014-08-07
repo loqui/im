@@ -65,7 +65,7 @@ App.connectors['coseme'] = function (account) {
   
   this.sync = function (callback) {
     var getStatusesAndPics = function () {
-      var contacts = this.account.core.roster.map(function(e){return e.jid;});
+      var contacts = this.account.core.chats.map(function(e){return e.jid;});
       MI.call('contacts_getStatus', [contacts]);
       this.avatar(null, [contacts]);
     }.bind(this);
@@ -713,8 +713,9 @@ App.connectors['coseme'] = function (account) {
           account.presenceRender(jid);
         }
       } else {
+        Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', parseInt(lastSeen) < 300 ? 'a' : 'away');
         contact.presence.show = parseInt(lastSeen) < 300 ? 'a' : 'away';
-        account.presenceRender(jid);
+        account.presenceRender(contact);
         var chatSection = $('section#chat[data-jid="' + jid + '"]');
         if (chatSection.length) {
           var status = chatSection.find('header .status');
@@ -727,16 +728,18 @@ App.connectors['coseme'] = function (account) {
   this.events.onPresenceAvailable = function (jid) {
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
     if (contact) {
+      Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', 'a');
       contact.presence.show = 'a';
-      account.presenceRender(jid);
+      account.presenceRender(contact);
     }
   }
   
   this.events.onPresenceUnavailable = function (jid) {
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
     if (contact) {
+      Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', 'away');
       contact.presence.show = 'away';
-      account.presenceRender(jid);
+      account.presenceRender(contact);
     }
   }
   
