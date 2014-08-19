@@ -65,7 +65,7 @@ App.connectors['coseme'] = function (account) {
   
   this.sync = function (callback) {
     var getStatusesAndPics = function () {
-      var contacts = this.account.core.roster.map(function(e){return e.jid;});
+      var contacts = this.account.core.chats.map(function(e){return e.jid;});
       MI.call('contacts_getStatus', [contacts]);
       this.avatar(null, [contacts]);
     }.bind(this);
