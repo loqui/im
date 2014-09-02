@@ -64,7 +64,7 @@ var Message = function (account, core, options) {
     var chat = this.chat;
     if (this.core.text && this.core.text.substr(0, 4) == "?OTR") {
       if (!chat.OTR) {
-        Plus.goOTR(this.core.from);
+        Plus.goOTR(this.core.from, false, this.account);
       }
       if (chat.OTR) {
         chat.OTR.receiveMsg(message.core.text);

@@ -96,9 +96,9 @@ var Plus = {
     
   },
   
-  goOTR: function (jid, start) {
+  goOTR: function (jid, start, account) {
     $('section#chat nav#plus').removeClass('show');
-    var account = Messenger.account();
+    var account = account || Messenger.account();
     var ci = account.chatFind(jid);
     if (ci < 0) {
       var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
