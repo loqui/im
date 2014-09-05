@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=loqui
+Exec=ubuntu-html5-app-launcher $@ --www=www
+Icon=loqui.png
+Terminal=false
+Type=Application
+X-Ubuntu-Touch=true
+

@@ -1,0 +1,15 @@
+{
+    "architecture": "all",
+    "description": "Loqui Instant Messenger unifies all your chat accounts in just one app.",
+    "framework": "ubuntu-sdk-14.04-dev1",
+    "hooks": {
+        "loqui": {
+            "apparmor": "loqui.json",
+            "desktop": "loqui.desktop"
+        }
+    },
+    "maintainer": "LoquiIM Community",
+    "name": "com.ubuntu.loqui.im.loqui",
+    "title": "LoquiIM",
+    "version": "v0.3.1"
+}
