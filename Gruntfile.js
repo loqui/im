@@ -119,6 +119,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-node-webkit-builder');
-  grunt.registerTask('default', ['clean', 'copy', 'compress', 'nodewebkit']);
+  grunt.registerTask('default', ['clean', 'copy', 'compress']);
+  grunt.registerTask('with-desktop', ['clean', 'copy', 'compress', 'nodewebkit']);
   grunt.registerTask('devel', ['connect', 'watch']);
 };
