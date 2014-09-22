@@ -18,6 +18,7 @@ var Messenger = {
     var muc = $('section#chat').data('muc') == "true";
     var account = this.account();
     var text = text || $('section#chat div#text').text();
+    text = text.trim();
     if (text.length) {
       var msg = new Message(account, 
       {
@@ -30,12 +31,12 @@ var Messenger = {
         muc: muc
       });
       msg.send();
-      $('section#chat div#text').empty();
       var ul = $('section#chat ul#messages');
       ul[0].scrollTop = ul[0].scrollHeight;
       $('#chat #messages span.lastRead').remove();
       App.audio('sent');
     }
+    $('section#chat div#text').empty();
     $('section#chat article#main button#plus').show();
     $('section#chat article#main button#say').hide();
   },
