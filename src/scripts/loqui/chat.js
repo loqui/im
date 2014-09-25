@@ -72,7 +72,7 @@ var Chat = function (core, account) {
             prevAck = ack;
             prevRead = time <= lastRead;
           }
-          if (chat.account.supports('receipts') && !chat.core.muc && chat.core.lastAck && prevAck) {
+          if (chat.account.supports('receipts') && !chat.core.muc && (index == (chat.core.chunks.length - 1)) && chat.core.lastAck && prevAck) {
             frag.appendChild($('<span/>').addClass('lastACK')[0]);
           }
           li[0].appendChild(frag);
