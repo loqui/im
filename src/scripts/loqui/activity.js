@@ -139,8 +139,11 @@ var Activity = function (action, account, content, options) {
 if ('mozSetMessageHandler' in navigator) {
   navigator.mozSetMessageHandler('activity', function(a) {
     if (a.source.name === 'share') {
-      var file = a.source.data;
-      Activity('file', null, file, null);
+      if (a.source.data.type == 'url') {
+        Activity('chat', null, a.source.data.url);
+      } else {
+        Activity('file', null, a.source.data);
+      }
     }
   });
 }

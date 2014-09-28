@@ -64,7 +64,7 @@
       "href": "./index.html",
       "disposition": "window",
       "filters": {
-        "type": ["image/*", "video/*", "audio/*"]
+        "type": ["image/*", "video/*", "audio/*", "url"]
       },
       "returnValue": false
     }
