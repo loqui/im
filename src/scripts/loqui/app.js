@@ -343,7 +343,7 @@ var App = {
   
   // Play a sound
   audio: function (file) {
-    if (App.settings.sound) {
+    if (App.settings.sound && !document.hidden) {
       $('audio[src="audio/' + file + '.ogg"]')[0].play();
     }
   },
