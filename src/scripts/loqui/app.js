@@ -4,7 +4,7 @@ var App = {
 
   name: 'Loqui IM',
   shortName: 'Loqui',
-  version: 'v0.3.3',
+  version: 'v0.3.4',
   minorVersion: 'a',
   connectors: [],
   logForms: [],
@@ -53,7 +53,8 @@ var App = {
       chunkSize: 30,
       core: {
         settings: {
-          muted: false
+          muted: [false],
+          otr: [false, 'switchOTR']
         }
       }
     },
@@ -169,7 +170,21 @@ var App = {
       'v0.3.1': function () {
         from['v0.3.2']();
       },
-      'v0.3.2': function () {}
+      'v0.3.2': function () {
+        from['v0.3.3']();
+      },
+      'v0.3.3': function () {
+        for (var ai in App.accounts) {
+          var account = App.accounts[ai];
+          for (var ci in account.chats) {
+            var chat = account.chats[ci];
+            var muted = chat.core.settings.muted;
+            chat.core.settings = $.extend({}, App.defaults.Chat.core.settings);
+            chat.core.settings.muted[0] = muted instanceof Array ? muted[0] : muted;
+          }
+          account.save();
+        }
+      }
     };
     if (last < App.version && last in from) {
       Lungo.Notification.show('forward', _('Upgrading'), 5);

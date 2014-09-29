@@ -96,7 +96,7 @@ var Plus = {
     
   },
   
-  goOTR: function (jid, start, account) {
+  switchOTR: function (jid, account) {
     $('section#chat nav#plus').removeClass('show');
     var account = account || Messenger.account();
     var ci = account.chatFind(jid);
@@ -116,68 +116,85 @@ var Plus = {
       account.chats.splice(ci, 1);
       account.core.chats.splice(ci, 1);
     }
-    var to = jid;
-    if (chat.OTR) {
-      chat.OTR.endOtr();
-    } else {
+    if (chat.core.settings.otr[0]) {
+      // This chat should be private
       if (account.OTR.enabled) {
-        chat.OTR = new OTR({
-          priv: account.OTR.key
-        });
-        chat.OTR.on('ui', function (text) {
-          var msg = new Message(account, {
-            to: account.core.user,
-            from: to,
-            text: text,
-            stamp: Tools.localize(Tools.stamp()),
-          }, {
-            otr: true,
-            logging: account.OTR.logging
-          });
-          msg.postReceive();
-        });
-        chat.OTR.on('io', function (text) {
-          var msg = new Message(account, {
-            from: account.core.user,
-            to: to,
-            text: text,
-            stamp: Tools.localize(Tools.stamp())
-          }, {
-            otr: true,
-            logging: account.OTR.logging,
-            render: false
-          });
-          msg.postSend();
-        });
-        chat.OTR.on('error', function (err) {
-          Tools.log('OTR-ERROR', err);
-        })
-        chat.OTR.on('status', function (state) {
-          switch (state) {
-            case OTR.CONST.STATUS_AKE_SUCCESS:
-              if (chat.OTR.msgstate === OTR.CONST.MSGSTATE_ENCRYPTED) {
-                // The chat is secure
-                $('section#chat[data-jid="' + chat.core.jid + '"]').data('otr', 'true');
-              } else {
-                // The chat is no longer secure
-                $('section#chat[data-jid="' + chat.core.jid + '"]').data('otr', 'false');
-                delete chat.OTR;
-              }
-              break;
-            case OTR.CONST.STATUS_END_OTR:
-              // The chat is no longer secure
-              $('section#chat[data-jid="' + chat.core.jid + '"]').data('otr', 'false');
-              delete chat.OTR;
-              break;
-          }
-        });
-        if (start) {
-          chat.OTR.sendQueryMsg();
+        // Has OTR key, let's go OTR
+        if (!chat.OTR) {
+          this.goOTR(chat);
         }
       } else {
+        // No key, let's create one
         account.OTRMenu();
       }
+    } else {
+      // Plain chat
+      if (chat.OTR) {
+        // OTR is in use, let's kill it
+        this.killOTR(chat);
+      }
     }
+  },
+  
+  goOTR: function (chat) {
+    console.log('GOING OTR IN', chat);
+    var account = chat.account;
+    chat.OTR = new OTR({
+      priv: account.OTR.key
+    });
+    chat.OTR.on('ui', function (text) {
+      var msg = new Message(account, {
+        to: account.core.user,
+        from: chat.core.jid,
+        text: text,
+        stamp: Tools.localize(Tools.stamp()),
+      }, {
+        otr: true,
+        logging: account.OTR.logging
+      });
+      msg.postReceive();
+    });
+    chat.OTR.on('io', function (text) {
+      var msg = new Message(account, {
+        from: account.core.user,
+        to: chat.core.jid,
+        text: text,
+        stamp: Tools.localize(Tools.stamp())
+      }, {
+        otr: true,
+        logging: account.OTR.logging,
+        render: false
+      });
+      msg.postSend();
+    });
+    chat.OTR.on('error', function (err) {
+      Tools.log('OTR-ERROR', err);
+    })
+    chat.OTR.on('status', function (state) {
+      switch (state) {
+        case OTR.CONST.STATUS_AKE_SUCCESS:
+          if (chat.OTR.msgstate === OTR.CONST.MSGSTATE_ENCRYPTED) {
+            // The chat is secure
+            $('section#chat[data-jid="' + chat.core.jid + '"]').data('otr', 'true');
+          } else {
+            // The chat is no longer secure
+            $('section#chat[data-jid="' + chat.core.jid + '"]').data('otr', 'false');
+            delete chat.OTR;
+          }
+          break;
+        case OTR.CONST.STATUS_END_OTR:
+          // The chat is no longer secure
+          $('section#chat[data-jid="' + chat.core.jid + '"]').data('otr', 'false');
+          delete chat.OTR;
+          break;
+      }
+    });
+    chat.OTR.sendQueryMsg();
+  },
+  
+  killOTR: function (chat) {
+    chat.OTR.endOtr();
+    delete chat.OTR;
   },
 
   showConsole: function() {

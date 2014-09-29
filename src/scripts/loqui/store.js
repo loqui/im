@@ -70,6 +70,7 @@ var Store = {
   },
   
   put: function (key, value, callback) {
+    console.log('PUTTING', key, value);
   	asyncStorage.setItem(key, JSON.stringify(value), callback);
   },
   

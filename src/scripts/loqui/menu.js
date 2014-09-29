@@ -246,9 +246,9 @@ var Menu = {
       var account = Messenger.account();
       account.OTRMenu();
     },
-    goOTR: function(obj) {
+    switchOTR: function(obj) {
       var jid = $(obj).closest('section').data('jid');
-      Plus.goOTR(jid, true);
+      Plus.switchOTR(jid);
     },
     purchase: function () {
       var number = Messenger.account().core.data.login;
@@ -293,6 +293,7 @@ var Menu = {
   
   // Opens a certain menu
   show: function (which, attr, delay) {
+    console.log('SHOW', which, attr, delay);
     var map = this.map;
     setTimeout(function () { map[which](attr); }, delay );
   }

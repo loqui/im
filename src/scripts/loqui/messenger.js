@@ -90,11 +90,11 @@ var Messenger = {
         var key = li.data('key');
         var chat = account.chatGet(jid);
         if (li.data('value') == 'true') {
-          chat.core.settings[key] = false;
+          chat.core.settings[key][0] = false;
         } else {
-          chat.core.settings[key] = true;
+          chat.core.settings[key][0] = true;
         }
-        li.data('value', chat.core.settings[key]);
+        li.data('value', chat.core.settings[key][0]);
         account.save();
       }
       for (let [key, value] in settings) {
@@ -102,7 +102,13 @@ var Messenger = {
           $('<span/>').addClass('caption').text(_('AccountSet' + key))
         ).append(
           $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>')
-        ).data('value', value).bind('click', accountSwitch);
+        ).data('value', value.length > 1 ? value[0] : value).bind('click', accountSwitch);
+        if (value.length > 1 && value[1]) {
+          li.on('click', function (e) {
+            console.log(value, value[1]);
+            Menu.show(value[1], li[0]);
+          });
+        }
         setUl.append(li);
       }
       if (App.avatars[jid]) {

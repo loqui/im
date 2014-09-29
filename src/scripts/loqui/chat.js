@@ -228,6 +228,9 @@ var Chat = function (core, account) {
         });
       }, this.core.jid);
     }
+    if (this.core.settings.otr[0]) {
+      Plus.switchOTR(this.core.jid, this.account);
+    }
     setTimeout(function () {
       if (this.core.muc) {
         if (this.core.participants) {
@@ -256,16 +259,6 @@ var Chat = function (core, account) {
     this.lastRead = this.core.lastRead;
     this.core.lastRead = Tools.localize(Tools.stamp());
     this.save();
-  }
-  
-  this.goOTR = function () {
-    if (this.OTR.enabled) {
-      this.OTR.buddy = new OTR({
-        priv: this.OTR.key
-      });    
-    } else {
-      
-    }
   }
   
   // Save or update this chat in store
