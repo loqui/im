@@ -440,9 +440,9 @@ App.connectors['XMPP'] = function (account) {
     }
     if (request && !(composing) && !(paused)) {
       var out = $msg({to: from, from: to, id: this.connection.getUniqueId()}),
-			request = Strophe.xmlElement('received', {'xmlns': Strophe.NS.XEP0184, 'id': tree.attr('id')});
-			out.tree().appendChild(request);
-			this.connection.send(out);
+      request = Strophe.xmlElement('received', {'xmlns': Strophe.NS.XEP0184, 'id': tree.attr('id')});
+      out.tree().appendChild(request);
+      this.connection.send(out);
     }
     if (received) {
       this.events.onMessageDelivered(stanza);
@@ -689,32 +689,33 @@ App.emoji['XMPP'] = {
 App.emoji['FB'] = {
   
   map: [
-    ['emoji1', ':)'],
-    ['emoji2', ':('],
-    ['emoji3', ':P'],
-    ['emoji4', ':D'],
-    ['emoji5', ':O'],
-    ['emoji6', ':3'],
-    ['emoji7', '8)'],
-    ['emoji8', '8|'],
-    ['emoji9', '>:('],
-    ['emoji10', ':\\', ':/'],
-    ['emoji11', ':\'('],
-    ['emoji12', '3:)'],
-    ['emoji13', ':*'],
-    ['emoji14', '<3'],
-    ['emoji15', 'O.o','o.O'],
-    ['emoji16', '>:O','>:o'],
-    ['emoji17', ':v'],
-    ['emoji18', ':poop:'],
-    ['emoji19', 'O:)'],
-    ['emoji20', ';-)', ';)'],
-    ['emoji21', '^_^'],
-    ['emoji22', '-_-'],
-    ['emoji23', ':|]'],
-    ['emoji24', ':putnam:'],
-    ['emoji25', '(^^^)'],
-    ['emoji20', '<(")']
+    ['emoji1', '>:('],
+    ['emoji2', ':poop:'],
+    ['emoji3', '3:)'],
+    ['emoji4', '>:O','>:o'],
+    ['emoji5', 'O:)'],
+    ['emoji6', ':putnam:'],
+    ['emoji7', ':)', '=)'],
+    ['emoji8', ':(', '=('],
+    ['emoji9', ':P', ':p'],
+    ['emoji10', ':D'],
+    ['emoji11', ':O', ':o'],
+    ['emoji12', ':3'],
+    ['emoji13', '8)', '8-)'],
+    ['emoji14', '8|', '8-|'],
+    ['emoji15', ':\\', ':/', ':-\\', ':-/'],
+    ['emoji16', ':\'('],
+    ['emoji17', ':*', ':-*'],
+    ['emoji18', '<3'],
+    ['emoji19', 'o.O'],
+    ['emoji20', 'O.o'],
+    ['emoji21', ':v'],
+    ['emoji22', ';-)', ';)'],
+    ['emoji23', '^_^'],
+    ['emoji24', '-_-'],
+    ['emoji25', ':|]'],
+    ['emoji26', '(^^^)'],
+    ['emoji27', '<(")']
   ],
 
   fy: function (text) {
@@ -722,15 +723,18 @@ App.emoji['FB'] = {
     var map = this.map;
     if (mapped && map.length != undefined) {
       for (var i in map) {
-        var original = map[i][0];
-        for (var j in map[i].slice(1)) {
-          var token = map[i].slice(1)[j].replace(/([\*\|\(\)\[\]\\\$\{\}\.\+\?\^])/g, '\\$1');
-          var rexp = new RegExp('('+token+')', 'g');
-          mapped = mapped.replace(rexp, '<img src="img/emoji/fb/'+original+'.png" alt="$1" />');
-          if (mapped != text) {
-            return mapped;
-          }
+        var original = map[i][0],
+            emoji = map[i].slice(1);
+        for (var j in emoji) {
+          var token = emoji[j].replace(/([\*\|\(\)\[\]\\\$\{\}\.\+\?\^])/g, '\\$1');
+          var rexpStart = new RegExp('^('+token+')');
+          mapped = mapped.replace(rexpStart, '<img src="img/emoji/fb/'+original+'.png" alt="$1" />');
+          var rexp = new RegExp(' ('+token+')', 'g');
+          mapped = mapped.replace(rexp, ' <img src="img/emoji/fb/'+original+'.png" alt="$1" />');
         }
+      }
+      if (mapped != text) {
+        return mapped;
       }
     }
     return text;
