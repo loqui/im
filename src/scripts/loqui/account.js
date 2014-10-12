@@ -18,6 +18,18 @@ var Account = function (core) {
     $.extend(this.OTR, App.defaults.Account.core.OTR);
   }
   
+  if(this.connector.presence.get){
+    var account= this;
+    setInterval(function(){
+      if(account.connector.isConnected()){
+	console.log('keep alive!');
+	account.chats.forEach(function(chat){
+	  account.connector.presence.get(chat.core.jid);
+	});
+      }
+    }, 30000);
+  }
+
   // Test account
   this.test = function () {
     this.connector.connect({
