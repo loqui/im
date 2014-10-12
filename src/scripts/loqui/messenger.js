@@ -30,6 +30,7 @@ var Messenger = {
         muc: muc
       });
       msg.send();
+      Lungo.Router.article('chat', 'main');
       var ul = $('section#chat ul#messages');
       ul[0].scrollTop = ul[0].scrollHeight;
       $('#chat #messages span.lastRead').remove();
