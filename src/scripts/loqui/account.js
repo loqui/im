@@ -19,15 +19,16 @@ var Account = function (core) {
   }
   
   if(this.connector.presence.get){
-    var account= this;
-    setInterval(function(){
-      if(account.connector.isConnected()){
-	console.log('keep alive!');
-	account.chats.forEach(function(chat){
-	  account.connector.presence.get(chat.core.jid);
-	});
-      }
-    }, 30000);
+      var account= this;
+      setInterval(function(){
+          if(account.core.enabled){
+              console.log('keep alive!');
+              account.chats.forEach(function(chat){
+                  if(!chat.core.muc)
+                      account.connector.presence.get(chat.core.jid);
+              });
+          }
+      }, 30000);
   }
 
   // Test account
