@@ -172,7 +172,7 @@ var Menu = {
       });
     },
     doSearch: function (obj) {
-      //Lungo.Router.section('searchBar');
+      Lungo.Router.article('activity', 'search');
     },
     chatRemove: function (obj) {
       var jid = $(obj).closest('section').data('jid');
@@ -215,7 +215,7 @@ var Menu = {
         }
         Lungo.Notification.hide();
       }
-      Lungo.Router.article('chat', 'emoji');
+      Lungo.Router.emoji('chat');
     },
     imageSend: function () {
       Plus.imageSend();

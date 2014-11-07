@@ -231,9 +231,6 @@
     <article id='emoji'>
       <h1 data-l10n-id='Emoji'>Emoji</h1>
       <ul></ul>
-      <div class='buttongroup'>
-        <button data-role='back' data-view-article='main' data-l10n-id='Cancel'>Cancel</button>
-      </div>
     </article>
     <article id='call'>
       <h1 data-l10n-id='Call'>Call</h1>
@@ -282,18 +279,13 @@
       <nav class='on-left'>
         <button data-view-section='back' data-icon='remove' class='up'></button>
       </nav>
+      <nav class="on-right">
+        <button data-menu-onclick='doSearch' data-icon='search' class='up'></button>
+      </nav>
       <nav data-control='groupbar'>
         <a data-l10n-id='Chats' data-view-article='chats'>Chats</a>
         <a data-l10n-id='Contacts' data-view-article='contacts'>Contacts</a>
         <a data-l10n-id='Groups' data-view-article='groups'>Groups</a>
-      </nav>
-    </header>
-    <article id='main' class='active scroll'></article>
-  </section>
-  <section id='searchBar' data-transition='vertical'>
-    <header data-title='Search'>
-      <nav class='on-left'>
-        <button data-view-section='back' data-icon='remove' class='up'></button>
       </nav>
     </header>
     <article id='main' class='active scroll'></article>
