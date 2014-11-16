@@ -11,10 +11,10 @@
   "icons": {
     "32": "/img/icon-32.png",
     "60": "/img/icon-60.png",
-    "90": "/img/icon-90.png",
-    "120": "/img/icon-120.png",
+    "84": "/img/icon-84.png",
     "128": "/img/icon-128.png",
-    "256": "/img/icon-256.png"
+    "256": "/img/icon-256.png",
+    "284": "/img/icon-284.png"
   },
   "default_locale": "en",
   "messages": [
