@@ -27,6 +27,7 @@ var Activity = function (action, account, content, options) {
       if (options.groups) {
         account.groupsRender(f, click);
       }
+      account.searchRender(f, click);
     },
     file: function (f, account, content) {
       var click = function (t) {

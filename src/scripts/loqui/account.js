@@ -8,6 +8,9 @@ var Account = function (core) {
   this.connector = new App.connectors[Providers.data[this.core.provider].connector.type](this);
   this.chats = [];
   this.OTR = {};
+  this.contacts = {};
+  this.names = [];
+  this.jidToNameMap = {};
   
   if ('OTR' in core) {
     $.extend(this.OTR, core.OTR);
@@ -291,8 +294,19 @@ var Account = function (core) {
     var ul = $('<ul/>').addClass('list').addClass('scroll');
     var frag = f;
     var account = this;
+    this.contacts = {};
     this.core.roster.forEach(function (contact, i, roster) {
       var name = contact.name || contact.jid;
+      var nameParts = name.toLowerCase().split(' ');
+      for(var _i = 0, _len = nameParts.length; _i < _len; _i++) {
+        var part = nameParts[_i];
+        if(account.contacts.hasOwnProperty(part))
+          account.contacts[part] += ' ' + contact.jid;
+        else
+          account.contacts[part] = contact.jid;
+        account.names.push(part);
+        account.jidToNameMap[contact.jid] = contact.name;
+      }
       var li = document.createElement('li');
       li.dataset.jid = contact.jid;
       if (selected && selected.indexOf(contact.jid) > -1) {
@@ -412,6 +426,75 @@ var Account = function (core) {
       }
     });
     App.smartupdate('avatars');
+  }
+
+  // Manage search through contacts
+  this.searchRender = function (f, click) {
+    if(!this.contacts)
+      return false;
+    var account = this;
+    var article = $('<article/>').attr('id', 'search');
+    var header = $('<header/>').addClass('beige');
+    var input = $('<input/>').attr('id', 'searchInput')
+                .on('input', function (event) {
+                  var ele = event.target;
+                  if(ele.value)
+                    ele.nextSibling.className = '';
+                  else
+                    ele.nextSibling.className = 'hidden';
+                  account.search(article, this.value, click);
+                });
+    var reset = $('<span/>').attr('id', 'reset')
+                .addClass('hidden')
+                .on('click', function (event) {
+                  this.previousSibling.value = '';
+                  this.className = 'hidden';
+                  account.search(article, '', click);
+                });
+    header.append(input).append(reset);
+    article.append(header).append($('<h1/>').text('Type some characters to start searching'));
+    var frag = f;
+    frag.appendChild(article[0]);
+  }
+
+  // Search through contacts for a loose match and append a list
+  this.search = function (article, text, click) {
+    var account = this;
+    if(article[0].lastChild.nodeName === 'UL' || article[0].lastChild.nodeName === 'H1')
+      article[0].lastChild.remove();
+    if(!text) {
+      article.append($('<h1/>').text('Type some characters to start searching'));
+      return false;
+    }
+    text = text.toLowerCase();
+    var str = {};
+    // forEach is slow, and evil
+    for(var _i = 0, _len = account.names.length; _i < _len; _i++) {
+      if(account.names[_i].startsWith(text)) {
+        str[account.names[_i]] = 1; // Just a placeholder
+      }
+    }
+    var matches = [];
+    for(var match in str) {
+      if(str.hasOwnProperty(match))
+        matches.push(match);
+    }
+    var ul = $('<ul/>').addClass('list').addClass('scroll');
+    for(var _i = 0, _len = matches.length; _i < _len; _i++) {
+      var jids = account.contacts[matches[_i]].split(' ');
+      for(var _j = 0, _l = jids.length; _j < _l; _j++) {
+        var name = account.jidToNameMap[jids[_j]];
+        var li = document.createElement('li');
+        li.dataset.jid = jids[_j];
+        li.innerHTML = '<span class=\'name\'>' + name + '</span>'
+                       + '<span class=\'status\'>' + jids[_j] + '</span>';
+        li.addEventListener('click', function (e) {
+          click(this);
+        });
+        ul[0].appendChild(li);
+      }
+    }
+    article.append(ul[0]);
   }
   
   this.OTRMenu = function () {
