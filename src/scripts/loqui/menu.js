@@ -172,7 +172,7 @@ var Menu = {
       });
     },
     doSearch: function (obj) {
-      //Lungo.Router.section('searchBar');
+      Lungo.Router.article('activity', 'search');
     },
     chatRemove: function (obj) {
       var jid = $(obj).closest('section').data('jid');
