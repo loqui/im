@@ -184,6 +184,12 @@ var Chungo = {
       this.section(section);
       var to = $$('section#' + section).children('article#' + article);
       to.addClass('show').siblings('article').removeClass('show');
+    },
+
+    emoji: function (section) {
+      this.section(section);
+      var to = $$('section#' + section).children('article#emoji');
+      to.addClass('show');
     }
     
   },

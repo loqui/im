@@ -215,7 +215,7 @@ var Menu = {
         }
         Lungo.Notification.hide();
       }
-      Lungo.Router.article('chat', 'emoji');
+      Lungo.Router.emoji('chat');
     },
     imageSend: function () {
       Plus.imageSend();
