@@ -23,10 +23,13 @@ var Account = function (core) {
       setInterval(function(){
           if(account.core.enabled){
               console.log('keep alive!');
-              account.chats.forEach(function(chat){
-                  if(!chat.core.muc)
-                      account.connector.presence.get(chat.core.jid);
+              account.sync(function(sync){
+                  sync();
               });
+//              account.chats.forEach(function(chat){
+//                  if(!chat.core.muc)
+//                      account.connector.presence.get(chat.core.jid);
+//              });
           }
       }, 30000);
   }
