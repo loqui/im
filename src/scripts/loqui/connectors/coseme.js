@@ -714,12 +714,13 @@ App.connectors['coseme'] = function (account) {
         }
       } else {
         Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', parseInt(lastSeen) < 300 ? 'a' : 'away');
-        contact.presence.show = parseInt(lastSeen) < 300 ? 'a' : 'away';
+        var present= (parseInt(lastSeen) < 1);
+        contact.presence.show = present ? 'a' : 'away';
         account.presenceRender(contact);
         var chatSection = $('section#chat[data-jid="' + jid + '"]');
         if (chatSection.length) {
           var status = chatSection.find('header .status');
-          status.html((parseInt(lastSeen) < 300 ? _('showa') : _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})})) +  ' - ' + status.html());
+          status.html((present ? _('showa') : _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})})) +  ' - ' + status.html());
         }
       }
     }
@@ -731,6 +732,12 @@ App.connectors['coseme'] = function (account) {
       Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', 'a');
       contact.presence.show = 'a';
       account.presenceRender(contact);
+
+      var chatSection = $('section#chat[data-jid="' + jid + '"]');
+      if (chatSection.length) {
+        var status = chatSection.find('header .status');
+        status.html(_('showa') +  ' - ' + status.html());
+      }
     }
   }
   
@@ -740,6 +747,13 @@ App.connectors['coseme'] = function (account) {
       Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', 'away');
       contact.presence.show = 'away';
       account.presenceRender(contact);
+
+      var chatSection = $('section#chat[data-jid="' + jid + '"]');
+      if (chatSection.length) {
+        var status = chatSection.find('header .status');
+        var time = Tools.convenientDate(Tools.localize(Tools.stamp( Math.floor(Date.now()/1000))));
+        status.html(_('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})}) +  ' - ' + status.html());
+      }
     }
   }
   
