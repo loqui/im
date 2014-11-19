@@ -18,7 +18,7 @@ var Account = function (core) {
     $.extend(this.OTR, App.defaults.Account.core.OTR);
   }
   
-  if(this.connector.presence.get){
+  if(this.connector.sync){
       var account= this;
       setInterval(function(){
           if(account.core.enabled){
@@ -26,10 +26,6 @@ var Account = function (core) {
               account.sync(function(sync){
                   sync();
               });
-//              account.chats.forEach(function(chat){
-//                  if(!chat.core.muc)
-//                      account.connector.presence.get(chat.core.jid);
-//              });
           }
       }, 30000);
   }
