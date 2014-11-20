@@ -64,9 +64,11 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.sync = function (callback) {
-    var getStatusesAndPics = function () {
-      var contacts = this.account.core.chats.map(function(e){return e.jid;});
-      MI.call('contacts_getStatus', [contacts]);
+    var getStatusesAndPics = function (noStatuses) {
+      if(!noStatuses){
+        var contacts = this.account.core.chats.map(function(e){return e.jid;});
+        MI.call('contacts_getStatus', [contacts]);
+      }
       this.avatar(null, [contacts]);
     }.bind(this);
     if (!('roster' in this.account.core) || !this.account.core.roster.length) {

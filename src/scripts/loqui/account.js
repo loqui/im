@@ -27,7 +27,7 @@ var Account = function (core) {
           if(account.core.enabled){
               console.log('keep alive!');
               account.sync(function(sync){
-                  sync();
+                  sync(true);
               });
           }
       }, 30000);
