@@ -8,7 +8,7 @@ var Chat = function (core, account) {
   this.core.last = this.core.last || {};
   this.core.lastAck = this.core.lastAck || undefined;
   this.account = account;
-  this.notification = undefined;
+  this.notification = null;
   this.lastRead = Tools.localize(Tools.stamp());
   this.unread = this.core.unread;
   if (!('settings' in this.core)) {
@@ -164,18 +164,16 @@ var Chat = function (core, account) {
       if (last.media) {
         var text = _('SentYou', {type: _('MediaType_' + last.media.type)});
       }
-      if (chat.notification && 'close' in chat.notification) {
-        chat.notification.close();
-      }
+
       if (pic) {
         pic.url.then(function (src) {
           if (src.slice(0, 1) == '/' && chat.core.muc) {
             src = 'https://raw.githubusercontent.com/loqui/im/dev/img/goovatar.png';
           }
-          chat.notification = App.notify({ subject: subject, text: text, pic: src, callback: callback }, 'received');
+          chat.notification = App.notify({ subject: subject, text: text, pic: src, from : chat.core.jid, callback: callback }, 'received');
         }.bind(chat));
       } else {
-        chat.notification = App.notify({ subject: subject, text: text, pic: 'img/foovatar.png', callback: callback }, 'received');
+        chat.notification = App.notify({ subject: subject, text: text, pic: 'img/foovatar.png', from : chat.core.jid, callback: callback }, 'received');
       }
       chat.core.lastAck = last.stamp;
       var section = $('section#chat');
@@ -255,6 +253,10 @@ var Chat = function (core, account) {
       this.account.unread -= this.core.unread;
       this.core.unread = 0;
       Accounts.unread();
+    }
+    if(this.notification && 'close' in this.notification){
+        this.notification.close();
+        this.notification= null;
     }
     this.lastRead = this.core.lastRead;
     this.core.lastRead = Tools.localize(Tools.stamp());

@@ -64,6 +64,16 @@ document.addEventListener("visibilitychange", function() {
     } else {
       App.lastActive = new Date;
       account.connector.presence.send();
+
+      var section = $('section#chat');
+      if(section.hasClass('show')){
+        var current = section.data('jid');
+        var chat = account.chatGet(current);
+        if(chat.notification && 'close' in chat.notification){
+            chat.notification.close();
+            chat.notification= null;
+        }
+      }
     }
   }
 });

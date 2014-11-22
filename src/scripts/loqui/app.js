@@ -334,7 +334,7 @@ var App = {
     }
     if (force || navigator.mozNotification && document.hidden) {
       if ('Notification' in window) {
-        var notification = new Notification(core.subject, {body: core.text, icon: core.pic});
+        var notification = new Notification(core.subject, {body: core.text, icon: core.pic, tag: core.from});
         notification.onclick = function () {
           core.callback();
           App.notifications.length = 0;
