@@ -9,6 +9,7 @@ App.connectors['coseme'] = function (account) {
   this.account = account;
   this.provider = Providers.data[account.core.provider];
   this.presence = {
+    name: this.account.core.presence ? this.account.core.presence.name : '',
     show: this.account.core.presence ? this.account.core.presence.show : App.defaults.Connector.presence.show,
     status: this.account.core.presence ? this.account.core.presence.status : App.defaults.Connector.presence.status
   };
@@ -149,11 +150,13 @@ App.connectors['coseme'] = function (account) {
     MI.call(method, [jid]);
   }
   
-  this.presence.set = function (show, status) {
+  this.presence.set = function (show, status, name) {
     this.presence.show = show || this.presence.show;
     this.presence.status = status || this.presence.status;
+    this.presence.name = name || this.presence.name;
     this.presence.send();
     this.account.core.presence = {
+      name: this.presence.name,
       show: this.presence.show,
       status: this.presence.status
     }
@@ -172,7 +175,7 @@ App.connectors['coseme'] = function (account) {
         dnd: 'presence_sendUnavailable',
         chat: 'presence_sendAvailableForChat'
       };
-      MI.call(method[show], []);
+      MI.call(method[show], [this.presence.name]);
       MI.call('profile_setStatus', [status]);
     }
   }.bind(this);

@@ -8213,8 +8213,12 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
 
     // Presence
 
-    presence_sendAvailable: function() {
-      var presenceNode = newProtocolTreeNode('presence', {type: 'available'});
+    presence_sendAvailable: function(aPushname) {
+      var attrs = { type : 'available' };
+      if (aPushname) {
+        attrs.name = utf8FromString(aPushname);
+      }
+      var presenceNode = newProtocolTreeNode('presence', attrs)
       self._writeNode(presenceNode);
     },
 
@@ -8237,11 +8241,11 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
     },
 
     presence_sendAvailableForChat: function(aPushname) {
-      aPushname = utf8FromString(aPushname);
-      var presenceNode = newProtocolTreeNode('presence', {
-        name: aPushname,
-        type: 'active'
-      });
+      var attrs = { type : 'active' };
+      if (aPushname) {
+        attrs.name = utf8FromString(aPushname);
+      }
+      var presenceNode = newProtocolTreeNode('presence', attrs)
       self._writeNode(presenceNode);
     },
 

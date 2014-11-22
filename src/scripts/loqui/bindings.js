@@ -174,6 +174,15 @@ $('section#me #status input').on('blur', function (e) {
   }
 });
 
+$('section#me #nick input').on('blur', function (e) {
+  Messenger.presenceUpdate();
+}).on('keydown', function (e) {
+  if (e.which == 13) {
+    e.preventDefault();
+    Messenger.presenceUpdate();
+  }
+});
+
 $('[data-var]').each(function () {
   var key = $(this).data('var');
   var value = App[key];
