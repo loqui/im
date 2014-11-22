@@ -1166,6 +1166,9 @@ section.profile div#settings li span.caption {
   width: calc(100% - 4rem);
   font-size: 1em;
 }
+section#me:not([data-features~=nickChange]) div#nick {
+  display: none!important;
+}
 section#me:not([data-features~=statusChange]) div#status {
   display: none!important;
 }
@@ -1191,6 +1194,12 @@ section#chat:not([data-features~=attention]) a.bolt {
   display: none!important;
 }
 section#me div#status input {
+  width: 100%;
+  height: 2.4rem;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+section#me div#nick input {
   width: 100%;
   height: 2.4rem;
   font-size: 1rem;

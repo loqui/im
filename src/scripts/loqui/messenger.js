@@ -63,7 +63,8 @@ var Messenger = {
     var account = this.account();
     if (App.online && account.connector.connected) {
       var status = $('section#me #status input').val();
-      account.connector.presence.set(null, status);
+      var nick = $('section#me #nick input').val();
+      account.connector.presence.set(null, status, nick);
     } else {
       Lungo.Notification.error(_('Error'), _('NoWhenOffline'), 'exclamation-sign', 3);
     }

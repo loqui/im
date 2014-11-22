@@ -145,6 +145,7 @@ var Account = function (core) {
     var mainSection = $('section#main');
     meSection.data('features', features.join(' '));
     mainSection.data('features', features.join(' '));
+    meSection.find('#nick input').val(this.connector.presence.name);
     meSection.find('#status input').val(this.connector.presence.status);
     meSection.find('#card .name').text(address == this.core.user ? '' : address);
     meSection.find('#card .user').text(this.core.user);
