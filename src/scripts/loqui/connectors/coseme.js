@@ -335,12 +335,12 @@ App.connectors['coseme'] = function (account) {
       group_gotPicture: this.events.onGroupGotPicture,
       group_gotGroups: null,
       group_gotParticipating: this.events.onGroupGotParticipating,
-      notification_contactProfilePictureUpdated: this.events.onNotification,
-      notification_contactProfilePictureRemoved: this.events.onNotification,
-      notification_groupPictureUpdated: this.events.onNotification,
-      notification_groupPictureRemoved: this.events.onNotification,
-      notification_groupParticipantAdded: this.events.onNotification,
-      notification_groupParticipantRemoved: this.events.onNotification,
+      notification_contactProfilePictureUpdated: this.events.onContactProfilePictureUpdated,
+      notification_contactProfilePictureRemoved: this.events.onContactProfilePictureRemoved,
+      notification_groupPictureUpdated: this.events.onGroupPictureUpdated,
+      notification_groupPictureRemoved: this.events.onGroupPictureRemoved,
+      notification_groupParticipantAdded: this.events.onGroupParticipantAdded,
+      notification_groupParticipantRemoved: this.events.onGroupParticipantRemoved,
       notification_status: this.events.onNotification,
       contact_gotProfilePictureId: this.events.onAvatar,
       contact_gotProfilePicture: this.events.onAvatar,
@@ -640,6 +640,40 @@ App.connectors['coseme'] = function (account) {
       }
     }
     return true;
+  }
+
+  this.events.onContactProfilePictureUpdated = function (from, stamp, msgId, pictureId, jid) {
+    var method = 'notification_ack';
+    MI.call(method, [from, msgId]);
+  }
+
+  this.events.onContactProfilePictureRemoved = function (from, stamp, msgId, pictureId, jid) {
+    var method = 'notification_ack';
+    MI.call(method, [from, msgId]);
+  }
+
+  this.events.onGroupPictureUpdated = function (from, stamp, msgId, pictureId, jid) {
+    var method = 'notification_ack';
+    MI.call(method, [from, msgId]);
+  }
+
+  this.events.onGroupPictureRemoved = function (from, stamp, msgId, pictureId, jid) {
+    var method = 'notification_ack';
+    MI.call(method, [from, msgId]);
+  }
+
+  this.events.onGroupParticipantAdded = function (from, jid, _, stamp, msgId) {
+    var method = 'notification_ack';
+    MI.call(method, [from, msgId]);
+    this.account.connector.muc.participantsGet(from);
+  }
+
+  this.events.onGroupParticipantRemoved = function (from, jid, _, stamp, msgId) {
+    var method = 'notification_ack';
+    MI.call(method, [from, msgId]);
+    if (jid != this.account.core.fullJid) {
+      this.account.connector.muc.participantsGet(from);
+    }
   }
 
   this.events.onGroupImageReceived = function (msgId, fromAttribute, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt) {
