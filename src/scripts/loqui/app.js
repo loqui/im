@@ -193,7 +193,7 @@ var App = {
           for (var ci in account.chats) {
             var chat = account.chats[ci];
             var muted = chat.core.settings.muted;
-            chat.core.settings = $.extend({}, App.defaults.Chat.core.settings);
+            chat.core.settings = $.extend(chat.core.settings, App.defaults.Chat.core.settings);
           }
           account.save();
         }
