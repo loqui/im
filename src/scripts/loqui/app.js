@@ -4,7 +4,7 @@ var App = {
 
   name: 'Loqui IM',
   shortName: 'Loqui',
-  version: 'v0.3.4',
+  version: 'v0.3.5',
   minorVersion: 'a',
   connectors: [],
   logForms: [],
@@ -54,7 +54,8 @@ var App = {
       core: {
         settings: {
           muted: [false],
-          otr: [false, 'switchOTR']
+          otr: [false, 'switchOTR'],
+          hidden: [false]
         }
       }
     },
@@ -181,6 +182,18 @@ var App = {
             var muted = chat.core.settings.muted;
             chat.core.settings = $.extend({}, App.defaults.Chat.core.settings);
             chat.core.settings.muted[0] = muted instanceof Array ? muted[0] : muted;
+          }
+          account.save();
+        }
+        from['v0.3.4']();
+      },
+      'v0.3.4': function(){
+        for (var ai in App.accounts) {
+          var account = App.accounts[ai];
+          for (var ci in account.chats) {
+            var chat = account.chats[ci];
+            var muted = chat.core.settings.muted;
+            chat.core.settings = $.extend({}, App.defaults.Chat.core.settings);
           }
           account.save();
         }

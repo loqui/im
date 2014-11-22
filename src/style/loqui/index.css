@@ -496,6 +496,11 @@ section#main article ul li span.avatar img:not([src]) {
 section#main article ul li span.unread {
   display: none;
 }
+
+section#main article ul li[data-hidden="1"]{
+    display: none;
+}
+
 section#main article ul li[data-unread="1"] span.unread {
   display: block;
   position: absolute;
