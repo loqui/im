@@ -33,10 +33,12 @@ App.connectors['coseme'] = function (account) {
       this.connected = true;
       this.account.core.fullJid = CoSeMe.yowsup.connectionmanager.jid;
       callback.connected();
-      pulse= setInterval(function(){
-        console.log('keep alive: sending pong!');
-        MI.call('pong', ['0']);
-      }, 30000)
+      if(!pulse){
+        pulse= setInterval(function(){
+          console.log('keep alive: sending pong!');
+          MI.call('pong', ['0']);
+        }, 60000);
+      }
     }.bind(this));
     SI.registerListener('auth_fail', function() {
       Tools.log("AUTH FAIL");
@@ -57,6 +59,7 @@ App.connectors['coseme'] = function (account) {
     var method = 'disconnect';
     var params = ['undefined'];
     clearInterval(pulse);
+    pulse= null;
     MI.call(method, params);
   }
   
