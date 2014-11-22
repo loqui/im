@@ -624,12 +624,13 @@ App.connectors['coseme'] = function (account) {
     if (body) {
       var date = new Date(stamp);
       var stamp = Tools.localize(Tools.stamp(stamp));
+      var fromUser = from.split('@')[0];
       var msg = new Message(account, {
         from: from,
         to: to,
         text: body,
         stamp: stamp,
-        pushName: pushName
+        pushName: (pushName && pushName != fromUser) ? (fromUser + ': ' + pushName) : pushName
       }, {
         muc: true
       });
