@@ -97,6 +97,7 @@ var Messenger = {
         }
         li.data('value', chat.core.settings[key][0]);
         account.save();
+        account.singleRender(chat, false);
       }
       for (let [key, value] in settings) {
         var li = $('<li/>').data('key', key).append(

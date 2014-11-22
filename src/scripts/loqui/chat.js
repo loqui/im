@@ -184,6 +184,7 @@ var Chat = function (core, account) {
       }
     }
     $('#chat #messages span.lastRead').remove();
+    this.core.settings.hidden[0]= false;
     this.save(true);
   }.bind(this);
   
