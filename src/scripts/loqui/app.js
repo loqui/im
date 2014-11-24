@@ -27,7 +27,6 @@ var App = {
       settings: {
         reconnect: true,
         sound: true,
-        disHide: false,
         csn: true,
         boltGet: true,
         devMode: false
