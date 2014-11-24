@@ -20,18 +20,6 @@ var Account = function (core) {
   } else {
     $.extend(this.OTR, App.defaults.Account.core.OTR);
   }
-  
-  if(this.connector.sync){
-      var account= this;
-      setInterval(function(){
-          if(account.core.enabled){
-              console.log('keep alive!');
-              account.sync(function(sync){
-                  sync(true);
-              });
-          }
-      }, 30000);
-  }
 
   // Test account
   this.test = function () {

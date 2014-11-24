@@ -5,6 +5,8 @@ App.connectors['coseme'] = function (account) {
   var Yowsup = CoSeMe.yowsup;
   var SI = Yowsup.getSignalsInterface();
   var MI = Yowsup.getMethodsInterface();
+
+  var pulse= null;
   
   this.account = account;
   this.provider = Providers.data[account.core.provider];
@@ -32,6 +34,12 @@ App.connectors['coseme'] = function (account) {
       this.connected = true;
       this.account.core.fullJid = CoSeMe.yowsup.connectionmanager.jid;
       callback.connected();
+      if(!pulse){
+        pulse= setInterval(function(){
+          console.log('keep alive: sending pong!');
+          MI.call('pong', ['0']);
+        }, 60000);
+      }
     }.bind(this));
     SI.registerListener('auth_fail', function() {
       Tools.log("AUTH FAIL");
@@ -51,6 +59,8 @@ App.connectors['coseme'] = function (account) {
     this.connected = false;
     var method = 'disconnect';
     var params = ['undefined'];
+    clearInterval(pulse);
+    pulse= null;
     MI.call(method, params);
   }
   
@@ -65,11 +75,9 @@ App.connectors['coseme'] = function (account) {
   }
   
   this.sync = function (callback) {
-    var getStatusesAndPics = function (noStatuses) {
+    var getStatusesAndPics = function () {
       var contacts = this.account.core.chats.map(function(e){return e.jid;});
-      if(!noStatuses){
-        MI.call('contacts_getStatus', [contacts]);
-      }
+      MI.call('contacts_getStatus', [contacts]);
       this.avatar(null, [contacts]);
     }.bind(this);
     if (!('roster' in this.account.core) || !this.account.core.roster.length) {
