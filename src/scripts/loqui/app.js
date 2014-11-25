@@ -69,7 +69,7 @@ var App = {
       }
     }
   },
-  
+
   // This is the main procedure
   run: function () {
     // Initialize Store class
