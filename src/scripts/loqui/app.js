@@ -69,7 +69,15 @@ var App = {
       }
     }
   },
-  
+
+  disabled : {
+    chatSettings : {
+      muc : {
+        hidden : true      
+      }
+    }
+  },
+
   // This is the main procedure
   run: function () {
     // Initialize Store class
