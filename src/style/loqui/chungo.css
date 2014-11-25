@@ -1,17 +1,17 @@
 @media screen and (orientation:portrait) {
   html{
-    font-size: 1rem!important;
+    font-size: 1rem;
   }
 }
 @media screen and (orientation:landscape) {
   html{
-    font-size: 1rem!important;
+    font-size: 1rem;
   }
   * {
-    animation: none!important;
-    -webkit-animation: none!important;
-    transition: none!important;
-    -webkit-transition: none!important;
+    -webkit-animation: none;
+    animation: none;
+    -webkit-transition: none;
+    transition: none;
   }
 }
 @font-face {
@@ -81,13 +81,13 @@ section.show[data-transition="horizontal"] {
   transform: translateX(0);
   -webkit-transform: translateX(0);
 }
-section.prev.forth[data-transition="horizontal"] {
-  transform: translateX(-100%);
+.prev.forth[data-transition="horizontal"] {
   -webkit-transform: translateX(-100%);
+  transform: translateX(-100%);
 }
-section.prev.back[data-transition="horizontal"] {
-  transform: translateX(100%);
+.prev.back[data-transition="horizontal"] {
   -webkit-transform: translateX(100%);
+  transform: translateX(100%);
 }
 section.show[data-transition="vertical"] {
   transform: translateY(0);
@@ -103,9 +103,9 @@ section {
   width: 100%;
   background-color: white;
 }
-section.asided {
-  transform: translateX(calc(-100% + 3rem))!important;
-  -webkit-transform: translateX(calc(-100% + 3rem))!important;
+section.asided, section.show.asided {
+  -webkit-transform: translateX(calc(-100% + 3rem));
+  transform: translateX(calc(-100% + 3rem));
 }
 
 section > header {
@@ -117,10 +117,10 @@ section > header button {
   height: 3rem;
   width: 3rem;
 }
-header nav.on-left {
+header .on-left {
   float: left;
 }
-header nav.on-right {
+header .on-right {
   float: right;
 }
 header button {
@@ -136,7 +136,7 @@ section > article {
   right: 0;
   z-index: -1;
 }
-section > article.headless {
+section > .headless {
   top: 0;
 }
 section.show > article.show {
@@ -154,15 +154,15 @@ aside {
   width: calc(100% - 3rem);
   height: calc(100% - .5rem);
   background-color: white;
-  transform: translateX(120%);
   -webkit-transform: translateX(120%);
-  transition: transform .3s;
+  transform: translateX(120%);
   -webkit-transition: transform .3s;
-  z-index: 50!important;
+  transition: transform .3s;
+  z-index: 50;
 }
 aside.show {
-  transform: translateX(3rem);
   -webkit-transform: translateX(3rem);
+  transform: translateX(3rem);
 }
 aside.show article.active {
   background-color: white;
@@ -191,7 +191,7 @@ nav[data-control=menu] {
   display: none;
 }
 .show {
-  display: block!important;
+  display: block;
 }
 .scroll {
   overflow: auto;
@@ -203,12 +203,12 @@ nav[data-control=menu] {
 }
 .buttongroup button {
   padding: .7rem;
-  background: #E95644!important;
-  color: white!important;
+  background: #E95644;
+  color: white;
   font-weight: 100;
   font-style: italic;
   border: none;
-  border-radius: .2rem!important;
+  border-radius: .2rem;
 }
 
 .chungo .shader {
@@ -295,7 +295,7 @@ article.form label {
 section .hideable {
   opacity: 1;
 }
-section.fast .hideable {
+.fast .hideable {
   opacity: 0;
 }
 
@@ -318,22 +318,22 @@ section.fast .hideable {
 
 @keyframes popUp {
   from {
-    transform: translateY(-100%);
     -webkit-transform: translateY(-100%);
+    transform: translateY(-100%);
   }
   to {
-    transform: translateY(0);
     -webkit-transform: translateY(0);
+    transform: translateY(0);
   }
 }
 @keyframes popDown {
   from {
-    transform: translateY(0);
     -webkit-transform: translateY(0);
+    transform: translateY(0);
   }
   to {
-    transform: translateY(-100%);
     -webkit-transform: translateY(-100%);
+    transform: translateY(-100%);
   }
 }
 
