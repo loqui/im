@@ -160,21 +160,19 @@ var Messenger = {
         account.save();
       }
       Object.keys(App.defaults.Chat.core.settings).forEach(function(key){
-        if(!App.disabled.chatSettings.muc[key]){
-          var value= chat.core.settings[key] || App.defaults.Chat.core.settings[key];
-          var li = $('<li/>').data('key', key).append(
-            $('<span/>').addClass('caption').text(_('AccountSet' + key))
-          ).append(
-            $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>')
-          ).data('value', value.length > 1 ? value[0] : value).bind('click', accountSwitch);
-          if (value.length > 1 && value[1]) {
-            li.on('click', function (e) {
-              console.log(value, value[1]);
-              Menu.show(value[1], li[0]);
-            });
-          }
-          setUl.append(li);
+        var value= chat.core.settings[key] || App.defaults.Chat.core.settings[key];
+        var li = $('<li/>').data('key', key).append(
+          $('<span/>').addClass('caption').text(_('AccountSet' + key))
+        ).append(
+          $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>')
+        ).data('value', value.length > 1 ? value[0] : value).bind('click', accountSwitch);
+        if (value.length > 1 && value[1]) {
+          li.on('click', function (e) {
+            console.log(value, value[1]);
+            Menu.show(value[1], li[0]);
+          });
         }
+        setUl.append(li);
       });
     }
     if (App.avatars[jid]) {
