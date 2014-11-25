@@ -90,6 +90,9 @@ var Messenger = {
         var li = sw.closest('li');
         var key = li.data('key');
         var chat = account.chatGet(jid);
+        if(!Array.isArray(chat.core.settings[key])){
+            chat.core.settings[key]= chat.core.settings[key];
+        }
         if (li.data('value') == 'true') {
           chat.core.settings[key][0] = false;
         } else {
@@ -151,13 +154,17 @@ var Messenger = {
         var li = sw.closest('li');
         var key = li.data('key');
         var chat = account.chatGet(jid);
-        if (li.data('value') == 'true') {
-          chat.core.settings[key] = false;
-        } else {
-          chat.core.settings[key] = true;
+        if(!Array.isArray(chat.core.settings[key])){
+            chat.core.settings[key]= chat.core.settings[key];
         }
-        li.data('value', chat.core.settings[key]);
+        if (li.data('value') == 'true') {
+          chat.core.settings[key][0] = false;
+        } else {
+          chat.core.settings[key][0] = true;
+        }
+        li.data('value', chat.core.settings[key][0]);
         account.save();
+        account.singleRender(chat, false);
       }
       Object.keys(App.defaults.Chat.core.settings).forEach(function(key){
         var value= chat.core.settings[key] || App.defaults.Chat.core.settings[key];
