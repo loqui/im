@@ -88,8 +88,7 @@ $('section#chat article#main div#text').on('keydown', function (e) {
     if (this.textContent.length < 2) {
       $('section#chat article#main button#plus').show();
       $('section#chat article#main button#say').hide();
-      $('section#chat nav#plus a').show();
-      $('section#chat nav#plus').hide();
+      $('section#chat nav#plus').removeClass('show');
       Messenger.csn('paused');
     }
   } else {
