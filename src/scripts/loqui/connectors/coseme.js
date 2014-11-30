@@ -999,28 +999,28 @@ App.logForms['coseme'] = function (article, provider, data) {
   });
   var smsButtons = $('<div/>').addClass('buttongroup');
   var smsReq = $('<button/>').data('role', 'submit').style('backgroundColor', data.color).text(_('SMSRequest'));
+  var voiceReq = $('<button/>').data('role', 'submit').style('backgroundColor', data.color).text(_('VoiceRequest'));
   var codeReady = $('<button/>').data('role', 'submit').style('backgroundColor', data.color).text(_('codeReady'));
   var back = $('<button/>').data('view-section', 'back').text(_('GoBack'));
-  smsButtons.append(smsReq).append(codeReady).append(back);
+  smsButtons.append(smsReq).append(voiceReq).append(codeReady).append(back);
   sms.append(smsButtons);
   var code = $('<div/>').addClass('code hidden')
-    .append('<p>Enter the 6-digits code you have received by SMS.</p>')
+    .append($('<p>').text(_('recodeLabel')))
     .append($('<input/>')
       .attr('type', 'number')
       .attr('name', 'rCode')
       .attr('placeholder', '123456')
     );
   var codeButtons = $('<div/>').addClass('buttongroup');
-  var retry = $('<button/>')
-    .data('role','back')
+  var back = $('<button/>')
     .bind('click', function () {
       code.addClass('hidden');
       sms.removeClass('hidden');
     })
-    .text(_('Back'));
+    .text(_('GoBack'));
   var validate = $('<button/>').data('role', 'submit').style('backgroundColor', data.color).text(_('CodeValidate'));
   codeButtons.append(validate);
-  codeButtons.append(retry);
+  codeButtons.append(back);
   code.append(codeButtons);
   var recode = $('<div/>').addClass('recode hidden')
     .append($('<p/>').text(_('recodeSMS', { provider: data.longName })))
@@ -1117,7 +1117,61 @@ App.logForms['coseme'] = function (article, provider, data) {
           }        
         }
         var onerror = function (data) {}
-        var deviceId = CoSeMe.registration.getCode(cc, user, onsent, onerror, deviceId);      
+        var deviceId = CoSeMe.registration.getCode(cc, user, onsent, onerror, deviceId, 'sms'); 
+      }
+      var onhasid = function (file) {
+        var onread = function (deviceId) {
+          codeGet(deviceId);
+        }
+        Tools.textUnblob(file, onread);
+      }
+      var onneedsid = function (error) {
+        var deviceId = Math.random().toString(36).substring(2);
+        Store.SD.save('.coseme.id', [deviceId]);
+        codeGet(deviceId);
+      }
+      Store.SD.recover('.coseme.id', onhasid, onneedsid);
+    }
+  });
+  voiceReq.bind('click', function () {
+    var article = this.parentNode.parentNode.parentNode;
+    var provider = article.parentNode.id;
+    var user = $(article).find('[name="user"]').val();
+    var cc  = $(article).find('[name="country"]').val();
+    if (cc && user) {
+      Lungo.Notification.show('phone', _('Voicesending'));
+      var codeGet = function (deviceId) {
+        $(article).data('deviceId', deviceId);
+        var onsent = function (data) {
+          Tools.log(data);
+          if (data.status == 'sent') {
+            Tools.log('Sent phone call to', cc, user, 'with DID', deviceId, 'retry after', data.retry_after);
+            Lungo.Notification.success(_('voicesent'), _('voicesentExp'), 'phone', 3);
+            sms.addClass('hidden');
+            code.removeClass('hidden');
+          } else if (data.status == 'ok') {
+            if (data.type == 'existing') {
+                var account = new Account({
+                  user: user,
+                  cc: cc,
+                  data: data,
+                  provider: provider,
+                  resource: App.defaults.Account.core.resource,
+                  enabled: true,
+                  chats: []
+                }); 
+                account.test();  
+            } else {
+              Tools.log('Not valid', 'Reason:', data.reason, 'with DID', deviceId);
+              Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
+            }
+          } else {
+            Tools.log('Could not sent phone call', 'Reason:', data.reason, 'with DID', deviceId);
+            Lungo.Notification.error(_('VoicenotSent'), _('SMSreason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
+          }        
+        }
+        var onerror = function (data) {}
+        var deviceId = CoSeMe.registration.getCode(cc, user, onsent, onerror, deviceId, 'voice'); 
       }
       var onhasid = function (file) {
         var onread = function (deviceId) {

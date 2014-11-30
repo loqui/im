@@ -5809,7 +5809,7 @@ CoSeMe.namespace('registration', (function(){
   }
 
   return {
-    getCode: function(countryCode, phone, onready, onerror, deviceId) {
+    getCode: function(countryCode, phone, onready, onerror, deviceId, method) {
       var params = Object.create(null);
       params['cc'] = countryCode;
       params['in'] = phone;
@@ -5818,7 +5818,7 @@ CoSeMe.namespace('registration', (function(){
       params['lg'] = 'en';
       params['mcc'] = '000';
       params['mnc'] = '000';
-      params['method'] = 'sms';
+      params['method'] = method in {'sms': 1, 'voice': 1} ? method : 'sms';
       var seedAndId = getRealDeviceId(deviceId);
       params['id'] = seedAndId.id;
 
