@@ -103,7 +103,6 @@ $('section#chat article#main div#text').on('keydown', function (e) {
   }
 }).on('tap', function (e) {
   Lungo.Router.article('chat', 'main');
-  e.target.dispatchEvent(new Event('keydown'));
   $('section#chat nav#plus').addClass('show');
   var ul = $('section#chat ul#messages');
   ul[0].scrollTop = ul[0].scrollHeight + 500;
