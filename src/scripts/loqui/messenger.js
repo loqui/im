@@ -9,7 +9,8 @@ var Messenger = {
 
   add: function (emoji) {
     var textBox = $('article#main div#footbox div#text');
-    textBox.append(" " + emoji);
+    textBox.append(emoji);
+    textBox[0].dispatchEvent(new Event('keydown'));
   },
 
   say: function (text) {
