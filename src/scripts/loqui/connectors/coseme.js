@@ -493,32 +493,6 @@ App.connectors['coseme'] = function (account) {
   
   this.events.onMessageSent = function (from, msgId) {
     Tools.log('SENT', from, msgId);
-    var chat= account.chatGet(from);
-    var lastIndex= chat.core.chunks[chat.core.chunks.length-1];
-    var secondLastIndex= chat.core.chunks[chat.core.chunks.length];
-
-    Store.recover(lastIndex, function(chunk){
-      for(var i in chunk){
-        var msg= chunk[i];
-        if(msg.id == msgId){
-          msg.status= 'sent';
-          msg= new Message(account, msg);
-          Store.update(lastIndex, chunk, msg.reRender.bind(msg, [lastIndex]));
-          return;
-        }
-      }
-      Store.recover(secondLastIndex, function(chunk){
-        for(var i in chunk){
-          var msg= chunk[i];
-          if(msg.id == msgId){
-            msg.status= 'sent';
-            msg= new Message(account, msg);
-            Store.update(secondLastIndex, chunk, msg.reRender.bind(msg, [secondLastIndex]));
-            return;
-          }
-        }
-      });
-    });
   }
 
   this.events.onMessageDelivered = function (from, msgId) {

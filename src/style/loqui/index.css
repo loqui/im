@@ -838,15 +838,6 @@ section > nav[data-control="menu"] a:before {
   background-color: #E95644;
   color: white;
 }
-#messages > li > div[data-type='out'][data-status='sending'] > span.text {
-  background-color: #efcc12;
-}
-#messages > li > div[data-type='out'][data-status='failed'] > span.text {
-  background-color: #EEE;
-  color: #000;
-  padding: calc(0.5rem - 2px) calc(0.6rem - 2px);
-  border: 2px solid #E95644;
-}
 #messages > li > div[data-type='in'] > span.text {
   left: 1.8rem;
   background-color: #EEE;
