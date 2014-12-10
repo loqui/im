@@ -91,7 +91,7 @@ var Messenger = {
         var key = li.data('key');
         var chat = account.chatGet(jid);
         if(!Array.isArray(chat.core.settings[key])){
-            chat.core.settings[key]= chat.core.settings[key];
+            chat.core.settings[key]= App.defaults.Chat.core.settings[key];
         }
         if (li.data('value') == 'true') {
           chat.core.settings[key][0] = false;
@@ -155,7 +155,7 @@ var Messenger = {
         var key = li.data('key');
         var chat = account.chatGet(jid);
         if(!Array.isArray(chat.core.settings[key])){
-            chat.core.settings[key]= chat.core.settings[key];
+            chat.core.settings[key]= App.defaults.Chat.core.settings[key];
         }
         if (li.data('value') == 'true') {
           chat.core.settings[key][0] = false;
