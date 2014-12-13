@@ -1378,21 +1378,21 @@ section[data-show='na'] header .backchange,
 section:not([data-show]) header .backchange
 section[data-show='na'] footer .backchange,
 section:not([data-show]) footer .backchange {
-  display: none;
+  display: none !important;
 }
 
 .disHide #contacts li[data-show='na'] {
-  display: none;
+  display: none !important;
 }
 
 #contacts li[data-show='na'] .status,
 #contacts li[data-show='na'] .show,
 #contacts li[data-muc='true'] .show {
-  display: none;
+  display: none !important;
 }
 
 #chat[data-muc='true'] header .show {
-  display: none;
+  display: none !important;
 }
 
 #settings nav #developer {
