@@ -493,6 +493,7 @@ App.connectors['coseme'] = function (account) {
   
   this.events.onMessageSent = function (from, msgId) {
     Tools.log('SENT', from, msgId);
+    account.messageSent(from, msgId);
   }
 
   this.events.onMessageDelivered = function (from, msgId) {
