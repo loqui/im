@@ -3,3 +3,4 @@ dist/*
 package/*
 cache/*
 *.log
+.DS_Store

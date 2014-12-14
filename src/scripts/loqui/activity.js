@@ -27,6 +27,7 @@ var Activity = function (action, account, content, options) {
       if (options.groups) {
         account.groupsRender(f, click);
       }
+      account.searchRender(f, click);
     },
     file: function (f, account, content) {
       var click = function (t) {
@@ -137,13 +138,15 @@ var Activity = function (action, account, content, options) {
 }
 
 if ('mozSetMessageHandler' in navigator) {
-  navigator.mozSetMessageHandler('activity', function(a) {
-    if (a.source.name === 'share') {
-      if (a.source.data.type == 'url') {
-        Activity('chat', null, a.source.data.url);
-      } else {
-        Activity('file', null, a.source.data);
+  document.addEventListener('appReady', function(){
+    navigator.mozSetMessageHandler('activity', function(a) {
+      if (a.source.name === 'share') {
+        if (a.source.data.type == 'url') {
+          Activity('chat', null, a.source.data.url);
+        } else {
+          Activity('file', null, a.source.data);
+        }
       }
-    }
+    });
   });
 }

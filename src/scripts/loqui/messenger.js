@@ -9,8 +9,8 @@ var Messenger = {
 
   add: function (emoji) {
     var textBox = $('article#main div#footbox div#text');
-    textBox.append(" " + emoji);
-    textBox.trigger('keydown');
+    textBox.append(emoji);
+    textBox[0].dispatchEvent(new Event('keydown'));
   },
 
   say: function (text) {
@@ -31,6 +31,7 @@ var Messenger = {
         muc: muc
       });
       msg.send();
+      Lungo.Router.article('chat', 'main');
       var ul = $('section#chat ul#messages');
       ul[0].scrollTop = ul[0].scrollHeight;
       $('#chat #messages span.lastRead').remove();
@@ -63,7 +64,8 @@ var Messenger = {
     var account = this.account();
     if (App.online && account.connector.connected) {
       var status = $('section#me #status input').val();
-      account.connector.presence.set(null, status);
+      var nick = $('section#me #nick input').val();
+      account.connector.presence.set(null, status, nick);
     } else {
       Lungo.Notification.error(_('Error'), _('NoWhenOffline'), 'exclamation-sign', 3);
     }
@@ -83,12 +85,14 @@ var Messenger = {
       section.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + account.core.provider + '.svg'));
       section.find('#status p').html(App.emoji[Providers.data[account.core.provider].emoji].fy(contact.presence.status) || _('showna'));
       var setUl = section.find('#settings ul').empty();
-      var settings = Iterator(chat.core.settings);
       var accountSwitch = function (e) {
         var sw = $(this);
         var li = sw.closest('li');
         var key = li.data('key');
         var chat = account.chatGet(jid);
+        if(!Array.isArray(chat.core.settings[key])){
+            chat.core.settings[key]= App.defaults.Chat.core.settings[key];
+        }
         if (li.data('value') == 'true') {
           chat.core.settings[key][0] = false;
         } else {
@@ -96,8 +100,10 @@ var Messenger = {
         }
         li.data('value', chat.core.settings[key][0]);
         account.save();
+        account.singleRender(chat, false);
       }
-      for (let [key, value] in settings) {
+      Object.keys(App.defaults.Chat.core.settings).forEach(function(key){
+        var value= chat.core.settings[key] || App.defaults.Chat.core.settings[key];
         var li = $('<li/>').data('key', key).append(
           $('<span/>').addClass('caption').text(_('AccountSet' + key))
         ).append(
@@ -110,7 +116,7 @@ var Messenger = {
           });
         }
         setUl.append(li);
-      }
+      });
       if (App.avatars[jid]) {
         Store.recover(App.avatars[jid].chunk, function (val) {
           section.find('#card .avatar').children('img').attr('src', val);
@@ -143,28 +149,38 @@ var Messenger = {
         partUl.append($('<li/>').text(contact ? contact.name : participantJid.split('@')[0]));
       }
       var setUl = section.find('#settings ul').empty();
-      var settings = Iterator(chat.core.settings);
       var accountSwitch = function (e) {
         var sw = $(this);
         var li = sw.closest('li');
         var key = li.data('key');
         var chat = account.chatGet(jid);
-        if (li.data('value') == 'true') {
-          chat.core.settings[key] = false;
-        } else {
-          chat.core.settings[key] = true;
+        if(!Array.isArray(chat.core.settings[key])){
+            chat.core.settings[key]= App.defaults.Chat.core.settings[key];
         }
-        li.data('value', chat.core.settings[key]);
+        if (li.data('value') == 'true') {
+          chat.core.settings[key][0] = false;
+        } else {
+          chat.core.settings[key][0] = true;
+        }
+        li.data('value', chat.core.settings[key][0]);
         account.save();
+        account.singleRender(chat, false);
       }
-      for (let [key, value] in settings) {
+      Object.keys(App.defaults.Chat.core.settings).forEach(function(key){
+        var value= chat.core.settings[key] || App.defaults.Chat.core.settings[key];
         var li = $('<li/>').data('key', key).append(
           $('<span/>').addClass('caption').text(_('AccountSet' + key))
         ).append(
           $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>')
-        ).data('value', value).bind('click', accountSwitch);
+        ).data('value', value.length > 1 ? value[0] : value).bind('click', accountSwitch);
+        if (value.length > 1 && value[1]) {
+          li.on('click', function (e) {
+            console.log(value, value[1]);
+            Menu.show(value[1], li[0]);
+          });
+        }
         setUl.append(li);
-      }
+      });
     }
     if (App.avatars[jid]) {
       Store.recover(App.avatars[jid].chunk, function (val) {

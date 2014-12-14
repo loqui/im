@@ -11,6 +11,20 @@ var Message = function (account, core, options) {
     logging: (options && 'logging' in options) ? options.logging : true,
     muc: (options && 'muc' in options) ? options.muc : false
   };
+
+  this._formatName = function (name) {
+    var re = /[A-Za-z-]+/;
+    var parts = name.split(' ');
+    for (var idx in parts) {
+      if (idx >= 2) {
+        var info = re.exec(parts[idx]);
+        if (info) {
+          parts[idx] = info[0][0] + '.';
+        }
+      }
+    }
+    return parts.join(' ');
+  }
   
   this.__defineGetter__('chat', function () {
     var chatJid = Strophe.getBareJidFromJid(this.options.muc ? this.core.to : (this.core.from == (account.core.user || account.core.fullJid) ? this.core.to : this.core.from));
@@ -226,7 +240,7 @@ var Message = function (account, core, options) {
     }
   	var type = (this.core.from == this.account.core.user || this.core.from == this.account.core.realJid) ? 'out' : 'in';
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', Strophe.getBareJidFromJid(this.core.from));
-    var name = type == 'in' ? ((contact ? (contact.name || contact.jid) : (this.core.pushName || this.core.from))).split(' ').slice(0, 2).join(' ') : _('Me');
+    var name = type == 'in' ? this._formatName((contact ? (contact.name || contact.jid) : (this.core.pushName || this.core.from))) : _('Me');
     var day = Tools.day(this.core.stamp);
     var div = $('<div/>').data('type', type);
     var index = index || parseInt($('section#chat ul#messages li > div').last().data('index')) + 1;

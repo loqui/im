@@ -27,7 +27,6 @@ var App = {
       settings: {
         reconnect: true,
         sound: true,
-        disHide: false,
         csn: true,
         boltGet: true,
         devMode: false
@@ -54,7 +53,8 @@ var App = {
       core: {
         settings: {
           muted: [false],
-          otr: [false, 'switchOTR']
+          otr: [false, 'switchOTR'],
+          hidden: [false]
         }
       }
     },
@@ -69,13 +69,13 @@ var App = {
       }
     }
   },
-  
+
   // This is the main procedure
   run: function () {
     // Initialize Store class
     Store.init();
     // Load settings and data from storage
-    App.load(function () {
+    App.load().then(function () {
       // Log in or show wizard 
       App.upgrade();
       App.start();
@@ -83,54 +83,52 @@ var App = {
   },
   
   // Load settings and data from storage
-  load: function (callback) {
-    async.parallel([
-      function (callback) {
-        Store.get('accountsCores', function (val) {
-          App.accounts = [];
-          App.accountsCores = val || [];
-          if (App.accountsCores.length) {
-            // Inflate accounts
-            for (var i in App.accountsCores) {
-              var account = new Account(App.accountsCores[i]);
-              // Inflate chats
-              for (var j in account.core.chats) {
-                var chat = new Chat(account.core.chats[j], account);
-                account.chats.push(chat);
+  load: function () {
+    return Promise.all([
+        new Promise(function (callback) {
+          Store.get('accountsCores', function (val) {
+            App.accounts = [];
+            App.accountsCores = val || [];
+            if (App.accountsCores.length) {
+              // Inflate accounts
+              for (var i in App.accountsCores) {
+                var account = new Account(App.accountsCores[i]);
+                // Inflate chats
+                for (var j in account.core.chats) {
+                  var chat = new Chat(account.core.chats[j], account);
+                  account.chats.push(chat);
+                }
+                App.accounts.push(account);
               }
-              App.accounts.push(account);
             }
-          }
-          callback(null);
-        });
-      },
-      function (callback) {
-        Store.get('settings', function (val) {
-          App.settings = val && Object.keys(val).length ? val : App.defaults.App.settings;
-          callback(null);
-        });
-      },
-      function (callback) {
-        Store.get('devsettings', function (val) {
-          App.devsettings = val && Object.keys(val).length ? val : App.defaults.App.devsettings;
-          callback(null);
-        });
-      },
-      function (callback) {
-        Store.get('avatars', function (val) {
-          App.avatars = val || {};
-          callback(null);
-        });
-      },
-      function (callback) {
-        Store.get('caps', function (val) {
-          App.caps = val || {};
-          callback(null);
-        });
-      }
-    ], function (err, results) {
-      callback(null);
-    });
+            callback(null);
+          });
+        }),
+        new Promise(function (callback) {
+          Store.get('settings', function (val) {
+            App.settings = val && Object.keys(val).length ? val : App.defaults.App.settings;
+            callback(null);
+          });
+        }),
+        new Promise(function (callback) {
+          Store.get('devsettings', function (val) {
+            App.devsettings = val && Object.keys(val).length ? val : App.defaults.App.devsettings;
+            callback(null);
+          });
+        }),
+        new Promise(function (callback) {
+          Store.get('avatars', function (val) {
+            App.avatars = val || {};
+            callback(null);
+          });
+        }),
+        new Promise(function (callback) {
+          Store.get('caps', function (val) {
+            App.caps = val || {};
+            callback(null);
+          });
+        })
+      ]);
   },
   
   // Perform special processes if upgrading from older version
@@ -146,7 +144,7 @@ var App = {
         from['v0.2.6']();
       },
       'v0.2.6': function () {
-        Object.keys(App.avatars).map(function (key, i) { App.avatars[key] = {chunk: App.avatars[key]} })
+        Object.keys(App.avatars).map(function (key, i) { App.avatars[key] = {chunk: App.avatars[key]}; });
         App.accountsCores.forEach(function (account) {
           account.enabled = App.defaults.Account.core.enabled;
         });
@@ -184,6 +182,18 @@ var App = {
           }
           account.save();
         }
+        from['v0.3.4']();
+      },
+      'v0.3.4': function(){
+        for (var ai in App.accounts) {
+          var account = App.accounts[ai];
+          for (var ci in account.chats) {
+            var chat = account.chats[ci];
+            var muted = chat.core.settings.muted;
+            chat.core.settings = $.extend(chat.core.settings, App.defaults.Chat.core.settings);
+          }
+          account.save();
+        }
       }
     };
     if (last < App.version && last in from) {
@@ -202,6 +212,9 @@ var App = {
       App.switchesDevRender();
       this.connect();
       Menu.show('main');
+      document.dispatchEvent(new Event('appReady'));
+
+        
       // If there is more than one account, open the account switcher by default
       if (App.accounts.length > 1) {
         setTimeout(function () {
@@ -269,7 +282,7 @@ var App = {
       var value = this.settings[key];
       var li = $('<li><span></span><switch/></li>');
       li.children('span').text(_('Set' + key));
-      var div = $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>')
+      var div = $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>');
       li.children('switch').replaceWith(div);
       li.data('key', key);
       li.data('value', value);
@@ -302,7 +315,7 @@ var App = {
       var value = this.devsettings[key];
       var li = $('<li><span></span><switch/></li>');
       li.children('span').text(_('Set' + key));
-      var div = $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>')
+      var div = $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>');
       li.children('switch').replaceWith(div);
       li.data('key', key);
       li.data('value', value);
@@ -331,20 +344,20 @@ var App = {
   notify: function (core, altSound, force) {
     var alt = function () {
       App.audio(altSound);    
-    }
+    };
     if (force || navigator.mozNotification && document.hidden) {
       if ('Notification' in window) {
-        var notification = new Notification(core.subject, {body: core.text, icon: core.pic});
+        var notification = new Notification(core.subject, {body: core.text, icon: core.pic, tag: core.from});
         notification.onclick = function () {
           core.callback();
           App.notifications.length = 0;
-        }
+        };
       } else if ('mozNotification' in navigator) {
         var notification = navigator.mozNotification.createNotification(core.subject, core.text, core.pic);
         notification.onclick = function () {
           core.callback();
           App.notifications.length = 0;
-        }
+        };
         notification.show();
       }
       if (force) {
@@ -367,8 +380,8 @@ var App = {
   alarmSet: function (data) {
     if (navigator.mozAlarms) {
       var req = navigator.mozAlarms.add(new Date(Date.now()+90000), 'ignoreTimezone', data);
-      req.onsuccess = function () { }
-      req.onerror = function () { }
+      req.onsuccess = function () { };
+      req.onerror = function () { };
     }
   },
   
@@ -380,4 +393,4 @@ var App = {
     };
   }
   
-}
+};

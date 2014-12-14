@@ -5,10 +5,13 @@ App.connectors['coseme'] = function (account) {
   var Yowsup = CoSeMe.yowsup;
   var SI = Yowsup.getSignalsInterface();
   var MI = Yowsup.getMethodsInterface();
+
+  var pulse= null;
   
   this.account = account;
   this.provider = Providers.data[account.core.provider];
   this.presence = {
+    name: this.account.core.presence ? this.account.core.presence.name : '',
     show: this.account.core.presence ? this.account.core.presence.show : App.defaults.Connector.presence.show,
     status: this.account.core.presence ? this.account.core.presence.status : App.defaults.Connector.presence.status
   };
@@ -31,6 +34,12 @@ App.connectors['coseme'] = function (account) {
       this.connected = true;
       this.account.core.fullJid = CoSeMe.yowsup.connectionmanager.jid;
       callback.connected();
+      if(!pulse){
+        pulse= setInterval(function(){
+          console.log('keep alive: sending pong!');
+          MI.call('pong', ['0']);
+        }, 60000);
+      }
     }.bind(this));
     SI.registerListener('auth_fail', function() {
       Tools.log("AUTH FAIL");
@@ -50,6 +59,8 @@ App.connectors['coseme'] = function (account) {
     this.connected = false;
     var method = 'disconnect';
     var params = ['undefined'];
+    clearInterval(pulse);
+    pulse= null;
     MI.call(method, params);
   }
   
@@ -147,11 +158,13 @@ App.connectors['coseme'] = function (account) {
     MI.call(method, [jid]);
   }
   
-  this.presence.set = function (show, status) {
+  this.presence.set = function (show, status, name) {
     this.presence.show = show || this.presence.show;
     this.presence.status = status || this.presence.status;
+    this.presence.name = name || this.presence.name;
     this.presence.send();
     this.account.core.presence = {
+      name: this.presence.name,
       show: this.presence.show,
       status: this.presence.status
     }
@@ -170,7 +183,7 @@ App.connectors['coseme'] = function (account) {
         dnd: 'presence_sendUnavailable',
         chat: 'presence_sendAvailableForChat'
       };
-      MI.call(method[show], []);
+      MI.call(method[show], [this.presence.name]);
       MI.call('profile_setStatus', [status]);
     }
   }.bind(this);
@@ -333,12 +346,12 @@ App.connectors['coseme'] = function (account) {
       group_gotPicture: this.events.onGroupGotPicture,
       group_gotGroups: null,
       group_gotParticipating: this.events.onGroupGotParticipating,
-      notification_contactProfilePictureUpdated: this.events.onNotification,
-      notification_contactProfilePictureRemoved: this.events.onNotification,
-      notification_groupPictureUpdated: this.events.onNotification,
-      notification_groupPictureRemoved: this.events.onNotification,
-      notification_groupParticipantAdded: this.events.onNotification,
-      notification_groupParticipantRemoved: this.events.onNotification,
+      notification_contactProfilePictureUpdated: this.events.onContactProfilePictureUpdated,
+      notification_contactProfilePictureRemoved: this.events.onContactProfilePictureRemoved,
+      notification_groupPictureUpdated: this.events.onGroupPictureUpdated,
+      notification_groupPictureRemoved: this.events.onGroupPictureRemoved,
+      notification_groupParticipantAdded: this.events.onGroupParticipantAdded,
+      notification_groupParticipantRemoved: this.events.onGroupParticipantRemoved,
       notification_status: this.events.onNotification,
       contact_gotProfilePictureId: this.events.onAvatar,
       contact_gotProfilePicture: this.events.onAvatar,
@@ -622,12 +635,13 @@ App.connectors['coseme'] = function (account) {
     if (body) {
       var date = new Date(stamp);
       var stamp = Tools.localize(Tools.stamp(stamp));
+      var fromUser = from.split('@')[0];
       var msg = new Message(account, {
         from: from,
         to: to,
         text: body,
         stamp: stamp,
-        pushName: pushName
+        pushName: (pushName && pushName != fromUser) ? (fromUser + ': ' + pushName) : pushName
       }, {
         muc: true
       });
@@ -638,6 +652,40 @@ App.connectors['coseme'] = function (account) {
       }
     }
     return true;
+  }
+
+  this.events.onContactProfilePictureUpdated = function (from, stamp, msgId, pictureId, jid) {
+    var method = 'notification_ack';
+    MI.call(method, [from, msgId]);
+  }
+
+  this.events.onContactProfilePictureRemoved = function (from, stamp, msgId, pictureId, jid) {
+    var method = 'notification_ack';
+    MI.call(method, [from, msgId]);
+  }
+
+  this.events.onGroupPictureUpdated = function (from, stamp, msgId, pictureId, jid) {
+    var method = 'notification_ack';
+    MI.call(method, [from, msgId]);
+  }
+
+  this.events.onGroupPictureRemoved = function (from, stamp, msgId, pictureId, jid) {
+    var method = 'notification_ack';
+    MI.call(method, [from, msgId]);
+  }
+
+  this.events.onGroupParticipantAdded = function (from, jid, _, stamp, msgId) {
+    var method = 'notification_ack';
+    MI.call(method, [from, msgId]);
+    this.account.connector.muc.participantsGet(from);
+  }
+
+  this.events.onGroupParticipantRemoved = function (from, jid, _, stamp, msgId) {
+    var method = 'notification_ack';
+    MI.call(method, [from, msgId]);
+    if (jid != this.account.core.fullJid) {
+      this.account.connector.muc.participantsGet(from);
+    }
   }
 
   this.events.onGroupImageReceived = function (msgId, fromAttribute, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt) {
@@ -714,12 +762,13 @@ App.connectors['coseme'] = function (account) {
         }
       } else {
         Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', parseInt(lastSeen) < 300 ? 'a' : 'away');
-        contact.presence.show = parseInt(lastSeen) < 300 ? 'a' : 'away';
+        var present= (parseInt(lastSeen) < 1);
+        contact.presence.show = present ? 'a' : 'away';
         account.presenceRender(contact);
         var chatSection = $('section#chat[data-jid="' + jid + '"]');
         if (chatSection.length) {
           var status = chatSection.find('header .status');
-          status.html((parseInt(lastSeen) < 300 ? _('showa') : _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})})) +  ' - ' + status.html());
+          status.html((present ? _('showa') : _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})})) +  ' - ' + status.html());
         }
       }
     }
@@ -731,6 +780,12 @@ App.connectors['coseme'] = function (account) {
       Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', 'a');
       contact.presence.show = 'a';
       account.presenceRender(contact);
+
+      var chatSection = $('section#chat[data-jid="' + jid + '"]');
+      if (chatSection.length) {
+        var status = chatSection.find('header .status');
+        status.html(_('showa') +  ' - ' + status.html());
+      }
     }
   }
   
@@ -740,6 +795,13 @@ App.connectors['coseme'] = function (account) {
       Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', 'away');
       contact.presence.show = 'away';
       account.presenceRender(contact);
+
+      var chatSection = $('section#chat[data-jid="' + jid + '"]');
+      if (chatSection.length) {
+        var status = chatSection.find('header .status');
+        var time = Tools.convenientDate(Tools.localize(Tools.stamp( Math.floor(Date.now()/1000))));
+        status.html(_('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})}) +  ' - ' + status.html());
+      }
     }
   }
   
@@ -911,28 +973,28 @@ App.logForms['coseme'] = function (article, provider, data) {
   });
   var smsButtons = $('<div/>').addClass('buttongroup');
   var smsReq = $('<button/>').data('role', 'submit').style('backgroundColor', data.color).text(_('SMSRequest'));
+  var voiceReq = $('<button/>').data('role', 'submit').style('backgroundColor', data.color).text(_('VoiceRequest'));
   var codeReady = $('<button/>').data('role', 'submit').style('backgroundColor', data.color).text(_('codeReady'));
   var back = $('<button/>').data('view-section', 'back').text(_('GoBack'));
-  smsButtons.append(smsReq).append(codeReady).append(back);
+  smsButtons.append(smsReq).append(voiceReq).append(codeReady).append(back);
   sms.append(smsButtons);
   var code = $('<div/>').addClass('code hidden')
-    .append('<p>Enter the 6-digits code you have received by SMS.</p>')
+    .append($('<p>').text(_('recodeLabel')))
     .append($('<input/>')
       .attr('type', 'number')
       .attr('name', 'rCode')
       .attr('placeholder', '123456')
     );
   var codeButtons = $('<div/>').addClass('buttongroup');
-  var retry = $('<button/>')
-    .data('role','back')
+  var back = $('<button/>')
     .bind('click', function () {
       code.addClass('hidden');
       sms.removeClass('hidden');
     })
-    .text(_('Back'));
+    .text(_('GoBack'));
   var validate = $('<button/>').data('role', 'submit').style('backgroundColor', data.color).text(_('CodeValidate'));
   codeButtons.append(validate);
-  codeButtons.append(retry);
+  codeButtons.append(back);
   code.append(codeButtons);
   var recode = $('<div/>').addClass('recode hidden')
     .append($('<p/>').text(_('recodeSMS', { provider: data.longName })))
@@ -1029,7 +1091,61 @@ App.logForms['coseme'] = function (article, provider, data) {
           }        
         }
         var onerror = function (data) {}
-        var deviceId = CoSeMe.registration.getCode(cc, user, onsent, onerror, deviceId);      
+        var deviceId = CoSeMe.registration.getCode(cc, user, onsent, onerror, deviceId, 'sms'); 
+      }
+      var onhasid = function (file) {
+        var onread = function (deviceId) {
+          codeGet(deviceId);
+        }
+        Tools.textUnblob(file, onread);
+      }
+      var onneedsid = function (error) {
+        var deviceId = Math.random().toString(36).substring(2);
+        Store.SD.save('.coseme.id', [deviceId]);
+        codeGet(deviceId);
+      }
+      Store.SD.recover('.coseme.id', onhasid, onneedsid);
+    }
+  });
+  voiceReq.bind('click', function () {
+    var article = this.parentNode.parentNode.parentNode;
+    var provider = article.parentNode.id;
+    var user = $(article).find('[name="user"]').val();
+    var cc  = $(article).find('[name="country"]').val();
+    if (cc && user) {
+      Lungo.Notification.show('phone', _('Voicesending'));
+      var codeGet = function (deviceId) {
+        $(article).data('deviceId', deviceId);
+        var onsent = function (data) {
+          Tools.log(data);
+          if (data.status == 'sent') {
+            Tools.log('Sent phone call to', cc, user, 'with DID', deviceId, 'retry after', data.retry_after);
+            Lungo.Notification.success(_('voicesent'), _('voicesentExp'), 'phone', 3);
+            sms.addClass('hidden');
+            code.removeClass('hidden');
+          } else if (data.status == 'ok') {
+            if (data.type == 'existing') {
+                var account = new Account({
+                  user: user,
+                  cc: cc,
+                  data: data,
+                  provider: provider,
+                  resource: App.defaults.Account.core.resource,
+                  enabled: true,
+                  chats: []
+                }); 
+                account.test();  
+            } else {
+              Tools.log('Not valid', 'Reason:', data.reason, 'with DID', deviceId);
+              Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
+            }
+          } else {
+            Tools.log('Could not sent phone call', 'Reason:', data.reason, 'with DID', deviceId);
+            Lungo.Notification.error(_('VoicenotSent'), _('SMSreason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
+          }        
+        }
+        var onerror = function (data) {}
+        var deviceId = CoSeMe.registration.getCode(cc, user, onsent, onerror, deviceId, 'voice'); 
       }
       var onhasid = function (file) {
         var onread = function (deviceId) {
