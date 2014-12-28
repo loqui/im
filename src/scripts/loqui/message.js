@@ -117,7 +117,8 @@ var Message = function (account, core, options) {
         if (avatarize) {
           account.avatarsRender();
         }
-        ul[0].scrollTop = ul[0].scrollHeight;
+        $('section#chat #typing').hide();
+		ul[0].scrollTop = ul[0].scrollHeight;
         chat.core.lastRead = Tools.localize(Tools.stamp());
       } else {
         chat.core.unread++;
