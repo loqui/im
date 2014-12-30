@@ -610,7 +610,7 @@ var Account = function (core) {
     var chat= this.chatGet(from);
     var account= this;
     var lastIndex= chat.core.chunks[chat.core.chunks.length-1];
-    var secondLastIndex= chat.core.chunks[chat.core.chunks.length];
+    var secondLastIndex= chat.core.chunks[chat.core.chunks.length-2];
 
     Store.recover(lastIndex, function(chunk){
       for(var i in chunk){
