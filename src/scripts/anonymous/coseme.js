@@ -5922,14 +5922,18 @@ CoSeMe.namespace('media', (function() {
       xhr.send(formData);
     }
 
-    xhr.upload.onprogress = function(event) {
-      if (event.lengthComputable) {
-        progressCb((event.loaded / event.total) * 100);
+    xhr.upload.onprogress = function(e) {
+      logger.log('XHR fired onprogress...');
+      if (progressCb) {
+        if (e.lengthComputable) {
+          var pr = Math.floor((e.loaded/e.total) * 100);
+          progressCb(pr);
+        }
       }
     };
 
     xhr.onload = function(event) {
-      logger.log('Got some data!');
+      logger.log('XHR fired onload. xhr.status:', xhr.status);
 
       if (xhr.status === 200) {
         if (progressCb) {
@@ -5938,25 +5942,27 @@ CoSeMe.namespace('media', (function() {
 
         var json = xhr.response;
         if (json.url) {
-            logger.log('We got an URL on the result:', json.url);
-            if (successCb) {
-                successCb(json.url);
-            }
+          logger.log('We got an URL on the result:', json.url);
+          if (successCb) {
+            successCb(json.url);
+          }
         } else {
-            if (errorCb) {
-                errorCb('No URL in result');
-            }
+          if (errorCb) {
+            errorCb('No URL in result');
+          }
         }
       } else {
         logger.log('Got error status:', xhr.status);
+        if (errorCb) {
+          errorCb(xhr.status);
+        }
       }
-
-      // Let's close the socket and remove the errorCb handler
-      errorCb = undefined;
     };
 
-    xhr.onerror = function(event) {
-      errorCb('Got upload error!');
+    xhr.onerror = function(e) {
+      if (errorCb) {
+        errorCb(xhr.status);
+      }
     };
   }
 
