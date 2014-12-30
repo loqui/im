@@ -95,7 +95,7 @@ var Tools = {
   HTMLescape: function (str) {
     var div = document.createElement('div');
     div.appendChild(document.createTextNode(str));
-    return div.innerHTML;
+    return div.innerHTML.replace(/\n/g, '<br>');
   },
   
   fileGet: function (url, cb) {
