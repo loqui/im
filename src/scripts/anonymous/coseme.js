@@ -5848,33 +5848,6 @@ CoSeMe.namespace('media', (function() {
 
   var logger = new CoSeMe.common.Logger('media');
 
-  /**
-   * Per Yowsup.
-   */
-  var MAX_UPLOAD_BODY_ANSWER = 8192*7;
-
-  /**
-   * Converts into Latin1 an array of bytes.
-   */
-  function _latin1(array) {
-    //return CryptoJS.enc.Latin1.parse(array).toString();
-    var c, latinarray = [];
-    for (var i = 0, l = array.length; i < l; i++) {
-      c = String.fromCharCode(array[i]);
-      latinarray.push(c);
-    }
-    return latinarray.join('');
-  }
-
-  function _str2ab(str) {
-    var buf = new ArrayBuffer(str.length);
-    var bufView = new Uint8Array(buf);
-    for (var i=0, strLen=str.length; i<strLen; i++) {
-      bufView[i] = str.charCodeAt(i);
-    }
-    return buf;
-  }
-
   function download(url, successCb, errorCb, progressCb) {
     var blob = null;
     var xhr = new XMLHttpRequest({mozSystem: true});
