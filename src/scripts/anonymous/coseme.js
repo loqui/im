@@ -5981,6 +5981,10 @@ CoSeMe.namespace('media', (function() {
       // Let's close the socket and remove the errorCb handler
       errorCb = undefined;
     };
+
+    xhr.onerror = function(event) {
+      errorCb('Got upload error!');
+    };
   }
 
   return {
