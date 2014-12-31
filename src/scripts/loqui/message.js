@@ -79,6 +79,8 @@ var Message = function (account, core, options) {
 				  message.status= 'failed';
 			  }else if(sentACK){
 				  message.status= 'sending';
+				  message.id= msg.core.id;
+				  msg.core.id= 0;
 				  msg.setSendTimeout(block, index);
 			  }else{
 				  message.status= '';
