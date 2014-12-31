@@ -470,7 +470,7 @@ App.connectors['XMPP'] = function (account) {
     chat.save();
     var section = $('section#chat');
     if (section.hasClass('show') && section.data('jid') == from) {
-      var li = section.find('ul li').last();
+      var li = section.find('article#main ul li').last();
       section.find('span.lastACK').remove();
       li.append($('<span/>').addClass('lastACK')[0]);
     }
