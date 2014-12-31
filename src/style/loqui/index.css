@@ -84,7 +84,7 @@ section > article.simple > div > p {
   margin-bottom: 3rem;
   text-align: center;
   color: white;
-  background-color: rgba(0, 0, 0, .7);
+  background-color: transparent;
 }
 section.setup img[src^='img/providers']{
   position: absolute;
