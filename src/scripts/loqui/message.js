@@ -67,6 +67,28 @@ var Message = function (account, core, options) {
     if (this.account.connector.isConnected() && this.options.send) {
       this.core.id = account.connector.send(this.core.to, this.core.text, {delay: (this.options && 'delay' in this.options) ? this.core.stamp : this.options.delay, muc: this.options.muc});
       triedToSend= true;
+	  if(this.core.original){
+		  var msg= this;
+		  var block= this.core.original[0];
+		  var index= this.core.original[1];
+		  var sentACK= this.account.supports('sentACK');
+		  Store.recover(block, function(chunk){
+			  var message= chunk[index];
+
+			  if(!triedToSend){
+				  message.status= 'failed';
+			  }else if(sentACK){
+				  message.status= 'sending';
+				  msg.setSendTimeout(block, index);
+			  }else{
+				  message.status= '';
+			  }
+
+			  Store.update(block, chunk, null);
+			  (new Message(msg.account, message)).reRender(block);
+
+		  });
+	  }
     }
     if (this.options.render) {
       this.addToChat(triedToSend);
@@ -128,6 +150,32 @@ var Message = function (account, core, options) {
     });
   }
 
+  this.setSendTimeout= function(block, index){
+	  var message= this.core;
+	  var account= this.account;
+	  setTimeout(function(){
+		  Store.recover(block, function(chunk){
+			if(index !== null){
+				var msg= chunk[index];
+			}else{
+				for(var i in chunk){
+					if(chunk[i].id == message.id){
+						var msg= chunk[i];
+					}
+				}
+			}
+			if(msg){
+				if(msg.status == 'sending'){
+					msg.status= 'failed';
+					msg= new Message(account, msg);
+					Store.update(block, chunk, null);
+					msg.reRender(block);
+				}
+			}
+		  });
+	  }, 30000);
+  }
+
   //Outcoming
   this.addToChat = function (triedToSend) {
     var message = this;
@@ -135,7 +183,7 @@ var Message = function (account, core, options) {
     var account = this.account;
     var to = this.core.to;
     var sentACK= account.supports('sentACK');
-      
+
     if(!triedToSend){
       message.core.status= 'failed';
     }else if(sentACK){
@@ -145,23 +193,9 @@ var Message = function (account, core, options) {
       msg: message.core,
       delay: !account.connector.isConnected()
     }, function (blockIndex) {
-      if(triedToSend && sentACK){
-        setTimeout(function(){
-          Store.recover(blockIndex, function(chunk){
-            for(var i in chunk){
-              var msg= chunk[i];
-              if(msg.id == message.core.id){
-                if(msg.status == 'sending'){
-                  msg.status= 'failed';
-                  msg= new Message(account, msg);
-                  Store.update(blockIndex, chunk, msg.reRender.bind(msg, [blockIndex]));
-                }
-                return;
-              }
-            }
-          });
-        }, 30000);
-      }
+	  if(triedToSend && sentACK){
+		  message.setSendTimeout(blockIndex, null);
+	  }
       if ($('section#chat').data('jid') == to && $('section#chat').hasClass('show')) {
         var ul = $('section#chat ul#messages');
         var li = ul.children('li[data-chunk="' + blockIndex + '"]');

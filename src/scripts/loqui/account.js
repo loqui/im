@@ -566,7 +566,8 @@ var Account = function (core) {
           from: content.from,
           to: content.to,
           text: content.text,
-          stamp: content.stamp
+          stamp: content.stamp,
+		  original : sendQ[0]
         }, {
           render: false
         });
