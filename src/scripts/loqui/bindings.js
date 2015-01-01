@@ -97,9 +97,7 @@ $('section#chat article#main div#text').on('keydown', function (e) {
     $('section#chat nav#plus').addClass('show');
     var ul = $('section#chat ul#messages');
     ul[0].scrollTop = ul[0].scrollHeight;
-    if ($(this).text().length == 0) {
-      Messenger.csn('composing');
-    }
+    Messenger.csn('composing');
   }
 }).on('tap', function (e) {
   Lungo.Router.article('chat', 'main');
@@ -110,6 +108,7 @@ $('section#chat article#main div#text').on('keydown', function (e) {
   if ($(e.explicitOriginalTarget).closest('[data-control=menu]').length < 1) {
     $('section#chat nav#plus').removeClass('show');
   }
+  Messenger.csn('paused');
 });
 
 // Tap my avatar

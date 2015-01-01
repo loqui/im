@@ -48,6 +48,12 @@ var Messenger = {
     var muc = account.chatGet(to).core.muc;
     if (account.connector.isConnected() && account.supports('csn') && App.settings.csn && !muc) {
       account.connector.csnSend(to, state);
+      if(this.typingTimeout){
+        clearTimeout(this.typingTimeout);
+      }
+      if(state == 'composing'){
+        this.typingTimeout= setTimeout(account.connector.csnSend.bind(account.connector, [to, 'paused']), 5000);
+      }
     }
   },
   
