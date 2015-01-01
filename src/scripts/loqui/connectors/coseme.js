@@ -500,7 +500,8 @@ App.connectors['coseme'] = function (account) {
     var account = this.account;
     var chat = account.chatGet(from);
     chat.core.lastAck = Tools.localize(Tools.stamp());
-    chat.save();
+    chat.save()
+	account.messageSent(from, msgId);
     var section = $('section#chat');
     if (section.hasClass('show') && section.data('jid') == from) {
       var li = section.find('ul li').last();
