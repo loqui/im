@@ -617,9 +617,12 @@ var Account = function (core) {
       for(var i in chunk){
         var msg= chunk[i];
         if(msg.id == msgId){
-          msg.status= 'sent';
-          msg= new Message(account, msg);
-          Store.update(lastIndex, chunk, msg.reRender.bind(msg, [lastIndex]));
+		  if(msg.status != 'sent'){
+		    msg.status= 'sent';
+            msg= new Message(account, msg);
+            Store.update(lastIndex, chunk, null);
+			msg.reRender(lastIndex);
+		  }
           return;
         }
       }
@@ -627,9 +630,12 @@ var Account = function (core) {
         for(var i in chunk){
           var msg= chunk[i];
           if(msg.id == msgId){
-            msg.status= 'sent';
-            msg= new Message(account, msg);
-            Store.update(secondLastIndex, chunk, msg.reRender.bind(msg, [secondLastIndex]));
+			if(msg.status != 'sent'){
+			  msg.status= 'sent';
+			  msg= new Message(account, msg);
+			  Store.update(secondLastIndex, chunk, null);
+			  msg.reRender(secondLastIndex);
+			}
             return;
           }
         }
