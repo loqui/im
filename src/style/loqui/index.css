@@ -332,7 +332,7 @@ section > nav[data-control="menu"] a:before {
 #activity article ul li {
   position: relative;
   border-bottom: .05rem solid #E6E6E6;
-  height: 4rem;
+  height: 5.6rem;
   cursor: pointer;
   box-sizing: content-box;
 }
@@ -371,8 +371,9 @@ section > nav[data-control="menu"] a:before {
   top: .6rem;
   color: #444;
   max-width: calc(100% - 4.7rem);
-  max-height: 1.4em;
   overflow: hidden;
+  font-size: 1.6rem;
+  padding-top: .3rem;
 }
 #activity article ul li span.name {
   position: absolute;
@@ -380,8 +381,9 @@ section > nav[data-control="menu"] a:before {
   top: .6rem;
   color: #444;
   max-width: calc(100% - 4.5rem);
-  max-height: 1.4em;
   overflow: hidden;
+  font-size: 1.6rem;
+  padding-top: .3rem;
 }
 #main article ul li span.status,
 #main article ul li span.lastMessage {
@@ -392,7 +394,6 @@ section > nav[data-control="menu"] a:before {
   font-weight: 100;
   font-size: .8em;
   max-width: calc(100% - 6.5rem);
-  max-height: 1.4em;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -404,12 +405,12 @@ section > nav[data-control="menu"] a:before {
   top: 2rem;
   color: #444;
   font-weight: 100;
-  font-size: .8em;
+  font-size: 1.4rem;
   max-width: calc(100% - 4.5rem);
-  max-height: 1.4em;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  padding-top: 0.9rem;
 }
 #main article ul li span.name img,
 #main article ul li span.status img,
@@ -559,7 +560,7 @@ section > nav[data-control="menu"] a:before {
 }
 
 #activity article header.beige {
-  height: 3rem;
+  height: 4.4rem;
   background-color: #ECECEC;
   border-bottom: .1rem solid #CECECE;
   box-sizing: content-box;
@@ -577,7 +578,7 @@ section > nav[data-control="menu"] a:before {
 }
 #activity.extended article .list {
   position: absolute;
-  top: 3rem;
+  top: 4.4rem;
   right: 0;
   bottom: 0;
   left: 0;
