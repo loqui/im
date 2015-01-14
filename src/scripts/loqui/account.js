@@ -289,7 +289,7 @@ var Account = function (core) {
     if (ul.css('display') == 'block') {
       Lungo.Element.count('section#main header nav button[data-view-article="chats"]', totalUnread);
     }
-    this.unread = totalUnread;
+    this.unread = totalUnread;*/
   }
 
   // List all contacts for this account
@@ -383,7 +383,7 @@ var Account = function (core) {
       }
     });
     article.append(header).append(ul);
-    frag.appendChild(article[0]);*/
+    frag.appendChild(article[0]);
   }
   
   // Render presence for every contact

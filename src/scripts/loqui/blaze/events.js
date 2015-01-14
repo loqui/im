@@ -53,3 +53,13 @@ Template.accounts_list.events({
     //Chungo.Aside.hide();
   }
 });
+
+Template.chats.events({
+  'click .noChats, click .floater': function (e, t) {
+    var account = Accounts.current;
+    Activity('chat', account, null, {
+      chats: false,
+      groups: account.supports('muc')
+    });
+  }
+});
