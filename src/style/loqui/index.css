@@ -508,7 +508,7 @@ section > nav[data-control="menu"] a:before {
   text-align: center;
   width: 16rem;
   left: calc(50% - 8rem);
-  top: calc(50% - 2rem);
+  top: calc(50% - 5rem);
 }
 #main .noChats strong {
   color: #444;
