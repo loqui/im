@@ -295,6 +295,7 @@ var Account = function (core) {
   // List all contacts for this account
   this.contactsRender = function (f, click, selected) {
     var account = this;
+    console.log(account);
     var article = $('<article/>').attr('id', 'contacts');
     var header = $('<header/>').addClass('beige')
       .append($('<button/>').addClass('new').text(_('ContactAdd')).on('click', function (event) {
@@ -340,7 +341,7 @@ var Account = function (core) {
     });
     article.append(header).append(ul);
     frag.appendChild(article[0]);
-  }
+  }.bind(this);
   
   // List all group chats for this account
   this.groupsRender = function (f, click) {
@@ -384,7 +385,7 @@ var Account = function (core) {
     });
     article.append(header).append(ul);
     frag.appendChild(article[0]);
-  }
+  }.bind(this);
   
   // Render presence for every contact
   this.presenceRender = function (jid) {
