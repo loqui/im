@@ -38,6 +38,12 @@ Template.providers_setup.helpers({
   }
 });
 
+UI.registerHelper('chats', function () {
+  if (App.accounts.length) {
+    return Accounts.current.chats;
+  }
+});
+
 UI.registerHelper('accounts', function () {
   return App.accounts.map(function(x, i) {
     return {data: x, index: i}
@@ -61,4 +67,8 @@ UI.registerHelper('providers', function () {
 
 UI.registerHelper('_', function (string) {
   return _(string);
+});
+
+UI.registerHelper('dateFormat', function (stamp) {
+  return Tools.coolDate(stamp);
 });

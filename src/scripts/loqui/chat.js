@@ -195,7 +195,7 @@ var Chat = function (core, account) {
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.jid);
     section.data('jid', this.core.jid);
     section.data('features', $('section#main').data('features'));
-    section.data('caps', contact && contact.presence.caps in App.caps ? App.caps[contact.presence.caps].features.join(' ') : 'false');
+    section.data('caps', (contact && contact.presence.caps in App.caps) ? App.caps[contact.presence.caps].features.join(' ') : 'false');
     section.data('muc', this.core.muc || false);
     section.data('mine', this.core.muc && this.core.info && this.core.info.owner == this.account.core.fullJid);
     header.children('.title').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(this.core.title));

@@ -76,9 +76,14 @@
     <article id="chats" class="scroll">
     <script type="text/spacebars" name="chats">
       {{#if chats}}
-        {{#each chats}}
-          This is a chat
-        {{/each}}
+        <ul>
+        {{#each chats}}{{#with core}}
+          <li class="chat" data-jid="{{jid}}">
+            <span class="name">{{title}}</span>
+            <span class="lastMessage">{{last.stamp}}</span>
+          </li>
+        {{/with}}{{/each}}
+        </ul>
       {{else}}
         <span class="noChats"><strong>{{_ "NoChats"}}</strong><p>{{_ "NoChatsExplanation"}}</p></span>
       {{/if}}

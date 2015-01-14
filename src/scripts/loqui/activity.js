@@ -119,7 +119,6 @@ var Activity = function (action, account, content, options) {
         section.find('[data-view-article="chats"]').show();
         section.find('[data-view-article="chats"]')[0].click();
       } else {
-        console.log('Firing trigger on contacts', options);
         section.find('[data-view-article="chats"]').hide();
         section.find('[data-view-article="contacts"]')[0].click();
       }
