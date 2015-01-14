@@ -377,7 +377,7 @@ section > nav[data-control="menu"] a:before {
 }
 #activity article ul li span.name {
   position: absolute;
-  left: 1rem;
+  left: 1.6rem;
   top: .6rem;
   color: #444;
   max-width: calc(100% - 4.5rem);
@@ -401,7 +401,7 @@ section > nav[data-control="menu"] a:before {
 #activity article ul li span.status,
 #activity article ul li span.lastMessage {
   position: absolute;
-  left: 1rem;
+  left: 1.6rem;
   top: 2rem;
   color: #444;
   font-weight: 100;
