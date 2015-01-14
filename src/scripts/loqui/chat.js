@@ -11,6 +11,9 @@ var Chat = function (core, account) {
   this.notification = null;
   this.lastRead = Tools.localize(Tools.stamp());
   this.unread = this.core.unread;
+  
+  this._last = new Blaze.Var(this.core.last);
+  
   if (!('settings' in this.core)) {
     this.core.settings = {};
     $.extend(this.core.settings, App.defaults.Chat.core.settings);
@@ -18,6 +21,14 @@ var Chat = function (core, account) {
   if (!('info' in this.core)) {
     this.core.info = {};
   }
+  
+  this.__defineGetter__('last', function () {
+    return this._last.get();
+  });
+  this.__defineSetter__('last', function (val) {
+    this._last.set(val);
+    this.core.last = val;
+  });
   
   // Render last chunk of messages
   this.lastChunkRender = function () {
@@ -107,7 +118,7 @@ var Chat = function (core, account) {
     var chunkListSize = this.core.chunks.length;
     var blockIndex = this.core.chunks[chunkListSize - 1];
     var storageIndex;
-    chat.core.last = msg;
+    chat.last = msg;
     if (chunkListSize > 0) {
       Store.recover(blockIndex, function (chunk) {
         if (!chunk || chunk.length >= App.defaults.Chat.chunkSize) {

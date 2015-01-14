@@ -77,12 +77,12 @@
     <script type="text/spacebars" name="chats">
       {{#if chats}}
         <ul>
-        {{#each chats}}{{#with core}}
-          <li class="chat" data-jid="{{jid}}">
-            <span class="name">{{title}}</span>
+        {{#each chats}}
+          <li class="chat" data-jid="{{core.jid}}">
+            <span class="name">{{core.title}}</span>
             <span class="lastMessage"><time class="ago" datetime="{{last.stamp}}">{{ago last.stamp}}</time></span>
           </li>
-        {{/with}}{{/each}}
+        {{/each}}
         </ul>
       {{else}}
         <span class="noChats"><strong>{{_ "NoChats"}}</strong><p>{{_ "NoChatsExplanation"}}</p></span>
