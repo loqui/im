@@ -205,10 +205,10 @@ section nav[data-control="groupbar"] a.selected {
 section > nav[data-control="menu"] {
   position: absolute;
   background-color: rgba(0, 0, 0, .8);
-  top: 3rem;
+  top: 5.4rem;
   left: 0;
   right: 0;
-  padding: .6rem 0 .6rem .2rem;
+  padding: 1rem 0 1.6rem 1rem;
   z-index: -1;
 }
 section > nav[data-control="menu"].show {
@@ -402,7 +402,7 @@ section > nav[data-control="menu"] a:before {
   color: #666;
   font-weight: 100;
   font-size: 1.4rem;
-  max-width: calc(100% - 6.5rem);
+  max-width: calc(100% - 12rem);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -435,7 +435,7 @@ section > nav[data-control="menu"] a:before {
 #main article ul li span.lastStamp > * {
   position: absolute;
   right: 1.6rem;
-  top: 1rem;
+  top: 1.2rem;
   color: #999;
   font-weight: 100;
   font-size: 1.2rem;
@@ -672,21 +672,21 @@ section > nav[data-control="menu"] a:before {
   right: 0;
   bottom: 0;
   left: 0;
-  padding: .6rem;
+  padding: 1rem;
   background-color: #F9F9F9;
   border-top: .1rem solid #E6E6E6;
 }
 #chat #footbox #typing {
   position: absolute;
-  top: -1.3rem;
+  top: -2.4rem;
   left: 0;
   height: 1.05rem;
-  padding: .2rem .7rem 0 .5rem;
+  padding: .4rem 1rem .9rem 1rem;
   border: .1rem solid #E6E6E6;
   border-bottom: none;
   border-left: none;
   background-color: inherit;
-  font-size: .8rem;
+  font-size: 1.2rem;
   font-weight: 100;
   color: #999;
   z-index: 1;
@@ -697,11 +697,11 @@ section > nav[data-control="menu"] a:before {
   position: relative;
   float: right;
   top: 0.05rem;
-  font-size: .9rem;
+  font-size: 1.2rem;
   line-height: 1.5rem;
   padding: .1rem 1rem .2rem 1rem;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 3.2rem;
+  height: 3.2rem;
   margin: 0;
   margin-left: 0.5rem;
   font-weight: bold;
@@ -715,16 +715,16 @@ section > nav[data-control="menu"] a:before {
 }
 #text {
   position: relative;
-  padding: .7rem .5rem .5rem .5rem;
-  min-height: 1.2rem;
-  max-height: 4rem;
+  padding: .4rem .5rem .9rem .5rem;
+  min-height: 1.8rem;
+  max-height: 6.2rem;
   background: none;
   border: none;
   border-bottom: .1rem solid #BBB;
   border-radius: .2rem;
-  font-size: 1rem;
+  font-size: 1.4rem;
+  line-height: 1.6rem;
   font-weight: 300;
-  line-height: 1.2rem;
   color: #666;
   outline: none;
   overflow: auto;
@@ -764,9 +764,9 @@ section > nav[data-control="menu"] a:before {
 #messages > li > div {
   position: relative;
   display: block;
-  padding: .5rem .5rem;
+  padding: .5rem 1.6rem;
   clear: both;
-  max-width: calc(100% - 3.5rem);
+  max-width: calc(100% - 5rem);
   animation: fadeIn .5s;
   -webkit-animation: fadeIn .5s;
 }
@@ -789,10 +789,10 @@ section > nav[data-control="menu"] a:before {
 }
 #messages > li > div .avatar img {
   position: absolute;
-  top: 1rem;
+  top: .8rem;
   border-radius: 100%;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 2.4rem;
+  height: 2.4rem;
 }
 #chat[data-muc='true'] #messages > li > div.extended .avatar img {
   top: 2.2rem;
@@ -834,8 +834,8 @@ section > nav[data-control="menu"] a:before {
   content: '';
   display: block;
   position: absolute;
-  top: 1.4rem;
-  left: 2rem;
+  top: 1.7rem;
+  left: 3rem;
   width: .7rem;
   height: .7rem;
   background-color: #EEE;
@@ -923,10 +923,10 @@ section > nav[data-control="menu"] a:before {
   clear: both;
   width: calc(100vw);
   text-align: center;  
-  font-size: .8rem;
+  font-size: 1.2rem;
   font-weight: 100;
   font-style: italic;
-  padding-top: .3rem;
+  padding: 1rem 0 .5rem 0;
   color: #666;
   text-shadow: 0 .05rem 0 white;
 }
@@ -968,29 +968,23 @@ section > nav[data-control="menu"] a:before {
 }
 #emoji {
   background: none repeat scroll 0% 0% rgba(255, 255, 255, 0.8);
-  margin-top: 4.7rem;
-  height: calc(100vh - 12.7rem);
+  margin-top: 5.8rem;
+  height: calc(100vh - 17.9rem);
   padding: 0.5rem;
   overflow: scroll;
   border-top: .1rem solid #222;
-}
-#emoji h1 {
-  font-size: 1.2rem;
-  border-bottom: .1rem solid #AAA;
-  color: #444;
-  margin: 1rem;
 }
 #emoji ul {
   list-style-type: none;
 }
 #emoji ul li {
-  padding: 1rem;
+  padding: 1.38rem;
   float: left;
   cursor: pointer;
 }
 #emoji ul li img {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 2rem;
+  height: 2rem;
 }
 #emoji button {
   width: 100%;

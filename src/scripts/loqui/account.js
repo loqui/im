@@ -229,7 +229,7 @@ var Account = function (core) {
   
   // List all chats for this account
   this.chatsRender = function (f, click, hold) {
-    /*var account = this;
+    var account = this;
     var oldUl = $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"]');
     var ul = $("<ul />");
     var media = _('AttachedFile');
@@ -303,7 +303,7 @@ var Account = function (core) {
     if (ul.css('display') == 'block') {
       Lungo.Element.count('section#main header nav button[data-view-article="chats"]', totalUnread);
     }
-    this.unread = totalUnread;*/
+    this.unread = totalUnread;
   }
 
   // List all contacts for this account

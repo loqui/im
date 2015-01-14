@@ -168,7 +168,9 @@ var Message = function (account, core, options) {
     if (this.core.text) {
       var html = App.emoji[Providers.data[this.account.core.provider].emoji].fy(Tools.urlHL(Tools.HTMLescape(this.core.text)));
     } else if (this.core.media) {
-      var html = $('<img/>').attr('src', this.core.media.thumb).data('url', this.core.media.url).data('downloaded', this.core.media.downloaded || false);
+      var html = $('<img/>').attr('src', this.core.media.thumb);
+      html.dataset.url = this.core.media.url;
+      html.dataset.downloaded = this.core.media.downloaded || false;
       switch (this.core.media.type) {
         case 'url':
           html.addClass('maps');
@@ -242,21 +244,24 @@ var Message = function (account, core, options) {
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', Strophe.getBareJidFromJid(this.core.from));
     var name = type == 'in' ? this._formatName((contact ? (contact.name || contact.jid) : (this.core.pushName || this.core.from))) : _('Me');
     var day = Tools.day(this.core.stamp);
-    var div = $('<div/>').data('type', type);
+    var div = $('<div/>');
+    div[0].dataset.type = type;
     var index = index || parseInt($('section#chat ul#messages li > div').last().data('index')) + 1;
     index = index >= App.defaults.Chat.chunkSize ? 0 : index;
-    div.data('index', index);
-    div.data('stamp', this.core.stamp);
-    div.data('from', this.core.from);
+    div[0].dataset.index = index;
+    div[0].dataset.stamp = this.core.stamp;
+    div[0].dataset.from = this.core.from;
     if (this.core.id) {
-      div.data('id', this.core.id);
+      div[0].dataset.id = this.core.id;
     }
     if (this.core.media) {
-      div.data('media-type', this.core.media.type);
+      div[0].dataset.mediaType = this.core.media.type;
     }
     if (avatarize) {
+      var img = $('<img/>');
+      img[0].dataset.jid = type == 'in' ? this.core.from : this.account.core.user;
       var pic = $('<span/>').addClass('avatar hideable').append(
-        $('<img/>').data('jid', type == 'in' ? this.core.from : this.account.core.user)
+        img
       );
       var nameSpan = $('<span/>').addClass('name').css('color', Tools.nickToColor(this.core.from)).text(name);
       div.append(pic).append(nameSpan).addClass('extended');
