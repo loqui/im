@@ -63,5 +63,11 @@ Template.chats.events({
       chats: false,
       groups: account.supports('muc')
     });
+  },
+  'click li': function (e, t) {
+    var jid = $(e.target).closest('li').data('jid');
+    var account = Accounts.current;
+    var chat = account.chatGet(jid);
+    chat.show();
   }
 });

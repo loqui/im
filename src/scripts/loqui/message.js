@@ -121,8 +121,7 @@ var Message = function (account, core, options) {
 		ul[0].scrollTop = ul[0].scrollHeight;
         chat.core.lastRead = Tools.localize(Tools.stamp());
       } else {
-        chat.core.unread++;
-        chat.account.unread++;
+        chat.unread++;
       }
     });
   }
@@ -259,7 +258,7 @@ var Message = function (account, core, options) {
       var pic = $('<span/>').addClass('avatar hideable').append(
         $('<img/>').data('jid', type == 'in' ? this.core.from : this.account.core.user)
       );
-      var nameSpan = $('<span/>').addClass('name').style('color', Tools.nickToColor(this.core.from)).text(name);
+      var nameSpan = $('<span/>').addClass('name').css('color', Tools.nickToColor(this.core.from)).text(name);
       div.append(pic).append(nameSpan).addClass('extended');
     }
     if (html) {

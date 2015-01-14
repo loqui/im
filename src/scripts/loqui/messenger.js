@@ -16,7 +16,7 @@ var Messenger = {
   say: function (text) {
     var to = $('section#chat').data('jid');
     var muc = $('section#chat').data('muc') == "true";
-    var account = this.account();
+    var account = Accounts.current;
     var text = text || $('section#chat div#text').text();
     text = text.trim();
     if (text.length) {
@@ -44,7 +44,7 @@ var Messenger = {
   
   csn: function (state) {
     var to = $('section#chat').data('jid');
-    var account = this.account();
+    var account = Accounts.current;
     var muc = account.chatGet(to).core.muc;
     if (account.connector.isConnected() && account.supports('csn') && App.settings.csn && !muc) {
       account.connector.csnSend(to, state);
@@ -52,7 +52,7 @@ var Messenger = {
   },
   
   avatarSet: function (blob) {
-    var account = this.account();
+    var account = Accounts.current;
     if (account.supports('avatarChange')) {
       account.connector.avatarSet(blob);
     } else {
@@ -61,7 +61,7 @@ var Messenger = {
   },
   
   presenceUpdate: function () {
-    var account = this.account();
+    var account = Accounts.current;
     if (App.online && account.connector.connected) {
       var status = $('section#me #status input').val();
       var nick = $('section#me #nick input').val();
@@ -72,7 +72,7 @@ var Messenger = {
   },
   
   contactProfile: function (jid) {
-    var account = this.account();
+    var account = Accounts.current;
     var jid = jid || $('section#chat').data('jid');
     var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
     var chat = account.chatGet(jid);
@@ -131,7 +131,7 @@ var Messenger = {
   },
   
   mucProfile: function (jid) {
-    var account = this.account();
+    var account = Accounts.current;
     var jid = jid || $('section#chat').data('jid');
     var ci = account.chatFind(jid);
     if (ci >= 0) {
@@ -193,7 +193,7 @@ var Messenger = {
   },
   
   contactAdd: function () {
-    var account = Messenger.account();
+    var account = Accounts.current;
     if (App.online && account.connector.connection.connected) {
       if (account.supports('rosterMgmt')) {
         var section = $('section#contactAdd');
@@ -229,7 +229,7 @@ var Messenger = {
   },
   
   contactRemove: function (jid) {
-    var account = Messenger.account();
+    var account = Accounts.current;
     if (App.online && account.connector.connected) {
       if (account.supports('rosterMgmt')) {
         var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
@@ -268,7 +268,7 @@ var Messenger = {
   },
   
   chatRemove: function (jid, account, force) {
-    var account = account || Messenger.account();
+    var account = account || Accounts.current;
     var index = account.chatFind(jid);
     if (index >= 0) {
       var chat = Lungo.Core.findByProperty(account.core.chats, 'jid', jid);
@@ -296,7 +296,7 @@ var Messenger = {
   },
   
   mucClear: function (gid, force) {
-    var account = Messenger.account();
+    var account = Accounts.current;
     var chat = account.chatGet(gid);
     var index = account.chatFind(gid);
     if (chat) {
@@ -325,7 +325,7 @@ var Messenger = {
   },
   
   mucExit: function (gid) {
-    var account = Messenger.account();
+    var account = Accounts.current;
     var chat = account.chatGet(gid).core;
     var title = chat.title || gid;
     var will = confirm(_('MucExitConfirm', {title: title}));
@@ -336,7 +336,7 @@ var Messenger = {
   },
   
   accountRemove: function (jid) {
-    var account = Messenger.account();
+    var account = Accounts.current;
     var will = confirm(_('ConfirmAccountRemove', {account: account.core.user}));
     if (will) {
       var accountIndex = Accounts.find(account.core.fullJid);

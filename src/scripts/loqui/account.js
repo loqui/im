@@ -36,6 +36,10 @@ var Account = function (core) {
     this._chats.set(val);
   });
   
+  this.__defineGetter__('unread', function () {
+    return this.chats.reduce(function (prev, cur) {return prev + cur.unread}, 0);
+  });
+  
   if ('OTR' in core) {
     $.extend(this.OTR, core.OTR);
     if (core.OTR.key) { // inflate the packed key
@@ -180,9 +184,11 @@ var Account = function (core) {
   // Render everything for this account
   this.allRender = function () {
     this.accountRender();
-    /*this.chatsRender();
+    /*
+    this.chatsRender();
     this.presenceRender();
-    this.avatarsRender();*/
+    */
+    this.avatarsRender();
   }
   
   // Changes some styles based on presence and connection status
@@ -427,7 +433,7 @@ var Account = function (core) {
   // Render all the avatars
   this.avatarsRender = function () {
     var account = this;
-    /*var avatars = App.avatars;
+    var avatars = App.avatars;
     $('span.avatar img:not([src])').each(function (i, el) {
       var jid = Strophe.getBareJidFromJid($(el).closest('[data-jid]').data('jid')) || account.core.fullJid;
       var me = jid == account.core.fullJid;
@@ -454,20 +460,8 @@ var Account = function (core) {
           });
         }, jid);
       }
-    });*/
-    var show = function (a) {
-      a.url.then(function (val) {
-        $('section#me .avatar img').attr('src', val);
-      });
-    }
-    if (account.core.fullJid in App.avatars) {
-      show(new Avatar(App.avatars[account.core.fullJid]));
-    } else {
-      account.connector.avatar(function (src) {
-        show(src);
-      });
-    }
-  }
+    });
+  }.bind(this);
 
   // Manage search through contacts
   this.searchRender = function (f, click) {
@@ -652,10 +646,10 @@ var Account = function (core) {
   // Save to store
   this.save = function () {
     var index = Accounts.find(this.core.fullJid || this.core.user);
-	  if(index > -1) {
-		  var cores = App.accountsCores;
-		  cores[index] = this.core;
-		  App.accountsCores = cores;
+	  if (index > -1) {
+		  var accounts = App.accounts;
+		  accounts[index] = this;
+		  App.accounts = accounts;
 	  }
   }
 
@@ -689,11 +683,11 @@ var Accounts = {
   // Total unread messages
   unread: function (partial) {
     var total = App.accounts.reduce(function(prev, cur){return prev + cur.unread}, 0);
-    Lungo.Element.count('section#chat header .tab', total);
+    Lungo.Element.count('section#chat header .menu', total);
     if (partial) {
       total -= partial;
     }
-    Lungo.Element.count('section#main header .tab', total);
+    Lungo.Element.count('section#main header .menu', total);
   }
   
 }

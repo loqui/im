@@ -3,7 +3,7 @@
 var Plus = {
 
   bolt: function () {
-    var account = Messenger.account();
+    var account = Accounts.current;
     var to = $('section#chat').data('jid');
     $('section#chat nav#plus').removeClass('show');
     if (to && App.online && account.connector.connection.connected){
@@ -23,7 +23,7 @@ var Plus = {
   },
   
   imageSend: function () {
-    var account = Messenger.account();
+    var account = Accounts.current;
     if (account.supports('imageSend')) {
     var to = $('section#chat').data('jid');
       var e = new MozActivity({
@@ -42,7 +42,7 @@ var Plus = {
   },
 
   videoSend: function () {
-    var account = Messenger.account();
+    var account = Accounts.current;
     if (account.supports('videoSend')) {
     var to = $('section#chat').data('jid');
       var e = new MozActivity({
@@ -61,7 +61,7 @@ var Plus = {
   },
 
   audioSend: function () {
-    var account = Messenger.account();
+    var account = Accounts.current;
     if (account.supports('audioSend')) {
     var to = $('section#chat').data('jid');
       var e = new MozActivity({
@@ -80,7 +80,7 @@ var Plus = {
   },
   
   locationSend: function () {
-    var account = Messenger.account();
+    var account = Accounts.current;
     if (account.supports('locationSend')) {
       var to = $('section#chat').data('jid');
       Geo.posGet(function (loc) {
@@ -97,7 +97,7 @@ var Plus = {
   
   switchOTR: function (jid, account) {
     $('section#chat nav#plus').removeClass('show');
-    var account = account || Messenger.account();
+    var account = account || Accounts.current;
     var ci = account.chatFind(jid);
     if (ci < 0) {
       var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);

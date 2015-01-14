@@ -10,8 +10,8 @@ var Chat = function (core, account) {
   this.account = account;
   this.notification = null;
   this.lastRead = Tools.localize(Tools.stamp());
-  this.unread = this.core.unread;
   
+  this._unread = new Blaze.Var(this.core.unread);
   this._last = new Blaze.Var(this.core.last);
   
   if (!('settings' in this.core)) {
@@ -28,6 +28,14 @@ var Chat = function (core, account) {
   this.__defineSetter__('last', function (val) {
     this._last.set(val);
     this.core.last = val;
+  });
+  
+  this.__defineGetter__('unread', function () {
+    return this._unread.get();
+  });
+  this.__defineSetter__('unread', function (val) {
+    this._unread.set(val);
+    this.core.unread = val;
   });
   
   // Render last chunk of messages
@@ -175,11 +183,10 @@ var Chat = function (core, account) {
       if (last.media) {
         var text = _('SentYou', {type: _('MediaType_' + last.media.type)});
       }
-
       if (pic) {
         pic.url.then(function (src) {
           if (src.slice(0, 1) == '/' && chat.core.muc) {
-            src = 'https://raw.githubusercontent.com/loqui/im/dev/img/goovatar.png';
+            src = 'https://raw.githubusercontent.com/loqui/im/dev/src/img/goovatar.png';
           }
           chat.notification = App.notify({ subject: subject, text: text, pic: src, from : chat.core.jid, callback: callback }, 'received');
         }.bind(chat));
@@ -204,11 +211,10 @@ var Chat = function (core, account) {
     var section = $('section#chat');
     var header = section.children('header');
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.jid);
-    section.data('jid', this.core.jid);
-    section.data('features', $('section#main').data('features'));
-    section.data('caps', (contact && contact.presence.caps in App.caps) ? App.caps[contact.presence.caps].features.join(' ') : 'false');
-    section.data('muc', this.core.muc || false);
-    section.data('mine', this.core.muc && this.core.info && this.core.info.owner == this.account.core.fullJid);
+    section[0].dataset.jid = this.core.jid;
+    section[0].dataset.features = $('section#main')[0].dataset.features;
+    section[0].dataset.muc = this.core.muc || false;
+    section[0].dataset.mine = this.core.muc && this.core.info && this.core.info.owner == this.account.core.fullJid;
     header.children('.title').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(this.core.title));
     section.find('#plus').removeClass('show');
     section.find('#typing').hide();
@@ -260,12 +266,7 @@ var Chat = function (core, account) {
       }
       this.lastChunkRender();
     }.bind(this), 0);
-    this.unread = this.core.unread;
-    if (this.core.unread) {
-      this.account.unread -= this.core.unread;
-      this.core.unread = 0;
-      Accounts.unread();
-    }
+    this.unread = 0;
     if(this.notification && 'close' in this.notification){
         this.notification.close();
         this.notification= null;

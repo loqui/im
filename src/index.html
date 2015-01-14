@@ -78,9 +78,11 @@
       {{#if chats}}
         <ul>
         {{#each chats}}
-          <li class="chat" data-jid="{{core.jid}}">
+          <li data-jid="{{core.jid}}" data-unread="{{unread}}">
+            <span class="avatar"><img/></span>
             <span class="name">{{core.title}}</span>
-            <span class="lastMessage"><time class="ago" datetime="{{last.stamp}}">{{ago last.stamp}}</time></span>
+            <span class="lastStamp"><time datetime="{{last.stamp}}">{{date last.stamp}}<br />{{time last.stamp}}</time></span>
+            <span class="lastMessage">{{{emojify last.text}}}</span>
           </li>
         {{/each}}
         </ul>
@@ -249,13 +251,13 @@
   </section>
   <section id="chat" data-transition="horizontal" class="fix head">
     <header>
-      <nav class="on-left">
+      <nav class="on-left discreet">
         <button data-view-section="back" data-icon="angle-left" class="tab"></button>
       </nav>
       <span class="totalUnread"></span>
       <span class="title"></span>
       <span class="status"></span>
-      <span class="show backchange"></span>
+      <span class="backchange"></span>
       <span class="avatar" data-menu-onclick="chatInfo"><img/></span>
     </header>
     <article id="main">
@@ -312,7 +314,7 @@
       </div>
     </div>
   </div>
-  <section id="activity" data-transition="vertical">
+  <section id="activity" data-transition="horizontal">
     <header>
       <h1></h1>
       <nav class="on-left">

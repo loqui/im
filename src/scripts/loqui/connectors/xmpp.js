@@ -189,7 +189,7 @@ App.connectors['XMPP'] = function (account) {
       var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', to);
       var caps = contact && contact.presence.caps;
       var features = caps in App.caps && App.caps[caps].features;
-      var wantsReceipt = features && features.indexOf(Strophe.NS.XEP0184);
+      var wantsReceipt = features && Tools.toArray(features).indexOf(Strophe.NS.XEP0184);
       this.connection.Messaging.send(to, text, options.delay, wantsReceipt);
     }
   }.bind(this);

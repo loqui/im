@@ -69,6 +69,10 @@ UI.registerHelper('_', function (string) {
   return _(string);
 });
 
+UI.registerHelper('emojify', function (string) {
+  return App.emoji[Providers.data[Accounts.current.core.provider].emoji].fy(string);
+});
+
 UI.registerHelper('ago', function (ts) {
   var string = '';
   if (ts) {
@@ -86,6 +90,29 @@ UI.registerHelper('ago', function (ts) {
     } else {
       string = then.toLocaleDateString() + '@' + then.toLocaleTimeString().split(':').slice(0, 2).join(':');
     }
+  }
+  return string;
+});
+
+UI.registerHelper('date', function (ts) {
+  var string = '';
+  if (ts) {
+    var day = Tools.day(ts);
+    var today = Tools.day(Tools.localize(Tools.stamp()));
+    var string = 
+      day.toString() == today.toString()
+      ?
+        _('Today')
+      :
+        _('DateFormat', {day: day[2], month: day[1]})
+  }
+  return string;
+});
+
+UI.registerHelper('time', function (ts) {
+  var string = '';
+  if (ts) {
+    var string = Tools.hour(ts);
   }
   return string;
 });

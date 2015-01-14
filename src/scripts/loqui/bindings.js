@@ -252,6 +252,9 @@ var bindings = function () {
   $('section#welcome').on('click', function(){
      Menu.show('providers');
   });
+  $('section#chat').on('swipeRight', function () {
+    Lungo.Router.section('back');
+  });
   $('section#main').on('click', function(e){
     if($(e.target).hasClass('asided')){
       Lungo.Aside.hide();
@@ -259,10 +262,12 @@ var bindings = function () {
   }).on('swipeLeft', function(e){
     if($(e.target).hasClass('asided')){
       Lungo.Aside.hide();
+    } else if($('section#chat[data-jid]').length > 0) {
+      Lungo.Router.section('chat');
     }
   }).on('swipeRight', function () {
     Lungo.Aside.show('accounts');
-  });;
+  });
   $('aside').on('swipeLeft', function () {
     Lungo.Aside.hide();
   });
