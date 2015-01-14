@@ -159,7 +159,7 @@ section.extended > header {
 }
 section.extended article {
   top: 11.2rem;
-  height: calc(100% - 11.2rem);
+  height: calc(100% - 17.6rem);
 }
 section:not(.extended) nav[data-control="groupbar"] {
   display: none;

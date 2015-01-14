@@ -36,6 +36,28 @@ if (navigator.mozAlarms) {
   });
 }
 
+setInterval(function () {
+  $('time[datetime].ago').each(function () {
+    var ts = $(this).attr('datetime');
+    var now = new Date();
+    var then = Tools.unstamp(ts);
+    var diff = now - then;
+    var string;
+    if (diff < 60000) {
+      string = 'right now';
+    } else if (diff < 3600000) {
+      string = Math.floor(diff / 60000) + ' min.';
+    } else if (diff < 7200000) {
+      string = '1 hour';
+    } else if (now.toLocaleDateString() == then.toLocaleDateString()) {
+      string = Math.floor(diff / 3600000) + ' hours';
+    } else {
+      string = then.toLocaleDateString() + '@' + then.toLocaleTimeString().split(':').slice(0, 2).join(':');
+    }
+    $(this).text(string);
+  });
+}, 60000);
+
 // Reconnect on new WiFi / 3G connection
 document.body.addEventListener('online', function () {
   Tools.log('ONLINE AGAIN');

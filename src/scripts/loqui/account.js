@@ -6,7 +6,7 @@ var Account = function (core) {
   this.core = core;
   this.core.sendQ = this.core.sendQ || [];
   this.connector = new App.connectors[Providers.data[this.core.provider].connector.type](this);
-  this.chats = [];
+  this._chats = new Blaze.Var([]);
   this.OTR = {};
   this.contacts = {};
   this.names = [];
@@ -27,6 +27,13 @@ var Account = function (core) {
       }
       this.save();
     }
+  });
+  
+  this.__defineGetter__('chats', function () {
+    return this._chats.get();
+  });
+  this.__defineSetter__('chats', function (val) {
+    this._chats.set(val);
   });
   
   if ('OTR' in core) {

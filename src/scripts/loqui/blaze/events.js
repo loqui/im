@@ -49,7 +49,9 @@ Template.account_cover.events({
 
 Template.accounts_list.events({
   'click li': function (e, t) {
-    Accounts.current = $(e.target).data('accountIndex');
+    var index = $(e.target).data('accountIndex')
+    $('#main header select').val(index);
+    Accounts.current = index;
     //Chungo.Aside.hide();
   }
 });

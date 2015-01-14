@@ -80,7 +80,7 @@
         {{#each chats}}{{#with core}}
           <li class="chat" data-jid="{{jid}}">
             <span class="name">{{title}}</span>
-            <span class="lastMessage">{{last.stamp}}</span>
+            <span class="lastMessage"><time class="ago" datetime="{{last.stamp}}">{{ago last.stamp}}</time></span>
           </li>
         {{/with}}{{/each}}
         </ul>
