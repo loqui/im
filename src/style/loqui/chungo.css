@@ -139,9 +139,7 @@ section > .headless {
 section.show > article.show {
   display: block;
 }
-section.asided > article {
-  opacity: .4;
-}
+
 section:after {
   content: '';
   position: fixed;
