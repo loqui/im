@@ -484,7 +484,7 @@ section > nav[data-control="menu"] a:before {
 }
 
 #chats ul li[data-hidden="1"]{
-    display: none;
+  display: none;
 }
 
 #main article ul li[data-unread="1"] span.unread {
@@ -1657,5 +1657,25 @@ article.form ul.listBox li.add:before {
 #console #bodyConsole #logConsole div {
   word-wrap: break-word;
   font-size: .9rem;
+}
+
+.floater {
+  display: block;
+  background-color: #222;
+  border-radius: 100%;
+  position: fixed;
+  right: 2.3rem;
+  bottom: 2.3rem;
+  width: 5.6rem;
+  height: 5.6rem;
+  box-shadow: 0 .2rem .2rem rgba(0, 0, 0, .3);
+}
+
+.floater:before {
+  color: white;
+  font-size: 2.4rem;
+  position: relative;
+  top: 1.5rem;
+  left: 1.7rem;
 }
 
