@@ -1669,6 +1669,7 @@ article.form ul.listBox li.add:before {
   width: 5.6rem;
   height: 5.6rem;
   box-shadow: 0 .2rem .2rem rgba(0, 0, 0, .3);
+  transition: all .2s ease;
 }
 
 .floater:before {
