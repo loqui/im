@@ -185,6 +185,7 @@ var Account = function (core) {
     li.data('show', this.connector.presence.show);
     $('section#main header').css('border-color', this.connector.provider.color);
     $('aside#accounts .cover').css('background-color', this.connector.provider.color);
+    $('.floater').css('background-color', this.connector.provider.color);
   }
   
   this.singleRender = function (chat, up) {

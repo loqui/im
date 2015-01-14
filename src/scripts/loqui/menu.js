@@ -35,7 +35,7 @@ var Menu = {
     mucCreateForm: function (obj) {
       Lungo.Router.section('back');
       Lungo.Router.section('mucCreateForm');
-      var account = Messenger.account();
+      var account = Accounts.current;
       var form = $('section#mucCreateForm article.form');
       var server = Strophe.getDomainFromJid(account.core.fullJid);
       var inList = form.find('option[value$="' + server + '"]');
@@ -51,7 +51,7 @@ var Menu = {
       }
     },
     mucCreate: function (obj) {
-      var account = Messenger.account();
+      var account = Accounts.current;
       var form = $('section#mucCreateForm article.form');
       var domain = form.find('[name=custom]').val() || form.find('[name=server]').val();
       var title = form.find('[name=title]').val().trim();
@@ -63,7 +63,7 @@ var Menu = {
     mucSearchForm: function () {
       Lungo.Router.section('back');
       Lungo.Router.section('mucSearchForm');
-      var account = Messenger.account();
+      var account = Accounts.current;
       var form = $('section#mucSearchForm article.form');
       var server = Strophe.getDomainFromJid(account.core.fullJid);
       var inList = form.find('option[value$="' + server + '"]');
@@ -74,7 +74,7 @@ var Menu = {
       }
     },
     mucSearch: function (obj) {
-      var account = Messenger.account();
+      var account = Accounts.current;
       var form = $('section#mucSearchForm article.form');
       var server = form.find('[name=custom]').val() || form.find('[name=server]').val();
       var ul = form.find('output').children('ul').first().empty();
@@ -100,7 +100,7 @@ var Menu = {
     },
     mucInvite: function (obj) {
       var cb;
-      var account = Messenger.account();
+      var account = Accounts.current;
       if (typeof obj == 'object') {
         var obj = $(obj);
         var listBox = obj.parent();
@@ -124,7 +124,7 @@ var Menu = {
     },
     mucDirectInvite: function (obj) {
       var cb;
-      var account = Messenger.account();
+      var account = Accounts.current;
       if (typeof obj == 'object') {
         var obj = $(obj);
         cb = function (jid, name) {
@@ -143,7 +143,7 @@ var Menu = {
       Activity('invite', account, cb, options);
     },
     contactAdd: function (obj) {
-      var account = Messenger.account();
+      var account = Accounts.current;
       if (account.supports('rosterMgmt')) {
         var selfDomain = Strophe.getDomainFromJid(account.core.user);
         var placeholder = _('User').toLowerCase() + '@' + selfDomain;
@@ -159,7 +159,7 @@ var Menu = {
       Messenger.contactRemove(jid);
     },
     chatAdd: function (obj) {
-      var account = Messenger.account();
+      var account = Accounts.current;
       Activity('chat', account, null, {
         chats: false,
         groups: account.supports('muc')
@@ -189,7 +189,7 @@ var Menu = {
       }
     },
     emoji: function () {
-      var account = Messenger.account();
+      var account = Accounts.current;
       var ul = $('section#chat article#emoji ul');
       var emojiList = App.emoji[Providers.data[account.core.provider].emoji].map;
       if (ul.children('li').length != emojiList.length) {
@@ -238,7 +238,7 @@ var Menu = {
       Plus.rtc({audio: true, video: true});
     },
     otrMenu: function(obj) {
-      var account = Messenger.account();
+      var account = Accounts.current;
       account.OTRMenu();
     },
     switchOTR: function(obj) {
@@ -246,7 +246,7 @@ var Menu = {
       Plus.switchOTR(jid);
     },
     purchase: function () {
-      var number = Messenger.account().core.data.login;
+      var number = Accounts.current.core.data.login;
       var openURL = new MozActivity({
         name: "view",
         data: {
