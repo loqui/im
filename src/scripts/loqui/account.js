@@ -188,7 +188,9 @@ var Account = function (core) {
     this.chatsRender();
     this.presenceRender();
     */
-    this.avatarsRender();
+    setTimeout(function () {
+      this.avatarsRender();
+    }.bind(this));
   }
   
   // Changes some styles based on presence and connection status

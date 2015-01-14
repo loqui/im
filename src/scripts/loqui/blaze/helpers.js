@@ -40,7 +40,7 @@ Template.providers_setup.helpers({
 
 UI.registerHelper('chats', function () {
   if (App.accounts.length) {
-    return Accounts.current.chats;
+    return [].concat(Accounts.current.chats).reverse();
   }
 });
 

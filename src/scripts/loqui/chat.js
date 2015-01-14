@@ -279,7 +279,6 @@ var Chat = function (core, account) {
   // Save or update this chat in store
   this.save = function (up) {
     this.account.save();
-    this.account.singleRender(this, up);
   }
     
 }

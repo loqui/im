@@ -74,7 +74,7 @@ var App = {
   },
   set accounts (val) {
     this._accounts.set([].concat(val));
-    this.accountsCores = this.accountsCores;
+    this.accountsCores = [].concat(this.accountsCores);
   },
   
   get accountsCores () {
