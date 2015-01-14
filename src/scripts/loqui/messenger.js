@@ -60,7 +60,9 @@ var Messenger = {
         }
         this.typingTimeout= setTimeout(function(){
           account.connector.csnSend(to, 'paused');
-        }, 5000);
+          clearInterval(this.composingInterval);
+          this.composingInterval= null;
+        }.bind(this), 5000);
       }else{
         account.connector.csnSend(to, state);
         clearInterval(this.composingInterval);
