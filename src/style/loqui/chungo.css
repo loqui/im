@@ -1,11 +1,11 @@
 @media screen and (orientation:portrait) {
   html{
-    font-size: 1rem;
+    font-size: .65rem;
   }
 }
 @media screen and (orientation:landscape) {
   html{
-    font-size: 1rem;
+    font-size: .65rem;
   }
   * {
     -webkit-animation: none;
@@ -45,7 +45,7 @@
   font-family: Fira, FiraSans, Open Sans, sans-serif;
   font-weight: 100;
   letter-spacing: -0.05em;
-  font-size: 1.1rem;
+  font-size: 1.6rem;
 }
 
 section {
@@ -103,19 +103,14 @@ section {
   width: 100%;
   background-color: white;
 }
-section.asided, section.show.asided {
-  -webkit-transform: translateX(calc(-100% + 3rem));
-  transform: translateX(calc(-100% + 3rem));
-}
 
 section > header {
-  height: 3rem;
-  overflow: auto;
+  height: 5.4rem;
 }
 section > header button {
   display: block;
-  height: 3rem;
-  width: 3rem;
+  height: 5.6rem;
+  width: 4rem;
 }
 header .on-left {
   float: left;
@@ -125,12 +120,14 @@ header .on-right {
 }
 header button {
   float: left;
+  margin: 0;
+  padding: 0 1.6rem;
 }
 
 section > article {
   display: none;
   position: absolute;
-  top: 3rem;
+  top: 5.6rem;
   bottom: 0;
   left: 0;
   right: 0;
@@ -145,31 +142,52 @@ section.show > article.show {
 section.asided > article {
   opacity: .4;
 }
+section:after {
+  content: '';
+  position: fixed;
+  display: block;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: black;
+  opacity: 0;
+  transition: opacity .3s ease;
+  pointer-events: none;
+}
+section.asided:after {
+  opacity: .5;
+  pointer-events: all;
+}
 
 aside {
   display: block;
   position: fixed;
-  top: .5rem;
+  top: 0;
   left: 0;
-  width: calc(100% - 3rem);
-  height: calc(100% - .5rem);
+  width: calc(100vw - 5.6rem);
+  max-width: 400px;
+  height: 100vh;
   background-color: white;
-  -webkit-transform: translateX(120%);
-  transform: translateX(120%);
+  -webkit-transform: translateX(-100%);
+  transform: translateX(-100%);
   -webkit-transition: transform .3s;
-  transition: transform .3s;
   z-index: 50;
+  overflow: auto;
+  overflow-x: hidden;
+  box-shadow: 0 0 1rem rgba(0, 0, 0, 0);
+  transition: all .3s;
 }
 aside.show {
-  -webkit-transform: translateX(3rem);
-  transform: translateX(3rem);
+  -webkit-transform: translateX(0);
+  transform: translateX(0);
+  box-shadow: 0 0 1rem rgba(0, 0, 0, .4);
 }
 aside.show article.active {
   background-color: white;
   visibility: visible;
   position: absolute;
-  height: calc(100% - 3rem);
-  left: -3rem;
+  left: 0;
   right: 0;
 }
 
@@ -202,11 +220,12 @@ nav[data-control=menu] {
   margin: 20px 0 0 0;
 }
 .buttongroup button {
-  padding: .7rem;
+  padding: .8rem;
   background: #E95644;
   color: white;
   font-weight: 100;
   font-style: italic;
+  font-size: 1.6rem;
   border: none;
   border-radius: .2rem;
 }
@@ -238,7 +257,7 @@ nav[data-control=menu] {
   background-color: #222;
   color: white;
   z-index: 101;
-  padding-bottom: .5rem;
+  padding: 1rem;
 }
 .chungo .notifier[data-type='neutral'] {
   border-bottom: .4rem solid #3498FD;
@@ -258,7 +277,7 @@ nav[data-control=menu] {
   -webkit-animation: popDown .2s;
 }
 .chungo .notifier .icon {
-  font-size: 4rem;
+  font-size: 5rem;
   display: block;
   width: calc(100% - 4rem);
   margin: 1rem 2rem 0 2rem;
@@ -268,7 +287,7 @@ nav[data-control=menu] {
   display: block;
   width: calc(100% - 4rem);
   margin: 0 2rem 0 2rem;
-  font-size: 1.2rem;
+  font-size: 2rem;
   font-weight: 300;
   font-style: italic;
   text-align: center;
@@ -277,19 +296,27 @@ nav[data-control=menu] {
   display: block;
   width: calc(100% - 4rem);
   margin: .3rem 2rem 1rem 2rem;
-  font-size: 1rem;
+  font-size: 1.6rem;
   font-weight: 100;
   text-align: center;
 }
 
 article.form input,
 article.form select {
-  width: calc(100%);
+  width: calc(100% - 2rem);
+  height: 3.6rem;
+  font-size: 1.4rem;
+  border: .1rem solid #DFDFDF;
+  border-radius: .2rem;
+  padding: 0 1rem;
+}
+article.form select {
+  width: 100%;
 }
 article.form label {
   display: block;
-  margin-top: .5rem;
-  padding-bottom: .2rem;
+  margin-top: 1rem;
+  padding-bottom: .5rem;
 }
 
 section .hideable {

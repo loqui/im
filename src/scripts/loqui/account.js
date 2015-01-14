@@ -11,6 +11,23 @@ var Account = function (core) {
   this.contacts = {};
   this.names = [];
   this.jidToNameMap = {};
+  this._enabled = new Blaze.Var(false);
+  
+  this.__defineGetter__('enabled', function () {
+    return this._enabled.get();
+  });
+  this.__defineSetter__('enabled', function (val) {
+    this._enabled.set(val);
+    if (val != 'loading') {
+      this.core.enabled = val;
+      if (!val) {
+        this.connector.disconnect();    
+      } else {
+        this.connect();
+      }
+      this.save();
+    }
+  });
   
   if ('OTR' in core) {
     $.extend(this.OTR, core.OTR);
@@ -37,8 +54,8 @@ var Account = function (core) {
           if (Accounts.find(this.core.fullJid) < 0) {
             Tools.log('ADDING ACCOUNT', this);
             App.accounts.push(this);
-            App.smartpush('accountsCores', this.core);
             Lungo.Notification.hide();
+            this.show();
             $('section.setup#' + this.core.provider + ' input').val('');
             $('section#success span#imported').text(_('Imported', {number: (this.core.roster && this.core.roster.length) ? this.core.roster.length : 0}));
             this.connector.avatar(function (avatar) {
@@ -67,21 +84,18 @@ var Account = function (core) {
     if (this.connector.isConnected()) {
       this.connector.start();
       this.sendQFlush();
-      this.accountRender();
-      this.presenceRender();
     } else {
       if (navigator.onLine){
         this.connector.connect({
           connecting: function () {
-            $('aside#accounts li[data-jid="' + (this.core.fullJid || this.core.user) + '"]').data('value', 'loading');
+            this.enabled = 'loading';
           }.bind(this),
           connected: function () {
+            this.enabled = true;
             var cb = function (rcb) {
               App.audio('login');
               this.connector.start();
               this.sendQFlush();
-              this.accountRender();
-              this.presenceRender();
               if (rcb) {
                 rcb();
               }
@@ -89,7 +103,7 @@ var Account = function (core) {
             this.sync(cb);
           }.bind(this),
           authenticating: function () {
-            $('aside#accounts li[data-jid="' + (this.core.fullJid || this.core.user) + '"]').data('value', 'loading');
+            this.enabled = 'loading';
           }.bind(this),
           authfail: function () {
             var failStamps = this.connector.failStamps || {};
@@ -101,8 +115,7 @@ var Account = function (core) {
           }.bind(this),
           disconnected: function () {
             this.connector.connected = false;
-            this.accountRender();
-            if (App.online && App.settings.reconnect && this.core.enabled) {
+            if (App.online && App.settings.reconnect && this.enabled) {
               this.connect();
             }
           }.bind(this)
@@ -118,8 +131,8 @@ var Account = function (core) {
   
   // Bring account to foreground
   this.show = function () {
-    var account = this;
-    $('section#main').data('jid', this.core.fullJid);
+    Accounts.current = Accounts.find(this.core.fullJid);
+    /*$('section#main').data('jid', this.core.fullJid);
     var vCard = $(this.connector.vcard);
     var address = ( vCard.length && vCard.find('FN').length ) ? vCard.find('FN').text() : this.core.user;
     $('section#main header img').attr('src', 'img/providers/' + this.core.provider + '.svg');
@@ -152,17 +165,17 @@ var Account = function (core) {
     }
     Accounts.unread(account.unread);
     Store.recover(account.core.background, function (url) {
-      $('section#chat ul#messages').style('background', 'url('+url+') no-repeat center center fixed');
-      $('section.profile div#card').style('background', 'url('+url+') no-repeat center center fixed'); 
-    }.bind(this)); 
+      $('section#chat ul#messages').css('background', 'url('+url+') no-repeat center center fixed');
+      $('section.profile div#card').css('background', 'url('+url+') no-repeat center center fixed'); 
+    }.bind(this)); */
   }
   
   // Render everything for this account
   this.allRender = function () {
     this.accountRender();
-    this.chatsRender();
+    /*this.chatsRender();
     this.presenceRender();
-    this.avatarsRender();
+    this.avatarsRender();*/
   }
   
   // Changes some styles based on presence and connection status
@@ -170,6 +183,8 @@ var Account = function (core) {
     var li = $('aside#accounts li[data-jid="' + (this.core.fullJid || this.core.user) + '"]');
     li.data('value', this.connector.isConnected() ? true : (this.core.enabled ? 'loading' : false));
     li.data('show', this.connector.presence.show);
+    $('section#main header').css('border-color', this.connector.provider.color);
+    $('aside#accounts .cover').css('background-color', this.connector.provider.color);
   }
   
   this.singleRender = function (chat, up) {
@@ -188,7 +203,7 @@ var Account = function (core) {
         return prev + cur.core.unread;
       }, 0);
       Lungo.Element.count('aside li[data-jid="' + this.core.fullJid + '"]', totalUnread);
-      if (ul.style('display') == 'block') {
+      if (ul.css('display') == 'block') {
         Lungo.Element.count('section#main header nav button[data-view-article="chats"]', totalUnread);
         Accounts.unread(totalUnread);
       }
@@ -200,7 +215,7 @@ var Account = function (core) {
   
   // List all chats for this account
   this.chatsRender = function (f, click, hold) {
-    var account = this;
+    /*var account = this;
     var oldUl = $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"]');
     var ul = $("<ul />");
     var media = _('AttachedFile');
@@ -271,7 +286,7 @@ var Account = function (core) {
       oldUl.replaceWith(ul);    
     }
     Lungo.Element.count('aside li[data-jid="' + this.core.fullJid + '"]', totalUnread);
-    if (ul.style('display') == 'block') {
+    if (ul.css('display') == 'block') {
       Lungo.Element.count('section#main header nav button[data-view-article="chats"]', totalUnread);
     }
     this.unread = totalUnread;
@@ -368,12 +383,12 @@ var Account = function (core) {
       }
     });
     article.append(header).append(ul);
-    frag.appendChild(article[0]);
+    frag.appendChild(article[0]);*/
   }
   
   // Render presence for every contact
   this.presenceRender = function (jid) {
-    if (this.connector.isConnected() && this.supports('presence')) {
+    /*if (this.connector.isConnected() && this.supports('presence')) {
       var contactPresenceRender = function (contact) {
         if (this.supports('show')) {
           var li = $('section#main article ul li[data-jid="'+contact.jid+'"]');
@@ -397,13 +412,13 @@ var Account = function (core) {
           contactPresenceRender(this.core.roster[i]);
         }
       }
-    }
+    }*/
   }
   
   // Render all the avatars
   this.avatarsRender = function () {
     var account = this;
-    var avatars = App.avatars;
+    /*var avatars = App.avatars;
     $('span.avatar img:not([src])').each(function (i, el) {
       var jid = Strophe.getBareJidFromJid($(el).closest('[data-jid]').data('jid')) || account.core.fullJid;
       var me = jid == account.core.fullJid;
@@ -416,19 +431,33 @@ var Account = function (core) {
           }
         });
       } else if (account.connector.isConnected() && account.supports('easyAvatars')) {
+        console.log('REQUESTING AVATAR FOR', jid);
         account.connector.avatar(function (a) {
           a.url.then(function (val) {
+            console.log(a.data);
             $(el).attr('src', val);
             if (me) {
               $('section#main footer .avatar img').attr('src', val);
               $('section#me .avatar img').attr('src', val);
             }
             avatars[jid] = a.data;
+            App.avatars = avatars;
           });
         }, jid);
       }
-    });
-    App.smartupdate('avatars');
+    });*/
+    var show = function (a) {
+      a.url.then(function (val) {
+        $('section#me .avatar img').attr('src', val);
+      });
+    }
+    if (account.core.fullJid in App.avatars) {
+      show(new Avatar(App.avatars[account.core.fullJid]));
+    } else {
+      account.connector.avatar(function (src) {
+        show(src);
+      });
+    }
   }
 
   // Manage search through contacts
@@ -615,8 +644,9 @@ var Account = function (core) {
   this.save = function () {
     var index = Accounts.find(this.core.fullJid || this.core.user);
 	  if(index > -1) {
-		  App.accountsCores[index] = this.core;
-		  App.smartupdate('accountsCores');
+		  var cores = App.accountsCores;
+		  cores[index] = this.core;
+		  App.accountsCores = cores;
 	  }
   }
 
@@ -624,70 +654,27 @@ var Account = function (core) {
 
 var Accounts = {
 
+  _current: Blaze.Var(0),
+
+  get current () {
+    return App.accounts[this._current.get()];
+  },
+  set current (i) {
+    this._current.set(i);
+    this.current.allRender();
+  },
+
   // Find the index of an account
   find: function (jid) {
     var index = -1;
-    for (var i in App.accountsCores) {
-      var account = App.accountsCores[i];
+    for (var i in App.accounts) {
+      var account = App.accounts[i].core;
       if (account.fullJid ? (account.fullJid == jid) : (account.user == jid)) {
         index = i;
         break;
       }
     }
     return index;
-  },
-  
-  // Create accounts icons
-  aside: function () {
-    var accountSwitch = function (e) {
-      e.stopPropagation();
-      var sw = $(this);
-      var li = sw.closest('li');
-      var account = App.accounts[Accounts.find(li.data('jid'))];
-      if (li.data('value') == 'true') {
-        if (confirm(_('AccountDisable', {account: account.core.fullJid}))) {
-          account.core.enabled = false;
-          account.connector.disconnect();
-        }
-      } else {
-        account.connect();
-        account.core.enabled = true;
-      }
-      account.save();
-    }
-    var ul = $('aside#accounts ul');
-    ul.empty();
-    for (var i in App.accounts) {
-      var account = App.accounts[i];
-      var li = $('<li/>').data('jid', account.core.fullJid || account.core.user).append(
-        $('<span/>').addClass('provider').text(account.connector.provider.longName)
-      ).append(
-        $('<span/>').addClass('jid').text(account.core.user)
-      ).append(
-        $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>').bind('click', accountSwitch)
-      ).data('value', 'loading');
-      li.on('click', function () {
-        var index = Accounts.find(this.dataset.jid);
-        if (index) {
-          App.accounts[index].show();
-          Lungo.Aside.hide();
-        }
-      });
-      var img = $('<img/>').addClass('provIcon').attr('src', 'img/providers/squares/' + account.core.provider + '.svg');
-      ul.append(li.append(img));
-    }
-  },
-  
-  // Create main sections 
-  main: function () {
-    var chats = $('section#main article#chats').empty();
-    var contacts = $('section#main article#contacts').empty();
-    for (var i in App.accounts) {
-      var account = App.accounts[i];
-      chats.append($("<ul/>").data('jid', account.core.fullJid));
-      contacts.append($("<ul/>").data('jid', account.core.fullJid));
-      account.allRender();
-    }
   },
   
   // Total unread messages

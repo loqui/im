@@ -599,40 +599,48 @@ App.connectors['XMPP'] = function (account) {
   
 }
 
-App.logForms['XMPP'] = function (article, provider, data) {
-  article
-    .append($('<h1/>').style('color', data.color).html(_('SettingUp', { provider: data.longName })))
-    .append($('<img/>').attr('src', 'img/providers/' + provider + '.svg'))
-    .append($('<label/>').attr('for', 'user').text(_(data.terms['user'], { provider: data.altname })))
-    .append($('<input/>').attr('type', data.terms.userInputType).attr('x-inputmode', 'verbatim').attr('name', 'user').attr('placeholder', (data.terms.placeholder || _(data.terms['user'], { provider: data.altname }) )))
-    .append($('<label/>').attr('for', 'pass').text(_(data.terms['pass'])))
-    .append($('<input/>').attr('type', 'password').attr('name', 'pass').attr('placeholder', '******'));
-  if (data.notice) {
-    article.append($('<small/>').html(_(provider + 'Notice')));
-  }
-  var buttongroup = $('<div/>').addClass('buttongroup');
-  var submit = $('<button/>').data('role', 'submit').style('backgroundColor', data.color).text(_('LogIn'));
-  var back = $('<button/>').data('view-section', 'back').text(_('GoBack'));
-  submit.bind('click', function () {
-    var article = this.parentNode.parentNode;
-    var provider = article.parentNode.id;
-    var user = Providers.autoComplete($(article).children('[name="user"]').val(), provider);
-    var pass = $(article).children('[name="pass"]').val();
-    var cc = $(article).children('[name="cc"]').val();
-    if (user && pass) {
-      var account = new Account({
-        user: user,
-        pass: pass,
-        provider: provider,
-        resource: App.defaults.Account.core.resource,
-        enabled: true,
-        chats: []
-      });
-      account.test();
+App.logForms['XMPP'] = function (provider, article) {
+  var data = Providers.data[provider];
+  return {
+    get html () {
+      if (article) {
+        article
+          .append($('<h1/>').css('color', data.color).html(_('SettingUp', { provider: data.longName })))
+          .append($('<img/>').attr('src', 'img/providers/' + provider + '.svg'))
+          .append($('<label/>').attr('for', 'user').text(_(data.terms['user'], { provider: data.altname })))
+          .append($('<input/>').attr('type', data.terms.userInputType).attr('x-inputmode', 'verbatim').attr('name', 'user').attr('placeholder', (data.terms.placeholder || _(data.terms['user'], { provider: data.altname }) )))
+          .append($('<label/>').attr('for', 'pass').text(_(data.terms['pass'])))
+          .append($('<input/>').attr('type', 'password').attr('name', 'pass').attr('placeholder', '******'));
+        if (data.notice) {
+          article.append($('<small/>').html(_(provider + 'Notice')));
+        }
+        var buttongroup = $('<div/>').addClass('buttongroup')
+          .append($('<button/>').addClass('submit').css('backgroundColor', data.color).text(_('LogIn')))
+          .append($('<button/>').addClass('back').text(_('GoBack')))
+        article.append(buttongroup);
+      }
+    },
+    events: function (target) {
+      if (target.hasClass('submit')) {
+        var article = target[0].parentNode.parentNode;
+        var provider = article.parentNode.id;
+        var user = Providers.autoComplete($(article).children('[name="user"]').val(), provider);
+        var pass = $(article).children('[name="pass"]').val();
+        var cc = $(article).children('[name="cc"]').val();
+        if (user && pass) {
+          var account = new Account({
+            user: user,
+            pass: pass,
+            provider: provider,
+            resource: App.defaults.Account.core.resource,
+            enabled: true,
+            chats: []
+          });
+          account.test();
+        }      
+      }
     }
-  });
-  buttongroup.append(submit).append(back);
-  article.append(buttongroup);
+  }
 }
 
 App.emoji['XMPP'] = {

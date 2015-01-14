@@ -5,16 +5,10 @@ var Menu = {
   // Tells what menu to open
   map: {
     providers: function () {
-      if (!$('section#providers ul li').length) {
-        Providers.list();
-      }
       Lungo.Router.section('providers');
     },
     main: function () {
-      Accounts.aside();
-      Accounts.main();
-      var last = App.accounts.length - 1;
-      App.accounts[last || 0].show();
+      Accounts.current = 0;
       Lungo.Router.section('main');
       Lungo.Router._stack[0] = 'main';
     },

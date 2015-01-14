@@ -26,14 +26,15 @@ input[type='search'] {
   margin-right: .5rem;
 }
 .buttongroup {
-  margin: 1.5rem 0;
+  margin: 2.5rem 0;
 }
 .buttongroup > button {
   margin-bottom: .4rem;
   width: 100%;
 }
 article.form button[data-view-section='back'],
-article.form button[data-role='back'] {
+article.form button[data-role='back'],
+article.form button.back {
   width: 100%;
   background-color: #DDD;
   color: #666;
@@ -43,27 +44,29 @@ article.form button[data-role='submit'] {
 }
 article.form label {
   width: 100%;
+  font-size: 1.4rem;
 }
 
 section > article.simple {
-  padding: 2rem;
+  padding: 3.2rem;
   color: #333;
 }
 section > article.simple > h1 {
   position: relative;
-  width: 11rem;
-  font-size: 1.6rem;
-  line-height: 2rem;
+  width: calc(100vw - 6.4rem);
+  font-size: 2.6rem;
+  line-height: 2.6rem;
   margin: 0 0 1rem 0;
   font-weight: 100;
   color: #E95644;
 }
 section > article.simple > p {
   font-weight: 100;
+  font-size: 1.6rem;
 }
 section > article.simple > div > p {
   font-weight: 300;
-  font-size: 1em;
+  font-size: 1.6rem;
   margin-bottom: .5rem;
 }
 #welcome {
@@ -88,8 +91,8 @@ section > article.simple > div > p {
 }
 section.setup img[src^='img/providers']{
   position: absolute;
-  top: 2rem; right: 2rem;
-  width: 4rem;
+  top: 3.5rem; right: 3rem;
+  width: 5.6rem;
 }
 #providers {
   z-index: 100;
@@ -106,30 +109,29 @@ section.setup img[src^='img/providers']{
   box-sizing: content-box;
 }
 section > header {
-  background-color: #312F34;
+  background-color: #222;
 }
-section > header > h1 {
+section > header h1 {
   position: absolute;
-  right: 3rem;
-  left: 3rem;
-  top: -.4rem;
+  left: 5.6rem;
+  right: 5.6rem;
   color: white;
   text-align: center;
+  font-weight: 100;
+  font-size: 2rem;
   font-style: italic;
-  font-size: 1.2em;
+}
+section > header.simple > h1 {
+  right: 3rem;
+  left: 3rem;
+  top: .2rem;
+  font-style: italic;
+  font-size: 1.5em;
 }
 section > header > nav {
   overflow: hidden;
   float: right;
   display: block;
-}
-section > header > nav button.tab {
-  background: none;
-  border: none;
-  height: 2.5rem;
-  margin-top: .5rem;
-  border-radius: 0;
-  width: 3.2rem;
 }
 section > header > nav .up {
   border: none;
@@ -137,20 +139,7 @@ section > header > nav .up {
   color: white;
   font-size: 1.2em;
 }
-section > header > .on-right button.tab {
-  background-image: url('/img/tab-decoration-right.svg');
-  background-size: 3.2rem 2.5rem;
-  -webkit-background-size: 3.2rem 2.5rem;
-  padding: 0 0 0 1.2rem;
-}
-section > header > .on-left button.tab {
-  background-image: url('/img/tab-decoration-left.svg');
-  background-size: 3.2rem 2.5rem;
-  -webkit-background-size: 3.2rem 2.5rem;
-  padding: 0 1.2rem 0 0;
-}
 section > header > nav.discreet {
-  margin-right: -.5rem;
 }
 section > header > nav.discreet button {
   border: none;
@@ -159,6 +148,7 @@ section > header > nav.discreet button {
   background-color: transparent;
   color: white;
   width: 2.6rem;
+  font-size: 1.6rem;
 }
 
 section.extended > header {
@@ -168,8 +158,8 @@ section.extended > header {
   background-color: #E74C3C;
 }
 section.extended article {
-  top: 6rem;
-  height: calc(100% - 6rem);
+  top: 11.2rem;
+  height: calc(100% - 9.8rem);
 }
 section:not(.extended) nav[data-control="groupbar"] {
   display: none;
@@ -179,9 +169,9 @@ section:not(.extended) nav[data-control="groupbar"] {
 }
 section nav[data-control="groupbar"] {
   position: absolute;
-  top: 3rem;
+  top: 5.6rem;
   width: 100%;
-  height: 3rem;
+  height: 5.6rem;
   background-color: white;
   color: #333;
   border-bottom: .1rem solid #CECECE;
@@ -197,16 +187,15 @@ section nav[data-control="groupbar"] {
 }
 section nav[data-control="groupbar"] a {
   float: left;
-  margin: .55rem 0 0 .5rem;
-  padding: .4rem .8rem .4rem .8rem;
-  font-size: .8em;
+  margin: 1rem -1rem 0 1rem;
+  padding: .8rem 1.5rem .6rem 1.5rem;
+  font-size: 1.6rem;
   font-weight: 100;
   font-style: italic;
-  border-radius: 1rem;
+  border-radius: 3rem;
 }
 section nav[data-control="groupbar"] a.selected {
   background-color: #E74C3C;
-  padding: .4rem .8rem .4rem .8rem;
   color: white;
 }
 .aside {
@@ -276,35 +265,27 @@ section > nav[data-control="menu"] a:before {
   padding: 1rem;
 }
 
-#main > header div.account,
-#main > header div.account * {
+#main > header > span {
   position: absolute;
   color: white;
-  display: block;
-}
-#main > header div.account img {
-  top: .5rem;
-  left: .3rem;
-  height: 2rem;
-}
-#main > header div.account .provider {
-  top: .5rem;
-  left: 2.6rem;
-  font-size: .6em;
-  font-weight: 300;
-  width: calc(100vw - 11.2rem);
-  overflow: hidden;
-  white-space: nowrap;
+  text-align: center;
   text-overflow: ellipsis;
-}
-#main > header div.account .jid {
-  top: 1.3rem;
-  left: 2.6rem;
-  font-size: .8em;
-  width: calc(100vw - 11.2rem);
-  overflow: hidden;
   white-space: nowrap;
-  text-overflow: ellipsis;
+  overflow: hidden;
+  left: 3.2rem;
+  right: 3.2rem;
+}
+#main > header select {
+  position: absolute;
+  top: 0;
+  height: 5.6rem;
+  width: calc(100% - 6.4rem);
+  opacity: 0;
+}
+#main > header .jid {
+  padding: 1.7rem;
+  font-size: 1.6rem;
+  font-weight: 700;
 }
 #main > header span.counter {
   display: block;
@@ -468,6 +449,10 @@ section > nav[data-control="menu"] a:before {
   border-radius: 50%;
   box-sizing: content-box;
 }
+#main header {
+  border-bottom: .5rem solid;
+  transition: border-bottom .2s ease;
+}
 #main article ul li:active .show {
   border-color: #DDD;
 }
@@ -610,7 +595,7 @@ section > nav[data-control="menu"] a:before {
 
 #settings ul li {
   position: relative;
-  padding: 1rem;
+  padding: 2rem 1.6rem;
   border-bottom: .1rem solid #DDD;
   list-style-type: none;
   cursor: pointer;
@@ -619,7 +604,7 @@ section > nav[data-control="menu"] a:before {
   display: block;
   max-width: calc(100% - 4rem);
   font-weight: 100;
-  font-size: .9em;
+  font-size: 1.6rem;
 }
 #chat header span {
   color: white;
@@ -1252,93 +1237,89 @@ ul.mini {
   margin-top: 1rem;
   list-style-type: none;
 }
-ul.mini li {
-  border-bottom: .1rem solid #CCC;
+ul.mini li a {
+  border-bottom: .1rem solid #E3E3E3;
 }
-ul.mini li:last-child {
+ul.mini li:last-of-type a {
   border: none;
 }
 ul.mini li a {
+  position: relative;
   display: block;
-  padding: .9rem .2rem .7rem .2rem;
+  padding: 1rem .2rem 1rem 0;
+  font-size: 1.6rem;
+  margin-left: 4rem;
 }
 ul.mini li img {
-  height: 1.3rem;
-  margin-right: .5rem;
-  margin-top: -.2rem;
-}
-aside header {
-  display: block;
-  padding: .7rem .4rem;
-  font-size: .9em;
-  font-weight: 300;
-  text-transform: uppercase;
-  color: #222;
-}
-aside header nav {
   position: absolute;
-  top: .4rem;
-  right: .2rem;
+  height: 2.4rem;
+  left: -4rem;
+  top: .9rem;
 }
-aside header nav button {
-  height: 2rem;
-  width: 2rem;
-  border: none;
-}
-aside article ul li {
+
+aside .cover {
+  display: block;
   position: relative;
-  height: 3.6rem;
-  overflow: hidden;
-  border-top: .1rem solid #E6E6E6;
-  box-sizing: content-box;
+  background-color: #333;
+  height: 17rem;
+  transition: background-color .2s ease;
 }
-aside article ul li:first-child {
-  border-bottom: none;
-  border-top: none;
-}
-aside article ul li img.provIcon {
+aside .cover span {
+  color: white;
   position: absolute;
-  top: .5rem;
-  left: .8rem;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: .4rem;
+  left: 1.6rem;
 }
-aside article ul li span.provider {
-  position: absolute;
-  top: .7rem;
-  left: 3.9rem;
-  font-size: .7em;
-  color: #666;
-  max-width: calc(80vw - 5.5rem);
+aside .cover .provider {
+  font-size: 1.4rem;
+  bottom: 3.6rem;
+  text-transform: uppercase;
+}
+aside .cover .jid {
+  font-size: 1.8rem;
+  font-weight: 600;
+  bottom: 1.6rem;
+  max-width: calc(100% - 7.6rem);
   overflow: hidden;
   white-space: nowrap;
-  text-overflow: ellipsis;
+  text-overflow: ellipsis;  
 }
-aside article ul li span.jid {
-  position: absolute;
-  top: 1.6rem;
-  left: 3.9rem;
-  font-size: .9em;
-  max-width: calc(80vw - 5.5rem);
+aside .cover .switch {
+  top: auto;
+  bottom: 2rem;
+  right: 1.6rem;
+}
+aside .menu li {
+  position: relative;
+  font-size: 1.6rem;
+  font-weight: 100;
+  padding: 1.2rem 3.6rem 1.2rem 4.8rem;
+  color: #444;
   overflow: hidden;
   white-space: nowrap;
-  text-overflow: ellipsis;
+  text-overflow: ellipsis; 
 }
-aside article ul li span.counter {
-  display: block;
+aside .menu li:first-of-type {
+  padding-top: 2.4rem;
+}
+aside .menu li:last-of-type {
+  margin-bottom: 1rem;
+}
+aside .menu li img.icon {
   position: absolute;
-  top: 1.1rem;
-  right: 4.2rem;
-  background-color: #E74C3C;
-  color: #FFF;
-  padding: .4rem .5rem;
-  font-size: .6em;
-  line-height: .6em;
-  border-radius: .6rem;
+  bottom: .9rem;
+  height: 2.8rem;
+  left: 1.2rem;
 }
-aside article ul li span.counter[data-value='0'] {
-  display: none;
+aside .menu li img.provider {
+  position: absolute;
+  bottom: 1.3rem;
+  height: 2rem;
+  left: 1.6rem;
+}
+aside .menu hr {
+  border: none;
+  border-top: .01rem solid #DDD;
+  margin: 1rem 1.6rem;
 }
 
 li[data-show=a] .backchange,
@@ -1491,12 +1472,12 @@ section:not([data-show]) footer .backchange {
 
 div.switch {
   position: absolute;
-  top: 1rem;
-  right: .8rem;
+  top: 1.6rem;
+  right: 1.6rem;
   display: block;
-  width: 3rem;
-  height: 1.4rem;
-  border-radius: 1.4rem;
+  width: 5.4rem;
+  height: 2.6rem;
+  border-radius: 2.4rem;
   background-color: #BDC6C8;
   transition: all .2s;
   -webkit-transition: all .2s;
@@ -1505,18 +1486,18 @@ div.switch {
 div.switch img.tick {
   display: none;
   position: absolute;
-  height: .9rem;
-  left: .3rem;
-  top: .25rem;
+  height: 1.4rem;
+  left: .6rem;
+  top: .6rem;
 }
 div.switch div.ball {
   position: absolute;
   display: block;
   top: -.35rem;
   left: -.3rem;
-  width: 1.1rem;
-  height: 1.1rem;
-  border: .5rem solid #ABB5B7;
+  width: 2rem;
+  height: 2rem;
+  border: .7rem solid #ABB5B7;
   border-radius: 50%;
   background-color: #FFF;
   transition: all .2s;
@@ -1530,14 +1511,14 @@ div.switch div.ball {
   background-color: #2EDF88;
 }
 [data-value="true"] div.switch div.ball {
-  left: 1.2rem;
+  left: 2.4rem;
   border-color: #2CC269;
 }
 [data-value="loading"] div.switch {
   background-color: #F1D726;
 }
 [data-value="loading"] div.switch div.ball {
-  left: 1.2rem;
+  left: 2.4rem;
   border-color: #EFBA07;
 }
 
@@ -1676,25 +1657,5 @@ article.form ul.listBox li.add:before {
 #console #bodyConsole #logConsole div {
   word-wrap: break-word;
   font-size: .9rem;
-}
-
-@media (min-width: 1024px) {
-  #main {
-    padding-top: 100px;
-    padding-left: 220px;
-    padding-right: 220px;
-  } 
-  
-  section.setup article {
-    padding-top: 100px;
-    padding-left: 220px;
-    padding-right: 220px;
-  } 
-  
-  .buttongroup {
-    padding-left: 20%;
-    padding-right: 20%;
-    margin: 1.5rem 0;
-  }
 }
 

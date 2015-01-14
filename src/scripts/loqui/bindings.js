@@ -230,6 +230,20 @@ var bindings = function () {
   $('section#welcome').on('click', function(){
      Menu.show('providers');
   });
+  $('section#main').on('click', function(e){
+    if($(e.target).hasClass('asided')){
+      Lungo.Aside.hide();
+    }
+  }).on('swipeLeft', function(e){
+    if($(e.target).hasClass('asided')){
+      Lungo.Aside.hide();
+    }
+  }).on('swipeRight', function () {
+    Lungo.Aside.show('accounts');
+  });;
+  $('aside').on('swipeLeft', function () {
+    Lungo.Aside.hide();
+  });
   $('#debugConsole #showConsole').on('click', function () {
     Plus.showConsole();
     $('#debugConsole #showConsole').hide();
@@ -252,5 +266,9 @@ var bindings = function () {
       option = select.find('[data-reveal]')
       select.siblings('[name="' + option.data('reveal') + '"]').addClass('hidden').val('');
     }
+  });
+  $("script[type='text/spacebars']").each(function(index, script) {
+    var name = script.getAttribute('name');
+    UI.insert(UI.render(Template[name]), script.parentNode, script);
   });
 }
