@@ -48,8 +48,12 @@ Template.account_cover.events({
 });
 
 Template.accounts_list.events({
+  'click .switch': function (e, t) {
+    var status = $(e.target).closest('li')[0].dataset.value;
+    Accounts.current.enabled = (status == 'false' || status == undefined);
+  },
   'click li': function (e, t) {
-    var index = $(e.target).data('accountIndex')
+    var index = $(e.target).closest('li').data('accountIndex');
     $('#main header select').val(index);
     Accounts.current = index;
     //Chungo.Aside.hide();
