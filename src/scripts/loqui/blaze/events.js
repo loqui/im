@@ -41,22 +41,24 @@ Template.account_header.events({
 });
 
 Template.account_cover.events({
-  'click .switch': function (e, t) {
-    var status = $(e.target).closest('.cover')[0].dataset.value;
-    Accounts.current.enabled = (status == 'false' || status == undefined);
+  'click': function (e, t) {
+    Menu.show('me');
   }
 });
 
 Template.accounts_list.events({
-  'click .switch': function (e, t) {
-    var status = $(e.target).closest('li')[0].dataset.value;
-    Accounts.current.enabled = (status == 'false' || status == undefined);
-  },
   'click li': function (e, t) {
-    var index = $(e.target).closest('li').data('accountIndex');
-    $('#main header select').val(index);
-    Accounts.current = index;
-    //Chungo.Aside.hide();
+    var closestSwitch = $(e.target).closest('.switch');
+    var li = $(e.target).closest('li')[0];
+    var index = li.dataset.accountIndex;
+    if (closestSwitch.length > 0) {
+      var status = li.dataset.value;
+      App.accounts[index].enabled = (status == 'false' || status == undefined);
+    } else {
+      $('#main header select').val(index);
+      Accounts.current = index;
+      Chungo.Aside.hide();    
+    }
   }
 });
 

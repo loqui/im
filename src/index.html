@@ -412,7 +412,8 @@
         <script type="text/spacebars" name="accounts_list">
           {{#each accounts}}
             <li data-account-index="{{index}}" data-value="{{data.enabled}}">
-              <img class="provider" src="img/providers/{{data.core.provider}}.svg" />{{data.core.user}}
+              <img class="provider" src="img/providers/{{data.core.provider}}.svg" />
+              <span>{{data.core.user}}</span>
               <div class="switch"><div class="ball"></div><img class="tick" src="img/tick.svg"></div>
             </li>
           {{/each}}
