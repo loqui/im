@@ -710,7 +710,7 @@ section > nav[data-control="menu"] a:before {
 }
 #text {
   position: relative;
-  padding: .4rem .5rem .9rem .5rem;
+  padding: .6rem .5rem .7rem .5rem;
   min-height: 1.8rem;
   max-height: 6.2rem;
   background: none;
@@ -810,7 +810,7 @@ section > nav[data-control="menu"] a:before {
 #messages > li > div > span.text {
   position: relative;
   display: block;
-  padding: .5rem 1rem;
+  padding: 1rem 1.6rem;
   font-weight: 100;
   font-size: 1.6rem;
   word-wrap: break-word;
