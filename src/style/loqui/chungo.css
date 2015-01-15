@@ -218,14 +218,14 @@ nav[data-control=menu] {
   margin: 20px 0 0 0;
 }
 .buttongroup button {
-  padding: .8rem;
+  padding: 1.3rem;
   background: #E95644;
   color: white;
   font-weight: 100;
   font-style: italic;
   font-size: 1.6rem;
   border: none;
-  border-radius: .2rem;
+  border-radius: .4rem;
 }
 
 .chungo .shader {
