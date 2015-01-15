@@ -349,6 +349,7 @@ var Messenger = {
       }
       App.accounts.splice(accountIndex, 1);
       App.accountsCores.splice(accountIndex, 1);
+      App.accounts = App.accounts;
       Lungo.Notification.success(_('Wait'), _('WaitLong'), 'exclamation-sign', 3);
       setTimeout(function () {
         window.location.reload();

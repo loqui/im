@@ -124,6 +124,7 @@ var Account = function (core) {
           }.bind(this),
           disconnected: function () {
             App.audio('logout');
+            this.account.presenceRender();
             this.connector.connected = false;
             if (App.online && App.settings.reconnect && this.enabled) {
               this.connect();
