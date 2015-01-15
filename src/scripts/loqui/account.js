@@ -201,6 +201,18 @@ var Account = function (core) {
     $('section#main header').css('border-color', this.connector.provider.color);
     $('aside#accounts .cover').css('background-color', this.connector.provider.color);
     $('.floater').css('background-color', this.connector.provider.color);
+    var vCard = $(this.connector.vcard);
+    var address = ( vCard.length && vCard.find('FN').length ) ? vCard.find('FN').text() : this.core.user;
+    var features = Providers.data[this.core.provider].features;
+    var meSection = $('section#me');
+    var mainSection = $('section#main');
+    meSection[0].dataset.features = features.join(' ');
+    mainSection[0].dataset.features = features.join(' ');
+    meSection.find('#nick input').val(this.connector.presence.name);
+    meSection.find('#status input').val(this.connector.presence.status);
+    meSection.find('#card .name').text(address == this.core.user ? '' : address);
+    meSection.find('#card .user').text(this.core.user);
+    meSection.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + this.core.provider + '.svg'));
   }.bind(this);
   
   this.singleRender = function (chat, up) {

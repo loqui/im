@@ -25,6 +25,14 @@ input[type='search'] {
   width: 100%;
   border-radius: 0;
 }
+input[type='text'] {
+  width: calc(100% - 2rem);
+  height: 4.2rem;
+  font-size: 1.5rem;
+  border: .1rem solid #DFDFDF;
+  border-radius: .2rem;
+  padding: 0 1rem;
+}
 .spaced {
   margin-right: .5rem;
 }
@@ -305,6 +313,9 @@ section > nav[data-control="menu"] a:before {
   animation: blink .5s infinite alternate;
   -webkit-animation: blink .5s infinite alternate;
 }
+#chat > header .angle-left {
+  font-size: 2rem;
+}
 #chat > header span.counter {
   display: block;
   position: absolute;
@@ -455,9 +466,6 @@ section > nav[data-control="menu"] a:before {
   border-bottom: .5rem solid;
   transition: border-bottom .2s ease;
 }
-#main article ul li:active .show {
-  border-color: #DDD;
-}
 #main article ul li span.avatar {
   position: absolute;
   display: block;
@@ -560,12 +568,11 @@ section > nav[data-control="menu"] a:before {
   box-sizing: content-box;
 }
 #activity article header.beige button {
-  margin: .7rem 0;
-  padding: .3rem 1rem;
+  padding: 1.3rem 1.6rem 1.2rem 1.6rem;
   border: none;
   border-radius: 0;
   background: none;
-  font-size: .8em;
+  font-size: 1.4rem;
 }
 #activity article header.beige button:not(:last-child) {
   border-right: .1rem solid #BBB;
@@ -1178,17 +1185,9 @@ section.profile #settings li .caption {
 #chat:not([data-features~=attention]) .bolt {
   display: none;
 }
-#status input {
-  width: 100%;
-  height: 2.4rem;
-  font-size: 1rem;
-  margin-bottom: 1.5rem;
-}
+#status input,
 #nick input {
-  width: 100%;
-  height: 2.4rem;
-  font-size: 1rem;
-  margin-bottom: 1.5rem;
+  margin: .5rem 0 1.5rem 0;
 }
 section.profile article > div:not(#card) {
   padding: 0 1.6rem 0rem 1.6rem;
@@ -1344,6 +1343,9 @@ li[data-show] .avatar:after {
   left: 3.4rem;
   top: -.4rem;
 }
+li[data-show]:active .avatar:after {
+  border-color: #DDD;
+}
 section[data-show] header .avatar:after {
   right: 6rem;
   top: 1rem;
@@ -1374,20 +1376,6 @@ section:not([data-show]) header .avatar:after,
 body[data-online='false'] .avatar:after,
 ul:not([data-enabled='true']) .avatar:after {
   content: none;
-}
-
-.disHide #contacts li[data-show='na'] {
-  display: none !important;
-}
-
-#contacts li[data-show='na'] .status,
-#contacts li[data-show='na'] .show,
-#contacts li[data-muc='true'] .show {
-  display: none !important;
-}
-
-#chat[data-muc='true'] header .show {
-  display: none !important;
 }
 
 #settings nav #developer {
