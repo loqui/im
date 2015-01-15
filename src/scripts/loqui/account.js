@@ -195,7 +195,7 @@ var Account = function (core) {
   this.accountRender = function () {
     var ul = $('section#main ul[data-jid="' + (this.core.fullJid || this.core.user) + '"]');
     var li = $('aside#accounts li[data-jid="' + (this.core.fullJid || this.core.user) + '"]');
-    ul.show().siblings('ul').fadeOut(200);
+    ul.show().siblings('ul').hide();
     li.data('value', this.connector.isConnected() ? true : (this.core.enabled ? 'loading' : false));
     li.data('show', this.connector.presence.show);
     $('section#main header').css('border-color', this.connector.provider.color);
@@ -433,9 +433,11 @@ var Account = function (core) {
       contactPresenceRender(jid);
     } else {
       var ul = $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"]');
-      ul[0].dataset.enabled = this.enabled;
-      for (var [key, val] in this.core.chats) {
-        contactPresenceRender(val.jid);
+      if (ul.length > 0) {
+        ul[0].dataset.enabled = this.enabled;
+        for (var [key, val] in this.core.chats) {
+          contactPresenceRender(val.jid);
+        }
       }
     }
   }.bind(this);
