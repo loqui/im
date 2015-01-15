@@ -1275,10 +1275,10 @@ aside .cover .provider {
   text-transform: uppercase;
 }
 aside .cover .jid {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 600;
   bottom: 1.6rem;
-  max-width: calc(100% - 7.6rem);
+  max-width: calc(100% - 10rem);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;  
@@ -1295,6 +1295,14 @@ aside .cover .switch {
   top: auto;
   bottom: 2rem;
   right: 1.6rem;
+}
+aside .cover .settings {
+  color: white;
+  font-size: 3rem;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: 1.6rem 2.8rem;
 }
 aside .menu li {
   position: relative;
