@@ -185,10 +185,8 @@ var Account = function (core) {
   this.allRender = function () {
     this.accountRender();
     this.chatsRender();
-    setTimeout(function () {
-      this.avatarsRender();
-      this.presenceRender();
-    }.bind(this));
+    this.avatarsRender();
+    this.presenceRender();
   }
   
   // Changes some styles based on presence and connection status
@@ -213,6 +211,7 @@ var Account = function (core) {
     meSection.find('#card .name').text(address == this.core.user ? '' : address);
     meSection.find('#card .user').text(this.core.user);
     meSection.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + this.core.provider + '.svg'));
+    Accounts.unread(this.unread);
   }.bind(this);
   
   this.singleRender = function (chat, up) {
@@ -225,17 +224,8 @@ var Account = function (core) {
       }
       li.children('.lastMessage').html(chat.core.last.text ? App.emoji[Providers.data[this.core.provider].emoji].fy(chat.core.last.text) : (chat.core.media ? _('AttachedFile') : ''));
       li.children('.lastStamp date').html(chat.core.last.stamp ? Tools.convenientDate(chat.core.last.stamp).join('<br />') : '');
-      li[0].dataset.unread = chat.unread;
+      li[0].dataset.unread = chat.core.unread;
       li[0].dataset.hidden = chat.core.settings.hidden[0] ? 1 : 0;
-      var totalUnread = this.chats.reduceRight(function (prev, cur, i, all) {
-        return prev + cur.core.unread;
-      }, 0);
-      Lungo.Element.count('aside li[data-jid="' + this.core.fullJid + '"]', totalUnread);
-      if (ul.css('display') == 'block') {
-        Lungo.Element.count('section#main header nav button[data-view-article="chats"]', totalUnread);
-        Accounts.unread(totalUnread);
-      }
-      Accounts.unread();
     } else {
       this.allRender();
     }
@@ -302,10 +292,6 @@ var Account = function (core) {
       f.appendChild($('<article/>').attr('id', 'chats').addClass('scroll').append(ul)[0]);
     } else {
       oldUl.replaceWith(ul);    
-    }
-    Lungo.Element.count('aside li[data-jid="' + this.core.fullJid + '"]', totalUnread);
-    if (ul.css('display') == 'block') {
-      Lungo.Element.count('section#main header nav button[data-view-article="chats"]', totalUnread);
     }
   }.bind(this);
 
@@ -712,11 +698,11 @@ var Accounts = {
   // Total unread messages
   unread: function (partial) {
     var total = App.accounts.reduce(function(prev, cur){return prev + cur.unread}, 0);
-    Lungo.Element.count('section#chat header .menu', total);
+    Lungo.Element.count('section#chat header', total);
     if (partial) {
       total -= partial;
     }
-    Lungo.Element.count('section#main header .menu', total);
+    Lungo.Element.count('section#main header', total);
   }
   
 }

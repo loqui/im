@@ -931,7 +931,7 @@ section > nav[data-control="menu"] a:before {
   clear: both;
   width: calc(100vw);
   text-align: center;  
-  font-size: .8rem;
+  font-size: 1.2rem;
   font-weight: 100;
   font-style: italic;
   margin: .5rem 0;

@@ -252,11 +252,12 @@ var Chat = function (core, account) {
     if (this.core.unread) {
       this.account.unread -= this.core.unread;
       this.core.unread = 0;
-      Accounts.unread();
+      $('section#main ul[data-jid="' + (this.account.core.fullJid || this.account.core.user) + '"] li[data-jid="' + this.core.jid + '"]')[0].dataset.unread = 0;
+      //Accounts.unread();
     }
-    if(this.notification && 'close' in this.notification){
-        this.notification.close();
-        this.notification= null;
+    if (this.notification && 'close' in this.notification){
+      this.notification.close();
+      this.notification = null;
     }
     this.lastRead = this.core.lastRead;
     this.core.lastRead = Tools.localize(Tools.stamp());
