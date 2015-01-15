@@ -65,7 +65,7 @@ Template.chats.events({
     });
   },
   'click li': function (e, t) {
-    var jid = $(e.target).closest('li').data('jid');
+    var jid = $(e.target).closest('li')[0].dataset.jid;
     var account = Accounts.current;
     var chat = account.chatGet(jid);
     chat.show();
