@@ -29,6 +29,7 @@ input[type='search'] {
   margin: 2.5rem 0;
 }
 .buttongroup > button {
+  margin-top: .5rem;
   margin-bottom: .4rem;
   width: 100%;
 }
@@ -817,7 +818,7 @@ section > nav[data-control="menu"] a:before {
   display: block;
   padding: .5rem 1rem;
   font-weight: 100;
-  font-size: .9em;
+  font-size: 1.6rem;
   word-wrap: break-word;
   border-radius: .3rem;
 }
@@ -1072,10 +1073,10 @@ section.profile #card {
 section.profile #card span.avatar {
   position: absolute;
   display: block;
-  height: 7rem;
-  width: 7rem;
+  height: 10rem;
+  width: 10rem;
   top: 2rem;
-  left: calc(50% - 3.5rem);
+  left: calc(50% - 5rem);
 }
 section.profile #card span.avatar img {
   display: block;
@@ -1086,36 +1087,38 @@ section.profile #card span.avatar img {
 }
 section.profile #card span.name {
   display: block;
-  margin: 8rem 1rem 0 1rem;
+  margin: 11rem 1rem 0 1rem;
   max-width: calc(100% - 2rem);
   text-align: center;
-  font-size: 1.1rem;
-  line-height: 1rem;
+  font-size: 1.6rem;
+  line-height: 1.6rem;
   color: #222;
   font-weight: 300;
   text-shadow: 0 .05rem 0 white;
 }
 section.profile #card .user {
   display: block;
-  margin: .5rem 1rem 1rem 1rem;
+  margin: 1rem 1rem 1rem 1rem;
   max-width: calc(100% - 2rem);
   text-align: center;
   margin-bottom: 0;
-  font-size: .9rem;
-  line-height: 1rem;
+  font-size: 1.4rem;
   font-weight: 200;
   word-break: break-all;
   text-shadow: 0 .05rem 0 white;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;  
 }
 section.profile #card span.provider {
   position: absolute;
   display: block;
-  width: 2rem;
-  height: 2rem;
-  top: 2rem;
-  left: calc(50% + 2rem);
-  border: .3rem solid white;
-  border-radius: .6rem;
+  width: 3rem;
+  height:3rem;
+  top: 1.4rem;
+  left: calc(50% + 2.6rem);
+  border: .4rem solid white;
+  border-radius: .8rem;
   background-color: white;
   box-sizing: content-box;
 }
@@ -1152,14 +1155,14 @@ section.profile #settings ul {
 section.profile #settings li {
   display: block;
   position: relative;
-  height: 2.2rem;
+  height: 5.6rem;
 }
 section.profile #settings li .caption {
   display: block;
   position: relative;
-  top: .6rem;
+  top: 2rem;
   width: calc(100% - 4rem);
-  font-size: 1em;
+  font-size: 1.6rem;
 }
 #me:not([data-features~=nickChange]) #nick {
   display: none;
@@ -1201,21 +1204,22 @@ section.profile #settings li .caption {
   margin-bottom: 1.5rem;
 }
 section.profile article > div:not(#card) {
-  padding: 0 1rem;
+  padding: 0 1.6rem 0rem 1.6rem;
 /* border-top: .1rem solid #CCC; */
 }
 section.profile article > div:not(#card) h2 {
-  font-size: 1.1rem;
+  font-size: 1.6rem;
   color: #444;
   margin-bottom: 0;
 }
 section.profile article > div:not(#card) p {
-  font-weight: 200;
-  font-size: .9rem;
-  margin: .5rem 0 1rem 0;
+  font-weight: 100;
+  font-size: 1.4rem;
+  margin: .5rem 0 2rem 0;
+  color: #666;
 }
 section.profile article > div:not(#card) .buttongroup {
-  margin: .5rem 0;
+  margin: .5rem 0 1.6rem 0;
 }
 section.profile article > div:not(#card) ul li {
   list-style: none;
@@ -1476,7 +1480,7 @@ section:not([data-show]) footer .backchange {
 
 div.switch {
   position: absolute;
-  top: 1.6rem;
+  top: 2.1rem;
   right: 1.6rem;
   display: block;
   width: 5.4rem;
