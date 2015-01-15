@@ -448,17 +448,6 @@ section > nav[data-control="menu"] a:before {
 #activity article ul li span.unread {
   display: none;
 }
-.main li .show {
-  display: block;
-  position: absolute;
-  left: 3rem;
-  top: .5rem;
-  width: .6rem;
-  height: .6rem;
-  border: .25rem solid #F9F9F9;
-  border-radius: 50%;
-  box-sizing: content-box;
-}
 #main header {
   border-bottom: .5rem solid;
   transition: border-bottom .2s ease;
@@ -1330,36 +1319,53 @@ aside .menu hr {
   margin: 1rem 1.6rem;
 }
 
-li[data-show=a] .backchange,
-li[data-show=chat] .backchange,
-section[data-show=a] header .backchange,
-section[data-show=chat] header .backchange,
-section[data-show=a] footer .backchange,
-section[data-show=chat] footer .backchange {
+li[data-show] .avatar:after,
+li[data-show] .avatar:after,
+section[data-show] header .avatar:after,
+section[data-show] header .avatar:after,
+section[data-show] footer .avatar:after,
+section[data-show] footer .avatar:after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 3.4rem;
+  top: -.4rem;
+  width: 1rem;
+  height: 1rem;
+  border: .5rem solid white;
+  border-radius: 50%;
+  box-sizing: content-box;
+}
+li[data-show=a] .avatar:after,
+li[data-show=chat] .avatar:after,
+section[data-show=a] header .avatar:after,
+section[data-show=chat] header .avatar:after,
+section[data-show=a] footer .avatar:after,
+section[data-show=chat] footer .avatar:after {
   background-color: #2ECC71;
 }
-li[data-show=away] .backchange,
-section[data-show=away] header .backchange,
-section[data-show=away] footer .backchange {
+li[data-show=away] .avatar:after,
+section[data-show=away] header .avatar:after,
+section[data-show=away] footer .avatar:after {
   background-color: #3498DF;
 }
-li[data-show=xa] .backchange,
-section[data-show=xa] header .backchange,
-section[data-show=xa] footer .backchange {
+li[data-show=xa] .avatar:after,
+section[data-show=xa] header .avatar:after,
+section[data-show=xa] footer .avatar:after {
   background-color: #F1C40F;
 }
-li[data-show=dnd] .backchange,
-section[data-show=dnd] header .backchange,
-section[data-show=dnd] footer .backchange {
+li[data-show=dnd] .avatar:after,
+section[data-show=dnd] header .avatar:after,
+section[data-show=dnd] footer .avatar:after {
   background-color: #E95644;
 }
-li[data-show='na'] .backchange,
-li:not([data-show]) .backchange,
-section[data-show='na'] header .backchange,
-section:not([data-show]) header .backchange
-section[data-show='na'] footer .backchange,
-section:not([data-show]) footer .backchange {
-  display: none !important;
+li[data-show='na'] .avatar:after,
+li:not([data-show]) .avatar:after,
+section[data-show='na'] header .avatar:after,
+section:not([data-show]) header .avatar:after,
+section[data-show='na'] footer .avatar:after,
+section:not([data-show]) footer .avatar:after {
+  content: none;
 }
 
 .disHide #contacts li[data-show='na'] {

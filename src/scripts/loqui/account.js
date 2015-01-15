@@ -186,8 +186,8 @@ var Account = function (core) {
     this.accountRender();
     /*
     this.chatsRender();
-    this.presenceRender();
     */
+    this.presenceRender();
     setTimeout(function () {
       this.avatarsRender();
     }.bind(this));
@@ -412,7 +412,7 @@ var Account = function (core) {
           li.data('show', contact.presence.show || 'na');
           li.find('.status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));
           var section = $('section#chat');
-          if (section.data('jid') == contact.jid) {
+          if (section[0].dataset.jid == contact.jid) {
             section.data('show', contact.presence.show || 'na');
             section.find('header .status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));
           }
@@ -430,6 +430,20 @@ var Account = function (core) {
         }
       }
     }*/
+    var contactPresenceRender = function (jid) {
+      var contact = Lungo.Core.findByProperty(this.core.roster, 'jid', jid);
+      if (this.supports('show')) {
+        var li = $('section#main article ul li[data-jid="'+contact.jid+'"]');
+        li[0].dataset.show = contact.presence.show || 'na';
+      }
+    }.bind(this);
+    if (jid) {
+      contactPresenceRender(jid);
+    } else {
+      for (var [key, val] in this.core.chats) {
+        contactPresenceRender(val.jid);
+      }
+    }
   }
   
   // Render all the avatars

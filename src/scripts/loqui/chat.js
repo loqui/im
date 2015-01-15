@@ -202,6 +202,7 @@ var Chat = function (core, account) {
       }
     }
     $('#chat #messages span.lastRead').remove();
+    chat.account.allRender();
     this.core.settings.hidden[0]= false;
     this.save(true);
   }.bind(this);
