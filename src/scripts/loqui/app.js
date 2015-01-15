@@ -14,7 +14,7 @@ var App = {
   _settings: new Blaze.Var({}),
   _devsettings: new Blaze.Var({}),
   _avatars: new Blaze.Var({}),
-  _online: new Blaze.Var(true),
+  _online: new Blaze.Var(navigator.onLine),
   _notifications: new Blaze.Var([]),
   pathFiles: 'loqui/files/',
   pathBackup: 'loqui/backup/',
@@ -113,6 +113,7 @@ var App = {
   },
   set online (val) {
     this._online.set(val);
+    $('body')[0].dataset.online = val;
   },
   
   get avatars () {
@@ -257,6 +258,7 @@ var App = {
   
   // Bootstrap logins and so on
   start: function () {
+    App.online = App.online;
     // If there is already a configured account
     if (App.accounts.length) {
       App.alarmSet({});

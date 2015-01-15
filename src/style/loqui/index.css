@@ -1380,7 +1380,9 @@ li:not([data-show]) .avatar:after,
 section[data-show='na'] header .avatar:after,
 section:not([data-show]) header .avatar:after,
 section[data-show='na'] footer .avatar:after,
-section:not([data-show]) footer .avatar:after {
+section:not([data-show]) footer .avatar:after,
+body[data-online='false'] .avatar:after,
+ul:not([data-enabled='true']) .avatar:after {
   content: none;
 }
 

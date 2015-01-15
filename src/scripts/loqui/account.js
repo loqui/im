@@ -22,7 +22,7 @@ var Account = function (core) {
     if (val != 'loading') {
       this.core.enabled = val;
       if (!val) {
-        this.connector.disconnect();    
+        this.connector.disconnect();
       } else {
         this.connect();
       }
@@ -123,6 +123,7 @@ var Account = function (core) {
             Lungo.Notification.error(_('NoAuth'), _('NoAuthNotice'), 'signal', 5);
           }.bind(this),
           disconnected: function () {
+            App.audio('logout');
             this.connector.connected = false;
             if (App.online && App.settings.reconnect && this.enabled) {
               this.connect();
@@ -231,7 +232,7 @@ var Account = function (core) {
   this.chatsRender = function (f, click, hold) {
     var account = this;
     var oldUl = $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"]');
-    var ul = $('<ul />');
+    var ul = oldUl.clone().empty();
     var media = _('AttachedFile');
     ul[0].dataset.jid = account.core.fullJid;
     if (!f) {
@@ -430,11 +431,13 @@ var Account = function (core) {
     if (jid) {
       contactPresenceRender(jid);
     } else {
+      var ul = $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"]');
+      ul[0].dataset.enabled = this.enabled;
       for (var [key, val] in this.core.chats) {
         contactPresenceRender(val.jid);
       }
     }
-  }
+  }.bind(this);
   
   // Render all the avatars
   this.avatarsRender = function () {
