@@ -220,7 +220,7 @@ section > nav[data-control="menu"] {
   top: 5.4rem;
   left: 0;
   right: 0;
-  padding: 1rem 0 1.6rem 1rem;
+  padding: 0;
   z-index: -1;
 }
 section > nav[data-control="menu"].show {
@@ -233,7 +233,7 @@ section > nav[data-control="menu"] a {
   font-size: .8em;
   font-weight: 100;
   color: #FFF;
-  padding: .5rem 0 0 0;
+  padding: 1.6rem .8rem;
   text-align: center;
   text-transform: capitalize;
   box-sizing: content-box;
