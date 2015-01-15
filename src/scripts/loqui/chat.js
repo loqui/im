@@ -10,10 +10,7 @@ var Chat = function (core, account) {
   this.account = account;
   this.notification = null;
   this.lastRead = Tools.localize(Tools.stamp());
-  
-  this._unread = new Blaze.Var(this.core.unread);
-  this._last = new Blaze.Var(this.core.last);
-  
+  this.unread = this.core.unread;
   if (!('settings' in this.core)) {
     this.core.settings = {};
     $.extend(this.core.settings, App.defaults.Chat.core.settings);
@@ -21,22 +18,6 @@ var Chat = function (core, account) {
   if (!('info' in this.core)) {
     this.core.info = {};
   }
-  
-  this.__defineGetter__('last', function () {
-    return this._last.get();
-  });
-  this.__defineSetter__('last', function (val) {
-    this._last.set(val);
-    this.core.last = val;
-  });
-  
-  this.__defineGetter__('unread', function () {
-    return this._unread.get();
-  });
-  this.__defineSetter__('unread', function (val) {
-    this._unread.set(val);
-    this.core.unread = val;
-  });
   
   // Render last chunk of messages
   this.lastChunkRender = function () {
@@ -60,8 +41,8 @@ var Chat = function (core, account) {
           var li = $('<li/>');
           var frag = document.createDocumentFragment();
           li.addClass('chunk');
-          li[0].dataset.chunk = stIndex;
-          li[0].dataset.index = index;
+          li.data('chunk', stIndex);
+          li.data('index', index);
           var prevType, prevTime, prevAck;
           var prevRead = true;
           var lastRead = Tools.unstamp(chat.lastRead || chat.core.lastRead);
@@ -126,7 +107,7 @@ var Chat = function (core, account) {
     var chunkListSize = this.core.chunks.length;
     var blockIndex = this.core.chunks[chunkListSize - 1];
     var storageIndex;
-    chat.last = msg;
+    chat.core.last = msg;
     if (chunkListSize > 0) {
       Store.recover(blockIndex, function (chunk) {
         if (!chunk || chunk.length >= App.defaults.Chat.chunkSize) {
@@ -183,10 +164,11 @@ var Chat = function (core, account) {
       if (last.media) {
         var text = _('SentYou', {type: _('MediaType_' + last.media.type)});
       }
+
       if (pic) {
         pic.url.then(function (src) {
           if (src.slice(0, 1) == '/' && chat.core.muc) {
-            src = 'https://raw.githubusercontent.com/loqui/im/dev/src/img/goovatar.png';
+            src = 'https://raw.githubusercontent.com/loqui/im/dev/img/goovatar.png';
           }
           chat.notification = App.notify({ subject: subject, text: text, pic: src, from : chat.core.jid, callback: callback }, 'received');
         }.bind(chat));
@@ -195,14 +177,13 @@ var Chat = function (core, account) {
       }
       chat.core.lastAck = last.stamp;
       var section = $('section#chat');
-      if (chat.account.supports('receipts') && section.hasClass('show') && section[0].dataset.jid == last.from) {
-        var li = section.find('article#main ul li').last();
+      if (chat.account.supports('receipts') && section.hasClass('show') && section.data('jid') == last.from) {
+        var li = section.find('ul li').last();
         section.find('span.lastACK').remove();
         li.append($('<span/>').addClass('lastACK')[0]);
       }
     }
     $('#chat #messages span.lastRead').remove();
-    chat.account.allRender();
     this.core.settings.hidden[0]= false;
     this.save(true);
   }.bind(this);
@@ -212,15 +193,16 @@ var Chat = function (core, account) {
     var section = $('section#chat');
     var header = section.children('header');
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.jid);
-    section[0].dataset.jid = this.core.jid;
-    section[0].dataset.features = $('section#main')[0].dataset.features;
-    section[0].dataset.muc = this.core.muc || false;
-    section[0].dataset.mine = this.core.muc && this.core.info && this.core.info.owner == this.account.core.fullJid;
+    section.data('jid', this.core.jid);
+    section.data('features', $('section#main').data('features'));
+    //section.data('caps', contact && contact.presence.caps in App.caps ? App.caps[contact.presence.caps].features.join(' ') : 'false');
+    section.data('muc', this.core.muc || false);
+    section.data('mine', this.core.muc && this.core.info && this.core.info.owner == this.account.core.fullJid);
     header.children('.title').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(this.core.title));
     section.find('#plus').removeClass('show');
     section.find('#typing').hide();
     section.find('#messages').empty();
-    section[0].dataset.otr = 'OTR' in this;
+    section.data('otr', 'OTR' in this);
     Lungo.Router.section('chat');
     var avatarize = function (url) {
       header.children('.avatar').children('img').attr('src', url);
@@ -263,14 +245,19 @@ var Chat = function (core, account) {
           this.account.connector.presence.get(this.core.jid);
         }
         header.children('.status').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(status));
-        section[0].dataset.show = show;
+        section.data('show', show);
       }
       this.lastChunkRender();
     }.bind(this), 0);
-    this.unread = 0;
+    this.unread = this.core.unread;
+    if (this.core.unread) {
+      this.account.unread -= this.core.unread;
+      this.core.unread = 0;
+      Accounts.unread();
+    }
     if(this.notification && 'close' in this.notification){
-      this.notification.close();
-      this.notification = null;
+        this.notification.close();
+        this.notification= null;
     }
     this.lastRead = this.core.lastRead;
     this.core.lastRead = Tools.localize(Tools.stamp());
@@ -280,6 +267,8 @@ var Chat = function (core, account) {
   // Save or update this chat in store
   this.save = function (up) {
     this.account.save();
+    this.account.singleRender(this, up);
   }
     
 }
+

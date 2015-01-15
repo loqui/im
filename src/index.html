@@ -75,20 +75,9 @@
     </header>
     <article id="chats" class="scroll">
     <script type="text/spacebars" name="chats">
-      {{#if chats}}
-        <ul>
-        {{#each chats}}
-          <li data-jid="{{core.jid}}" data-unread="{{unread}}">
-            <span class="avatar"><img/></span>
-            <span class="name">{{core.title}}</span>
-            <span class="lastStamp"><time datetime="{{last.stamp}}">{{date last.stamp}}<br />{{time last.stamp}}</time></span>
-            <span class="lastMessage">{{{emojify last.text}}}</span>
-          </li>
-        {{/each}}
-        </ul>
-      {{else}}
-        <span class="noChats"><strong>{{_ "NoChats"}}</strong><p>{{_ "NoChatsExplanation"}}</p></span>
-      {{/if}}
+      {{#each accounts}}
+        <ul data-jid="{{data.core.fullJid}}"></ul>
+      {{/each}}
       <a class="floater" data-icon="pencil"></a>
     </script>
     </article>

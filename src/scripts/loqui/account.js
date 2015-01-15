@@ -6,11 +6,12 @@ var Account = function (core) {
   this.core = core;
   this.core.sendQ = this.core.sendQ || [];
   this.connector = new App.connectors[Providers.data[this.core.provider].connector.type](this);
-  this._chats = new Blaze.Var([]);
   this.OTR = {};
   this.contacts = {};
   this.names = [];
   this.jidToNameMap = {};
+  this.unread = 0;
+  this._chats = new Blaze.Var([]);
   this._enabled = new Blaze.Var(false);
   
   this.__defineGetter__('enabled', function () {
@@ -36,9 +37,6 @@ var Account = function (core) {
     this._chats.set(val);
   });
   
-  this.__defineGetter__('unread', function () {
-    return this.chats.reduce(function (prev, cur) {return prev + cur.unread}, 0);
-  });
   
   if ('OTR' in core) {
     $.extend(this.OTR, core.OTR);
@@ -184,37 +182,37 @@ var Account = function (core) {
   // Render everything for this account
   this.allRender = function () {
     this.accountRender();
-    /*
     this.chatsRender();
-    */
-    this.presenceRender();
     setTimeout(function () {
       this.avatarsRender();
+      this.presenceRender();
     }.bind(this));
   }
   
   // Changes some styles based on presence and connection status
   this.accountRender = function () {
+    var ul = $('section#main ul[data-jid="' + (this.core.fullJid || this.core.user) + '"]');
     var li = $('aside#accounts li[data-jid="' + (this.core.fullJid || this.core.user) + '"]');
+    ul.show().siblings('ul').fadeOut(200);
     li.data('value', this.connector.isConnected() ? true : (this.core.enabled ? 'loading' : false));
     li.data('show', this.connector.presence.show);
     $('section#main header').css('border-color', this.connector.provider.color);
     $('aside#accounts .cover').css('background-color', this.connector.provider.color);
     $('.floater').css('background-color', this.connector.provider.color);
-  }
+  }.bind(this);
   
   this.singleRender = function (chat, up) {
     var ul = $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"]');
     var li = ul.children('li[data-jid="' + chat.core.jid + '"]');
     if (li.length) {
       if (up) {
-        li.remove();
+        li.detach();
         ul.prepend(li);
       }
       li.children('.lastMessage').html(chat.core.last.text ? App.emoji[Providers.data[this.core.provider].emoji].fy(chat.core.last.text) : (chat.core.media ? _('AttachedFile') : ''));
-      li.children('.lastStamp').html(chat.core.last.stamp ? Tools.convenientDate(chat.core.last.stamp).join('<br />') : '');
-      li.data('unread', chat.core.unread ? 1 : 0).children('.unread').text(chat.core.unread);
-      li.data('hidden', chat.core.settings.hidden[0] ? 1 : 0);
+      li.children('.lastStamp date').html(chat.core.last.stamp ? Tools.convenientDate(chat.core.last.stamp).join('<br />') : '');
+      li[0].dataset.unread = chat.core.unread;
+      li[0].dataset.hidden = chat.core.settings.hidden[0] ? 1 : 0;
       var totalUnread = this.chats.reduceRight(function (prev, cur, i, all) {
         return prev + cur.core.unread;
       }, 0);
@@ -227,15 +225,15 @@ var Account = function (core) {
     } else {
       this.allRender();
     }
-  }
+  }.bind(this);
   
   // List all chats for this account
   this.chatsRender = function (f, click, hold) {
     var account = this;
     var oldUl = $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"]');
-    var ul = $("<ul />");
+    var ul = $('<ul />');
     var media = _('AttachedFile');
-    ul.data('jid', account.core.fullJid);
+    ul[0].dataset.jid = account.core.fullJid;
     if (!f) {
       ul.attr('style', oldUl.attr('style'));
     }
@@ -246,13 +244,14 @@ var Account = function (core) {
         var title = App.emoji[Providers.data[this.core.provider].emoji].fy(chat.title);
         var lastMsg = chat.last ? (chat.last.text ? (App.emoji[Providers.data[account.core.provider].emoji].fy(chat.last.text)) : (chat.last.media ? media : '')) : ' ';
         var lastStamp = chat.last.stamp ? Tools.convenientDate(chat.last.stamp).join('<br />') : '';
-        var li = $('<li/>').data('jid', chat.jid);
+        var li = $('<li/>');
+        li[0].dataset.jid = chat.jid;
+        li[0].dataset.unread = chat.unread;
         li.append($('<span/>').addClass('avatar').append('<img/>'));
         li.append($('<span/>').addClass('name').html(title));
         li.append($('<span/>').addClass('lastMessage').html(lastMsg));
-        li.append($('<span/>').addClass('lastStamp').html(lastStamp));
+        li.append($('<span/>').addClass('lastStamp').append($('<date/>').attr('datetime', chat.last.stamp).html(lastStamp)));
         li.append($('<span/>').addClass('show').addClass('backchange'));
-        li.append($('<span/>').addClass('unread').text(chat.unread));
         li.data('hidden', chat.settings.hidden[0] ? 1 : 0);
         li.data('unread', chat.unread ? 1 : 0);
         if (!chat.muc && account.supports('muc') && chat.jid.substring(1).match(/\-/)) {
@@ -261,17 +260,7 @@ var Account = function (core) {
         }
         li.data('muc', chat.muc ? true : false);
         li.bind('click', click ? function () {click(this)} : function () {
-          var ci = account.chatFind(this.dataset.jid);
-          if (ci >= 0) {
-            var chat = account.chats[ci];
-          } else {
-            var chat = new Chat({
-              jid: this.dataset.jid,
-              title: $(this).children('.name').text(),
-              chunks: []
-            }, account);
-          }
-          chat.show();
+          account.chatGet(this.dataset.jid).show();
         }).bind('hold', hold ? function () {hold(this)} : function () {
           window.navigator.vibrate([100]);
           if (this.dataset.jid.match(/\-/)) {
@@ -285,14 +274,14 @@ var Account = function (core) {
       }
     } else {
       var span = $('<span/>').addClass('noChats')
-        .append($('<strong/>').text(_('NoChats')))
-        .append($('<p/>').text(_('NoChatsExplanation')));
+      .append($('<strong/>').text(_('NoChats')))
+      .append($('<p/>').text(_('NoChatsExplanation')));
       span.on('click', function () {
         var account = Messenger.account();
         Activity('chat', account, null, {
           chats: false,
           groups: account.supports('muc')
-        });
+          });
       });
       ul.prepend(span);
     }
@@ -305,8 +294,7 @@ var Account = function (core) {
     if (ul.css('display') == 'block') {
       Lungo.Element.count('section#main header nav button[data-view-article="chats"]', totalUnread);
     }
-    this.unread = totalUnread;
-  }
+  }.bind(this);
 
   // List all contacts for this account
   this.contactsRender = function (f, click, selected) {
@@ -434,7 +422,9 @@ var Account = function (core) {
       var contact = Lungo.Core.findByProperty(this.core.roster, 'jid', jid);
       if (this.supports('show')) {
         var li = $('section#main article ul li[data-jid="'+contact.jid+'"]');
-        li[0].dataset.show = contact.presence.show || 'na';
+        if (li.length > 0) {
+          li[0].dataset.show = contact.presence.show || 'na';
+        }
       }
     }.bind(this);
     if (jid) {
@@ -450,7 +440,6 @@ var Account = function (core) {
   this.avatarsRender = function () {
     var account = this;
     var avatars = App.avatars;
-    $('#main .avatar img').removeAttr('src');
     $('span.avatar img:not([src])').each(function (i, el) {
       var closest = $(el).closest('[data-jid]');
       var jid = closest.length ? closest[0].dataset.jid : account.core.fullJid;
@@ -682,7 +671,7 @@ var Accounts = {
   },
   set current (i) {
     this._current.set(i);
-    this.current.allRender();
+    setTimeout(function () {this.current.allRender();}.bind(this), 0);
   },
 
   // Find the index of an account

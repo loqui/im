@@ -116,3 +116,7 @@ UI.registerHelper('time', function (ts) {
   }
   return string;
 });
+
+UI.registerHelper('json', function(context) {
+  return JSON.stringify(context);
+});
