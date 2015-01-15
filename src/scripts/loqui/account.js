@@ -213,7 +213,7 @@ var Account = function (core) {
       }
       li.children('.lastMessage').html(chat.core.last.text ? App.emoji[Providers.data[this.core.provider].emoji].fy(chat.core.last.text) : (chat.core.media ? _('AttachedFile') : ''));
       li.children('.lastStamp date').html(chat.core.last.stamp ? Tools.convenientDate(chat.core.last.stamp).join('<br />') : '');
-      li[0].dataset.unread = chat.core.unread;
+      li[0].dataset.unread = chat.unread;
       li[0].dataset.hidden = chat.core.settings.hidden[0] ? 1 : 0;
       var totalUnread = this.chats.reduceRight(function (prev, cur, i, all) {
         return prev + cur.core.unread;
@@ -254,13 +254,12 @@ var Account = function (core) {
         li.append($('<span/>').addClass('lastMessage').html(lastMsg));
         li.append($('<span/>').addClass('lastStamp').append($('<date/>').attr('datetime', chat.last.stamp).html(lastStamp)));
         li.append($('<span/>').addClass('show').addClass('backchange'));
-        li.data('hidden', chat.settings.hidden[0] ? 1 : 0);
-        li.data('unread', chat.unread ? 1 : 0);
+        li[0].dataset.unread = chat.unread;
         if (!chat.muc && account.supports('muc') && chat.jid.substring(1).match(/\-/)) {
           account.chats[i].core.muc = true;
           account.chats[i].save();
         }
-        li.data('muc', chat.muc ? true : false);
+        li[0].dataset.muc = chat.muc ? true : false;
         li.bind('click', click ? function () {click(this)} : function () {
           account.chatGet(this.dataset.jid).show();
         }).bind('hold', hold ? function () {hold(this)} : function () {

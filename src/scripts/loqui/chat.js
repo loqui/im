@@ -164,7 +164,6 @@ var Chat = function (core, account) {
       if (last.media) {
         var text = _('SentYou', {type: _('MediaType_' + last.media.type)});
       }
-
       if (pic) {
         pic.url.then(function (src) {
           if (src.slice(0, 1) == '/' && chat.core.muc) {
