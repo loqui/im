@@ -426,6 +426,11 @@ var Account = function (core) {
         if (li.length > 0) {
           li[0].dataset.show = contact.presence.show || 'na';
         }
+        var section = $('section#chat');
+        if (section[0].dataset.jid == contact.jid) {
+          section[0].dataset.show = contact.presence.show || 'na';
+          section.find('header .status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));
+        }
       }
     }.bind(this);
     if (jid) {

@@ -621,7 +621,7 @@ section > nav[data-control="menu"] a:before {
 }
 #chat header .status {
   position: absolute;
-  top: 2.6rem;
+  top: 2.8rem;
   right: 7.6rem;
   font-size: 1.2rem;
   font-weight: 100;
@@ -649,16 +649,11 @@ section > nav[data-control="menu"] a:before {
   position: absolute;
   top: -1rem;
   right: -1rem;
+}
+#chat header .avatar img {
   width: 7.2rem;
   height: 7.2rem;
   border-radius: 50%;
-  overflow: hidden;
-  background-color: #DDD;
-  transition: all 1s;
-  -webkit-transition: all 1s;
-}
-#chat header .avatar img {
-  width: 100%;
 }
 #footbox {
   position: absolute;
@@ -1335,52 +1330,47 @@ aside .menu hr {
   margin: 1rem 1.6rem;
 }
 
-li[data-show] .avatar:after,
-li[data-show] .avatar:after,
-section[data-show] header .avatar:after,
-section[data-show] header .avatar:after,
-section[data-show] footer .avatar:after,
-section[data-show] footer .avatar:after {
+[data-show] .avatar:after {
   content: '';
   display: block;
   position: absolute;
-  left: 3.4rem;
-  top: -.4rem;
   width: 1rem;
   height: 1rem;
   border: .5rem solid white;
   border-radius: 50%;
   box-sizing: content-box;
 }
+li[data-show] .avatar:after {
+  left: 3.4rem;
+  top: -.4rem;
+}
+section[data-show] header .avatar:after {
+  right: 6rem;
+  top: 1rem;
+  border-color: #222;
+}
 li[data-show=a] .avatar:after,
 li[data-show=chat] .avatar:after,
 section[data-show=a] header .avatar:after,
-section[data-show=chat] header .avatar:after,
-section[data-show=a] footer .avatar:after,
-section[data-show=chat] footer .avatar:after {
+section[data-show=chat] header .avatar:after {
   background-color: #2ECC71;
 }
 li[data-show=away] .avatar:after,
-section[data-show=away] header .avatar:after,
-section[data-show=away] footer .avatar:after {
+section[data-show=away] header .avatar:after {
   background-color: #3498DF;
 }
 li[data-show=xa] .avatar:after,
-section[data-show=xa] header .avatar:after,
-section[data-show=xa] footer .avatar:after {
+section[data-show=xa] header .avatar:after {
   background-color: #F1C40F;
 }
 li[data-show=dnd] .avatar:after,
-section[data-show=dnd] header .avatar:after,
-section[data-show=dnd] footer .avatar:after {
+section[data-show=dnd] header .avatar:after {
   background-color: #E95644;
 }
 li[data-show='na'] .avatar:after,
 li:not([data-show]) .avatar:after,
 section[data-show='na'] header .avatar:after,
 section:not([data-show]) header .avatar:after,
-section[data-show='na'] footer .avatar:after,
-section:not([data-show]) footer .avatar:after,
 body[data-online='false'] .avatar:after,
 ul:not([data-enabled='true']) .avatar:after {
   content: none;

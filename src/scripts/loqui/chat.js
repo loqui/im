@@ -192,11 +192,11 @@ var Chat = function (core, account) {
     var section = $('section#chat');
     var header = section.children('header');
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.jid);
-    section.data('jid', this.core.jid);
-    section.data('features', $('section#main').data('features'));
-    //section.data('caps', contact && contact.presence.caps in App.caps ? App.caps[contact.presence.caps].features.join(' ') : 'false');
-    section.data('muc', this.core.muc || false);
-    section.data('mine', this.core.muc && this.core.info && this.core.info.owner == this.account.core.fullJid);
+    section[0].dataset.jid = this.core.jid;
+    section[0].dataset.features = $('section#main').data('features');
+    //section[0].dataset.caps = contact && contact.presence.caps in App.caps ? App.caps[contact.presence.caps].features.join(' ') : 'false';
+    section[0].dataset.muc = this.core.muc || false;
+    section[0].dataset.mine = this.core.muc && this.core.info && this.core.info.owner == this.account.core.fullJid;
     header.children('.title').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(this.core.title));
     section.find('#plus').removeClass('show');
     section.find('#typing').hide();
@@ -238,13 +238,13 @@ var Chat = function (core, account) {
           header.children('.status').text(' ');
         }
       } else {
-        var show = this.account.connector.isConnected() && contact ? (contact.presence.show || 'na') : 'na';
+        var show = contact ? (contact.presence.show || 'na') : 'na';
         var status = contact ? (contact.presence.status || _('show' + show)) : ' ';
         if (this.account.connector.presence.get) {
           this.account.connector.presence.get(this.core.jid);
         }
         header.children('.status').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(status));
-        section.data('show', show);
+        section[0].dataset.show = show;
       }
       this.lastChunkRender();
     }.bind(this), 0);
