@@ -195,6 +195,7 @@ var Account = function (core) {
     ul.show().siblings('ul').hide();
     $('section#main header').css('border-color', this.connector.provider.color);
     $('aside#accounts .cover').css('background-color', this.connector.provider.color);
+    $('aside#accounts .cover .avatar img').removeAttr('src');
     $('.floater').css('background-color', this.connector.provider.color);
     var vCard = $(this.connector.vcard);
     var address = ( vCard.length && vCard.find('FN').length ) ? vCard.find('FN').text() : this.core.user;
