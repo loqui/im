@@ -46,7 +46,7 @@ UI.registerHelper('chats', function () {
 
 UI.registerHelper('accounts', function () {
   return App.accounts.map(function(x, i) {
-    return {data: x, index: i}
+    return {data: x, index: i, enabled: App.online && x.enabled}
   });
 });
 
