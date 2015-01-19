@@ -25,11 +25,11 @@ var Menu = {
       Messenger.mucProfile();
     },
     mucClear: function (obj) {
-      var gid = $(obj).closest('section').data('jid');
+      var gid = $(obj).closest('section')[0].dataset.jid;
       Messenger.mucClear(gid);
     },
     mucExit: function (obj) {
-      var gid = $(obj).closest('section').data('jid');
+      var gid = $(obj).closest('section')[0].dataset.jid;
       Messenger.mucExit(gid);
     },
     mucCreateForm: function (obj) {
@@ -79,7 +79,7 @@ var Menu = {
       var server = form.find('[name=custom]').val() || form.find('[name=server]').val();
       var ul = form.find('output').children('ul').first().empty();
       var mucJoin = function (e) {
-        var jid = $(this).parent().data('jid');
+        var jid = $(this).parent()[0].dataset.jid;
         var title = $(this).siblings('span').text();
         account.connector.muc.join(jid, title);
       }
@@ -87,7 +87,8 @@ var Menu = {
         account.connector.muc.explore(server,
           function (jid, name) {
             Tools.log('GOT', jid, name);
-            var html = $('<li/>').data('jid', jid).append($('<span/>').text(name)).append($('<a/>').text(_('Join')).on('click', mucJoin));
+            var html = $('<li/>').append($('<span/>').text(name)).append($('<a/>').text(_('Join')).on('click', mucJoin));
+            html[0].dataset.jid= jid;
             ul.append(html);
             Lungo.Notification.hide();
           },
@@ -109,7 +110,9 @@ var Menu = {
           if (ex.length > 0) {
             ex.remove();
           } else {
-            listBox.prepend($('<li/>').data('jid', jid).text(name));
+            var item= $('<li/>').text(name);
+            item[0].dataset.jid= jid;
+            listBox.prepend(item);
           }
         }
       } else {
@@ -128,7 +131,7 @@ var Menu = {
       if (typeof obj == 'object') {
         var obj = $(obj);
         cb = function (jid, name) {
-          account.connector.muc.invite($('section#muc').data('jid'), [jid], $('section#muc').find('span.name').text());
+          account.connector.muc.invite($('section#muc')[0].dataset.jid, [jid], $('section#muc').find('span.name').text());
           Lungo.Router.section('back');
           Lungo.Router.section('back');
           Lungo.Notification.success(_('MucInvited', {name: name}), null, 'check', 3);
@@ -155,7 +158,7 @@ var Menu = {
       }
     },
     contactRemove: function(obj) {
-      var jid = $(obj).closest('section').data('jid');
+      var jid = $(obj).closest('section')[0].dataset.jid;
       Messenger.contactRemove(jid);
     },
     chatAdd: function (obj) {
@@ -169,15 +172,15 @@ var Menu = {
       Lungo.Router.article('activity', 'search');
     },
     chatRemove: function (obj) {
-      var jid = $(obj).closest('section').data('jid');
+      var jid = $(obj).closest('section')[0].dataset.jid;
       Messenger.chatRemove(jid);
     },
     chatInfo: function (obj) {
-      var muc = ($(obj).closest('section').data('muc') == 'true') ? true : false;
+      var muc = ($(obj).closest('section')[0].dataset.muc == 'true') ? true : false;
       Menu.show(muc ? 'muc' : 'contact');
     },
     accountRemove: function(obj) {
-      var jid = $(obj).closest('section').data('jid');
+      var jid = $(obj).closest('section')[0].dataset.jid;
       Messenger.accountRemove(jid);
     },
     plus: function () {
@@ -200,7 +203,7 @@ var Menu = {
             var emoji = emojiList[i];
             var li = $('<li/>')
               .on('tap', function () {
-                Plus.emoji($(this).children('img').data('emoji'));
+                Plus.emoji($(this).children('img')[0].dataset.emoji);
               });
             var img = $('<img/>');
             account.connector.emojiRender(img, emoji);
@@ -242,7 +245,7 @@ var Menu = {
       account.OTRMenu();
     },
     switchOTR: function(obj) {
-      var jid = $(obj).closest('section').data('jid');
+      var jid = $(obj).closest('section')[0].dataset.jid;
       Plus.switchOTR(jid);
     },
     purchase: function () {

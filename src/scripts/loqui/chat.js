@@ -41,8 +41,8 @@ var Chat = function (core, account) {
           var li = $('<li/>');
           var frag = document.createDocumentFragment();
           li.addClass('chunk');
-          li.data('chunk', stIndex);
-          li.data('index', index);
+          li[0].dataset.chunk= stIndex;
+          li[0].dataset.index= index;
           var prevType, prevTime, prevAck;
           var prevRead = true;
           var lastRead = Tools.unstamp(chat.lastRead || chat.core.lastRead);
@@ -176,7 +176,7 @@ var Chat = function (core, account) {
       }
       chat.core.lastAck = last.stamp;
       var section = $('section#chat');
-      if (chat.account.supports('receipts') && section.hasClass('show') && section.data('jid') == last.from) {
+      if (chat.account.supports('receipts') && section.hasClass('show') && section[0].dataset.jid == last.from) {
         var li = section.find('ul li').last();
         section.find('span.lastACK').remove();
         li.append($('<span/>').addClass('lastACK')[0]);
@@ -193,7 +193,7 @@ var Chat = function (core, account) {
     var header = section.children('header');
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.jid);
     section[0].dataset.jid = this.core.jid;
-    section[0].dataset.features = $('section#main').data('features');
+    section[0].dataset.features = $('section#main')[0].dataset.features;
     //section[0].dataset.caps = contact && contact.presence.caps in App.caps ? App.caps[contact.presence.caps].features.join(' ') : 'false';
     section[0].dataset.muc = this.core.muc || false;
     section[0].dataset.mine = this.core.muc && this.core.info && this.core.info.owner == this.account.core.fullJid;
@@ -201,7 +201,7 @@ var Chat = function (core, account) {
     section.find('#plus').removeClass('show');
     section.find('#typing').hide();
     section.find('#messages').empty();
-    section.data('otr', 'OTR' in this);
+    section[0].dataset.otr= ('OTR' in this);
     Lungo.Router.section('chat');
     var avatarize = function (url) {
       header.children('.avatar').children('img').attr('src', url);

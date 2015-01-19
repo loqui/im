@@ -480,13 +480,13 @@ App.connectors['coseme'] = function (account) {
   }
 
   this.events.onContactTyping = function (from) {
-    if (from == $('section#chat').data('jid')) {
+    if (from == $('section#chat')[0].dataset.jid) {
       $("section#chat #typing").show();
     }
   }
 
   this.events.onContactPaused = function (from) {
-    if (from == $('section#chat').data('jid')) {
+    if (from == $('section#chat')[0].dataset.jid) {
       $("section#chat #typing").hide();
     }
   }
@@ -501,7 +501,7 @@ App.connectors['coseme'] = function (account) {
     chat.core.lastAck = Tools.localize(Tools.stamp());
     chat.save();
     var section = $('section#chat');
-    if (section.hasClass('show') && section.data('jid') == from) {
+    if (section.hasClass('show') && section[0].dataset.jid == from) {
       var li = section.find('article#main ul li').last();
       section.find('span.lastACK').remove();
       li.append($('<span/>').addClass('lastACK')[0]);
@@ -589,7 +589,7 @@ App.connectors['coseme'] = function (account) {
       if (!chat.core.participants || (JSON.stringify(chat.core.participants) != JSON.stringify(participants))) {
         chat.core.participants = participants;
         chat.save();
-        if ($('section#chat').hasClass('show') && $('section#chat').data('jid') == chat.core.jid) {
+        if ($('section#chat').hasClass('show') && $('section#chat')[0].dataset.jid == chat.core.jid) {
           chat.show();
         }
       }
@@ -603,7 +603,7 @@ App.connectors['coseme'] = function (account) {
       var chat = account.chats[ci];
       chat.core.participants = chat.core.participants.concat(participants);
       chat.save();
-      if ($('section#chat').hasClass('show') && $('section#chat').data('jid') == chat.core.jid) {
+      if ($('section#chat').hasClass('show') && $('section#chat')[0].dataset.jid == chat.core.jid) {
         chat.show();
       }
     }
@@ -764,7 +764,7 @@ App.connectors['coseme'] = function (account) {
         Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', parseInt(lastSeen) < 300 ? 'a' : 'away');
         var present= (parseInt(lastSeen) < 1);
         contact.presence.show = present ? 'a' : 'away';
-        account.presenceRender(contact);
+        account.presenceRender(jid);
         var chatSection = $('section#chat[data-jid="' + jid + '"]');
         if (chatSection.length) {
           var status = chatSection.find('header .status');
@@ -779,7 +779,7 @@ App.connectors['coseme'] = function (account) {
     if (contact) {
       Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', 'a');
       contact.presence.show = 'a';
-      account.presenceRender(contact);
+      account.presenceRender(jid);
 
       var chatSection = $('section#chat[data-jid="' + jid + '"]');
       if (chatSection.length) {
@@ -794,7 +794,7 @@ App.connectors['coseme'] = function (account) {
     if (contact) {
       Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', 'away');
       contact.presence.show = 'away';
-      account.presenceRender(contact);
+      account.presenceRender(jid);
 
       var chatSection = $('section#chat[data-jid="' + jid + '"]');
       if (chatSection.length) {
@@ -973,9 +973,12 @@ App.logForms['coseme'] = function (provider, article) {
               .css('width', 'calc(100% - 8rem)')
             );
           var smsButtons = $('<div/>').addClass('buttongroup');
-          var smsReq = $('<button/>').addClass('smsReq').data('role', 'submit').css('backgroundColor', data.color).text(_('SMSRequest'));
-          var voiceReq = $('<button/>').addClass('voiceReq').data('role', 'submit').css('backgroundColor', data.color).text(_('VoiceRequest'));
-          var codeReady = $('<button/>').addClass('codeReady').data('role', 'submit').css('backgroundColor', data.color).text(_('codeReady'));
+          var smsReq = $('<button/>').addClass('smsReq').css('backgroundColor', data.color).text(_('SMSRequest'));
+          smsReq[0].dataset.role= 'submit';
+          var voiceReq = $('<button/>').addClass('voiceReq').css('backgroundColor', data.color).text(_('VoiceRequest'));
+          voiceReq[0].dataset.role= 'submit';
+          var codeReady = $('<button/>').addClass('codeReady').css('backgroundColor', data.color).text(_('codeReady'));
+          codeReady[0].dataset.role= 'submit';
           var back = $('<button/>').addClass('back').text(_('GoBack'));
           smsButtons.append(smsReq).append(voiceReq).append(codeReady).append(back);
           sms.append(smsButtons);
@@ -1024,7 +1027,8 @@ App.logForms['coseme'] = function (provider, article) {
               .attr('placeholder', '123456')
             );
             var recodeButtons = $('<div/>').addClass('buttongroup');
-            var valCode = $('<button/>').addClass('valCode').data('role', 'submit').css('backgroundColor', data.color).text(_('recodeRequest'));
+            var valCode = $('<button/>').addClass('valCode').css('backgroundColor', data.color).text(_('recodeRequest'));
+            valCode[0].dataset.role= 'submit';
             var sback = $('<button/>').addClass('sback').text(_('GoBack'));
             recodeButtons.append(valCode).append(sback);
             recode.append(recodeButtons);
@@ -1059,7 +1063,7 @@ App.logForms['coseme'] = function (provider, article) {
         if (cc && user) {
           Lungo.Notification.show('envelope', _('SMSsending'));
           var codeGet = function (deviceId) {
-            $(article).data('deviceId', deviceId);
+            $(article)[0].dataset.deviceId= deviceId;
             var onsent = function (data) {
               Tools.log(data);
               if (data.status == 'sent') {
@@ -1111,7 +1115,7 @@ App.logForms['coseme'] = function (provider, article) {
           if (cc && user) {
             Lungo.Notification.show('phone', _('Voicesending'));
             var codeGet = function (deviceId) {
-              $(article).data('deviceId', deviceId);
+              $(article)[0].dataset.deviceId= deviceId;
               var onsent = function (data) {
                 Tools.log(data);
                 if (data.status == 'sent') {
@@ -1433,9 +1437,8 @@ App.emoji['coseme'] = {
   
   render: function (img, emoji) {
     var code = typeof emoji[1] == 'string' ? emoji[1] : emoji[1].join('-');
-    img
-      .attr('src', '/img/emoji/coseme/' + code + '.png')
-      .data('emoji', String.fromCodePoint(parseInt(emoji[1], 16)));
+    img.attr('src', '/img/emoji/coseme/' + code + '.png');
+    img[0].dataset.emoji= String.fromCodePoint(parseInt(emoji[1], 16));
   }
   
 }

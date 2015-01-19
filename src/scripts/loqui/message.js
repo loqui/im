@@ -94,12 +94,12 @@ var Message = function (account, core, options) {
     var message = this;
     var chat = this.chat;
     chat.messageAppend.push({msg: message.core}, function (blockIndex) {
-      if ($('section#chat').data('jid') == chat.core.jid && $('section#chat').hasClass('show')) {
+      if ($('section#chat')[0].dataset.jid == chat.core.jid && $('section#chat').hasClass('show')) {
         var ul = $('section#chat ul#messages');
         var li = ul.children('li[data-chunk="' + blockIndex + '"]');
         var last = li.children('div').last();
-        var avatarize = last.data('from') != message.core.from;
-        var timeDiff = Tools.unstamp(message.core.stamp) - Tools.unstamp(last.data('stamp')) > 300000;
+        var avatarize = last[0].dataset.from != message.core.from;
+        var timeDiff = Tools.unstamp(message.core.stamp) - Tools.unstamp(last[0].dataset.stamp) > 300000;
         var conv = Tools.convenientDate(message.core.stamp);
         if (li.length) {
           if (timeDiff) {
@@ -107,7 +107,8 @@ var Message = function (account, core, options) {
           }
           li.append(message.preRender(false, avatarize));
         } else {
-          var li = $('<li/>').addClass('chunk').data('chunk', blockIndex);
+          var li = $('<li/>').addClass('chunk');
+          li[0].dataset.chunk= blockIndex;
           if (timeDiff) {
             li.append($('<time/>').attr('datetime', message.core.stamp).text(_('DateTimeFormat', {date: conv[0], time: conv[1]}))[0]);
           }
@@ -137,11 +138,11 @@ var Message = function (account, core, options) {
       msg: message.core,
       delay: !account.connector.isConnected()
     }, function (blockIndex) {
-      if ($('section#chat').data('jid') == to && $('section#chat').hasClass('show')) {
+      if ($('section#chat')[0].dataset.jid == to && $('section#chat').hasClass('show')) {
         var ul = $('section#chat ul#messages');
         var li = ul.children('li[data-chunk="' + blockIndex + '"]');
         var last = li.children('div').last();
-        var timeDiff = Tools.unstamp(message.core.stamp) - Tools.unstamp(last.data('stamp')) > 300000;
+        var timeDiff = Tools.unstamp(message.core.stamp) - Tools.unstamp(last[0].dataset.stamp) > 300000;
         var conv = Tools.convenientDate(message.core.stamp);
         if (li.length) {
           if (timeDiff) {
@@ -149,7 +150,7 @@ var Message = function (account, core, options) {
           }
           li.append(message.preRender());
         } else {
-          var li = $('<li/>').addClass('chunk').data('chunk', blockIndex);
+          var li = $('<li/>').addClass('chunk')[0].dataset.chunk= blockIndex;
           if (timeDiff) {
             li.append($('<time/>').attr('datetime', message.core.stamp).text(_('DateTimeFormat', {date: conv[0], time: conv[1]}))[0]);
           }
@@ -170,8 +171,8 @@ var Message = function (account, core, options) {
       var html = App.emoji[Providers.data[this.account.core.provider].emoji].fy(Tools.urlHL(Tools.HTMLescape(this.core.text)));
     } else if (this.core.media) {
       var html = $('<img/>').attr('src', this.core.media.thumb);
-      html.dataset.url = this.core.media.url;
-      html.dataset.downloaded = this.core.media.downloaded || false;
+      html[0].dataset.url = this.core.media.url;
+      html[0].dataset.downloaded = this.core.media.downloaded || false;
       switch (this.core.media.type) {
         case 'url':
           html.addClass('maps');
@@ -204,7 +205,7 @@ var Message = function (account, core, options) {
             if (ext == 'aac') {
               ext = 'mp3';
             }
-            var localUrl = App.pathFiles + $(e.target).closest('[data-stamp]').data('stamp').replace(/[-:]/g, '') + url.split('/').pop().substring(0, 5).toUpperCase() + '.' + ext;
+            var localUrl = App.pathFiles + $(e.target).closest('[data-stamp]')[0].dataset.stamp.replace(/[-:]/g, '') + url.split('/').pop().substring(0, 5).toUpperCase() + '.' + ext;
             if (img.dataset.downloaded == 'true') {
               Store.SD.recover(localUrl, function (blob) {
                 open(blob);
@@ -213,7 +214,7 @@ var Message = function (account, core, options) {
               Tools.fileGet(url, function (blob) {
                 Store.SD.save(localUrl, blob, function () {
                   open(blob);
-                  var index = [$(img).closest('li[data-chunk]').data('chunk'), $(img).closest('div[data-index]').data('index')];
+                  var index = [$(img).closest('li[data-chunk]')[0].dataset.chunk, $(img).closest('div[data-index]')[0].dataset.index];
                   Store.recover(index[0], function (chunk) {
                     Tools.log(chunk, index);
                     chunk[index[1]].media.downloaded = true;
@@ -247,7 +248,7 @@ var Message = function (account, core, options) {
     var day = Tools.day(this.core.stamp);
     var div = $('<div/>');
     div[0].dataset.type = type;
-    var index = index || parseInt($('section#chat ul#messages li > div').last().data('index')) + 1;
+    var index = index || parseInt($('section#chat ul#messages li > div').last()[0].dataset.index) + 1;
     index = index >= App.defaults.Chat.chunkSize ? 0 : index;
     div[0].dataset.index = index;
     div[0].dataset.stamp = this.core.stamp;
