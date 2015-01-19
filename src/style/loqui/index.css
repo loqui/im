@@ -90,16 +90,14 @@ section > article.simple > div > p {
 }
 #welcome h1 {
   position: absolute;
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-style: italic;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 1rem;
-  margin-bottom: 3rem;
+  margin-bottom: 9rem;
   text-align: center;
   color: white;
-  background-color: transparent;
 }
 section.setup img[src^='img/providers']{
   position: absolute;

@@ -38,6 +38,10 @@ Template.providers_setup.helpers({
   }
 });
 
+UI.registerHelper('app', function () {
+  return App;
+});
+
 UI.registerHelper('chats', function () {
   if (App.accounts.length) {
     return [].concat(Accounts.current.chats).reverse();
@@ -65,8 +69,8 @@ UI.registerHelper('providers', function () {
   return providers;
 });
 
-UI.registerHelper('_', function (string) {
-  return _(string);
+UI.registerHelper('_', function (string, data) {
+  return _(string, {app: data});
 });
 
 UI.registerHelper('emojify', function (string) {

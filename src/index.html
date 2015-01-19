@@ -21,7 +21,9 @@
 <body class="app" data-online="false">
   <section id="welcome" data-transition="horizontal">
     <article id="main" class="scroll">
-      <h1 data-l10n-id="WelcomeTo" class="hidden">Welcome to Loqui!</h1>
+      <script type="text/spacebars" name="welcome">
+        <h1>{{_ 'WelcomeTo' app.name}}</h1>
+      </script>
     </article>
   </section>
   <section id="providers" data-transition="horizontal" class="form">
