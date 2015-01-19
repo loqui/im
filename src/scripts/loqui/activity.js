@@ -58,9 +58,9 @@ var Activity = function (action, account, content, options) {
     },
     invite: function (f, account, content, options) {
       var click = function (t) {
-        var t = $(t);
+        t = $(t);
         t.toggleClass('selected');
-        content(t.data('jid'), t.find('.name').text());
+        content(t[0].dataset.jid, t.find('.name').text());
       }
       account.contactsRender(f, click, options.selected);
     }

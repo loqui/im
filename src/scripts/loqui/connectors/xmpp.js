@@ -337,7 +337,7 @@ App.connectors['XMPP'] = function (account) {
             break;
           }
         }
-        if ($('section#chat').hasClass('show') && $('section#chat').data('jid') == chat.core.jid) {
+        if ($('section#chat').hasClass('show') && $('section#chat')[0].dataset.jid == chat.core.jid) {
           chat.show();
         }
         chat.save();
@@ -432,9 +432,9 @@ App.connectors['XMPP'] = function (account) {
       msg.receive();
     }
     if (account.supports('csn') && App.settings.csn) {
-      if(composing && Strophe.getBareJidFromJid(from) == $('section#chat').data('jid')){
+      if(composing && Strophe.getBareJidFromJid(from) == $('section#chat')[0].dataset.jid){
         $("section#chat #typing").show();
-      }else if(paused && Strophe.getBareJidFromJid(from) == $('section#chat').data('jid')){
+      }else if(paused && Strophe.getBareJidFromJid(from) == $('section#chat')[0].dataset.jid){
         $("section#chat #typing").hide();
       }
     }
@@ -469,7 +469,7 @@ App.connectors['XMPP'] = function (account) {
     chat.core.lastAck = Tools.localize(Tools.stamp());
     chat.save();
     var section = $('section#chat');
-    if (section.hasClass('show') && section.data('jid') == from) {
+    if (section.hasClass('show') && section[0].dataset.jid == from) {
       var li = section.find('article#main ul li').last();
       section.find('span.lastACK').remove();
       li.append($('<span/>').addClass('lastACK')[0]);
@@ -687,9 +687,8 @@ App.emoji['XMPP'] = {
   },
   
   render: function (img, emoji) {
-    img
-      .attr('src', 'img/emoji/xmpp/' + emoji[0] + '.png')
-      .data('emoji', emoji[1]);
+    img.attr('src', 'img/emoji/xmpp/' + emoji[0] + '.png');
+    img[0].dataset.emoji= emoji[1];
   }
   
 }
@@ -749,9 +748,8 @@ App.emoji['FB'] = {
   },
   
   render: function (img, emoji) {
-    img
-      .attr('src', 'img/emoji/fb/' + emoji[0] + '.png')
-      .data('emoji', emoji[1]);
+    img.attr('src', 'img/emoji/fb/' + emoji[0] + '.png')
+    img[0].dataset.emoji=emoji[1];
   }
   
 }
@@ -805,9 +803,8 @@ App.emoji['GTALK'] = {
   },
   
   render: function (img, emoji) {
-    img
-      .attr('src', 'img/emoji/gtalk/' + emoji[0] + '.gif')
-      .data('emoji', emoji[1]);
+    img.attr('src', 'img/emoji/gtalk/' + emoji[0] + '.gif')
+    img[0].dataset.emoji= emoji[1];
   }
   
 }

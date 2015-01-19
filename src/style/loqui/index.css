@@ -573,6 +573,8 @@ section > nav[data-control="menu"] a:before {
   border-radius: 0;
   background: none;
   font-size: 1.4rem;
+  width: 50%;
+  padding: 1.3rem 0rem 1.2rem;
 }
 #activity article header.beige button:not(:last-child) {
   border-right: .1rem solid #BBB;

@@ -124,7 +124,7 @@ var Account = function (core) {
           }.bind(this),
           disconnected: function () {
             App.audio('logout');
-            this.account.presenceRender();
+            this.presenceRender();
             this.connector.connected = false;
             if (App.online && App.settings.reconnect && this.enabled) {
               this.connect();
@@ -192,10 +192,7 @@ var Account = function (core) {
   // Changes some styles based on presence and connection status
   this.accountRender = function () {
     var ul = $('section#main ul[data-jid="' + (this.core.fullJid || this.core.user) + '"]');
-    var li = $('aside#accounts li[data-jid="' + (this.core.fullJid || this.core.user) + '"]');
     ul.show().siblings('ul').hide();
-    li.data('value', this.connector.isConnected() ? true : (this.core.enabled ? 'loading' : false));
-    li.data('show', this.connector.presence.show);
     $('section#main header').css('border-color', this.connector.provider.color);
     $('aside#accounts .cover').css('background-color', this.connector.provider.color);
     $('.floater').css('background-color', this.connector.provider.color);
@@ -257,6 +254,7 @@ var Account = function (core) {
         li.append($('<span/>').addClass('lastStamp').append($('<date/>').attr('datetime', chat.last.stamp).html(lastStamp)));
         li.append($('<span/>').addClass('show').addClass('backchange'));
         li[0].dataset.unread = chat.unread;
+        li[0].dataset.hidden= chat.settings.hidden[0] ? 1 : 0;
         if (!chat.muc && account.supports('muc') && chat.jid.substring(1).match(/\-/)) {
           account.chats[i].core.muc = true;
           account.chats[i].save();
@@ -438,7 +436,9 @@ var Account = function (core) {
       if (ul.length > 0) {
         ul[0].dataset.enabled = this.enabled;
         for (var [key, val] in this.core.chats) {
-          contactPresenceRender(val.jid);
+          if(!val.muc){
+            contactPresenceRender(val.jid);
+          }
         }
       }
     }

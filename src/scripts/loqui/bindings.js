@@ -11,12 +11,12 @@ $('document').ready(function(){
   
   setTimeout(function(){
     $('input[data-l10n-placeholder]').each(function () {
-      var original = $(this).data('l10n-placeholder');
+      var original = this.dataset.l10nPlaceholder;
       var local = _(original);
       $(this).attr('placeholder', local);
     });
     $('[data-menu-onclick]').each(function () {
-      var menu = $(this).data('menu-onclick');
+      var menu = this.dataset.menuOnclick;
       $(this).on('click', function (e) {
         Menu.show(menu, this);
       });
@@ -89,7 +89,7 @@ document.addEventListener("visibilitychange", function() {
 
       var section = $('section#chat');
       if(section.hasClass('show')){
-        var current = section.data('jid');
+        var current = section[0].dataset.jid;
         var chat = account.chatGet(current);
         if(chat.notification && 'close' in chat.notification){
             chat.notification.close();
@@ -214,7 +214,7 @@ $('section#me #nick input').on('blur', function (e) {
 });
 
 $('[data-var]').each(function () {
-  var key = $(this).data('var');
+  var key = this.dataset.var;
   var value = App[key];
   $(this).text(value);
 });
@@ -287,11 +287,11 @@ var bindings = function () {
   $('select').on('change', function () {
     var select = $(this);
     var option = select.find('option[value="' + select.val() + '"]');
-    if (option.data('reveal')) {
-      select.siblings('[name="' + option.data('reveal') + '"]').removeClass('hidden');
+    if (option[0].dataset.reveal) {
+      select.siblings('[name="' + option[0].dataset.reveal + '"]').removeClass('hidden');
     } else {
       option = select.find('[data-reveal]')
-      select.siblings('[name="' + option.data('reveal') + '"]').addClass('hidden').val('');
+      select.siblings('[name="' + option[0].dataset.reveal + '"]').addClass('hidden').val('');
     }
   });
   $("script[type='text/spacebars']").each(function(index, script) {
