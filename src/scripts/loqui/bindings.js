@@ -155,31 +155,35 @@ $('section#me #card span.avatar').on('click', function (e) {
 
 // Change background
 $('section#me #card button.background.change').on('click', function (e) {
-  var e = new MozActivity({
-    name: 'pick',
-    data: {
-      type: ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/bmp']
-    }
-  });
-  e.onsuccess = function () {
-    var account = Accounts.current;
-    var blob = this.result.blob;
-    var sh = window.innerHeight;
-    Tools.picThumb(blob, null, sh, function (url) {
-      if (account.core.background) {
-        Store.update(account.core.background, url);
-      } else{
-        account.core.background = Store.save(url);
+  if (typeof MozActivity != 'undefined') {
+    var e = new MozActivity({
+      name: 'pick',
+      data: {
+        type: ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/bmp']
       }
-      Store.recover(account.core.background, function (url) {
-        $('section#chat ul#messages').style('background', 'url('+url+') no-repeat center center fixed');
-        $('section.profile div#card').style('background', 'url('+url+') no-repeat center center fixed'); 
-        Lungo.Notification.show('star', _('backChanged'), 3);
-      }.bind(this)); 
     });
-  }
-  e.onerror = function () {
-    Tools.log('Picture selection was canceled');
+    e.onsuccess = function () {
+      var account = Accounts.current;
+      var blob = this.result.blob;
+      var sh = window.innerHeight;
+      Tools.picThumb(blob, null, sh, function (url) {
+        if (account.core.background) {
+          Store.update(account.core.background, url);
+        } else{
+          account.core.background = Store.save(url);
+        }
+        Store.recover(account.core.background, function (url) {
+          $('section#chat ul#messages').style('background', 'url('+url+') no-repeat center center fixed');
+          $('section.profile div#card').style('background', 'url('+url+') no-repeat center center fixed'); 
+          Lungo.Notification.show('star', _('backChanged'), 3);
+        }.bind(this)); 
+      });
+    }
+    e.onerror = function () {
+      Tools.log('Picture selection was canceled');
+    }
+  } else {
+    Lungo.Notification.error(_('NoDevice'), _('FxOSisBetter', 'exclamation-sign'));
   }
 });
 
