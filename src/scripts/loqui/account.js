@@ -278,7 +278,7 @@ var Account = function (core) {
       .append($('<strong/>').text(_('NoChats')))
       .append($('<p/>').text(_('NoChatsExplanation')));
       span.on('click', function () {
-        var account = Messenger.account();
+        var account = Accounts.current;
         Activity('chat', account, null, {
           chats: false,
           groups: account.supports('muc')
