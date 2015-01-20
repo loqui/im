@@ -98,8 +98,8 @@ var Message = function (account, core, options) {
         var ul = $('section#chat ul#messages');
         var li = ul.children('li[data-chunk="' + blockIndex + '"]');
         var last = li.children('div').last();
-        var avatarize = last[0].dataset.from != message.core.from;
-        var timeDiff = Tools.unstamp(message.core.stamp) - Tools.unstamp(last[0].dataset.stamp) > 300000;
+        var avatarize = last.length ? (last[0].dataset.from != message.core.from) : true;
+        var timeDiff = last.length ? Tools.unstamp(message.core.stamp) - Tools.unstamp(last[0].dataset.stamp) > 300000 : true;
         var conv = Tools.convenientDate(message.core.stamp);
         if (li.length) {
           if (timeDiff) {
@@ -142,7 +142,7 @@ var Message = function (account, core, options) {
         var ul = $('section#chat ul#messages');
         var li = ul.children('li[data-chunk="' + blockIndex + '"]');
         var last = li.children('div').last();
-        var timeDiff = Tools.unstamp(message.core.stamp) - Tools.unstamp(last[0].dataset.stamp) > 300000;
+        var timeDiff = last.length ? Tools.unstamp(message.core.stamp) - Tools.unstamp(last[0].dataset.stamp) > 300000 : true;
         var conv = Tools.convenientDate(message.core.stamp);
         if (li.length) {
           if (timeDiff) {
@@ -247,8 +247,9 @@ var Message = function (account, core, options) {
     var name = type == 'in' ? this._formatName((contact ? (contact.name || contact.jid) : (this.core.pushName || this.core.from))) : _('Me');
     var day = Tools.day(this.core.stamp);
     var div = $('<div/>');
+    var last = $('section#chat ul#messages li > div').last();
     div[0].dataset.type = type;
-    var index = index || parseInt($('section#chat ul#messages li > div').last()[0].dataset.index) + 1;
+    var index = index || (last.length ? parseInt(last[0].dataset.index) + 1 : 0);
     index = index >= App.defaults.Chat.chunkSize ? 0 : index;
     div[0].dataset.index = index;
     div[0].dataset.stamp = this.core.stamp;
