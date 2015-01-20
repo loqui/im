@@ -257,7 +257,7 @@ var App = {
   },
   
   // Bootstrap logins and so on
-  start: function () {
+  start: function (last) {
     App.online = App.online;
     // If there is already a configured account
     if (App.accounts.length) {
@@ -268,8 +268,12 @@ var App = {
       // If there is more than one account, open the account switcher by default
       if (App.accounts.length > 1) {
         setTimeout(function () {
-          Lungo.Aside.show('accounts');
-        }, 1500);
+          if (last) {
+            Accounts.current = App.accounts.length - 1;
+          } else {
+            Lungo.Aside.show('accounts');
+          }
+        }, 500);
       }
     } else {
       // Show wizard

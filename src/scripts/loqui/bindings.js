@@ -239,7 +239,7 @@ Strophe.Connection.rawOutput = function (data) {
 
 var bindings = function () {
   $('section#success button.start').on('click', function() {
-    App.start();
+    App.start(true);
   });
   $('section#contactAdd button.add').on('click', function() {
     Messenger.contactAdd();
