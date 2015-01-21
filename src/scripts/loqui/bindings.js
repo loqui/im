@@ -153,6 +153,28 @@ $('section#me #card span.avatar').on('click', function (e) {
   }
 });
 
+// Tap contact or muc avatar
+var listener= function(muc){
+  var jid= muc ? $('section#muc')[0].dataset.jid : $('section#contact')[0].dataset.jid;
+  var avatar= App.avatars[jid];
+
+  if(avatar){
+    Store.recover((avatar.original || avatar.chunk), function(url){
+      var blob = Tools.b64ToBlob(url.split(',').pop(), url.split(/[:;]/)[1]);
+      new MozActivity({
+        name: "open",
+        data: {
+          type: blob.type,
+          blob: blob
+        }
+      });
+    });
+  }
+};
+
+$('section#contact #card .avatar').on('click', listener.bind(null, false));
+$('section#muc #card .avatar').on('click', listener.bind(null, true));
+
 // Change background
 $('section#me #card button.background.change').on('click', function (e) {
   var e = new MozActivity({

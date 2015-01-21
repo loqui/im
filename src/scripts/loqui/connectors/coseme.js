@@ -458,17 +458,27 @@ App.connectors['coseme'] = function (account) {
           });
         });
       } else {
-        Tools.picThumb(blob, 96, 96, function (url) {
-          $('ul[data-jid="' + account.core.fullJid + '"] [data-jid="' + jid + '"] span.avatar img').attr('src', url);
-          $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', url);
-          var cb = function (index) {
-            avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
+
+        Promise.all([ new Promise(function(done){ Tools.blobToBase64(blob, done) }), new Promise(function(done){ Tools.picThumb(blob, 96, 96, done); }) ]).then(function(values){
+          var original= values[0];
+          var tumb= values[1];
+
+          $('ul[data-jid="' + account.core.fullJid + '"] [data-jid="' + jid + '"] span.avatar img').attr('src', tumb);
+          $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', tumb);
+          var cb = function (values) {
+            avatars[jid] = (new Avatar({id: picId, chunk: values[0], original : values[1]})).data;
             App.avatars= avatars;
           }
           if (jid in App.avatars) {
-            Store.update(App.avatars[jid].chunk, url, cb);
+            Promise.all([
+                new Promise(function(done){ Store.update(App.avatars[jid].chunk, tumb, done) }),
+                new Promise(function(done){ Store.update(App.avatars[jid].original, original, done) })
+            ]).then(cb)
           } else {
-            Store.save(url, cb);
+            Promise.all([
+                new Promise(function(done){ Store.save(tumb, done); }),
+                new Promise(function(done){ Store.save(original, done) })
+            ]).then(cb);
           }
         });
       }
@@ -573,13 +583,22 @@ App.connectors['coseme'] = function (account) {
   
   this.events.onGroupGotPicture = function (jid, picId, blob) {
     var account = this.account;
-    var avatars= this.avatars;
+    var avatars= App.avatars;
 
-    Tools.picThumb(blob, 96, 96, function (url) {
-      $('ul[data-jid="' + account.core.fullJid + '"] li[data-jid="' + jid + '"] span.avatar img').attr('src', url);
-      $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', url);
-      Store.save(url, function (index) {
-        avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
+    Promise.all([
+      new Promise(function(done){ Tools.picThumb(blob, 96, 96, done); }),
+      new Promise(function(done){ Tools.blobToBase64(blob, done); })
+    ]).then(function (values) {
+      var thumb= values[0];
+      var original= values[1];
+
+      $('ul[data-jid="' + account.core.fullJid + '"] li[data-jid="' + jid + '"] span.avatar img').attr('src', thumb);
+      $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', thumb);
+      Promise.all([
+        new Promise(function(done){ Store.save(thumb, done); }),
+        new Promise(function(done){ Store.save(original, done); })
+      ]).then(function(values) {
+        avatars[jid] = (new Avatar({id: picId, chunk: values[0], original : values[1]})).data;
         App.avatars= avatars;
       });
     });
