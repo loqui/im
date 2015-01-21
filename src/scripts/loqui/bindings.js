@@ -173,8 +173,8 @@ $('section#me #card button.background.change').on('click', function (e) {
           account.core.background = Store.save(url);
         }
         Store.recover(account.core.background, function (url) {
-          $('section#chat ul#messages').style('background', 'url('+url+') no-repeat center center fixed');
-          $('section.profile div#card').style('background', 'url('+url+') no-repeat center center fixed'); 
+          $('section#chat ul#messages').css('background-image', 'url('+url+')');
+          $('section.profile div#card').css('background-image', 'url('+url+')');
           Lungo.Notification.show('star', _('backChanged'), 3);
         }.bind(this)); 
       });
@@ -191,8 +191,8 @@ $('section#me #card button.background.delete').on('click', function (e) {
   var account = Accounts.current;
   if (account.core.background) {
     Store.blockDrop(account.core.background, function () {
-      $('section#chat ul#messages').style('background', 'none');
-      $('section.profile div#card').style('background', 'none');
+      $('section#chat ul#messages').css('background-image', 'none');
+      $('section.profile div#card').css('background-image', 'none');
       Lungo.Notification.show('star', _('backChanged'), 3); 
     });
   }

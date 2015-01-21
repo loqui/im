@@ -742,6 +742,7 @@ section > nav[data-control="menu"] a:before {
   padding-top: 1.5rem;
   background-size: cover;
   -webkit-background-size: cover;
+  background-position: center;
 }
 #messages > .more {
   width: calc(100vw - 1rem);
