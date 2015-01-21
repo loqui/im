@@ -111,6 +111,11 @@ module.exports = function(grunt) {
           spawn: false
         }
       }
+    },
+    execute: {
+      renderersCompiler: {
+        src: ['renderersCompiler.js']
+      }
     }
   });
   grunt.loadNpmTasks('grunt-contrib-watch');
@@ -119,7 +124,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-node-webkit-builder');
-  grunt.registerTask('default', ['clean', 'copy', 'compress']);
-  grunt.registerTask('with-desktop', ['clean', 'copy', 'compress', 'nodewebkit']);
+  grunt.loadNpmTasks('grunt-execute');
+  grunt.registerTask('default', ['clean', 'execute', 'copy', 'compress']);
+  grunt.registerTask('with-desktop', ['clean', 'execute', 'copy', 'compress', 'nodewebkit']);
   grunt.registerTask('devel', ['connect', 'watch']);
 };

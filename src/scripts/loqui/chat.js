@@ -41,8 +41,8 @@ var Chat = function (core, account) {
           var li = $('<li/>');
           var frag = document.createDocumentFragment();
           li.addClass('chunk');
-          li.data('chunk', stIndex);
-          li.data('index', index);
+          li[0].dataset.chunk= stIndex;
+          li[0].dataset.index= index;
           var prevType, prevTime, prevAck;
           var prevRead = true;
           var lastRead = Tools.unstamp(chat.lastRead || chat.core.lastRead);
@@ -164,7 +164,6 @@ var Chat = function (core, account) {
       if (last.media) {
         var text = _('SentYou', {type: _('MediaType_' + last.media.type)});
       }
-
       if (pic) {
         pic.url.then(function (src) {
           if (src.slice(0, 1) == '/' && chat.core.muc) {
@@ -177,8 +176,8 @@ var Chat = function (core, account) {
       }
       chat.core.lastAck = last.stamp;
       var section = $('section#chat');
-      if (chat.account.supports('receipts') && section.hasClass('show') && section.data('jid') == last.from) {
-        var li = section.find('article#main ul li').last();
+      if (chat.account.supports('receipts') && section.hasClass('show') && section[0].dataset.jid == last.from) {
+        var li = section.find('ul li').last();
         section.find('span.lastACK').remove();
         li.append($('<span/>').addClass('lastACK')[0]);
       }
@@ -193,16 +192,16 @@ var Chat = function (core, account) {
     var section = $('section#chat');
     var header = section.children('header');
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.jid);
-    section.data('jid', this.core.jid);
-    section.data('features', $('section#main').data('features'));
-    section.data('caps', contact && contact.presence.caps in App.caps ? App.caps[contact.presence.caps].features.join(' ') : 'false');
-    section.data('muc', this.core.muc || false);
-    section.data('mine', this.core.muc && this.core.info && this.core.info.owner == this.account.core.fullJid);
+    section[0].dataset.jid = this.core.jid;
+    section[0].dataset.features = $('section#main')[0].dataset.features;
+    //section[0].dataset.caps = contact && contact.presence.caps in App.caps ? App.caps[contact.presence.caps].features.join(' ') : 'false';
+    section[0].dataset.muc = this.core.muc || false;
+    section[0].dataset.mine = this.core.muc && this.core.info && this.core.info.owner == this.account.core.fullJid;
     header.children('.title').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(this.core.title));
     section.find('#plus').removeClass('show');
     section.find('#typing').hide();
     section.find('#messages').empty();
-    section.data('otr', 'OTR' in this);
+    section[0].dataset.otr= ('OTR' in this);
     Lungo.Router.section('chat');
     var avatarize = function (url) {
       header.children('.avatar').children('img').attr('src', url);
@@ -239,13 +238,13 @@ var Chat = function (core, account) {
           header.children('.status').text(' ');
         }
       } else {
-        var show = this.account.connector.isConnected() && contact ? (contact.presence.show || 'na') : 'na';
+        var show = contact ? (contact.presence.show || 'na') : 'na';
         var status = contact ? (contact.presence.status || _('show' + show)) : ' ';
         if (this.account.connector.presence.get) {
           this.account.connector.presence.get(this.core.jid);
         }
         header.children('.status').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(status));
-        section.data('show', show);
+        section[0].dataset.show = show;
       }
       this.lastChunkRender();
     }.bind(this), 0);
@@ -253,11 +252,12 @@ var Chat = function (core, account) {
     if (this.core.unread) {
       this.account.unread -= this.core.unread;
       this.core.unread = 0;
-      Accounts.unread();
+      $('section#main ul[data-jid="' + (this.account.core.fullJid || this.account.core.user) + '"] li[data-jid="' + this.core.jid + '"]')[0].dataset.unread = 0;
+      //Accounts.unread();
     }
-    if(this.notification && 'close' in this.notification){
-        this.notification.close();
-        this.notification= null;
+    if (this.notification && 'close' in this.notification){
+      this.notification.close();
+      this.notification = null;
     }
     this.lastRead = this.core.lastRead;
     this.core.lastRead = Tools.localize(Tools.stamp());
@@ -271,3 +271,4 @@ var Chat = function (core, account) {
   }
     
 }
+

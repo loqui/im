@@ -11,12 +11,12 @@ $('document').ready(function(){
   
   setTimeout(function(){
     $('input[data-l10n-placeholder]').each(function () {
-      var original = $(this).data('l10n-placeholder');
+      var original = this.dataset.l10nPlaceholder;
       var local = _(original);
       $(this).attr('placeholder', local);
     });
     $('[data-menu-onclick]').each(function () {
-      var menu = $(this).data('menu-onclick');
+      var menu = this.dataset.menuOnclick;
       $(this).on('click', function (e) {
         Menu.show(menu, this);
       });
@@ -35,6 +35,28 @@ if (navigator.mozAlarms) {
     App.alarmSet(message.data);
   });
 }
+
+setInterval(function () {
+  $('time[datetime].ago').each(function () {
+    var ts = $(this).attr('datetime');
+    var now = new Date();
+    var then = Tools.unstamp(ts);
+    var diff = now - then;
+    var string;
+    if (diff < 60000) {
+      string = 'right now';
+    } else if (diff < 3600000) {
+      string = Math.floor(diff / 60000) + ' min.';
+    } else if (diff < 7200000) {
+      string = '1 hour';
+    } else if (now.toLocaleDateString() == then.toLocaleDateString()) {
+      string = Math.floor(diff / 3600000) + ' hours';
+    } else {
+      string = then.toLocaleDateString() + '@' + then.toLocaleTimeString().split(':').slice(0, 2).join(':');
+    }
+    $(this).text(string);
+  });
+}, 60000);
 
 // Reconnect on new WiFi / 3G connection
 document.body.addEventListener('online', function () {
@@ -67,7 +89,7 @@ document.addEventListener("visibilitychange", function() {
 
       var section = $('section#chat');
       if(section.hasClass('show')){
-        var current = section.data('jid');
+        var current = section[0].dataset.jid;
         var chat = account.chatGet(current);
         if(chat.notification && 'close' in chat.notification){
             chat.notification.close();
@@ -192,7 +214,7 @@ $('section#me #nick input').on('blur', function (e) {
 });
 
 $('[data-var]').each(function () {
-  var key = $(this).data('var');
+  var key = this.dataset.var;
   var value = App[key];
   $(this).text(value);
 });
@@ -230,6 +252,25 @@ var bindings = function () {
   $('section#welcome').on('click', function(){
      Menu.show('providers');
   });
+  $('section#chat').on('swipeRight', function () {
+    Lungo.Router.section('back');
+  });
+  $('section#main').on('click', function(e){
+    if($(e.target).hasClass('asided')){
+      Lungo.Aside.hide();
+    }
+  }).on('swipeLeft', function(e){
+    if($(e.target).hasClass('asided')){
+      Lungo.Aside.hide();
+    } else if($('section#chat[data-jid]').length > 0) {
+      Lungo.Router.section('chat');
+    }
+  }).on('swipeRight', function () {
+    Lungo.Aside.show('accounts');
+  });
+  $('aside').on('swipeLeft', function () {
+    Lungo.Aside.hide();
+  });
   $('#debugConsole #showConsole').on('click', function () {
     Plus.showConsole();
     $('#debugConsole #showConsole').hide();
@@ -246,11 +287,15 @@ var bindings = function () {
   $('select').on('change', function () {
     var select = $(this);
     var option = select.find('option[value="' + select.val() + '"]');
-    if (option.data('reveal')) {
-      select.siblings('[name="' + option.data('reveal') + '"]').removeClass('hidden');
+    if (option[0].dataset.reveal) {
+      select.siblings('[name="' + option[0].dataset.reveal + '"]').removeClass('hidden');
     } else {
       option = select.find('[data-reveal]')
-      select.siblings('[name="' + option.data('reveal') + '"]').addClass('hidden').val('');
+      select.siblings('[name="' + option[0].dataset.reveal + '"]').addClass('hidden').val('');
     }
+  });
+  $("script[type='text/spacebars']").each(function(index, script) {
+    var name = script.getAttribute('name');
+    UI.insert(UI.render(Template[name]), script.parentNode, script);
   });
 }

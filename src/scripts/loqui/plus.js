@@ -3,8 +3,8 @@
 var Plus = {
 
   bolt: function () {
-    var account = Messenger.account();
-    var to = $('section#chat').data('jid');
+    var account = Accounts.current;
+    var to = $('section#chat')[0].dataset.jid;
     $('section#chat nav#plus').removeClass('show');
     if (to && App.online && account.connector.connection.connected){
       if (account.supports('attention')) {
@@ -23,9 +23,9 @@ var Plus = {
   },
   
   imageSend: function () {
-    var account = Messenger.account();
+    var account = Accounts.current;
     if (account.supports('imageSend')) {
-    var to = $('section#chat').data('jid');
+    var to = $('section#chat')[0].dataset.jid;
       var e = new MozActivity({
         name: 'pick',
         data: {
@@ -42,9 +42,9 @@ var Plus = {
   },
 
   videoSend: function () {
-    var account = Messenger.account();
+    var account = Accounts.current;
     if (account.supports('videoSend')) {
-    var to = $('section#chat').data('jid');
+    var to = $('section#chat')[0].dataset.jid;
       var e = new MozActivity({
         name: 'pick',
         data: {
@@ -61,9 +61,9 @@ var Plus = {
   },
 
   audioSend: function () {
-    var account = Messenger.account();
+    var account = Accounts.current;
     if (account.supports('audioSend')) {
-    var to = $('section#chat').data('jid');
+    var to = $('section#chat')[0].dataset.jid;
       var e = new MozActivity({
         name: 'pick',
         data: {
@@ -80,9 +80,9 @@ var Plus = {
   },
   
   locationSend: function () {
-    var account = Messenger.account();
+    var account = Accounts.current;
     if (account.supports('locationSend')) {
-      var to = $('section#chat').data('jid');
+      var to = $('section#chat')[0].dataset.jid;
       Geo.posGet(function (loc) {
         account.connector.locationSend(to, loc);
       });
@@ -97,7 +97,7 @@ var Plus = {
   
   switchOTR: function (jid, account) {
     $('section#chat nav#plus').removeClass('show');
-    var account = account || Messenger.account();
+    var account = account || Accounts.current;
     var ci = account.chatFind(jid);
     if (ci < 0) {
       var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
@@ -111,9 +111,7 @@ var Plus = {
     } else {
       var chat = account.chats[ci];
       account.chats.push(chat);
-      account.core.chats.push(chat.core);
       account.chats.splice(ci, 1);
-      account.core.chats.splice(ci, 1);
     }
     if (chat.core.settings.otr[0]) {
       // This chat should be private
@@ -174,16 +172,16 @@ var Plus = {
         case OTR.CONST.STATUS_AKE_SUCCESS:
           if (chat.OTR.msgstate === OTR.CONST.MSGSTATE_ENCRYPTED) {
             // The chat is secure
-            $('section#chat[data-jid="' + chat.core.jid + '"]').data('otr', 'true');
+            $('section#chat[data-jid="' + chat.core.jid + '"]')[0].dataset.otr= 'true';
           } else {
             // The chat is no longer secure
-            $('section#chat[data-jid="' + chat.core.jid + '"]').data('otr', 'false');
+            $('section#chat[data-jid="' + chat.core.jid + '"]')[0].dataset.otr= 'false';
             delete chat.OTR;
           }
           break;
         case OTR.CONST.STATUS_END_OTR:
           // The chat is no longer secure
-          $('section#chat[data-jid="' + chat.core.jid + '"]').data('otr', 'false');
+          $('section#chat[data-jid="' + chat.core.jid + '"]')[0].dataset.otr= 'false';
           delete chat.OTR;
           break;
       }

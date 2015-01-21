@@ -33,7 +33,7 @@ var Chungo = {
         });
         $$('[data-view-aside]').each(function () {
           $$(this).on('click', function (e) {
-            Chungo.Aside.toggle(e.target.dataset.viewAside);      
+            Chungo.Aside.toggle(e.target.dataset.viewAside);
           });
         });
         $$('[data-icon]').each(function () {
@@ -42,7 +42,7 @@ var Chungo = {
         });
         $$('[data-image]').each(function () {
           var image = this.dataset.image;
-          $$(this).style('backgroundImage', 'url(' + image + ')');
+          $$(this).prepend($$('<img/>').attr('src', image).addClass('icon'));
         });
         $$('[data-control="groupbar"]').each(function () {
           var links = $$(this).children('[data-view-article]');
@@ -196,6 +196,7 @@ var Chungo = {
     },
     
     show: function (id) {
+      $$('aside#' + id)[0].scrollTop = 0;
       $$('aside#' + id).addClass('show');
       $$('section.show').addClass('asided');
       this._current = {

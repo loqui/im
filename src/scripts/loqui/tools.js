@@ -134,6 +134,7 @@ var Tools = {
   
   countries: function () {
     var xhr = new XMLHttpRequest();
+    xhr.overrideMimeType('application/json');
     xhr.open('GET', 'scripts/goles/countries.json', false);
     xhr.send();
     var countries = JSON.parse(xhr.responseText) || {};
@@ -295,6 +296,14 @@ var Tools = {
       ctx.fillRect((i%8)*20, Math.floor(i/8)*20, 20, 20);
     }
     return canvas.toDataURL('image/png');
+  },
+  
+  toArray: function (o) {
+    var a = [];
+    for (i in o) {
+      a.push(o[i]);
+    }
+    return a;
   }
 
 }
