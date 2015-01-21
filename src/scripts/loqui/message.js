@@ -224,7 +224,7 @@ var Message = function (account, core, options) {
   }
   
   this.reRender= function(blockIndex){
-    if($('section#chat').data('jid') == this.core.to && $('section#chat').hasClass('show')){
+    if($('section#chat')[0].dataset.jid == this.core.to && $('section#chat').hasClass('show')){
       var element= $('section#chat ul#messages li[data-chunk="' + blockIndex + '"] div[data-id="' + this.core.id + '"]');
       element.replaceWith(this.preRender());
     }
@@ -324,7 +324,7 @@ var Message = function (account, core, options) {
       div.data('media-type', this.core.media.type);
     }
     if(type == 'out' && this.core.status){
-      div.data('status', this.core.status);
+      div[0].dataset.status= this.core.status;
     }
     if (avatarize) {
       var pic = $('<span/>').addClass('avatar hideable').append(
