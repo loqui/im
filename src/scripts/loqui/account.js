@@ -209,6 +209,15 @@ var Account = function (core) {
     meSection.find('#card .user').text(this.core.user);
     meSection.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + this.core.provider + '.svg'));
     Accounts.unread(this.unread);
+    if(this.core.background){
+      Store.recover(this.core.background, function (url) {
+        $('section#chat ul#messages').css('background-image', 'url('+url+')');
+        $('section.profile div#card').css('background-image', 'url('+url+')');
+      });
+    }else{
+        $('section#chat ul#messages').css('background-image', '');
+        $('section.profile div#card').css('background-image', '');
+    }
   }.bind(this);
   
   this.singleRender = function (chat, up) {
