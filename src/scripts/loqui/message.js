@@ -141,7 +141,7 @@ var Message = function (account, core, options) {
       if ($('section#chat')[0].dataset.jid == to && $('section#chat').hasClass('show')) {
         var ul = $('section#chat ul#messages');
         var li = ul.children('li[data-chunk="' + blockIndex + '"]');
-        var last = li.children('div').last();
+        var last = ul.children('li[data-chunk]').last().children('div').last();
         var timeDiff = last.length ? Tools.unstamp(message.core.stamp) - Tools.unstamp(last[0].dataset.stamp) > 300000 : true;
         var conv = Tools.convenientDate(message.core.stamp);
         if (li.length) {
