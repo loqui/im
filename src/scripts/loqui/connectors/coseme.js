@@ -444,6 +444,8 @@ App.connectors['coseme'] = function (account) {
   
   this.events.onAvatar = function (jid, picId, blob) {
     var account = this.account;
+    var avatars= App.avatars;
+
     Tools.log(jid, picId, blob);
     if (blob) {
       if (jid == this.account.core.fullJid) {
@@ -451,8 +453,8 @@ App.connectors['coseme'] = function (account) {
           $('section#main[data-jid="' + jid + '"] footer span.avatar img').attr('src', url);
           $('section#me .avatar img').attr('src', url);
           Store.save(url, function (index) {
-            App.avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
-            App.smartupdate('avatars');
+            avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
+            App.avatars= avatars;
           });
         });
       } else {
@@ -460,8 +462,8 @@ App.connectors['coseme'] = function (account) {
           $('ul[data-jid="' + account.core.fullJid + '"] [data-jid="' + jid + '"] span.avatar img').attr('src', url);
           $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', url);
           var cb = function (index) {
-            App.avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
-            App.smartupdate('avatars');
+            avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
+            App.avatars= avatars;
           }
           if (jid in App.avatars) {
             Store.update(App.avatars[jid].chunk, url, cb);
@@ -571,12 +573,14 @@ App.connectors['coseme'] = function (account) {
   
   this.events.onGroupGotPicture = function (jid, picId, blob) {
     var account = this.account;
+    var avatars= this.avatars;
+
     Tools.picThumb(blob, 96, 96, function (url) {
       $('ul[data-jid="' + account.core.fullJid + '"] li[data-jid="' + jid + '"] span.avatar img').attr('src', url);
       $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', url);
       Store.save(url, function (index) {
-        App.avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
-        App.smartupdate('avatars');
+        avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
+        App.avatars= avatars;
       });
     });
   }
