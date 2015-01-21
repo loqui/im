@@ -225,14 +225,16 @@ App.connectors['XMPP'] = function (account) {
   
   this.avatarSet = function(blob) {
     var jid = this.account.core.fullJid;
+    var avatars= App.avatars;
+
     Tools.picThumb(blob, 96, 96, function (url) {
       var b64 = url.split(',').pop();
       var vCardEl = $build('PHOTO');
       vCardEl.c('TYPE', {}, 'image/jpg');
       vCardEl.c('BINVAL', {}, b64);
       Store.save(url, function (index) {
-        App.avatars[jid] = (new Avatar({chunk: index})).data;
-        App.smartupdate('avatars');
+        avatars[jid] = (new Avatar({chunk: index})).data;
+        App.avatars= avatars;
       });
       this.connection.vcard.set(function (stanza) {
         this.account.core.avatarHash = b64_sha1(b64);
@@ -580,6 +582,7 @@ App.connectors['XMPP'] = function (account) {
   this.events.onDisco = function (stanza) {
     var stanza = $(stanza);
     var key = stanza.find('query').attr('node');
+    var caps= App.caps;
     var value = {
       identities: stanza.find('identity').map(function (i, e, a) {
         return {type: $(e).attr('type'), name: $(e).attr('name'), category: $(e).attr('category')};
@@ -588,8 +591,8 @@ App.connectors['XMPP'] = function (account) {
         return $(e).attr('var');
       })
     };
-    App.caps[key] = value;
-    App.smartupdate('caps');
+    caps[key] = value;
+    App.caps= caps;
     return true;
   }.bind(this);
   
