@@ -82,10 +82,10 @@ document.addEventListener("visibilitychange", function() {
   for (var i in App.accounts) {
     var account = App.accounts[i];
     if (document.hidden) {
-      account.connector.presence.send('away');
+      account.connector.presence.set('away');
     } else {
       App.lastActive = new Date;
-      account.connector.presence.send();
+      account.connector.presence.set('a');
 
       var section = $('section#chat');
       if(section.hasClass('show')){
