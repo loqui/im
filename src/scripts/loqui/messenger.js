@@ -3,7 +3,7 @@
 var Messenger = {
 
   account: function () {
-    var index = Accounts.find($('section#main').data('jid'));
+    var index = Accounts.find($('section#main')[0].dataset.jid);
     return App.accounts[index];
   },
 
@@ -14,9 +14,9 @@ var Messenger = {
   },
 
   say: function (text) {
-    var to = $('section#chat').data('jid');
-    var muc = $('section#chat').data('muc') == "true";
-    var account = this.account();
+    var to = $('section#chat')[0].dataset.jid;
+    var muc = $('section#chat')[0].dataset.muc == "true";
+    var account = Accounts.current;
     var text = text || $('section#chat div#text').text();
     text = text.trim();
     if (text.length) {
@@ -44,8 +44,8 @@ var Messenger = {
   },
   
   csn: function (state) {
-    var to = $('section#chat').data('jid');
-    var account = this.account();
+    var to = $('section#chat')[0].dataset.jid;
+    var account = Accounts.current;
     var muc = account.chatGet(to).core.muc;
     if (account.connector.isConnected() && account.supports('csn') && App.settings.csn && !muc) {
       account.connector.csnSend(to, state);
@@ -53,7 +53,7 @@ var Messenger = {
   },
   
   avatarSet: function (blob) {
-    var account = this.account();
+    var account = Accounts.current;
     if (account.supports('avatarChange')) {
       account.connector.avatarSet(blob);
     } else {
@@ -62,7 +62,7 @@ var Messenger = {
   },
   
   presenceUpdate: function () {
-    var account = this.account();
+    var account = Accounts.current;
     if (App.online && account.connector.connected) {
       var status = $('section#me #status input').val();
       var nick = $('section#me #nick input').val();
@@ -73,14 +73,14 @@ var Messenger = {
   },
   
   contactProfile: function (jid) {
-    var account = this.account();
-    var jid = jid || $('section#chat').data('jid');
+    var account = Accounts.current;
+    var jid = jid || $('section#chat')[0].dataset.jid;
     var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
     var chat = account.chatGet(jid);
     if (contact) {
       var name = contact.name || jid;
       var section = $('section#contact');
-      section.data('jid', jid);
+      section[0].dataset.jid= jid;
       section.find('#card .name').text(name == jid ? ' ' : name);
       section.find('#card .user').text(jid);
       section.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + account.core.provider + '.svg'));
@@ -89,27 +89,32 @@ var Messenger = {
       var accountSwitch = function (e) {
         var sw = $(this);
         var li = sw.closest('li');
-        var key = li.data('key');
+        var key = li[0].dataset.key;
         var chat = account.chatGet(jid);
         if(!Array.isArray(chat.core.settings[key])){
-            chat.core.settings[key]= chat.core.settings[key];
+            chat.core.settings[key]= App.defaults.Chat.core.settings[key];
         }
-        if (li.data('value') == 'true') {
+        if (li[0].dataset.value == 'true') {
           chat.core.settings[key][0] = false;
         } else {
           chat.core.settings[key][0] = true;
         }
-        li.data('value', chat.core.settings[key][0]);
+        li[0].dataset.value= chat.core.settings[key][0];
         account.save();
         account.singleRender(chat, false);
       }
       Object.keys(App.defaults.Chat.core.settings).forEach(function(key){
         var value= chat.core.settings[key] || App.defaults.Chat.core.settings[key];
-        var li = $('<li/>').data('key', key).append(
+        var li = $('<li/>');
+        li[0].dataset.key= key;
+        li[0].dataset.value= (value.length > 1 ? value[0] : value);
+        li.bind('click', accountSwitch);
+        li.append(
           $('<span/>').addClass('caption').text(_('AccountSet' + key))
         ).append(
           $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>')
-        ).data('value', value.length > 1 ? value[0] : value).bind('click', accountSwitch);
+        );
+
         if (value.length > 1 && value[1]) {
           li.on('click', function (e) {
             console.log(value, value[1]);
@@ -132,14 +137,14 @@ var Messenger = {
   },
   
   mucProfile: function (jid) {
-    var account = this.account();
-    var jid = jid || $('section#chat').data('jid');
+    var account = Accounts.current;
+    var jid = jid || $('section#chat')[0].dataset.jid;
     var ci = account.chatFind(jid);
     if (ci >= 0) {
       var chat = account.chats[ci];
       var section = $('section#muc');
-      section.data('jid', jid);
-      section.data('mine', chat.core.info && chat.core.info.owner == account.core.fullJid);
+      section[0].dataset.jid= jid;
+      section[0].dataset.mine= (chat.core.info && chat.core.info.owner == account.core.fullJid);
       section.find('#card .name').html(App.emoji[Providers.data[account.core.provider].emoji].fy(chat.core.title));
       section.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + account.core.provider + '.svg'));
       section.find('#participants h2').text(_('NumParticipants', {number: chat.core.participants.length}));
@@ -153,27 +158,31 @@ var Messenger = {
       var accountSwitch = function (e) {
         var sw = $(this);
         var li = sw.closest('li');
-        var key = li.data('key');
+        var key = li[0].dataset.key;
         var chat = account.chatGet(jid);
         if(!Array.isArray(chat.core.settings[key])){
-            chat.core.settings[key]= chat.core.settings[key];
+            chat.core.settings[key]= App.defaults.Chat.core.settings[key];
         }
-        if (li.data('value') == 'true') {
+        if (li[0].dataset.value == 'true') {
           chat.core.settings[key][0] = false;
         } else {
           chat.core.settings[key][0] = true;
         }
-        li.data('value', chat.core.settings[key][0]);
+        li[0].dataset.value= chat.core.settings[key][0];
         account.save();
         account.singleRender(chat, false);
       }
       Object.keys(App.defaults.Chat.core.settings).forEach(function(key){
         var value= chat.core.settings[key] || App.defaults.Chat.core.settings[key];
-        var li = $('<li/>').data('key', key).append(
+        var li = $('<li/>');
+        li[0].dataset.key= key;
+        li.append(
           $('<span/>').addClass('caption').text(_('AccountSet' + key))
         ).append(
           $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>')
-        ).data('value', value.length > 1 ? value[0] : value).bind('click', accountSwitch);
+        )
+        li[0].dataset.value= (value.length > 1 ? value[0] : value);
+        li.bind('click', accountSwitch);
         if (value.length > 1 && value[1]) {
           li.on('click', function (e) {
             console.log(value, value[1]);
@@ -194,7 +203,7 @@ var Messenger = {
   },
   
   contactAdd: function () {
-    var account = Messenger.account();
+    var account = Accounts.current;
     if (App.online && account.connector.connection.connected) {
       if (account.supports('rosterMgmt')) {
         var section = $('section#contactAdd');
@@ -230,7 +239,7 @@ var Messenger = {
   },
   
   contactRemove: function (jid) {
-    var account = Messenger.account();
+    var account = Accounts.current;
     if (App.online && account.connector.connected) {
       if (account.supports('rosterMgmt')) {
         var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
@@ -269,7 +278,7 @@ var Messenger = {
   },
   
   chatRemove: function (jid, account, force) {
-    var account = account || Messenger.account();
+    var account = account || Accounts.current;
     var index = account.chatFind(jid);
     if (index >= 0) {
       var chat = Lungo.Core.findByProperty(account.core.chats, 'jid', jid);
@@ -297,7 +306,7 @@ var Messenger = {
   },
   
   mucClear: function (gid, force) {
-    var account = Messenger.account();
+    var account = Accounts.current;
     var chat = account.chatGet(gid);
     var index = account.chatFind(gid);
     if (chat) {
@@ -326,7 +335,7 @@ var Messenger = {
   },
   
   mucExit: function (gid) {
-    var account = Messenger.account();
+    var account = Accounts.current;
     var chat = account.chatGet(gid).core;
     var title = chat.title || gid;
     var will = confirm(_('MucExitConfirm', {title: title}));
@@ -337,7 +346,7 @@ var Messenger = {
   },
   
   accountRemove: function (jid) {
-    var account = Messenger.account();
+    var account = Accounts.current;
     var will = confirm(_('ConfirmAccountRemove', {account: account.core.user}));
     if (will) {
       var accountIndex = Accounts.find(account.core.fullJid);
@@ -350,7 +359,7 @@ var Messenger = {
       }
       App.accounts.splice(accountIndex, 1);
       App.accountsCores.splice(accountIndex, 1);
-      App.smartupdate('accountsCores');
+      App.accounts = App.accounts;
       Lungo.Notification.success(_('Wait'), _('WaitLong'), 'exclamation-sign', 3);
       setTimeout(function () {
         window.location.reload();

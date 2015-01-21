@@ -58,9 +58,9 @@ var Activity = function (action, account, content, options) {
     },
     invite: function (f, account, content, options) {
       var click = function (t) {
-        var t = $(t);
+        t = $(t);
         t.toggleClass('selected');
-        content(t.data('jid'), t.find('.name').text());
+        content(t[0].dataset.jid, t.find('.name').text());
       }
       account.contactsRender(f, click, options.selected);
     }
@@ -117,10 +117,10 @@ var Activity = function (action, account, content, options) {
       }
       if (options.chats) {
         section.find('[data-view-article="chats"]').show();
-        section.find('[data-view-article="chats"]').trigger('click');
+        section.find('[data-view-article="chats"]')[0].click();
       } else {
         section.find('[data-view-article="chats"]').hide();
-        section.find('[data-view-article="contacts"]').trigger('click');
+        section.find('[data-view-article="contacts"]')[0].click();
       }
     } else {
       Tools.log('No such action!');

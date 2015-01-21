@@ -189,7 +189,7 @@ App.connectors['XMPP'] = function (account) {
       var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', to);
       var caps = contact && contact.presence.caps;
       var features = caps in App.caps && App.caps[caps].features;
-      var wantsReceipt = features && features.indexOf(Strophe.NS.XEP0184);
+      var wantsReceipt = features && Tools.toArray(features).indexOf(Strophe.NS.XEP0184);
       this.connection.Messaging.send(to, text, options.delay, wantsReceipt);
     }
   }.bind(this);
@@ -225,14 +225,16 @@ App.connectors['XMPP'] = function (account) {
   
   this.avatarSet = function(blob) {
     var jid = this.account.core.fullJid;
+    var avatars= App.avatars;
+
     Tools.picThumb(blob, 96, 96, function (url) {
       var b64 = url.split(',').pop();
       var vCardEl = $build('PHOTO');
       vCardEl.c('TYPE', {}, 'image/jpg');
       vCardEl.c('BINVAL', {}, b64);
       Store.save(url, function (index) {
-        App.avatars[jid] = (new Avatar({chunk: index})).data;
-        App.smartupdate('avatars');
+        avatars[jid] = (new Avatar({chunk: index})).data;
+        App.avatars= avatars;
       });
       this.connection.vcard.set(function (stanza) {
         this.account.core.avatarHash = b64_sha1(b64);
@@ -337,7 +339,7 @@ App.connectors['XMPP'] = function (account) {
             break;
           }
         }
-        if ($('section#chat').hasClass('show') && $('section#chat').data('jid') == chat.core.jid) {
+        if ($('section#chat').hasClass('show') && $('section#chat')[0].dataset.jid == chat.core.jid) {
           chat.show();
         }
         chat.save();
@@ -432,9 +434,9 @@ App.connectors['XMPP'] = function (account) {
       msg.receive();
     }
     if (account.supports('csn') && App.settings.csn) {
-      if(composing && Strophe.getBareJidFromJid(from) == $('section#chat').data('jid')){
+      if(composing && Strophe.getBareJidFromJid(from) == $('section#chat')[0].dataset.jid){
         $("section#chat #typing").show();
-      }else if(paused && Strophe.getBareJidFromJid(from) == $('section#chat').data('jid')){
+      }else if(paused && Strophe.getBareJidFromJid(from) == $('section#chat')[0].dataset.jid){
         $("section#chat #typing").hide();
       }
     }
@@ -469,8 +471,8 @@ App.connectors['XMPP'] = function (account) {
     chat.core.lastAck = Tools.localize(Tools.stamp());
     chat.save();
     var section = $('section#chat');
-    if (section.hasClass('show') && section.data('jid') == from) {
-      var li = section.find('ul li').last();
+    if (section.hasClass('show') && section[0].dataset.jid == from) {
+      var li = section.find('article#main ul li').last();
       section.find('span.lastACK').remove();
       li.append($('<span/>').addClass('lastACK')[0]);
     }
@@ -580,6 +582,7 @@ App.connectors['XMPP'] = function (account) {
   this.events.onDisco = function (stanza) {
     var stanza = $(stanza);
     var key = stanza.find('query').attr('node');
+    var caps= App.caps;
     var value = {
       identities: stanza.find('identity').map(function (i, e, a) {
         return {type: $(e).attr('type'), name: $(e).attr('name'), category: $(e).attr('category')};
@@ -588,8 +591,8 @@ App.connectors['XMPP'] = function (account) {
         return $(e).attr('var');
       })
     };
-    App.caps[key] = value;
-    App.smartupdate('caps');
+    caps[key] = value;
+    App.caps= caps;
     return true;
   }.bind(this);
   
@@ -599,40 +602,48 @@ App.connectors['XMPP'] = function (account) {
   
 }
 
-App.logForms['XMPP'] = function (article, provider, data) {
-  article
-    .append($('<h1/>').style('color', data.color).html(_('SettingUp', { provider: data.longName })))
-    .append($('<img/>').attr('src', 'img/providers/' + provider + '.svg'))
-    .append($('<label/>').attr('for', 'user').text(_(data.terms['user'], { provider: data.altname })))
-    .append($('<input/>').attr('type', data.terms.userInputType).attr('x-inputmode', 'verbatim').attr('name', 'user').attr('placeholder', (data.terms.placeholder || _(data.terms['user'], { provider: data.altname }) )))
-    .append($('<label/>').attr('for', 'pass').text(_(data.terms['pass'])))
-    .append($('<input/>').attr('type', 'password').attr('name', 'pass').attr('placeholder', '******'));
-  if (data.notice) {
-    article.append($('<small/>').html(_(provider + 'Notice')));
-  }
-  var buttongroup = $('<div/>').addClass('buttongroup');
-  var submit = $('<button/>').data('role', 'submit').style('backgroundColor', data.color).text(_('LogIn'));
-  var back = $('<button/>').data('view-section', 'back').text(_('GoBack'));
-  submit.bind('click', function () {
-    var article = this.parentNode.parentNode;
-    var provider = article.parentNode.id;
-    var user = Providers.autoComplete($(article).children('[name="user"]').val(), provider);
-    var pass = $(article).children('[name="pass"]').val();
-    var cc = $(article).children('[name="cc"]').val();
-    if (user && pass) {
-      var account = new Account({
-        user: user,
-        pass: pass,
-        provider: provider,
-        resource: App.defaults.Account.core.resource,
-        enabled: true,
-        chats: []
-      });
-      account.test();
+App.logForms['XMPP'] = function (provider, article) {
+  var data = Providers.data[provider];
+  return {
+    get html () {
+      if (article) {
+        article
+          .append($('<h1/>').css('color', data.color).html(_('SettingUp', { provider: data.longName })))
+          .append($('<img/>').attr('src', 'img/providers/' + provider + '.svg'))
+          .append($('<label/>').attr('for', 'user').text(_(data.terms['user'], { provider: data.altname })))
+          .append($('<input/>').attr('type', data.terms.userInputType).attr('x-inputmode', 'verbatim').attr('name', 'user').attr('placeholder', (data.terms.placeholder || _(data.terms['user'], { provider: data.altname }) )))
+          .append($('<label/>').attr('for', 'pass').text(_(data.terms['pass'])))
+          .append($('<input/>').attr('type', 'password').attr('name', 'pass').attr('placeholder', '******'));
+        if (data.notice) {
+          article.append($('<small/>').html(_(provider + 'Notice')));
+        }
+        var buttongroup = $('<div/>').addClass('buttongroup')
+          .append($('<button/>').addClass('submit').css('backgroundColor', data.color).text(_('LogIn')))
+          .append($('<button/>').addClass('back').text(_('GoBack')))
+        article.append(buttongroup);
+      }
+    },
+    events: function (target) {
+      if (target.hasClass('submit')) {
+        var article = target[0].parentNode.parentNode;
+        var provider = article.parentNode.id;
+        var user = Providers.autoComplete($(article).children('[name="user"]').val(), provider);
+        var pass = $(article).children('[name="pass"]').val();
+        var cc = $(article).children('[name="cc"]').val();
+        if (user && pass) {
+          var account = new Account({
+            user: user,
+            pass: pass,
+            provider: provider,
+            resource: App.defaults.Account.core.resource,
+            enabled: true,
+            chats: []
+          });
+          account.test();
+        }      
+      }
     }
-  });
-  buttongroup.append(submit).append(back);
-  article.append(buttongroup);
+  }
 }
 
 App.emoji['XMPP'] = {
@@ -679,9 +690,8 @@ App.emoji['XMPP'] = {
   },
   
   render: function (img, emoji) {
-    img
-      .attr('src', 'img/emoji/xmpp/' + emoji[0] + '.png')
-      .data('emoji', emoji[1]);
+    img.attr('src', 'img/emoji/xmpp/' + emoji[0] + '.png');
+    img[0].dataset.emoji= emoji[1];
   }
   
 }
@@ -741,9 +751,8 @@ App.emoji['FB'] = {
   },
   
   render: function (img, emoji) {
-    img
-      .attr('src', 'img/emoji/fb/' + emoji[0] + '.png')
-      .data('emoji', emoji[1]);
+    img.attr('src', 'img/emoji/fb/' + emoji[0] + '.png')
+    img[0].dataset.emoji=emoji[1];
   }
   
 }
@@ -797,9 +806,8 @@ App.emoji['GTALK'] = {
   },
   
   render: function (img, emoji) {
-    img
-      .attr('src', 'img/emoji/gtalk/' + emoji[0] + '.gif')
-      .data('emoji', emoji[1]);
+    img.attr('src', 'img/emoji/gtalk/' + emoji[0] + '.gif')
+    img[0].dataset.emoji= emoji[1];
   }
   
 }

@@ -1,6 +1,6 @@
 {
   "name": "LoquiIM",
-  "version": "v0.3.4a",
+  "version": "v0.4.0",
   "description": "Loqui Instant Messenger unifies all your chat accounts in just one app",
   "author": {
     "name": "LoquiIM Community",
@@ -20,6 +20,8 @@
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-watch": "~0.5.3",
     "grunt-contrib-connect": "~0.6.0",
-    "grunt-node-webkit-builder": "~0.2.0"
+    "grunt-node-webkit-builder": "~0.2.0",
+    "grunt-execute": "~0.2.2",
+    "jsdom":  "~2.0.0"
   }
 }

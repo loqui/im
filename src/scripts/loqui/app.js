@@ -4,19 +4,18 @@ var App = {
 
   name: 'Loqui IM',
   shortName: 'Loqui',
-  version: 'v0.3.4',
+  version: 'v0.4.0',
   minorVersion: 'a',
   connectors: [],
   logForms: [],
   emoji: [],
   toSave: [],
-  accounts: [],
-  accountsCores: [],
-  settings: {},
-  devsettings: {},
-  avatars: {},
-  online: true,
-  notifications: [],
+  _accounts: new Blaze.Var([]),
+  _settings: new Blaze.Var({}),
+  _devsettings: new Blaze.Var({}),
+  _avatars: new Blaze.Var({}),
+  _online: new Blaze.Var(navigator.onLine),
+  _notifications: new Blaze.Var([]),
   pathFiles: 'loqui/files/',
   pathBackup: 'loqui/backup/',
   caps: {},
@@ -69,6 +68,61 @@ var App = {
       }
     }
   },
+  
+  get accounts () {
+    return this._accounts.get();  
+  },
+  set accounts (val) {
+    this._accounts.set([].concat(val));
+    this.accountsCores = [].concat(this.accountsCores);
+  },
+  
+  get accountsCores () {
+    return this.accounts.map(function (e, i, a) {
+      return e.core;
+    });
+  },
+  set accountsCores (val) {
+    Store.put('accountsCores', val);
+  },
+  
+  get settings () {
+    return this._settings.get();
+  },
+  set settings (val) {
+    for (var [key, value] in Iterator(val)) {
+      $('body')[value ? 'addClass' : 'removeClass'](key);
+    }
+    Store.put('settings', val);
+    this._settings.set($.extend({}, val));
+  },
+  
+  get devsettings () {
+    return this._devsettings.get();
+  },
+  set devsettings (val) {
+    for (var [key, value] in Iterator(val)) {
+      $('body')[value ? 'addClass' : 'removeClass'](key);
+    }
+    Store.put('devsettings', val);
+    this._devsettings.set($.extend({}, val));
+  },
+  
+  get online () {
+    return this._online.get();
+  },
+  set online (val) {
+    this._online.set(val);
+    $('body')[0].dataset.online = val;
+  },
+  
+  get avatars () {
+    return this._avatars.get();
+  },
+  set avatars (val) {
+    Store.put('avatars', val);
+    this._avatars.set($.extend({}, val));
+  },
 
   // This is the main procedure
   run: function () {
@@ -86,33 +140,32 @@ var App = {
   load: function () {
     return Promise.all([
         new Promise(function (callback) {
-          Store.get('accountsCores', function (val) {
-            App.accounts = [];
-            App.accountsCores = val || [];
-            if (App.accountsCores.length) {
+          Store.get('accountsCores', function (cores) {
+            if (cores && cores.length) {
+              var accounts = App.accounts;
               // Inflate accounts
-              for (var i in App.accountsCores) {
-                var account = new Account(App.accountsCores[i]);
-                // Inflate chats
-                for (var j in account.core.chats) {
-                  var chat = new Chat(account.core.chats[j], account);
+              for (let [i, core] in Iterator(cores)) {
+                var account = new Account(core);
+                for (let [i, core] in Iterator(core.chats)) {
+                  let chat = new Chat(core, account);
                   account.chats.push(chat);
                 }
-                App.accounts.push(account);
+                accounts.push(account);
               }
+              App.accounts = accounts;
             }
             callback(null);
           });
         }),
         new Promise(function (callback) {
           Store.get('settings', function (val) {
-            App.settings = val && Object.keys(val).length ? val : App.defaults.App.settings;
+            App.settings = (val && Object.keys(val).length) ? val : App.defaults.App.settings;
             callback(null);
           });
         }),
         new Promise(function (callback) {
           Store.get('devsettings', function (val) {
-            App.devsettings = val && Object.keys(val).length ? val : App.defaults.App.devsettings;
+            App.devsettings = (val && Object.keys(val).length) ? val : App.defaults.App.devsettings;
             callback(null);
           });
         }),
@@ -149,7 +202,7 @@ var App = {
           account.enabled = App.defaults.Account.core.enabled;
         });
         App.smartupdate('avatars');
-        App.smartupdate('accountCores');
+        App.smartupdate('accountsCores');
         from['v0.3.0']();
       },
       'v0.3.0': function () {
@@ -205,16 +258,13 @@ var App = {
   
   // Bootstrap logins and so on
   start: function () {
+    App.online = App.online;
     // If there is already a configured account
     if (App.accounts.length) {
       App.alarmSet({});
-      App.switchesRender();
-      App.switchesDevRender();
       this.connect();
       Menu.show('main');
       document.dispatchEvent(new Event('appReady'));
-
-        
       // If there is more than one account, open the account switcher by default
       if (App.accounts.length > 1) {
         setTimeout(function () {
@@ -259,8 +309,8 @@ var App = {
   
   // Update an object and put it in storage
   smartupdate: function (key, callback) {
-    Tools.log('SAVING', key, this[key]);
-    Store.put(key, this[key], callback);
+    /*Tools.log('SAVING', key, this[key]);
+    Store.put(key, this[key], callback);*/
   },
   
   // Disconnect from every account
@@ -268,75 +318,6 @@ var App = {
     this.settings.reconnect = false;
     for (var i in this.accounts) {
       this.accounts[i].connector.disconnect();
-    }
-  },
-  
-  // Render settings switches
-  switchesRender: function () {
-    var ul = $('section#settings article#features ul').empty();
-    var body = $('body');
-    for (var key in App.defaults.App.settings) {
-      if (!(key in this.settings)) {
-        this.settings[key] = App.defaults.App.settings[key];
-      }
-      var value = this.settings[key];
-      var li = $('<li><span></span><switch/></li>');
-      li.children('span').text(_('Set' + key));
-      var div = $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>');
-      li.children('switch').replaceWith(div);
-      li.data('key', key);
-      li.data('value', value);
-      li.bind('click', function () {
-        var key = this.dataset.key;
-        var newVal = this.dataset.value == "true" ? false : true;
-        this.dataset.value = newVal;
-        App.settings[key] = newVal;
-        if (newVal) {
-          body.addClass(key);
-        } else {
-          body.removeClass(key);
-        }
-        App.smartupdate('settings');
-      });
-      ul.append(li);
-      if (value) {
-        body.addClass(key);
-      } else {
-        body.removeClass(key);
-      }
-    }
-    App.smartupdate('settings');
-  },
-
-  switchesDevRender: function () {
-    var ul = $('section#settings article#devmode ul').empty();
-    var body = $('body');
-    for (var key in this.devsettings) {
-      var value = this.devsettings[key];
-      var li = $('<li><span></span><switch/></li>');
-      li.children('span').text(_('Set' + key));
-      var div = $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>');
-      li.children('switch').replaceWith(div);
-      li.data('key', key);
-      li.data('value', value);
-      li.bind('click', function () {
-        var key = this.dataset.key;
-        var newVal = this.dataset.value == "true" ? false : true;
-        this.dataset.value = newVal;
-        App.devsettings[key] = newVal;
-        if (newVal) {
-          body.addClass(key);
-        } else {
-          body.removeClass(key);
-        }
-        App.smartupdate('devsettings');
-      });
-      ul.append(li);
-      if (value) {
-        body.addClass(key);
-      } else {
-        body.removeClass(key);
-      }
     }
   },
   

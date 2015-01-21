@@ -444,6 +444,8 @@ App.connectors['coseme'] = function (account) {
   
   this.events.onAvatar = function (jid, picId, blob) {
     var account = this.account;
+    var avatars= App.avatars;
+
     Tools.log(jid, picId, blob);
     if (blob) {
       if (jid == this.account.core.fullJid) {
@@ -451,8 +453,8 @@ App.connectors['coseme'] = function (account) {
           $('section#main[data-jid="' + jid + '"] footer span.avatar img').attr('src', url);
           $('section#me .avatar img').attr('src', url);
           Store.save(url, function (index) {
-            App.avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
-            App.smartupdate('avatars');
+            avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
+            App.avatars= avatars;
           });
         });
       } else {
@@ -460,8 +462,8 @@ App.connectors['coseme'] = function (account) {
           $('ul[data-jid="' + account.core.fullJid + '"] [data-jid="' + jid + '"] span.avatar img').attr('src', url);
           $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', url);
           var cb = function (index) {
-            App.avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
-            App.smartupdate('avatars');
+            avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
+            App.avatars= avatars;
           }
           if (jid in App.avatars) {
             Store.update(App.avatars[jid].chunk, url, cb);
@@ -480,13 +482,13 @@ App.connectors['coseme'] = function (account) {
   }
 
   this.events.onContactTyping = function (from) {
-    if (from == $('section#chat').data('jid')) {
+    if (from == $('section#chat')[0].dataset.jid) {
       $("section#chat #typing").show();
     }
   }
 
   this.events.onContactPaused = function (from) {
-    if (from == $('section#chat').data('jid')) {
+    if (from == $('section#chat')[0].dataset.jid) {
       $("section#chat #typing").hide();
     }
   }
@@ -503,8 +505,8 @@ App.connectors['coseme'] = function (account) {
     chat.save()
 	account.messageSent(from, msgId);
     var section = $('section#chat');
-    if (section.hasClass('show') && section.data('jid') == from) {
-      var li = section.find('ul li').last();
+    if (section.hasClass('show') && section[0].dataset.jid == from) {
+      var li = section.find('article#main ul li').last();
       section.find('span.lastACK').remove();
       li.append($('<span/>').addClass('lastACK')[0]);
     }
@@ -573,12 +575,14 @@ App.connectors['coseme'] = function (account) {
   
   this.events.onGroupGotPicture = function (jid, picId, blob) {
     var account = this.account;
+    var avatars= this.avatars;
+
     Tools.picThumb(blob, 96, 96, function (url) {
       $('ul[data-jid="' + account.core.fullJid + '"] li[data-jid="' + jid + '"] span.avatar img').attr('src', url);
       $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', url);
       Store.save(url, function (index) {
-        App.avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
-        App.smartupdate('avatars');
+        avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
+        App.avatars= avatars;
       });
     });
   }
@@ -591,7 +595,7 @@ App.connectors['coseme'] = function (account) {
       if (!chat.core.participants || (JSON.stringify(chat.core.participants) != JSON.stringify(participants))) {
         chat.core.participants = participants;
         chat.save();
-        if ($('section#chat').hasClass('show') && $('section#chat').data('jid') == chat.core.jid) {
+        if ($('section#chat').hasClass('show') && $('section#chat')[0].dataset.jid == chat.core.jid) {
           chat.show();
         }
       }
@@ -605,7 +609,7 @@ App.connectors['coseme'] = function (account) {
       var chat = account.chats[ci];
       chat.core.participants = chat.core.participants.concat(participants);
       chat.save();
-      if ($('section#chat').hasClass('show') && $('section#chat').data('jid') == chat.core.jid) {
+      if ($('section#chat').hasClass('show') && $('section#chat')[0].dataset.jid == chat.core.jid) {
         chat.show();
       }
     }
@@ -766,7 +770,7 @@ App.connectors['coseme'] = function (account) {
         Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', parseInt(lastSeen) < 300 ? 'a' : 'away');
         var present= (parseInt(lastSeen) < 1);
         contact.presence.show = present ? 'a' : 'away';
-        account.presenceRender(contact);
+        account.presenceRender(jid);
         var chatSection = $('section#chat[data-jid="' + jid + '"]');
         if (chatSection.length) {
           var status = chatSection.find('header .status');
@@ -781,7 +785,7 @@ App.connectors['coseme'] = function (account) {
     if (contact) {
       Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', 'a');
       contact.presence.show = 'a';
-      account.presenceRender(contact);
+      account.presenceRender(jid);
 
       var chatSection = $('section#chat[data-jid="' + jid + '"]');
       if (chatSection.length) {
@@ -796,7 +800,7 @@ App.connectors['coseme'] = function (account) {
     if (contact) {
       Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', 'away');
       contact.presence.show = 'away';
-      account.presenceRender(contact);
+      account.presenceRender(jid);
 
       var chatSection = $('section#chat[data-jid="' + jid + '"]');
       if (chatSection.length) {
@@ -941,290 +945,273 @@ App.connectors['coseme'] = function (account) {
     
 }
 
-App.logForms['coseme'] = function (article, provider, data) {
-  article
-    .append($('<h1/>').style('color', data.color).html(_('SettingUp', { provider: data.longName })))
-    .append($('<img/>').attr('src', 'img/providers/' + provider + '.svg'))
-  var sms = $('<div/>').addClass('sms')
-    .append($('<p/>').text(_('ProviderSMS', { provider: data.longName })))
-    .append($('<label/>').attr('for', 'countrySelect').text(_(data.terms['country'])));
-  var countrySelect = $('<select/>').attr('name', 'countrySelect');
-  var countries = Tools.countries();
-  countrySelect.append($('<option/>').attr('value', '').text('-- ' + _('YourCountry')));
-  for (var i in countries) {
-    var country = countries[i];
-    countrySelect.append($('<option/>').attr('value', country.dial).text(country.name));
-  }
-  sms
-    .append(countrySelect)
-    .append($('<label/>').attr('for', 'user').text(_(data.terms['user'])))
-    .append($('<input/>')
-      .attr('type', 'number')
-      .attr('name', 'country')
-      .attr('disabled', 'true')
-      .style('width', '3rem')
-      .addClass('spaced')
-    )
-    .append($('<input/>')
-      .attr('type', 'number')
-      .attr('name', 'user')
-      .style('width', 'calc(100% - 4.5rem)')
-    );
-  countrySelect.bind('change', function () {
-    sms.find('input[name="country"]').val(this.value);
-  });
-  var smsButtons = $('<div/>').addClass('buttongroup');
-  var smsReq = $('<button/>').data('role', 'submit').style('backgroundColor', data.color).text(_('SMSRequest'));
-  var voiceReq = $('<button/>').data('role', 'submit').style('backgroundColor', data.color).text(_('VoiceRequest'));
-  var codeReady = $('<button/>').data('role', 'submit').style('backgroundColor', data.color).text(_('codeReady'));
-  var back = $('<button/>').data('view-section', 'back').text(_('GoBack'));
-  smsButtons.append(smsReq).append(voiceReq).append(codeReady).append(back);
-  sms.append(smsButtons);
-  var code = $('<div/>').addClass('code hidden')
-    .append($('<p>').text(_('recodeLabel')))
-    .append($('<input/>')
-      .attr('type', 'number')
-      .attr('name', 'rCode')
-      .attr('placeholder', '123456')
-    );
-  var codeButtons = $('<div/>').addClass('buttongroup');
-  var back = $('<button/>')
-    .bind('click', function () {
-      code.addClass('hidden');
-      sms.removeClass('hidden');
-    })
-    .text(_('GoBack'));
-  var validate = $('<button/>').data('role', 'submit').style('backgroundColor', data.color).text(_('CodeValidate'));
-  codeButtons.append(validate);
-  codeButtons.append(back);
-  code.append(codeButtons);
-  var recode = $('<div/>').addClass('recode hidden')
-    .append($('<p/>').text(_('recodeSMS', { provider: data.longName })))
-    .append($('<label/>').attr('for', 'countrySelect').text(_(data.terms['country'])));
-  var countrySelect = $('<select/>').attr('name', 'countrySelect');
-  var countries = Tools.countries();
-  countrySelect.append($('<option/>').attr('value', '').text('-- ' + _('YourCountry')));
-  for (var i in countries) {
-    var country = countries[i];
-    countrySelect.append($('<option/>').attr('value', country.dial).text(country.name));
-  }
-  recode
-    .append(countrySelect)
-    .append($('<label/>').attr('for', 'user').text(_(data.terms['user'])))
-    .append($('<input/>')
-      .attr('type', 'number')
-      .attr('name', 'country')
-      .attr('disabled', 'true')
-      .style('width', '3rem')
-      .addClass('spaced')
-    )
-    .append($('<input/>')
-      .attr('type', 'number')
-      .attr('name', 'user')
-      .style('width', 'calc(100% - 4.5rem)')
-    )
-    .append($('<label/>').attr('for', 'user').text(_('recodeLabel')))
-    .append($('<input/>')
-      .attr('type', 'number')
-      .attr('name', 'rCode')
-      .attr('placeholder', '123456')
-    );
-  countrySelect.bind('change', function () {
-    recode.find('input[name="country"]').val(this.value);
-  });
-  var recodeButtons = $('<div/>').addClass('buttongroup');
-  var valCode = $('<button/>').data('role', 'submit').style('backgroundColor', data.color).text(_('recodeRequest'));
-  var sback = $('<button/>').text(_('GoBack'));
-  recodeButtons.append(valCode).append(sback);
-  recode.append(recodeButtons);
-  var progress = $('<div/>').addClass('progress hidden')
-    .append('<span/>')
-    .append($('<progress/>').attr('value', '0'));
-  article
-    .append(sms)
-    .append(code)
-    .append(recode)
-    .append(progress);
-  codeReady.bind('click', function () {
-    Tools.log('Move faster, we like Whatsapp right now!');
-    sms.addClass('hidden');
-    recode.removeClass('hidden');
-  });
-  sback.bind('click', function () {
-    Tools.log('Move faster, we like Whatsapp right now!');
-    recode.addClass('hidden');
-    sms.removeClass('hidden');
-  });
-  smsReq.bind('click', function () {
-    var article = this.parentNode.parentNode.parentNode;
-    var provider = article.parentNode.id;
-    var user = $(article).find('[name="user"]').val();
-    var cc  = $(article).find('[name="country"]').val();
-    if (cc && user) {
-      Lungo.Notification.show('envelope', _('SMSsending'));
-      var codeGet = function (deviceId) {
-        $(article).data('deviceId', deviceId);
-        var onsent = function (data) {
-          Tools.log(data);
-          if (data.status == 'sent') {
-            Tools.log('Sent SMS to', cc, user, 'with DID', deviceId, 'retry after', data.retry_after);
-            Lungo.Notification.success(_('SMSsent'), _('SMSsentExp'), 'envelope', 3);
-            sms.addClass('hidden');
-            code.removeClass('hidden');
-          } else if (data.status == 'ok') {
-            if (data.type == 'existing') {
+App.logForms['coseme'] = function (provider, article) {
+  var data = Providers.data[provider];
+  return {
+    get html () {
+      if (article) {
+        article
+          .append($('<h1/>').css('color', data.color).html(_('SettingUp', { provider: data.longName })))
+          .append($('<img/>').attr('src', 'img/providers/' + provider + '.svg'))
+          var sms = $('<div/>').addClass('sms')
+            .append($('<p/>').text(_('ProviderSMS', { provider: data.longName })))
+            .append($('<label/>').attr('for', 'countrySelect').text(_(data.terms['country'])));
+          var countrySelect = $('<select/>').attr('name', 'countrySelect');
+          var countries = Tools.countries();
+          countrySelect.append($('<option/>').attr('value', '').text('-- ' + _('YourCountry')));
+          for (var i in countries) {
+            var country = countries[i];
+            countrySelect.append($('<option/>').attr('value', country.dial).text(country.name));
+          }
+          sms
+            .append(countrySelect)
+            .append($('<label/>').attr('for', 'user').text(_(data.terms['user'])))
+            .append($('<input/>')
+              .attr('type', 'number')
+              .attr('name', 'country')
+              .attr('disabled', 'true')
+              .css('width', '3rem')
+              .addClass('spaced')
+            )
+            .append($('<input/>')
+              .attr('type', 'number')
+              .attr('name', 'user')
+              .css('width', 'calc(100% - 8rem)')
+            );
+          var smsButtons = $('<div/>').addClass('buttongroup');
+          var smsReq = $('<button/>').addClass('smsReq').css('backgroundColor', data.color).text(_('SMSRequest'));
+          smsReq[0].dataset.role= 'submit';
+          var voiceReq = $('<button/>').addClass('voiceReq').css('backgroundColor', data.color).text(_('VoiceRequest'));
+          voiceReq[0].dataset.role= 'submit';
+          var codeReady = $('<button/>').addClass('codeReady').css('backgroundColor', data.color).text(_('codeReady'));
+          codeReady[0].dataset.role= 'submit';
+          var back = $('<button/>').addClass('back').text(_('GoBack'));
+          smsButtons.append(smsReq).append(voiceReq).append(codeReady).append(back);
+          sms.append(smsButtons);
+          var code = $('<div/>').addClass('code hidden')
+            .append($('<p>').text(_('recodeLabel')))
+            .append($('<input/>')
+              .attr('type', 'number')
+              .attr('name', 'rCode')
+              .attr('placeholder', '123456')
+            );
+          var codeButtons = $('<div/>').addClass('buttongroup');
+          var back = $('<button/>').addClass('back').text(_('GoBack'));
+          var validate = $('<button/>').addClass('valCode').css('backgroundColor', data.color).text(_('CodeValidate'));
+          codeButtons.append(validate);
+          codeButtons.append(back);
+          code.append(codeButtons);
+          var recode = $('<div/>').addClass('recode hidden')
+            .append($('<p/>').text(_('recodeSMS', { provider: data.longName })))
+            .append($('<label/>').attr('for', 'countrySelect').text(_(data.terms['country'])));
+          var countrySelect = $('<select/>').attr('name', 'countrySelect');
+          var countries = Tools.countries();
+          countrySelect.append($('<option/>').attr('value', '').text('-- ' + _('YourCountry')));
+          for (var i in countries) {
+            var country = countries[i];
+            countrySelect.append($('<option/>').attr('value', country.dial).text(country.name));
+          }
+          recode
+            .append(countrySelect)
+            .append($('<label/>').attr('for', 'user').text(_(data.terms['user'])))
+            .append($('<input/>')
+              .attr('type', 'number')
+              .attr('name', 'country')
+              .attr('disabled', 'true')
+              .css('width', '3rem')
+              .addClass('spaced')
+            )
+            .append($('<input/>')
+              .attr('type', 'number')
+              .attr('name', 'user')
+              .css('width', 'calc(100% - 8rem)')
+            )
+            .append($('<label/>').attr('for', 'user').text(_('recodeLabel')))
+            .append($('<input/>')
+              .attr('type', 'number')
+              .attr('name', 'rCode')
+              .attr('placeholder', '123456')
+            );
+            var recodeButtons = $('<div/>').addClass('buttongroup');
+            var valCode = $('<button/>').addClass('valCode').css('backgroundColor', data.color).text(_('recodeRequest'));
+            valCode[0].dataset.role= 'submit';
+            var sback = $('<button/>').addClass('sback').text(_('GoBack'));
+            recodeButtons.append(valCode).append(sback);
+            recode.append(recodeButtons);
+            var progress = $('<div/>').addClass('progress hidden')
+              .append('<span/>')
+              .append($('<progress/>').attr('value', '0'));
+            article
+              .append(sms)
+              .append(code)
+              .append(recode)
+              .append(progress);
+        }
+    },
+    events: function (target) {
+      var form = target.closest('div:not(.buttongroup)');
+      var article = form.closest('article')[0];
+      if (target.attr('name') == 'countrySelect') {
+        form.find('input[name="country"]').val(target.val());
+      } else if (target.hasClass('codeReady')) {
+        form.addClass('hidden');
+        form.siblings('.recode').removeClass('hidden');
+      } else if (target.hasClass('codeReady')) {
+        form.addClass('hidden');
+        form.siblings('.recode').removeClass('hidden');
+      } else if (target.hasClass('sback')) {
+        form.addClass('hidden');
+        form.siblings('.sms').removeClass('hidden');
+      } else if (target.hasClass('smsReq')) {
+        var provider = article.parentNode.id;
+        var user = $(article).find('[name="user"]').val();
+        var cc  = $(article).find('[name="country"]').val();
+        if (cc && user) {
+          Lungo.Notification.show('envelope', _('SMSsending'));
+          var codeGet = function (deviceId) {
+            $(article)[0].dataset.deviceId= deviceId;
+            var onsent = function (data) {
+              Tools.log(data);
+              if (data.status == 'sent') {
+                Tools.log('Sent SMS to', cc, user, 'with DID', deviceId, 'retry after', data.retry_after);
+                Lungo.Notification.success(_('SMSsent'), _('SMSsentExp'), 'envelope', 3);
+                form.addClass('hidden');
+                form.siblings('.code').removeClass('hidden');
+              } else if (data.status == 'ok') {
+                if (data.type == 'existing') {
+                    var account = new Account({
+                      user: user,
+                      cc: cc,
+                      data: data,
+                      provider: provider,
+                      resource: App.defaults.Account.core.resource,
+                      enabled: true,
+                      chats: []
+                    }); 
+                    account.test();  
+                } else {
+                  Tools.log('Not valid', 'Reason:', data.reason, 'with DID', deviceId);
+                  Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
+                }
+              } else {
+                Tools.log('Could not sent SMS', 'Reason:', data.reason, 'with DID', deviceId);
+                Lungo.Notification.error(_('SMSnotSent'), _('SMSreason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
+              }        
+            }
+            var onerror = function (data) {}
+            var deviceId = CoSeMe.registration.getCode(cc, user, onsent, onerror, deviceId, 0, 0, document.webL10n.getLanguage(), 'sms'); 
+          }
+          var onhasid = function (file) {
+            var onread = function (deviceId) {
+              codeGet(deviceId);
+            }
+            Tools.textUnblob(file, onread);
+          }
+          var onneedsid = function (error) {
+            var deviceId = Math.random().toString(36).substring(2);
+            Store.SD.save('.coseme.id', [deviceId]);
+            codeGet(deviceId);
+          }
+          Store.SD.recover('.coseme.id', onhasid, onneedsid);
+        }
+      } else if (target.hasClass('voiceReq')) {
+          var provider = article.parentNode.id;
+          var user = $(article).find('[name="user"]').val();
+          var cc  = $(article).find('[name="country"]').val();
+          if (cc && user) {
+            Lungo.Notification.show('phone', _('Voicesending'));
+            var codeGet = function (deviceId) {
+              $(article)[0].dataset.deviceId= deviceId;
+              var onsent = function (data) {
+                Tools.log(data);
+                if (data.status == 'sent') {
+                  Tools.log('Sent phone call to', cc, user, 'with DID', deviceId, 'retry after', data.retry_after);
+                  Lungo.Notification.success(_('voicesent'), _('voicesentExp'), 'phone', 3);
+                  form.addClass('hidden');
+                  form.siblings('.code').removeClass('hidden');
+                } else if (data.status == 'ok') {
+                  if (data.type == 'existing') {
+                      var account = new Account({
+                        user: user,
+                        cc: cc,
+                        data: data,
+                        provider: provider,
+                        resource: App.defaults.Account.core.resource,
+                        enabled: true,
+                        chats: []
+                      }); 
+                      account.test();  
+                  } else {
+                    Tools.log('Not valid', 'Reason:', data.reason, 'with DID', deviceId);
+                    Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
+                  }
+                } else {
+                  Tools.log('Could not sent phone call', 'Reason:', data.reason, 'with DID', deviceId);
+                  Lungo.Notification.error(_('VoicenotSent'), _('SMSreason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
+                }        
+              }
+              var onerror = function (data) {}
+              var deviceId = CoSeMe.registration.getCode(cc, user, onsent, onerror, deviceId, 0, 0, document.webL10n.getLanguage(), 'voice'); 
+            }
+            var onhasid = function (file) {
+              var onread = function (deviceId) {
+                codeGet(deviceId);
+              }
+              Tools.textUnblob(file, onread);
+            }
+            var onneedsid = function (error) {
+              var deviceId = Math.random().toString(36).substring(2);
+              Store.SD.save('.coseme.id', [deviceId]);
+              codeGet(deviceId);
+            }
+            Store.SD.recover('.coseme.id', onhasid, onneedsid);
+          }
+      } else if (target.hasClass('valCode')) {
+        var provider = article.parentNode.id;
+        var user = form.find('[name="user"]').val() ||
+          form.siblings('sms').find('[name="user"]').val();
+        var cc  = form.find('[name="country"]').val() ||
+          form.siblings('sms').find('[name="country"]').val();
+        var rCode = form.find('[name="rCode"]').val().replace(/\D/g,'');
+        if (cc && user && rCode) {
+          var register = function (deviceId) {
+            var onready = function (data) {
+              Tools.log(data);
+              if (data.type == 'existing' || data.type == 'new') {
                 var account = new Account({
                   user: user,
                   cc: cc,
                   data: data,
                   provider: provider,
                   resource: App.defaults.Account.core.resource,
-                  enabled: true,
                   chats: []
-                }); 
+                });
                 account.test();  
-            } else {
-              Tools.log('Not valid', 'Reason:', data.reason, 'with DID', deviceId);
-              Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
+              }
             }
-          } else {
-            Tools.log('Could not sent SMS', 'Reason:', data.reason, 'with DID', deviceId);
-            Lungo.Notification.error(_('SMSnotSent'), _('SMSreason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
-          }        
-        }
-        var onerror = function (data) {}
-        var deviceId = CoSeMe.registration.getCode(cc, user, onsent, onerror, deviceId, 'sms'); 
-      }
-      var onhasid = function (file) {
-        var onread = function (deviceId) {
-          codeGet(deviceId);
-        }
-        Tools.textUnblob(file, onread);
-      }
-      var onneedsid = function (error) {
-        var deviceId = Math.random().toString(36).substring(2);
-        Store.SD.save('.coseme.id', [deviceId]);
-        codeGet(deviceId);
-      }
-      Store.SD.recover('.coseme.id', onhasid, onneedsid);
-    }
-  });
-  voiceReq.bind('click', function () {
-    var article = this.parentNode.parentNode.parentNode;
-    var provider = article.parentNode.id;
-    var user = $(article).find('[name="user"]').val();
-    var cc  = $(article).find('[name="country"]').val();
-    if (cc && user) {
-      Lungo.Notification.show('phone', _('Voicesending'));
-      var codeGet = function (deviceId) {
-        $(article).data('deviceId', deviceId);
-        var onsent = function (data) {
-          Tools.log(data);
-          if (data.status == 'sent') {
-            Tools.log('Sent phone call to', cc, user, 'with DID', deviceId, 'retry after', data.retry_after);
-            Lungo.Notification.success(_('voicesent'), _('voicesentExp'), 'phone', 3);
-            sms.addClass('hidden');
-            code.removeClass('hidden');
-          } else if (data.status == 'ok') {
-            if (data.type == 'existing') {
-                var account = new Account({
-                  user: user,
-                  cc: cc,
-                  data: data,
-                  provider: provider,
-                  resource: App.defaults.Account.core.resource,
-                  enabled: true,
-                  chats: []
-                }); 
-                account.test();  
-            } else {
-              Tools.log('Not valid', 'Reason:', data.reason, 'with DID', deviceId);
-              Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
+            var onerror = function (error) {
+              Tools.log('Not valid', 'Reason:', data.reason);
+              Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);            
             }
-          } else {
-            Tools.log('Could not sent phone call', 'Reason:', data.reason, 'with DID', deviceId);
-            Lungo.Notification.error(_('VoicenotSent'), _('SMSreason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
-          }        
+            Lungo.Notification.show('copy', _('CodeValidating'));
+            CoSeMe.registration.register(cc, user, rCode, onready, onerror, deviceId);
+          }
+          var onhasid = function (file) {
+            var onread = function (deviceId) {
+              register(deviceId);
+            }
+            Tools.textUnblob(file, onread);
+          }
+          var onneedsid = function (error) {
+            var deviceId = Math.random().toString(36).substring(2);
+            Store.SD.save('.coseme.id', [deviceId]);
+            register(deviceId);
+          }
+          Store.SD.recover('.coseme.id', onhasid, onneedsid);
         }
-        var onerror = function (data) {}
-        var deviceId = CoSeMe.registration.getCode(cc, user, onsent, onerror, deviceId, 'voice'); 
       }
-      var onhasid = function (file) {
-        var onread = function (deviceId) {
-          codeGet(deviceId);
-        }
-        Tools.textUnblob(file, onread);
-      }
-      var onneedsid = function (error) {
-        var deviceId = Math.random().toString(36).substring(2);
-        Store.SD.save('.coseme.id', [deviceId]);
-        codeGet(deviceId);
-      }
-      Store.SD.recover('.coseme.id', onhasid, onneedsid);
     }
-  });
-
-  validate.bind('click', function () {
-    var article = this.parentNode.parentNode.parentNode;
-    var provider = article.parentNode.id;
-    var user = $(article).find('[name="user"]').val();
-    var cc  = $(article).find('[name="country"]').val();
-    var rCode = $(article).find('[name="rCode"]').val().replace(/\D/g,'');
-    var deviceId = $(article).data('deviceId');
-    if (cc && user && rCode && deviceId) {
-      var onready = function (data) {
-        Tools.log(data);
-        if (data.type == 'existing') {
-          var account = new Account({
-            user: user,
-            cc: cc,
-            data: data,
-            provider: provider,
-            resource: App.defaults.Account.core.resource,
-            chats: []
-          });  
-          account.test();    
-        } else {
-          Tools.log('Not valid', 'Reason:', data.reason);
-          Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
-        }
-      }
-      var onerror = function (error) {}
-      Lungo.Notification.show('copy', _('CodeValidating'));
-      CoSeMe.registration.register(cc, user, rCode, onready, onerror, deviceId);
-    } 
-  });
-
-  valCode.bind('click', function () {
-    var article = this.parentNode.parentNode.parentNode;
-    var provider = article.parentNode.id;
-    var user = $(article).find('[name="user"]').val();
-    var cc  = $(article).find('[name="country"]').val();
-    var rCode = $(article).find('[name="rCode"]').val().replace(/\D/g,'');
-    var deviceId = $(article).data('deviceId');
-    if (cc && user && rCode && deviceId) {
-      var onready = function (data) {
-        Tools.log(data);
-        if (data.type == 'existing') {
-          var account = new Account({
-            user: user,
-            cc: cc,
-            data: data,
-            provider: provider,
-            resource: App.defaults.Account.core.resource,
-            chats: []
-          });  
-          account.test();    
-        } else {
-          Tools.log('Not valid', 'Reason:', data.reason);
-          Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
-        }
-      }
-      var onerror = function (error) {}
-      Lungo.Notification.show('copy', _('CodeValidating'));
-      CoSeMe.registration.register(cc, user, rCode, onready, onerror, deviceId);
-    } 
-  });
+  }
 }
 
 App.emoji['coseme'] = {
@@ -1365,7 +1352,6 @@ App.emoji['coseme'] = {
 ["e12f","1f4b0"],
 ["e30e","1f6ac"],
 ["e311","1f4a3"],
-["e113","1f52b"],
 ["e30f","1f48a"],
 ["e13b","1f489"],
 ["e42b","1f3c8"],
@@ -1423,7 +1409,7 @@ App.emoji['coseme'] = {
 ["e347","1f353"],
 ["e34a","1f346"],
 ["e349","1f345"],
-["e50a","1f52b"],
+["1f52b","1f52b"],
 ["e44c","1f308"],
 ["e132","1f3c1"],
 ["e143","1f38c"]
@@ -1457,9 +1443,8 @@ App.emoji['coseme'] = {
   
   render: function (img, emoji) {
     var code = typeof emoji[1] == 'string' ? emoji[1] : emoji[1].join('-');
-    img
-      .attr('src', '/img/emoji/coseme/' + code + '.png')
-      .data('emoji', String.fromCodePoint(parseInt(emoji[1], 16)));
+    img.attr('src', '/img/emoji/coseme/' + code + '.png');
+    img[0].dataset.emoji= String.fromCodePoint(parseInt(emoji[1], 16));
   }
   
 }
