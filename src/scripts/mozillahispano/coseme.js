@@ -5784,7 +5784,12 @@ CoSeMe.namespace('registration', (function(){
 
   function getRealDeviceId(aSeed) {
     var seed = aSeed || (Math.random() * 1e16).toString(36).substring(2, 10);
-    var id = CryptoJS.SHA1(seed).toString(CryptoJS.enc.Latin1).substring(0, 20);
+    var id = CryptoJS.SHA1(seed).toString(CryptoJS.enc.Latin1).substring(0, 20)
+      .split('').map(function (e) {
+        return encodeURIComponent(e).length > 1
+          ? String.fromCharCode(e.charCodeAt(0) % 128)
+          : e;
+      }).join('');
     return {
       seed: seed,
       id: id
