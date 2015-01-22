@@ -5786,7 +5786,7 @@ CoSeMe.namespace('registration', (function(){
     var seed = aSeed || (Math.random() * 1e16).toString(36).substring(2, 10);
     var id = CryptoJS.SHA1(seed).toString(CryptoJS.enc.Latin1).substring(0, 20)
       .split('').map(function (e) {
-        return e.charCodeAt(0) % 128;
+        return String.fromCharCode(e.charCodeAt(0) % 128)
       }).join('');
     return {
       seed: seed,
