@@ -772,7 +772,7 @@ App.connectors['coseme'] = function (account) {
         var chatSection = $('section#chat[data-jid="' + jid + '"]');
         if (chatSection.length) {
           var status = chatSection.find('header .status');
-          status.html((present ? _('showa') : _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})})) +  ' - ' + status.html());
+          status.html((present ? _('showa') + (contact.presence.status ? ' - ') : (_('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})}) + ' - ' + status.html() : '') ));
         }
       }
     }
