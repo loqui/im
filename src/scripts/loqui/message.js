@@ -97,9 +97,9 @@ var Message = function (account, core, options) {
       if ($('section#chat')[0].dataset.jid == chat.core.jid && $('section#chat').hasClass('show')) {
         var ul = $('section#chat ul#messages');
         var li = ul.children('li[data-chunk="' + blockIndex + '"]');
-        var last = li.children('div').last();
-        var avatarize = last.length ? (last[0].dataset.from != message.core.from) : true;
-        var timeDiff = last.length ? Tools.unstamp(message.core.stamp) - Tools.unstamp(last[0].dataset.stamp) > 300000 : true;
+        var last = ul.children('li[data-chunk]').last().children('div').last();
+        var avatarize = last[0].dataset.from != message.core.from;
+        var timeDiff = Tools.unstamp(message.core.stamp) - Tools.unstamp(last[0].dataset.stamp) > 300000;
         var conv = Tools.convenientDate(message.core.stamp);
         if (li.length) {
           if (timeDiff) {
@@ -141,7 +141,7 @@ var Message = function (account, core, options) {
       if ($('section#chat')[0].dataset.jid == to && $('section#chat').hasClass('show')) {
         var ul = $('section#chat ul#messages');
         var li = ul.children('li[data-chunk="' + blockIndex + '"]');
-        var last = li.children('div').last();
+        var last = ul.children('li[data-chunk]').last().children('div').last();
         var timeDiff = last.length ? Tools.unstamp(message.core.stamp) - Tools.unstamp(last[0].dataset.stamp) > 300000 : true;
         var conv = Tools.convenientDate(message.core.stamp);
         if (li.length) {
@@ -162,7 +162,7 @@ var Message = function (account, core, options) {
       }
     });
   }
-  
+
   // Represent this message in HTML
   this.preRender = function (index, avatarize) {
     var message = this;
