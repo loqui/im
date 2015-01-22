@@ -1171,7 +1171,7 @@ App.logForms['coseme'] = function (provider, article) {
         var cc  = form.find('[name="country"]').val() ||
           form.siblings('sms').find('[name="country"]').val();
         var rCode = form.find('[name="rCode"]').val().replace(/\D/g,'');
-        if (cc && user && rCode) {
+        if (rCode) {
           var register = function (deviceId) {
             var onready = function (data) {
               Tools.log(data);
