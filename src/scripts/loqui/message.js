@@ -124,6 +124,7 @@ var Message = function (account, core, options) {
       } else {
         chat.unread++;
         chat.core.unread++;
+        account.unread++;
       }
     });
   }
@@ -150,7 +151,8 @@ var Message = function (account, core, options) {
           }
           li.append(message.preRender());
         } else {
-          var li = $('<li/>').addClass('chunk')[0].dataset.chunk= blockIndex;
+          var li = $('<li/>').addClass('chunk');
+          li[0].dataset.chunk= blockIndex;
           if (timeDiff) {
             li.append($('<time/>').attr('datetime', message.core.stamp).text(_('DateTimeFormat', {date: conv[0], time: conv[1]}))[0]);
           }

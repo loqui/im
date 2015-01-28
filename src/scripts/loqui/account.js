@@ -10,7 +10,7 @@ var Account = function (core) {
   this.contacts = {};
   this.names = [];
   this.jidToNameMap = {};
-  this.unread = 0;
+  this._unread = new Blaze.Var(0);
   this._chats = new Blaze.Var([]);
   this._enabled = new Blaze.Var(false);
   
@@ -35,6 +35,15 @@ var Account = function (core) {
   });
   this.__defineSetter__('chats', function (val) {
     this._chats.set(val);
+  });
+
+  Object.defineProperty(this, 'unread', {
+      get : function(){
+        return this._unread.get();
+      },
+      set : function(value){
+        this._unread.set((value > 0) ? value : 0);
+      }
   });
   
   
