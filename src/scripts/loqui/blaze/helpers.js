@@ -50,12 +50,21 @@ UI.registerHelper('chats', function () {
 
 UI.registerHelper('accounts', function () {
   return App.accounts.map(function(x, i) {
-    return {data: x, index: i, enabled: App.online && x.enabled}
+    return {
+      data: x, 
+      index: i, 
+      enabled: App.online && x.enabled
+    }
   });
 });
 
 UI.registerHelper('account', function () {
-  return Accounts.current;
+  var current = Accounts.current;
+  if (current) {
+    return $.extend(current, {
+      othersUnread: App.unread - current.unread
+    });  
+  }
 });
 
 UI.registerHelper('providers', function () {
@@ -124,3 +133,4 @@ UI.registerHelper('time', function (ts) {
 UI.registerHelper('json', function(context) {
   return JSON.stringify(context);
 });
+
