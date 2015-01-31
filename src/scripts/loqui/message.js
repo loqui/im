@@ -121,6 +121,10 @@ var Message = function (account, core, options) {
         $('section#chat #typing').hide();
 		    ul[0].scrollTop = ul[0].scrollHeight;
         chat.core.lastRead = Tools.localize(Tools.stamp());
+        if (!$('section#chat').hasClass('show')) {
+          chat.unread++;
+          chat.core.unread++;
+        }
       } else {
         chat.unread++;
         chat.core.unread++;

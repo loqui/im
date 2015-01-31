@@ -190,70 +190,70 @@ var Chat = function (core, account) {
   // Create a chat window for this contact
   this.show = function () {
     var section = $('section#chat');
-    var header = section.children('header');
-    var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.jid);
-    section[0].dataset.jid = this.core.jid;
-    section[0].dataset.features = $('section#main')[0].dataset.features;
-    //section[0].dataset.caps = contact && contact.presence.caps in App.caps ? App.caps[contact.presence.caps].features.join(' ') : 'false';
-    section[0].dataset.muc = this.core.muc || false;
-    section[0].dataset.mine = this.core.muc && this.core.info && this.core.info.owner == this.account.core.fullJid;
-    header.children('.title').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(this.core.title));
-    section.find('#plus').removeClass('show');
-    section.find('#typing').hide();
-    section.find('#messages').empty();
-    section[0].dataset.otr= ('OTR' in this);
-    Lungo.Router.section('chat');
-    var avatarize = function (url) {
-      header.children('.avatar').children('img').attr('src', url);
-    }
-    if (App.avatars[this.core.jid]) {
-      var existant = $('ul li[data-jid="' + this.core.jid + '"] .avatar img');
-      if (existant.length) {
-        avatarize(existant.attr('src'));
+    if (section[0].dataset.jid != this.core.jid) {
+      var header = section.children('header');
+      var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.jid);
+      section[0].dataset.jid = this.core.jid;
+      section[0].dataset.features = $('section#main')[0].dataset.features;
+      //section[0].dataset.caps = contact && contact.presence.caps in App.caps ? App.caps[contact.presence.caps].features.join(' ') : 'false';
+      section[0].dataset.muc = this.core.muc || false;
+      section[0].dataset.mine = this.core.muc && this.core.info && this.core.info.owner == this.account.core.fullJid;
+      header.children('.title').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(this.core.title));
+      section.find('#plus').removeClass('show');
+      section.find('#typing').hide();
+      section.find('#messages').empty();
+      section[0].dataset.otr= ('OTR' in this);
+      var avatarize = function (url) {
+        header.children('.avatar').children('img').attr('src', url);
+      }
+      if (App.avatars[this.core.jid]) {
+        var existant = $('ul li[data-jid="' + this.core.jid + '"] .avatar img');
+        if (existant.length) {
+          avatarize(existant.attr('src'));
+        } else {
+          if (this.core.jid in App.avatars) {
+            (new Avatar(App.avatars[this.core.jid])).url.then(function (val) {
+              avatarize(val);
+            });
+          }
+        }
       } else {
-        if (this.core.jid in App.avatars) {
-          (new Avatar(App.avatars[this.core.jid])).url.then(function (val) {
+        header.children('.avatar').children('img').attr('src', 'img/foovatar.png');
+        var method = this.core.muc ? this.account.connector.muc.avatar : this.account.connector.avatar;
+        method(function (a) {
+          a.url.then(function (val) {
             avatarize(val);
           });
-        }
+        }, this.core.jid);
       }
-    } else {
-      header.children('.avatar').children('img').attr('src', 'img/foovatar.png');
-      var method = this.core.muc ? this.account.connector.muc.avatar : this.account.connector.avatar;
-      method(function (a) {
-        a.url.then(function (val) {
-          avatarize(val);
-        });
-      }, this.core.jid);
-    }
-    if (this.core.settings.otr[0]) {
-      Plus.switchOTR(this.core.jid, this.account);
-    }
-    setTimeout(function () {
-      if (this.core.muc) {
-        if (this.core.participants) {
-          header.children('.status').text(_('NumParticipants', {number: this.core.participants.length}));
+      if (this.core.settings.otr[0]) {
+        Plus.switchOTR(this.core.jid, this.account);
+      }
+      setTimeout(function () {
+        if (this.core.muc) {
+          if (this.core.participants) {
+            header.children('.status').text(_('NumParticipants', {number: this.core.participants.length}));
+          } else {
+            this.account.connector.muc.participantsGet(this.core.jid);
+            header.children('.status').text(' ');
+          }
         } else {
-          this.account.connector.muc.participantsGet(this.core.jid);
-          header.children('.status').text(' ');
+          var show = contact ? (contact.presence.show || 'na') : 'na';
+          var status = contact ? (contact.presence.status || _('show' + show)) : ' ';
+          if (this.account.connector.presence.get) {
+            this.account.connector.presence.get(this.core.jid);
+          }
+          header.children('.status').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(status));
+          section[0].dataset.show = show;
         }
-      } else {
-        var show = contact ? (contact.presence.show || 'na') : 'na';
-        var status = contact ? (contact.presence.status || _('show' + show)) : ' ';
-        if (this.account.connector.presence.get) {
-          this.account.connector.presence.get(this.core.jid);
-        }
-        header.children('.status').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(status));
-        section[0].dataset.show = show;
-      }
-      this.lastChunkRender();
-    }.bind(this), 0);
+        this.lastChunkRender();
+      }.bind(this), 0);
+    }
     this.unread = this.core.unread;
     if (this.core.unread) {
       this.account.unread -= this.core.unread;
       this.core.unread = 0;
       $('section#main ul[data-jid="' + (this.account.core.fullJid || this.account.core.user) + '"] li[data-jid="' + this.core.jid + '"]')[0].dataset.unread = 0;
-      //Accounts.unread();
     }
     if (this.notification && 'close' in this.notification){
       this.notification.close();
@@ -262,6 +262,7 @@ var Chat = function (core, account) {
     this.lastRead = this.core.lastRead;
     this.core.lastRead = Tools.localize(Tools.stamp());
     this.save();
+    Lungo.Router.section('chat');
   }
   
   // Save or update this chat in store
