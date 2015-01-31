@@ -274,6 +274,7 @@ var App = {
         setTimeout(function () {
           if (last) {
             Accounts.current = App.accounts.length - 1;
+            Accounts.current.show();
           } else {
             Lungo.Aside.show('accounts');
           }

@@ -167,12 +167,12 @@ var Chat = function (core, account) {
       if (pic) {
         pic.url.then(function (src) {
           if (src.slice(0, 1) == '/' && chat.core.muc) {
-            src = 'https://raw.githubusercontent.com/loqui/im/dev/img/goovatar.png';
+            src = 'https://raw.githubusercontent.com/loqui/im/dev/src/img/goovatar.png';
           }
           chat.notification = App.notify({ subject: subject, text: text, pic: src, from : chat.core.jid, callback: callback }, 'received');
         }.bind(chat));
       } else {
-        chat.notification = App.notify({ subject: subject, text: text, pic: 'img/foovatar.png', from : chat.core.jid, callback: callback }, 'received');
+        chat.notification = App.notify({ subject: subject, text: text, pic: 'https://raw.githubusercontent.com/loqui/im/dev/src/img/foovatar.png', from : chat.core.jid, callback: callback }, 'received');
       }
       chat.core.lastAck = last.stamp;
       var section = $('section#chat');
@@ -190,15 +190,16 @@ var Chat = function (core, account) {
   // Create a chat window for this contact
   this.show = function () {
     var section = $('section#chat');
-    if (section[0].dataset.jid != this.core.jid) {
+    if (!(section[0].dataset.jid == this.core.jid && section[0].dataset.account == this.account.core.fullJid)) {
       var header = section.children('header');
       var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.jid);
       section[0].dataset.jid = this.core.jid;
+      section[0].dataset.account = this.account.core.fullJid;
       section[0].dataset.features = $('section#main')[0].dataset.features;
       //section[0].dataset.caps = contact && contact.presence.caps in App.caps ? App.caps[contact.presence.caps].features.join(' ') : 'false';
       section[0].dataset.muc = this.core.muc || false;
       section[0].dataset.mine = this.core.muc && this.core.info && this.core.info.owner == this.account.core.fullJid;
-      section[0].dataset.unread = App.unread - this.unread;
+      section[0].dataset.unread = App.unread - this.core.unread;
       header.children('.title').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(this.core.title));
       section.find('#plus').removeClass('show');
       section.find('#typing').hide();
