@@ -123,6 +123,10 @@ var App = {
     Store.put('avatars', val);
     this._avatars.set($.extend({}, val));
   },
+  
+  get unread () {
+    return this.accounts.reduce(function (prev, cur) {return prev + cur.unread}, 0);
+  },
 
   // This is the main procedure
   run: function () {
@@ -379,3 +383,4 @@ var App = {
   }
   
 };
+
