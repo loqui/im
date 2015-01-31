@@ -788,7 +788,7 @@ App.connectors['coseme'] = function (account) {
       var chatSection = $('section#chat[data-jid="' + jid + '"]');
       if (chatSection.length) {
         var status = chatSection.find('header .status');
-        status.html(_('showa') +  ' - ' + status.html());
+        status.html(_('showa') + (contact.presence.status ? (' - ' + status.html()) : ''));
       }
     }
   }
