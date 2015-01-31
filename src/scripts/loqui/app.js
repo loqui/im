@@ -15,7 +15,7 @@ var App = {
   _devsettings: new Blaze.Var({}),
   _avatars: new Blaze.Var({}),
   _online: new Blaze.Var(navigator.onLine),
-  _notifications: new Blaze.Var([]),
+  notifications: [],
   pathFiles: 'loqui/files/',
   pathBackup: 'loqui/backup/',
   caps: {},
@@ -335,7 +335,7 @@ var App = {
     var alt = function () {
       App.audio(altSound);    
     };
-    if (force || navigator.mozNotification && document.hidden) {
+    if (force || document.hidden) {
       if ('Notification' in window) {
         var notification = new Notification(core.subject, {body: core.text, icon: core.pic, tag: core.from});
         notification.onclick = function () {
@@ -379,7 +379,9 @@ var App = {
   toForeground: function () {
     navigator.mozApps.getSelf().onsuccess = function (e) {
       var app = e.target.result;
-      app.launch('Loqui IM');
+      if (app) {
+        app.launch('Loqui IM');
+      }
     };
   }
   
