@@ -281,9 +281,22 @@ section > nav[data-control="menu"] a:before {
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
-  overflow: hidden;
   left: 3.2rem;
   right: 3.2rem;
+}
+#main > header > span[data-unread]:not([data-unread="0"]):before {
+  content: attr(data-unread);
+  display: block;
+  position: absolute;
+  top: 1.7rem;
+  left: -1.9rem;
+  background-color: #E74C3C;
+  color: #FFF;
+  padding: .35rem .8rem;
+  font-size: 1.2rem;
+  line-height: 1.4rem;
+  border-radius: 1.2rem;
+  pointer-events: none;
 }
 #main > header select {
   position: absolute;
@@ -661,6 +674,20 @@ section > nav[data-control="menu"] a:before {
   width: 7.2rem;
   height: 7.2rem;
   border-radius: 50%;
+}
+#chat[data-unread]:not([data-unread="0"]):before {
+  content: attr(data-unread);
+  display: block;
+  position: absolute;
+  top: 1.7rem;
+  left: 1.6rem;
+  background-color: #E74C3C;
+  color: #FFF;
+  padding: .35rem .8rem;
+  font-size: 1.2rem;
+  line-height: 1.4rem;
+  border-radius: 1.2rem;
+  pointer-events: none;
 }
 #footbox {
   position: absolute;
@@ -1294,9 +1321,22 @@ aside .menu li {
   padding: 1.2rem 3.6rem 1.2rem 4.8rem;
   color: #444;
 }
+aside .menu li[data-unread]:not([data-unread="0"]):after {
+  content: attr(data-unread);
+  display: block;
+  position: absolute;
+  bottom: 1.3rem;
+  right: 7.2rem;
+  background-color: #E74C3C;
+  color: #FFF;
+  padding: .35rem .8rem;
+  font-size: 1.2rem;
+  line-height: 1.4rem;
+  border-radius: 1.2rem;
+}
 aside .menu li span {
   display: block;
-  max-width: calc(100% - 4rem);
+  max-width: calc(100% - 6rem);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -1690,4 +1730,5 @@ article.form ul.listBox li.add:before {
   top: 1.5rem;
   left: 1.7rem;
 }
+
 
