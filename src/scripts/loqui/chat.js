@@ -198,6 +198,7 @@ var Chat = function (core, account) {
       //section[0].dataset.caps = contact && contact.presence.caps in App.caps ? App.caps[contact.presence.caps].features.join(' ') : 'false';
       section[0].dataset.muc = this.core.muc || false;
       section[0].dataset.mine = this.core.muc && this.core.info && this.core.info.owner == this.account.core.fullJid;
+      section[0].dataset.unread = App.unread - this.unread;
       header.children('.title').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(this.core.title));
       section.find('#plus').removeClass('show');
       section.find('#typing').hide();
@@ -251,7 +252,6 @@ var Chat = function (core, account) {
     }
     this.unread = this.core.unread;
     if (this.core.unread) {
-      this.account.unread -= this.core.unread;
       this.core.unread = 0;
       $('section#main ul[data-jid="' + (this.account.core.fullJid || this.account.core.user) + '"] li[data-jid="' + this.core.jid + '"]')[0].dataset.unread = 0;
     }

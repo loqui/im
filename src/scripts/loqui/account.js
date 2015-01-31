@@ -10,7 +10,7 @@ var Account = function (core) {
   this.contacts = {};
   this.names = [];
   this.jidToNameMap = {};
-  this.unread = 0;
+  this._unread = new Blaze.Var(0);
   this._chats = new Blaze.Var([]);
   this._enabled = new Blaze.Var(false);
   
@@ -36,7 +36,12 @@ var Account = function (core) {
   this.__defineSetter__('chats', function (val) {
     this._chats.set(val);
   });
-  
+
+  this.__defineGetter__('unread', function () {
+    var val = this.chats.reduce(function (prev, cur) {return prev + cur.core.unread}, 0);
+    this._unread.set(val);
+    return this._unread.get();
+  });
   
   if ('OTR' in core) {
     $.extend(this.OTR, core.OTR);
@@ -209,7 +214,6 @@ var Account = function (core) {
     meSection.find('#card .name').text(address == this.core.user ? '' : address);
     meSection.find('#card .user').text(this.core.user);
     meSection.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + this.core.provider + '.svg'));
-    Accounts.unread(this.unread);
     if(this.core.background){
       Store.recover(this.core.background, function (url) {
         $('section#chat ul#messages').css('background-image', 'url('+url+')');
@@ -248,7 +252,6 @@ var Account = function (core) {
     if (!f) {
       ul.attr('style', oldUl.attr('style'));
     }
-    var totalUnread = 0;
     if (this.core.chats && this.core.chats.length) {
       for (var i in this.core.chats) {
         var chat = this.core.chats[i];
@@ -280,7 +283,6 @@ var Account = function (core) {
             Messenger.contactProfile(this.dataset.jid);
           }
         });
-        totalUnread += chat.unread;
         ul.prepend(li);
       }
     } else {
@@ -703,16 +705,6 @@ var Accounts = {
       }
     }
     return index;
-  },
-  
-  // Total unread messages
-  unread: function (partial) {
-    var total = App.accounts.reduce(function(prev, cur){return prev + cur.unread}, 0);
-    Lungo.Element.count('section#chat header', total);
-    if (partial) {
-      total -= partial;
-    }
-    Lungo.Element.count('section#main header', total);
   }
   
 }
