@@ -246,7 +246,9 @@ var Chat = function (core, account) {
             this.account.connector.presence.get(this.core.jid);
           }
           header.children('.status').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(status));
-          section[0].dataset.show = show;
+          if (this.account.supports('show')) {
+            section[0].dataset.show = show;
+          }
         }
         this.lastChunkRender();
       }.bind(this), 0);

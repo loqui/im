@@ -364,43 +364,20 @@ var Account = function (core) {
   
   // Render presence for every contact
   this.presenceRender = function (jid) {
-    /*if (this.connector.isConnected() && this.supports('presence')) {
-      var contactPresenceRender = function (contact) {
-        if (this.supports('show')) {
-          var li = $('section#main article ul li[data-jid="'+contact.jid+'"]');
-          li.data('show', contact.presence.show || 'na');
-          li.find('.status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));
-          var section = $('section#chat');
-          if (section[0].dataset.jid == contact.jid) {
-            section.data('show', contact.presence.show || 'na');
-            section.find('header .status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));
-          }
-        }
-      }.bind(this);
-      if (jid) {
-        if (typeof jid == 'object') {
-          contactPresenceRender(jid);
-        } else {
-          contactPresenceRender(Lungo.Core.findByProperty(this.core.roster, 'jid', jid));
-        }
-      } else{
-        for (var i in this.core.roster) {
-          contactPresenceRender(this.core.roster[i]);
-        }
-      }
-    }*/
     var contactPresenceRender = function (jid) {
       var contact = Lungo.Core.findByProperty(this.core.roster, 'jid', jid);
-      if (this.supports('show')) {
-        var li = $('section#main article ul li[data-jid="'+contact.jid+'"]');
-        if (li.length > 0) {
-          li[0].dataset.show = contact.presence.show || 'na';
+      if (contact) {
+        if (this.supports('show')) {
+          var li = $('section#main article ul li[data-jid="'+contact.jid+'"]');
+          if (li.length > 0) {
+            li[0].dataset.show = contact.presence.show || 'na';
+          }
         }
-      }
-      var section = $('section#chat');
-      if (section[0].dataset.jid == contact.jid) {
-        section[0].dataset.show = contact.presence.show || 'na';
-        section.find('header .status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));
+        var section = $('section#chat');
+        if (section[0].dataset.jid == contact.jid) {
+          section[0].dataset.show = (this.supports('show') && contact.presence.show) || 'na';
+          section.find('header .status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));
+        }
       }
     }.bind(this);
     if (jid) {
@@ -654,9 +631,9 @@ var Accounts = {
   set current (i) {
     this._current.set(i);
     setTimeout(function () {
-      this.allRender();
       var ul = $('section#main ul[data-jid="' + (this.core.fullJid || this.core.user) + '"]');
       ul.show().siblings('ul').hide();
+      this.allRender();
     }.bind(this.current));
   },
 
