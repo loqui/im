@@ -1722,13 +1722,15 @@ article.form ul.listBox li.add:before {
   box-shadow: 0 .2rem .2rem rgba(0, 0, 0, .3);
   transition: all .2s ease;
 }
-
 .floater:before {
   color: white;
   font-size: 2.4rem;
   position: relative;
   top: 1.5rem;
   left: 1.7rem;
+}
+.hidden.floater {
+  bottom: -10rem;
 }
 
 
