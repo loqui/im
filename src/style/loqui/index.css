@@ -58,7 +58,10 @@ article.form label {
   width: 100%;
   font-size: 1.4rem;
 }
-
+article.form small {
+  display: block;
+  margin-top: 1.5rem;
+}
 section > article.simple {
   padding: 3.2rem;
   color: #333;
