@@ -12,7 +12,7 @@ input {
   pointer-events: auto;
 }
 small {
-  font-size: .9rem;
+  font-size: .9em;
   font-weight: 100;
 }
 article.form {
@@ -58,7 +58,10 @@ article.form label {
   width: 100%;
   font-size: 1.4rem;
 }
-
+article.form small {
+  display: block;
+  margin-top: 1.5rem;
+}
 section > article.simple {
   padding: 3.2rem;
   color: #333;
@@ -253,18 +256,17 @@ section > nav[data-control="menu"] a:before {
   border: none;
   border-bottom: 1px solid #CCC;
   border-radius: 5px;
-  width: calc(100% - 1.6rem);
-  margin: 0.4rem;
+  width: calc(100% - 2.6rem);
+  margin: .8rem 1rem;
   padding: 0.3rem;
 }
-
 #reset {
   position: absolute;
   right: 0;
   height: 20px;
   width: 20px;
   background: url('../../img/console-inactive.png');
-  margin: 0.7rem;
+  margin: 1.3rem;
 }
 
 #search > h1 {
@@ -281,9 +283,22 @@ section > nav[data-control="menu"] a:before {
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
-  overflow: hidden;
   left: 3.2rem;
   right: 3.2rem;
+}
+#main > header > span[data-unread]:not([data-unread="0"]):before {
+  content: attr(data-unread);
+  display: block;
+  position: absolute;
+  top: 1.7rem;
+  left: -1.9rem;
+  background-color: #E74C3C;
+  color: #FFF;
+  padding: .35rem .8rem;
+  font-size: 1.2rem;
+  line-height: 1.4rem;
+  border-radius: 1.2rem;
+  pointer-events: none;
 }
 #main > header select {
   position: absolute;
@@ -572,7 +587,10 @@ section > nav[data-control="menu"] a:before {
   background: none;
   font-size: 1.4rem;
   width: 50%;
-  padding: 1.3rem 0rem 1.2rem;
+  padding: 1.3rem 0 1.2rem 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 #activity article header.beige button:not(:last-child) {
   border-right: .1rem solid #BBB;
@@ -661,6 +679,20 @@ section > nav[data-control="menu"] a:before {
   width: 7.2rem;
   height: 7.2rem;
   border-radius: 50%;
+}
+#chat[data-unread]:not([data-unread="0"]):before {
+  content: attr(data-unread);
+  display: block;
+  position: absolute;
+  top: 1.7rem;
+  left: 1.6rem;
+  background-color: #E74C3C;
+  color: #FFF;
+  padding: .35rem .8rem;
+  font-size: 1.2rem;
+  line-height: 1.4rem;
+  border-radius: 1.2rem;
+  pointer-events: none;
 }
 #footbox {
   position: absolute;
@@ -1294,9 +1326,22 @@ aside .menu li {
   padding: 1.2rem 3.6rem 1.2rem 4.8rem;
   color: #444;
 }
+aside .menu li[data-unread]:not([data-unread="0"]):after {
+  content: attr(data-unread);
+  display: block;
+  position: absolute;
+  bottom: 1.3rem;
+  right: 7.2rem;
+  background-color: #E74C3C;
+  color: #FFF;
+  padding: .35rem .8rem;
+  font-size: 1.2rem;
+  line-height: 1.4rem;
+  border-radius: 1.2rem;
+}
 aside .menu li span {
   display: block;
-  max-width: calc(100% - 4rem);
+  max-width: calc(100% - 6rem);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -1682,7 +1727,6 @@ article.form ul.listBox li.add:before {
   box-shadow: 0 .2rem .2rem rgba(0, 0, 0, .3);
   transition: all .2s ease;
 }
-
 .floater:before {
   color: white;
   font-size: 2.4rem;
@@ -1690,4 +1734,8 @@ article.form ul.listBox li.add:before {
   top: 1.5rem;
   left: 1.7rem;
 }
+.hidden.floater {
+  bottom: -10rem;
+}
+
 

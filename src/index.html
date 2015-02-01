@@ -60,19 +60,16 @@
     <header>
       <script type="text/spacebars" name="account_header">
         {{#with account}}
-        <span class="jid">{{core.user}}</span>
+        <span class="jid" data-unread="{{othersUnread}}">{{core.user}}</span>
         {{/with}}
         <select>
         {{#each accounts}}
-          <option value="{{index}}">{{data.core.user}}</option>
+          <option value="{{index}}">{{data.core.user}} ({{data.unread}})</option>
         {{/each}}
         </select>
       </script>
       <nav class="on-left discreet">
         <button data-view-aside="accounts" data-icon="menu"></button>
-      </nav>
-      <nav class="on-right discreet">
-        <button data-menu-onclick="doSearch" data-icon="search" ></button>
       </nav>
     </header>
     <article id="chats" class="scroll">

@@ -37,16 +37,12 @@ var Account = function (core) {
     this._chats.set(val);
   });
 
-  Object.defineProperty(this, 'unread', {
-      get : function(){
-        return this._unread.get();
-      },
-      set : function(value){
-        this._unread.set((value > 0) ? value : 0);
-      }
+  this.__defineGetter__('unread', function () {
+    var val = this.chats.reduce(function (prev, cur) {return prev + cur.core.unread}, 0);
+    this._unread.set(val);
+    return this._unread.get();
   });
-  
-  
+
   if ('OTR' in core) {
     $.extend(this.OTR, core.OTR);
     if (core.OTR.key) { // inflate the packed key
@@ -152,42 +148,6 @@ var Account = function (core) {
   // Bring account to foreground
   this.show = function () {
     Accounts.current = Accounts.find(this.core.fullJid);
-    /*$('section#main').data('jid', this.core.fullJid);
-    var vCard = $(this.connector.vcard);
-    var address = ( vCard.length && vCard.find('FN').length ) ? vCard.find('FN').text() : this.core.user;
-    $('section#main header img').attr('src', 'img/providers/' + this.core.provider + '.svg');
-    $('section#main header .provider').text(this.connector.provider.longName);
-    $('section#main header .jid').text(address);
-    $('section#main article ul[data-jid="' + this.core.fullJid + '"]').show().siblings('ul').hide();
-    var index = Accounts.find(this.core.fullJid);
-    $('aside#accounts [data-jid="' + this.core.fullJid  + '"]').addClass('active').siblings('li').removeClass('active');
-    var features = Providers.data[this.core.provider].features;
-    var meSection = $('section#me');
-    var mainSection = $('section#main');
-    meSection.data('features', features.join(' '));
-    mainSection.data('features', features.join(' '));
-    meSection.find('#nick input').val(this.connector.presence.name);
-    meSection.find('#status input').val(this.connector.presence.status);
-    meSection.find('#card .name').text(address == this.core.user ? '' : address);
-    meSection.find('#card .user').text(this.core.user);
-    meSection.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + this.core.provider + '.svg'));
-    var show = function (a) {
-      a.url.then(function (val) {
-        $('section#me .avatar img').attr('src', val);
-      });
-    }
-    if (account.core.fullJid in App.avatars) {
-      show(new Avatar(App.avatars[account.core.fullJid]));
-    } else {
-      account.connector.avatar(function (src) {
-        show(src);
-      });
-    }
-    Accounts.unread(account.unread);
-    Store.recover(account.core.background, function (url) {
-      $('section#chat ul#messages').css('background', 'url('+url+') no-repeat center center fixed');
-      $('section.profile div#card').css('background', 'url('+url+') no-repeat center center fixed'); 
-    }.bind(this)); */
   }
   
   // Render everything for this account
@@ -199,9 +159,7 @@ var Account = function (core) {
   }
   
   // Changes some styles based on presence and connection status
-  this.accountRender = function () {
-    var ul = $('section#main ul[data-jid="' + (this.core.fullJid || this.core.user) + '"]');
-    ul.show().siblings('ul').hide();
+  this.accountRender = function (front) {
     $('section#main header').css('border-color', this.connector.provider.color);
     $('aside#accounts .cover').css('background-color', this.connector.provider.color);
     $('aside#accounts .cover .avatar img').removeAttr('src');
@@ -218,7 +176,6 @@ var Account = function (core) {
     meSection.find('#card .name').text(address == this.core.user ? '' : address);
     meSection.find('#card .user').text(this.core.user);
     meSection.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + this.core.provider + '.svg'));
-    Accounts.unread(this.unread);
     if(this.core.background){
       Store.recover(this.core.background, function (url) {
         $('section#chat ul#messages').css('background-image', 'url('+url+')');
@@ -257,7 +214,6 @@ var Account = function (core) {
     if (!f) {
       ul.attr('style', oldUl.attr('style'));
     }
-    var totalUnread = 0;
     if (this.core.chats && this.core.chats.length) {
       for (var i in this.core.chats) {
         var chat = this.core.chats[i];
@@ -289,7 +245,6 @@ var Account = function (core) {
             Messenger.contactProfile(this.dataset.jid);
           }
         });
-        totalUnread += chat.unread;
         ul.prepend(li);
       }
     } else {
@@ -409,43 +364,20 @@ var Account = function (core) {
   
   // Render presence for every contact
   this.presenceRender = function (jid) {
-    /*if (this.connector.isConnected() && this.supports('presence')) {
-      var contactPresenceRender = function (contact) {
-        if (this.supports('show')) {
-          var li = $('section#main article ul li[data-jid="'+contact.jid+'"]');
-          li.data('show', contact.presence.show || 'na');
-          li.find('.status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));
-          var section = $('section#chat');
-          if (section[0].dataset.jid == contact.jid) {
-            section.data('show', contact.presence.show || 'na');
-            section.find('header .status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));
-          }
-        }
-      }.bind(this);
-      if (jid) {
-        if (typeof jid == 'object') {
-          contactPresenceRender(jid);
-        } else {
-          contactPresenceRender(Lungo.Core.findByProperty(this.core.roster, 'jid', jid));
-        }
-      } else{
-        for (var i in this.core.roster) {
-          contactPresenceRender(this.core.roster[i]);
-        }
-      }
-    }*/
     var contactPresenceRender = function (jid) {
       var contact = Lungo.Core.findByProperty(this.core.roster, 'jid', jid);
-      if (this.supports('show')) {
-        var li = $('section#main article ul li[data-jid="'+contact.jid+'"]');
-        if (li.length > 0) {
-          li[0].dataset.show = contact.presence.show || 'na';
+      if (contact) {
+        if (this.supports('show')) {
+          var li = $('section#main article ul li[data-jid="'+contact.jid+'"]');
+          if (li.length > 0) {
+            li[0].dataset.show = contact.presence.show || 'na';
+          }
         }
-      }
-      var section = $('section#chat');
-      if (section[0].dataset.jid == contact.jid) {
-        section[0].dataset.show = contact.presence.show || 'na';
-        section.find('header .status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));
+        var section = $('section#chat');
+        if (section[0].dataset.jid == contact.jid) {
+          section[0].dataset.show = (this.supports('show') && contact.presence.show) || 'na';
+          section.find('header .status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));
+        }
       }
     }.bind(this);
     if (jid) {
@@ -698,7 +630,11 @@ var Accounts = {
   },
   set current (i) {
     this._current.set(i);
-    setTimeout(function () {this.current.allRender();}.bind(this), 0);
+    setTimeout(function () {
+      var ul = $('section#main ul[data-jid="' + (this.core.fullJid || this.core.user) + '"]');
+      ul.show().siblings('ul').hide();
+      this.allRender();
+    }.bind(this.current));
   },
 
   // Find the index of an account
@@ -712,16 +648,6 @@ var Accounts = {
       }
     }
     return index;
-  },
-  
-  // Total unread messages
-  unread: function (partial) {
-    var total = App.accounts.reduce(function(prev, cur){return prev + cur.unread}, 0);
-    Lungo.Element.count('section#chat header', total);
-    if (partial) {
-      total -= partial;
-    }
-    Lungo.Element.count('section#main header', total);
   }
   
 }

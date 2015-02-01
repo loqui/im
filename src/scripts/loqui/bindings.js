@@ -271,6 +271,10 @@ var bindings = function () {
     }
   }).on('swipeRight', function () {
     Lungo.Aside.show('accounts');
+  }).on('swipeUp', function () {
+    $('.floater').addClass('hidden');
+  }).on('swipeDown', function () {
+    $('.floater').removeClass('hidden');
   });
   $('aside').on('swipeLeft', function () {
     Lungo.Aside.hide();
