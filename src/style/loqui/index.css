@@ -256,18 +256,17 @@ section > nav[data-control="menu"] a:before {
   border: none;
   border-bottom: 1px solid #CCC;
   border-radius: 5px;
-  width: calc(100% - 1.6rem);
-  margin: 0.4rem;
+  width: calc(100% - 2.6rem);
+  margin: .8rem 1rem;
   padding: 0.3rem;
 }
-
 #reset {
   position: absolute;
   right: 0;
   height: 20px;
   width: 20px;
   background: url('../../img/console-inactive.png');
-  margin: 0.7rem;
+  margin: 1.3rem;
 }
 
 #search > h1 {
