@@ -12,7 +12,7 @@ input {
   pointer-events: auto;
 }
 small {
-  font-size: .9rem;
+  font-size: .9em;
   font-weight: 100;
 }
 article.form {
