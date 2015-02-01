@@ -94,7 +94,7 @@ var Message = function (account, core, options) {
     var message = this;
     var chat = this.chat;
     chat.messageAppend.push({msg: message.core}, function (blockIndex) {
-      if ($('section#chat')[0].dataset.jid == chat.core.jid && $('section#chat').hasClass('show')) {
+      if ($('section#chat')[0].dataset.jid == chat.core.jid) {
         var ul = $('section#chat ul#messages');
         var li = ul.children('li[data-chunk="' + blockIndex + '"]');
         var last = ul.children('li[data-chunk]').last().children('div').last();
@@ -121,6 +121,10 @@ var Message = function (account, core, options) {
         $('section#chat #typing').hide();
 		    ul[0].scrollTop = ul[0].scrollHeight;
         chat.core.lastRead = Tools.localize(Tools.stamp());
+        if (!$('section#chat').hasClass('show')) {
+          chat.unread++;
+          chat.core.unread++;
+        }
       } else {
         chat.unread++;
         chat.core.unread++;
@@ -152,7 +156,7 @@ var Message = function (account, core, options) {
           li.append(message.preRender());
         } else {
           var li = $('<li/>').addClass('chunk');
-          li[0].dataset.chunk= blockIndex;
+          li[0].dataset.chunk = blockIndex;
           if (timeDiff) {
             li.append($('<time/>').attr('datetime', message.core.stamp).text(_('DateTimeFormat', {date: conv[0], time: conv[1]}))[0]);
           }
