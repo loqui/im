@@ -472,7 +472,13 @@ App.connectors['coseme'] = function (account) {
           if (jid in App.avatars) {
             Promise.all([
                 new Promise(function(done){ Store.update(App.avatars[jid].chunk, tumb, done) }),
-                new Promise(function(done){ Store.update(App.avatars[jid].original, original, done) })
+                new Promise(function(done){
+                    if(App.avatars[jid].original){
+                        Store.update(App.avatars[jid].original, original, done);
+                    }else{
+                        Store.save(original, done);
+                    }
+                })
             ]).then(cb)
           } else {
             Promise.all([
