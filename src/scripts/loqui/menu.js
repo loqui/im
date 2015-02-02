@@ -1,3 +1,5 @@
+/* global Lungo, Accounts, Messenger, Tools, Activity, App, Providers, Plus */
+
 'use strict';
 
 var Menu = {
@@ -55,7 +57,7 @@ var Menu = {
       var form = $('section#mucCreateForm article.form');
       var domain = form.find('[name=custom]').val() || form.find('[name=server]').val();
       var title = form.find('[name=title]').val().trim();
-      var members = form.find('ul.listBox').children().map(function (i,e,a) {return e.dataset.jid});
+      var members = form.find('ul.listBox').children().map(function (i,e,a) {return e.dataset.jid;});
       if (title) {
         account.connector.muc.create(title, domain, members);
       }
@@ -82,7 +84,7 @@ var Menu = {
         var jid = $(this).parent()[0].dataset.jid;
         var title = $(this).siblings('span').text();
         account.connector.muc.join(jid, title);
-      }
+      };
       if (server) {
         account.connector.muc.explore(server,
           function (jid, name) {
@@ -102,9 +104,10 @@ var Menu = {
     mucInvite: function (obj) {
       var cb;
       var account = Accounts.current;
+      var listBox= null;
       if (typeof obj == 'object') {
-        var obj = $(obj);
-        var listBox = obj.parent();
+        obj = $(obj);
+        listBox = obj.parent();
         cb = function (jid, name) {
           var ex = listBox.find('li[data-jid="' + jid + '"]');
           if (ex.length > 0) {
@@ -114,14 +117,14 @@ var Menu = {
             item[0].dataset.jid= jid;
             listBox.prepend(item);
           }
-        }
+        };
       } else {
         cb = obj;
       }
       var options = {
         chats: false,
         groups: false,
-        selected: listBox && listBox.children().map(function (i,e,a) {return e.dataset.jid})
+        selected: listBox && listBox.children().map(function (i,e,a) {return e.dataset.jid;})
       };
       Activity('invite', account, cb, options);
     },
@@ -129,13 +132,13 @@ var Menu = {
       var cb;
       var account = Accounts.current;
       if (typeof obj == 'object') {
-        var obj = $(obj);
+        obj = $(obj);
         cb = function (jid, name) {
           account.connector.muc.invite($('section#muc')[0].dataset.jid, [jid], $('section#muc').find('span.name').text());
           Lungo.Router.section('back');
           Lungo.Router.section('back');
           Lungo.Notification.success(_('MucInvited', {name: name}), null, 'check', 3);
-        }
+        };
       } else {
         cb = obj;
       }
@@ -272,8 +275,8 @@ var Menu = {
             Tools.log(App.name + ' has been closed');
             window.close();
           }, 3000);
-        }
-        req.onerror = function () { }
+        };
+        req.onerror = function () { };
       }
     },
     reloadApp: function () {
@@ -282,7 +285,7 @@ var Menu = {
         Lungo.Notification.success(_('Reloading'), _('AppWillReload'), 'signout', 3);
         App.disconnect();
         App.run();
-        Tools.log(App.name + ' has been reloaded')
+        Tools.log(App.name + ' has been reloaded');
       } else {
         Tools.log('Upps...');
       }
@@ -296,4 +299,4 @@ var Menu = {
     setTimeout(function () { map[which](attr); }, delay );
   }
   
-}
+};

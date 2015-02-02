@@ -1,3 +1,5 @@
+/* global Chat, Tools, Plus, App, Providers, Store, Activity */
+
 'use strict';
 
 var Message = function (account, core, options) {
@@ -24,14 +26,15 @@ var Message = function (account, core, options) {
       }
     }
     return parts.join(' ');
-  }
+  };
   
   this.__defineGetter__('chat', function () {
     var chatJid = Strophe.getBareJidFromJid(this.options.muc ? this.core.to : (this.core.from == (account.core.user || account.core.fullJid) ? this.core.to : this.core.from));
     var ci = this.account.chatFind(chatJid);
+    var chat= null;
     if (ci < 0) {
       var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', chatJid);
-      var chat = new Chat({
+      chat = new Chat({
         jid: chatJid, 
         title: contact ? contact.name || chatJid : chatJid,
         chunks: [],
@@ -40,7 +43,7 @@ var Message = function (account, core, options) {
       this.account.chats.push(chat);
       this.account.core.chats.push(chat.core);
     } else {
-      var chat = this.account.chats[ci];
+      chat = this.account.chats[ci];
       this.account.chats.push(chat);
       this.account.core.chats.push(chat.core);
       this.account.chats.splice(ci, 1);
@@ -59,7 +62,7 @@ var Message = function (account, core, options) {
       this.options.otr = true;
     }
     this.postSend();
-  }
+  };
   
   this.postSend = function () {
     Tools.log('SEND', this.core.text, this.options);
@@ -69,7 +72,7 @@ var Message = function (account, core, options) {
     if (this.options.render) {
       this.addToChat();
     }
-  }
+  };
   
   // Receive this message, process and store it properly
   this.receive = function () {
@@ -85,9 +88,9 @@ var Message = function (account, core, options) {
         Plus.switchOTR(this.core.from, this.account);
       }
     } else {
-      this.postReceive()
+      this.postReceive();
     }
-  }
+  };
   
   // Incoming
   this.postReceive = function() {
@@ -107,7 +110,7 @@ var Message = function (account, core, options) {
           }
           li.append(message.preRender(false, avatarize));
         } else {
-          var li = $('<li/>').addClass('chunk');
+          li = $('<li/>').addClass('chunk');
           li[0].dataset.chunk= blockIndex;
           if (timeDiff) {
             li.append($('<time/>').attr('datetime', message.core.stamp).text(_('DateTimeFormat', {date: conv[0], time: conv[1]}))[0]);
@@ -131,7 +134,7 @@ var Message = function (account, core, options) {
         account.unread++;
       }
     });
-  }
+  };
 
   //Outcoming
   this.addToChat = function () {
@@ -155,7 +158,7 @@ var Message = function (account, core, options) {
           }
           li.append(message.preRender());
         } else {
-          var li = $('<li/>').addClass('chunk');
+          li = $('<li/>').addClass('chunk');
           li[0].dataset.chunk = blockIndex;
           if (timeDiff) {
             li.append($('<time/>').attr('datetime', message.core.stamp).text(_('DateTimeFormat', {date: conv[0], time: conv[1]}))[0]);
@@ -167,16 +170,18 @@ var Message = function (account, core, options) {
         chat.core.lastRead = Tools.localize(Tools.stamp());
       }
     });
-  }
+  };
 
   // Represent this message in HTML
   this.preRender = function (index, avatarize) {
     var message = this;
     var account = this.account;
+    var html= null;
+    var onDivClick= null;
     if (this.core.text) {
-      var html = App.emoji[Providers.data[this.account.core.provider].emoji].fy(Tools.urlHL(Tools.HTMLescape(this.core.text)));
+      html = App.emoji[Providers.data[this.account.core.provider].emoji].fy(Tools.urlHL(Tools.HTMLescape(this.core.text)));
     } else if (this.core.media) {
-      var html = $('<img/>').attr('src', this.core.media.thumb);
+      html = $('<img/>').attr('src', this.core.media.thumb);
       html[0].dataset.url = this.core.media.url;
       html[0].dataset.downloaded = this.core.media.downloaded || false;
       switch (this.core.media.type) {
@@ -203,8 +208,8 @@ var Message = function (account, core, options) {
                 blob: blob
               }
             });
-          }
-          var onClick = function (e) {
+          };
+          onClick = function (e) {
             var img = e.target;
             var url = img.dataset.url;
             var ext = url.split('.').pop();
@@ -228,7 +233,7 @@ var Message = function (account, core, options) {
                       img.dataset.downloaded = true;
                       Tools.log('SUCCESS');
                     });
-                  })
+                  });
                 }, function (error) {
                   Tools.log('SAVE ERROR', error);
                 });
@@ -238,7 +243,7 @@ var Message = function (account, core, options) {
           break;
       }
       html.bind('click', onClick);
-      var onDivClick = function(e) {
+      onDivClick = function(e) {
         e.preventDefault();
         var target = $(e.target);
         var span = target[0].lastChild;
@@ -255,7 +260,7 @@ var Message = function (account, core, options) {
     var div = $('<div/>');
     var last = $('section#chat ul#messages li > div').last();
     div[0].dataset.type = type;
-    var index = index || (last.length ? parseInt(last[0].dataset.index) + 1 : 0);
+    index = index || (last.length ? parseInt(last[0].dataset.index) + 1 : 0);
     index = index >= App.defaults.Chat.chunkSize ? 0 : index;
     div[0].dataset.index = index;
     div[0].dataset.stamp = this.core.stamp;
@@ -286,6 +291,6 @@ var Message = function (account, core, options) {
       Activity('chat', null, $(this).children('.text').text());
     });
   	return div[0];
-  }
+  };
   
-}
+};

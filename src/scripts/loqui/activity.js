@@ -1,8 +1,10 @@
+/* global App, Tools, Lungo */
+
 'use strict';
 
 var Activity = function (action, account, content, options) {
   
-  var options = options || {};
+  options = options || {};
 
   $.extend(options, {
     chats: (options && 'chats' in options) ? options.chats : true,
@@ -19,7 +21,7 @@ var Activity = function (action, account, content, options) {
         if (content) {
           $('#main #footbox #text').text(content).trigger('keydown');
         }
-      }
+      };
       if (options.chats) {
         account.chatsRender(f, click);
       }
@@ -47,7 +49,7 @@ var Activity = function (action, account, content, options) {
             }
           }
         }
-      }
+      };
       if (options.chats) {
         account.chatsRender(f, click);
       }
@@ -61,10 +63,10 @@ var Activity = function (action, account, content, options) {
         t = $(t);
         t.toggleClass('selected');
         content(t[0].dataset.jid, t.find('.name').text());
-      }
+      };
       account.contactsRender(f, click, options.selected);
     }
-  }
+  };
   
   var accountSelect = function (f, title) {
     var article = document.createElement('article');
@@ -96,7 +98,7 @@ var Activity = function (action, account, content, options) {
       article.appendChild(ul);
     }
     f.appendChild(article);
-  }
+  };
   
   var t = '';
   var f = document.createDocumentFragment();
@@ -135,7 +137,7 @@ var Activity = function (action, account, content, options) {
   
   Lungo.Router.section('activity');
   
-}
+};
 
 if ('mozSetMessageHandler' in navigator) {
   document.addEventListener('appReady', function(){

@@ -134,10 +134,11 @@ var Chungo = {
     _stack: [],
     
     section: function (to) {
+      var from = null;
       if (this._stack[this._stack.length - 1] != to) {
         if (to == 'back' && this._stack.length > 1) {
-          var from = this._stack.pop();
-          var to = this._stack[this._stack.length - 1];
+          from = this._stack.pop();
+          to = this._stack[this._stack.length - 1];
           $$('section#' + from)
             .removeClass('show')
             .removeClass('forth')
@@ -155,7 +156,7 @@ var Chungo = {
             }, 300);
           }
         } else {
-          var from = this._stack[this._stack.length - 1];
+          from = this._stack[this._stack.length - 1];
           if (to != from) {
             this._stack.push(to);
             if ($$('section#' + to).data('transition') != 'vertical') {
@@ -202,7 +203,7 @@ var Chungo = {
       this._current = {
         id: id,
         open: true
-      }
+      };
     },
     
     hide: function () {

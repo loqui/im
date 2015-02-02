@@ -2,6 +2,27 @@
 	"esnext" : true,
 	"globalstrict" : true,
 	"strict" : false,
-	"debug" : true,
-	"browser" : true
+	"devel" : true,
+	"browser" : true,
+    "laxbreak" : true,
+    "newcap" : false,
+    "loopfunc" : true,
+    "globals" : {
+        "$" : false,
+        "$$" : false,
+        "_" : false,
+        "Strophe" : false,
+        "Template" : false,
+        "MozActivity" : false,
+        "Blaze" : false,
+        "DSA" : false,
+        "Iterator" : false,
+        "async" : false,
+        "b64_sha1" : false,
+        "CryptoJS" : false,
+        "asyncStorage" : false,
+        "i18n" : false,
+        "formatE164" : false,
+        "MD5" : false
+    }
 }

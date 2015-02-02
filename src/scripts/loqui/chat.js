@@ -1,3 +1,5 @@
+/* global Tools, App, Store, Message, Avatar, Providers, Plus, Lungo */
+
 'use strict';
 
 var Chat = function (core, account) {
@@ -27,7 +29,7 @@ var Chat = function (core, account) {
     if (index >= 0) {
       this.chunkRender(index);
     }
-  }
+  };
   
   // Render a chunk of messages
   this.chunkRender = function (index) {
@@ -97,7 +99,7 @@ var Chat = function (core, account) {
         chat.account.avatarsRender();
       });
     }
-  }
+  };
   
   // Push messages to this queue to append them to this chat
   this.messageAppend = async.queue(function (task, callback) {
@@ -112,7 +114,7 @@ var Chat = function (core, account) {
       Store.recover(blockIndex, function (chunk) {
         if (!chunk || chunk.length >= App.defaults.Chat.chunkSize) {
           Tools.log('FULL OR NULL');
-          var chunk = [msg];
+          chunk = [msg];
           blockIndex = Store.save(chunk);
           Tools.log('PUSHING', blockIndex, chunk);
           chat.core.chunks.push(blockIndex);
@@ -157,12 +159,12 @@ var Chat = function (core, account) {
         chat.account.show();
         chat.show();
         App.toForeground();
-      }
+      };
       var contact = Lungo.Core.findByProperty(chat.account.core.roster, 'jid', Strophe.getBareJidFromJid(last.from));
       var subject = (chat.core.muc && chat.core.unread < 2) ? ((contact ? (contact.name || last.pushName) : last.pushName) + ' @ ' + chat.core.title) : chat.core.title;
       var text = chat.core.unread > 1 ? _('NewMessages', {number: chat.core.unread}) : last.text;
       if (last.media) {
-        var text = _('SentYou', {type: _('MediaType_' + last.media.type)});
+        text = _('SentYou', {type: _('MediaType_' + last.media.type)});
       }
       if (pic) {
         pic.url.then(function (src) {
@@ -207,7 +209,7 @@ var Chat = function (core, account) {
       section[0].dataset.otr= ('OTR' in this);
       var avatarize = function (url) {
         header.children('.avatar').children('img').attr('src', url);
-      }
+      };
       if (App.avatars[this.core.jid]) {
         var existant = $('ul li[data-jid="' + this.core.jid + '"] .avatar img');
         if (existant.length) {
@@ -266,13 +268,13 @@ var Chat = function (core, account) {
     this.core.lastRead = Tools.localize(Tools.stamp());
     this.save();
     Lungo.Router.section('chat');
-  }
+  };
   
   // Save or update this chat in store
   this.save = function (up) {
     this.account.save();
     this.account.singleRender(this, up);
-  }
+  };
     
-}
+};
 

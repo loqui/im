@@ -1,3 +1,5 @@
+/* global App, Providers, Accounts, Menu, Chungo, Activity, Lungo */
+
 'use strict';
 
 Template.settings_features.events({
@@ -53,7 +55,7 @@ Template.accounts_list.events({
     var index = li.dataset.accountIndex;
     if (closestSwitch.length > 0) {
       var status = li.dataset.value;
-      App.accounts[index].enabled = (status == 'false' || status == undefined);
+      App.accounts[index].enabled = (status == 'false' || status === undefined);
     } else {
       $('#main header select').val(index);
       Accounts.current = index;
