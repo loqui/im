@@ -1,0 +1,7 @@
+{
+	"esnext" : true,
+	"globalstrict" : true,
+	"strict" : false,
+	"debug" : true,
+	"browser" : true
+}
