@@ -30,14 +30,17 @@ Strophe.addConnectionPlugin('Messaging', {
 
 	send: function(to, body, stamp, wantsReceipt){
 		var msg = $msg({to: to, type: 'chat', id: this._connection.getUniqueId()});
-		if(body){
+		if (body) {
 			msg.c('body', {}, body);
-			if(stamp)msg.c('delay', {xmlns: Strophe.NS.XEP0203, stamp: stamp});
+			if (stamp) {
+			  msg.c('delay', {xmlns: Strophe.NS.XEP0203, stamp: stamp});
+		  }
 		}
 		if (wantsReceipt) {
       msg.c('request', {xmlns: Strophe.NS.XEP0184});
 		}
 		this._connection.send(msg.tree());
+		return msg.tree();
 	},
 	
 	csnSend: function(to, state) {

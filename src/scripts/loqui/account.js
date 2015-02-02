@@ -564,7 +564,8 @@ var Account = function (core) {
           from: content.from,
           to: content.to,
           text: content.text,
-          stamp: content.stamp
+          stamp: content.stamp,
+		  original : sendQ[0]
         }, {
           render: false
         });
@@ -602,6 +603,46 @@ var Account = function (core) {
       }, this);
     }
     return chat;
+  }
+  
+  this.messageSent = function(from, msgId){
+    var chat = this.chatGet(from);
+    var account = this;
+    var lastIndex = chat.core.chunks[chat.core.chunks.length-1];
+    var secondLastIndex = chat.core.chunks[chat.core.chunks.length-2];
+console.log('MARKING AS DELIVERED', from, msgId, chat, account, lastIndex, secondLastIndex);
+    Store.recover(lastIndex, function(chunk) {
+      for (var i in chunk) {
+        var msg = chunk[i];
+        if (msg.id == msgId) {
+		      if (msg.ack == 'sent') {
+		        msg.ack = 'delivered';
+		      } else {
+		        msg.ack = 'sent';
+		      }
+          msg = new Message(account, msg);
+          Store.update(lastIndex, chunk, null);
+		      msg.reRender(lastIndex);
+          return;
+        }
+      }
+      Store.recover(secondLastIndex, function(chunk) {
+        for (var i in chunk) {
+          var msg = chunk[i];
+          if (msg.id == msgId) {
+		        if (msg.ack == 'sent') {
+		          msg.ack = 'delivered';
+		        } else {
+		          msg.ack = 'sent';
+		        }
+            msg = new Message(account, msg);
+            Store.update(secondLastIndex, chunk, null);
+		        msg.reRender(secondLastIndex);
+            return;
+          }
+        }
+      });
+    });
   }
     
   // Check for feature support

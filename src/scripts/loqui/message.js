@@ -62,12 +62,35 @@ var Message = function (account, core, options) {
   }
   
   this.postSend = function () {
+    var triedToSend = false;
     Tools.log('SEND', this.core.text, this.options);
     if (this.account.connector.isConnected() && this.options.send) {
       this.core.id = account.connector.send(this.core.to, this.core.text, {delay: (this.options && 'delay' in this.options) ? this.core.stamp : this.options.delay, muc: this.options.muc});
+      triedToSend = true;
+	    if (this.core.original) {
+		    var msg = this;
+		    var block = this.core.original[0];
+		    var index = this.core.original[1];
+		    var receipts = this.account.supports('receipts');
+		    Store.recover(block, function(chunk){
+			    var message = chunk[index];
+			    if (!triedToSend) {
+				    message.ack = 'failed';
+			    } else if (receipts) {
+				    message.ack = 'sending';
+				    message.id = msg.core.id;
+				    msg.core.id = 0;
+				    msg.setSendTimeout(block, index);
+			    } else {
+				    message.ack = '';
+			    }
+			    Store.update(block, chunk, null);
+			    (new Message(msg.account, message)).reRender(block);
+		    });
+	    }
     }
     if (this.options.render) {
-      this.addToChat();
+      this.addToChat(triedToSend);
     }
   }
   
@@ -133,16 +156,51 @@ var Message = function (account, core, options) {
     });
   }
 
+  this.setSendTimeout= function(block, index){
+	  var message= this.core;
+	  var account= this.account;
+	  setTimeout(function(){
+		  Store.recover(block, function(chunk){
+			if(index !== null){
+				var msg= chunk[index];
+			}else{
+				for(var i in chunk){
+					if(chunk[i].id == message.id){
+						var msg= chunk[i];
+					}
+				}
+			}
+			if(msg){
+				if(msg.ack == 'sending'){
+					msg.ack = 'failed';
+					msg= new Message(account, msg);
+					Store.update(block, chunk, null);
+					msg.reRender(block);
+				}
+			}
+		  });
+	  }, 30000);
+  }
+
   //Outcoming
-  this.addToChat = function () {
+  this.addToChat = function (triedToSend) {
     var message = this;
     var chat = this.chat;
     var account = this.account;
     var to = this.core.to;
+    var receipts = account.supports('receipts');
+    if (!triedToSend) {
+      message.core.ack = 'failed';
+    } else if (receipts) {
+      message.core.ack = 'sending';
+    }
     chat.messageAppend.push({
       msg: message.core,
       delay: !account.connector.isConnected()
     }, function (blockIndex) {
+	  if (triedToSend && receipts) {
+		  message.setSendTimeout(blockIndex, null);
+	  }
       if ($('section#chat')[0].dataset.jid == to && $('section#chat').hasClass('show')) {
         var ul = $('section#chat ul#messages');
         var li = ul.children('li[data-chunk="' + blockIndex + '"]');
@@ -168,7 +226,14 @@ var Message = function (account, core, options) {
       }
     });
   }
-
+  
+  this.reRender= function(blockIndex){
+    if($('section#chat')[0].dataset.jid == this.core.to && $('section#chat').hasClass('show')){
+      var element= $('section#chat ul#messages li[data-chunk="' + blockIndex + '"] div[data-id="' + this.core.id + '"]');
+      element.replaceWith(this.preRender());
+    }
+  };
+  
   // Represent this message in HTML
   this.preRender = function (index, avatarize) {
     var message = this;
@@ -265,6 +330,9 @@ var Message = function (account, core, options) {
     }
     if (this.core.media) {
       div[0].dataset.mediaType = this.core.media.type;
+    }
+    if(type == 'out' && this.core.ack){
+      div[0].dataset.ack= this.core.ack;
     }
     if (avatarize) {
       var img = $('<img/>');

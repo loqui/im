@@ -184,14 +184,20 @@ App.connectors['XMPP'] = function (account) {
   
   this.send = function (to, text, options) {
     if (options.muc) {
-      this.connection.muc.message(to, Strophe.getNodeFromJid(this.account.core.fullJid), text, null, 'groupchat');
+      var stanza = this.connection.muc.message(to, Strophe.getNodeFromJid(this.account.core.fullJid), text, null, 'groupchat');
     } else {
       var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', to);
       var caps = contact && contact.presence.caps;
       var features = caps in App.caps && App.caps[caps].features;
       var wantsReceipt = features && Tools.toArray(features).indexOf(Strophe.NS.XEP0184);
-      this.connection.Messaging.send(to, text, options.delay, wantsReceipt);
+      var stanza = this.connection.Messaging.send(to, text, options.delay, wantsReceipt);
     }
+    if (App.online && this.connection.connected) {
+      setTimeout(function () {
+        this.events.onMessageDelivered($(stanza).attr('from', to));
+      }.bind(this), 500);
+    }
+    return $(stanza).attr('id');
   }.bind(this);
   
   this.attentionSend = function (to) {
@@ -384,10 +390,10 @@ App.connectors['XMPP'] = function (account) {
   
   this.handlers.init = function () {
     this.connection.deleteHandler(this.handlers.onMessage);
+    this.connection.deleteHandler(this.handlers.onAttention);
     this.connection.deleteHandler(this.handlers.onSubRequest);
     this.connection.deleteHandler(this.handlers.onTime[0]);
     this.connection.deleteHandler(this.handlers.onTime[1]);
-    this.connection.deleteHandler(this.handlers.onAttention);
     this.connection.deleteHandler(this.handlers.onDisco[0]);
     this.connection.deleteHandler(this.handlers.onDisco[1]);
     this.connection.deleteHandler(this.handlers.onDisco[2]);
@@ -397,7 +403,7 @@ App.connectors['XMPP'] = function (account) {
     this.handlers.onTime = this.connection.time.handlify(this.events.onTime);
     this.handlers.onAttention = this.connection.attention.handlify(this.events.onAttention);
     this.handlers.onDisco = this.connection.disco.handlify(this.events.onDisco);
-    this.handlers.onVersion = this.connection.disco.handlify(this.events.onVersion);
+    this.handlers.onVersion = this.connection.version.handlify(this.events.onVersion);
   }.bind(this);
   
   this.events.onDisconnected = function (stanza) {
@@ -470,12 +476,7 @@ App.connectors['XMPP'] = function (account) {
     var chat = account.chatGet(from);
     chat.core.lastAck = Tools.localize(Tools.stamp());
     chat.save();
-    var section = $('section#chat');
-    if (section.hasClass('show') && section[0].dataset.jid == from) {
-      var li = section.find('article#main ul li').last();
-      section.find('span.lastACK').remove();
-      li.append($('<span/>').addClass('lastACK')[0]);
-    }
+    account.messageSent(from, msgId);
     return true;
   }.bind(this);
   
