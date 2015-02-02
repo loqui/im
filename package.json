@@ -14,7 +14,7 @@
     "type": "AGPL"
   },
   "scripts" : {
-    "jshint": "node_modules/jshint/bin/jshint -c .jshintrc --exclude-path .gitignore src/scripts/loqui"
+    "jshint": "jshint -c .jshintrc --exclude-path .gitignore ."
   },
   "pre-commit": ["jshint"],
   "devDependencies": {
