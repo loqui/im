@@ -610,6 +610,7 @@ var Account = function (core) {
     var account = this;
     var lastIndex = chat.core.chunks[chat.core.chunks.length-1];
     var secondLastIndex = chat.core.chunks[chat.core.chunks.length-2];
+console.log('MARKING AS DELIVERED', from, msgId, chat, account, lastIndex, secondLastIndex);
     Store.recover(lastIndex, function(chunk) {
       for (var i in chunk) {
         var msg = chunk[i];

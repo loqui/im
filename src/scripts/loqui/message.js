@@ -62,34 +62,32 @@ var Message = function (account, core, options) {
   }
   
   this.postSend = function () {
-    var triedToSend= false;
+    var triedToSend = false;
     Tools.log('SEND', this.core.text, this.options);
     if (this.account.connector.isConnected() && this.options.send) {
       this.core.id = account.connector.send(this.core.to, this.core.text, {delay: (this.options && 'delay' in this.options) ? this.core.stamp : this.options.delay, muc: this.options.muc});
-      triedToSend= true;
-	  if(this.core.original){
-		  var msg= this;
-		  var block= this.core.original[0];
-		  var index= this.core.original[1];
-		  var receipts = this.account.supports('receipts');
-		  Store.recover(block, function(chunk){
-			  var message= chunk[index];
-			  if (!triedToSend) {
-				  message.ack= 'failed';
-			  } else if (receipts) {
-				  message.ack= 'sending';
-				  message.id= msg.core.id;
-				  msg.core.id= 0;
-				  msg.setSendTimeout(block, index);
-			  } else {
-				  message.ack= '';
-			  }
-
-			  Store.update(block, chunk, null);
-			  (new Message(msg.account, message)).reRender(block);
-
-		  });
-	  }
+      triedToSend = true;
+	    if (this.core.original) {
+		    var msg = this;
+		    var block = this.core.original[0];
+		    var index = this.core.original[1];
+		    var receipts = this.account.supports('receipts');
+		    Store.recover(block, function(chunk){
+			    var message = chunk[index];
+			    if (!triedToSend) {
+				    message.ack = 'failed';
+			    } else if (receipts) {
+				    message.ack = 'sending';
+				    message.id = msg.core.id;
+				    msg.core.id = 0;
+				    msg.setSendTimeout(block, index);
+			    } else {
+				    message.ack = '';
+			    }
+			    Store.update(block, chunk, null);
+			    (new Message(msg.account, message)).reRender(block);
+		    });
+	    }
     }
     if (this.options.render) {
       this.addToChat(triedToSend);

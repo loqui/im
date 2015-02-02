@@ -184,14 +184,20 @@ App.connectors['XMPP'] = function (account) {
   
   this.send = function (to, text, options) {
     if (options.muc) {
-      this.connection.muc.message(to, Strophe.getNodeFromJid(this.account.core.fullJid), text, null, 'groupchat');
+      var stanza = this.connection.muc.message(to, Strophe.getNodeFromJid(this.account.core.fullJid), text, null, 'groupchat');
     } else {
       var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', to);
       var caps = contact && contact.presence.caps;
       var features = caps in App.caps && App.caps[caps].features;
       var wantsReceipt = features && Tools.toArray(features).indexOf(Strophe.NS.XEP0184);
-      this.connection.Messaging.send(to, text, options.delay, wantsReceipt);
+      var stanza = this.connection.Messaging.send(to, text, options.delay, wantsReceipt);
     }
+    if (App.online && this.connection.connected) {
+      setTimeout(function () {
+        this.events.onMessageDelivered($(stanza).attr('from', to));
+      }.bind(this), 500);
+    }
+    return $(stanza).attr('id');
   }.bind(this);
   
   this.attentionSend = function (to) {
