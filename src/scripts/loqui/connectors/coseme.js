@@ -53,7 +53,7 @@ App.connectors['coseme'] = function (account) {
     });
     MI.call(method, params);
     callback.connecting();
-  }
+  };
   
   this.disconnect = function () {
     this.connected = false;
@@ -62,17 +62,17 @@ App.connectors['coseme'] = function (account) {
     clearInterval(pulse);
     pulse= null;
     MI.call(method, params);
-  }
+  };
   
   this.isConnected = function () {
     return App.online && this.connected;
-  }
+  };
   
   this.start = function () {
     Tools.log('CONNECTOR START');
     this.handlers.init();
     this.presence.set();
-  }
+  };
   
   this.sync = function (callback) {
     var getStatusesAndPics = function () {
