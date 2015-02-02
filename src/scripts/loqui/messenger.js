@@ -25,7 +25,8 @@ var Messenger = {
         from: account.core.user,
         to: to,
         text: text,
-        stamp: Tools.localize(Tools.stamp())
+        stamp: Tools.localize(Tools.stamp()),
+        status : ''
       },
       {
         muc: muc

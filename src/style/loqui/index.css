@@ -102,7 +102,7 @@ section > article.simple > div > p {
   text-align: center;
   color: white;
 }
-section.setup img[src^='img/providers']{
+section.setup img[src^='img/providers'] {
   position: absolute;
   top: 3.5rem; right: 3rem;
   width: 5.6rem;
@@ -878,28 +878,35 @@ section > nav[data-control="menu"] a:before {
   vertical-align: middle;
   height: 1.2em;
 }
-#messages > li > div[data-type='out'][data-receipt='sent']:after {
-  content: "";
-  display: block;
-  width: .5rem;
-  height: .5rem;
-  border-radius: 50%;
-  background-color: #3498DF;
-  position: absolute;
-  top: .3rem;
-  left: -1.9rem;
-  opacity: .3;
+#messages > li > div[data-type='out'][data-ack='sending'] > span.text {
+  background-color: #efcc12;
 }
-#messages > li > div[data-type='out'][data-receipt='delivered']:after {
-  content: "";
-  display: block;
-  width: .5rem;
-  height: .5rem;
-  border-radius: 50%;
-  background-color: #2ECC71;
+#messages > li > div[data-type='out'][data-ack='failed'] > span.text {
+  background-color: #EEE;
+  color: #000;
+  padding: calc(0.5rem - 2px) calc(1rem - 2px);
+  border: 2px solid #E95644;
+}
+#messages > li > div[data-type='out'][data-ack='sent']:after {
+  content: "✔";
   position: absolute;
-  top: .3rem;
-  right: 1.9rem;
+  top: 1.6rem;
+  left: -.3rem;
+  text-align: right;
+  font-size: .8em;
+  color: #71C837;
+  opacity: .5;
+}
+#messages > li > div[data-type='out'][data-ack='delivered']:after {
+  content: "✔✔";
+  position: absolute;
+  top: 1.6rem;
+  left: -1rem;
+  text-align: right;
+  font-size: .8em;
+  color: #71C837;
+  letter-spacing: -.5em;
+  opacity: .5;
 }
 #messages > li:last-child {
   margin-bottom: 3.5rem;

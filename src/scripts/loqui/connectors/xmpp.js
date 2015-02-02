@@ -470,12 +470,7 @@ App.connectors['XMPP'] = function (account) {
     var chat = account.chatGet(from);
     chat.core.lastAck = Tools.localize(Tools.stamp());
     chat.save();
-    var section = $('section#chat');
-    if (section.hasClass('show') && section[0].dataset.jid == from) {
-      var li = section.find('article#main ul li').last();
-      section.find('span.lastACK').remove();
-      li.append($('<span/>').addClass('lastACK')[0]);
-    }
+    account.messageSent(from, msgId);
     return true;
   }.bind(this);
   
