@@ -495,6 +495,7 @@ App.connectors.coseme = function (account) {
   
   this.events.onMessageSent = function (from, msgId) {
     Tools.log('SENT', from, msgId);
+    account.messageSent(from, msgId);
   };
 
   this.events.onMessageDelivered = function (from, msgId) {
@@ -502,12 +503,7 @@ App.connectors.coseme = function (account) {
     var chat = account.chatGet(from);
     chat.core.lastAck = Tools.localize(Tools.stamp());
     chat.save();
-    var section = $('section#chat');
-    if (section.hasClass('show') && section[0].dataset.jid == from) {
-      var li = section.find('article#main ul li').last();
-      section.find('span.lastACK').remove();
-      li.append($('<span/>').addClass('lastACK')[0]);
-    }
+	  account.messageSent(from, msgId);
     Tools.log('DELIVERED', from, msgId);
     MI.call('delivered_ack', [from, msgId]);
   };
