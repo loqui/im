@@ -71,18 +71,17 @@ var Message = function (account, core, options) {
 		  var msg= this;
 		  var block= this.core.original[0];
 		  var index= this.core.original[1];
-		  var csn= this.account.supports('csn');
+		  var receipts = this.account.supports('receipts');
 		  Store.recover(block, function(chunk){
 			  var message= chunk[index];
-
-			  if(!triedToSend){
+			  if (!triedToSend) {
 				  message.ack= 'failed';
-			  }else if(csn){
+			  } else if (receipts) {
 				  message.ack= 'sending';
 				  message.id= msg.core.id;
 				  msg.core.id= 0;
 				  msg.setSendTimeout(block, index);
-			  }else{
+			  } else {
 				  message.ack= '';
 			  }
 
@@ -190,18 +189,17 @@ var Message = function (account, core, options) {
     var chat = this.chat;
     var account = this.account;
     var to = this.core.to;
-    var csn= account.supports('csn');
-
-    if(!triedToSend){
+    var receipts = account.supports('receipts');
+    if (!triedToSend) {
       message.core.ack = 'failed';
-    }else if(csn){
+    } else if (receipts) {
       message.core.ack = 'sending';
     }
     chat.messageAppend.push({
       msg: message.core,
       delay: !account.connector.isConnected()
     }, function (blockIndex) {
-	  if (triedToSend && csn) {
+	  if (triedToSend && receipts) {
 		  message.setSendTimeout(blockIndex, null);
 	  }
       if ($('section#chat')[0].dataset.jid == to && $('section#chat').hasClass('show')) {

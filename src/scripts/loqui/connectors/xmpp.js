@@ -384,10 +384,10 @@ App.connectors['XMPP'] = function (account) {
   
   this.handlers.init = function () {
     this.connection.deleteHandler(this.handlers.onMessage);
+    this.connection.deleteHandler(this.handlers.onAttention);
     this.connection.deleteHandler(this.handlers.onSubRequest);
     this.connection.deleteHandler(this.handlers.onTime[0]);
     this.connection.deleteHandler(this.handlers.onTime[1]);
-    this.connection.deleteHandler(this.handlers.onAttention);
     this.connection.deleteHandler(this.handlers.onDisco[0]);
     this.connection.deleteHandler(this.handlers.onDisco[1]);
     this.connection.deleteHandler(this.handlers.onDisco[2]);
@@ -397,7 +397,7 @@ App.connectors['XMPP'] = function (account) {
     this.handlers.onTime = this.connection.time.handlify(this.events.onTime);
     this.handlers.onAttention = this.connection.attention.handlify(this.events.onAttention);
     this.handlers.onDisco = this.connection.disco.handlify(this.events.onDisco);
-    this.handlers.onVersion = this.connection.disco.handlify(this.events.onVersion);
+    this.handlers.onVersion = this.connection.version.handlify(this.events.onVersion);
   }.bind(this);
   
   this.events.onDisconnected = function (stanza) {
