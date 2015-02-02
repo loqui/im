@@ -1,3 +1,5 @@
+/* global Tools */
+
 'use strict';
 
 var Chungo = {

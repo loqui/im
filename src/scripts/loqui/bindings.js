@@ -1,4 +1,4 @@
-/* global App, Menu, Tools, Messenger, Accounts, Store, Plus, UI */
+/* global App, Menu, Tools, Messenger, Accounts, Store, Plus, UI, Lungo */
 
 'use strict';
 

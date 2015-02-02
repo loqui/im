@@ -1,4 +1,4 @@
-/* global Chat, Tools, Plus, App, Providers, Store, Activity */
+/* global Chat, Tools, Plus, App, Providers, Store, Activity, Lungo */
 
 'use strict';
 
