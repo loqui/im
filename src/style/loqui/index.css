@@ -884,7 +884,6 @@ section > nav[data-control="menu"] a:before {
 #messages > li > div[data-type='out'][data-ack='failed'] > span.text {
   background-color: #EEE;
   color: #000;
-  padding: calc(0.5rem - 2px) calc(1rem - 2px);
   border: 2px solid #E95644;
 }
 #messages > li > div[data-type='out'][data-ack='sent']:after {
