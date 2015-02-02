@@ -1,3 +1,5 @@
+/* global App, Providers, UI, Accounts, Tools */
+
 'use strict';
 
 Template.settings_features.helpers({
@@ -51,10 +53,10 @@ UI.registerHelper('chats', function () {
 UI.registerHelper('accounts', function () {
   return App.accounts.map(function(x, i) {
     return {
-      data: x, 
-      index: i, 
+      data: x,
+      index: i,
       enabled: App.online && x.enabled
-    }
+    };
   });
 });
 
@@ -63,7 +65,7 @@ UI.registerHelper('account', function () {
   if (current) {
     return $.extend(current, {
       othersUnread: App.unread - current.unread
-    });  
+    });
   }
 });
 
@@ -112,12 +114,12 @@ UI.registerHelper('date', function (ts) {
   if (ts) {
     var day = Tools.day(ts);
     var today = Tools.day(Tools.localize(Tools.stamp()));
-    var string = 
+    string =
       day.toString() == today.toString()
       ?
         _('Today')
       :
-        _('DateFormat', {day: day[2], month: day[1]})
+        _('DateFormat', {day: day[2], month: day[1]});
   }
   return string;
 });
@@ -125,7 +127,7 @@ UI.registerHelper('date', function (ts) {
 UI.registerHelper('time', function (ts) {
   var string = '';
   if (ts) {
-    var string = Tools.hour(ts);
+    string = Tools.hour(ts);
   }
   return string;
 });

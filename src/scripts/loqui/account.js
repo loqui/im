@@ -1,3 +1,5 @@
+/* global App, Providers, Store, Tools, Messenger, Activity, Menu, Avatar, Message, Chat, Lungo */
+
 'use strict';
 
 var Account = function (core) {
@@ -38,11 +40,11 @@ var Account = function (core) {
   });
 
   this.__defineGetter__('unread', function () {
-    var val = this.chats.reduce(function (prev, cur) {return prev + cur.core.unread}, 0);
+    var val = this.chats.reduce(function (prev, cur) {return prev + cur.core.unread;}, 0);
     this._unread.set(val);
     return this._unread.get();
   });
-  
+
   if ('OTR' in core) {
     $.extend(this.OTR, core.OTR);
     if (core.OTR.key) { // inflate the packed key
@@ -91,7 +93,7 @@ var Account = function (core) {
         Lungo.Notification.error(_('NoAuth'), _('NoAuthNotice'), 'signal', 5);
       }
     });
-  }
+  };
   
   // Connect
   this.connect = function () {
@@ -121,7 +123,7 @@ var Account = function (core) {
           }.bind(this),
           authfail: function () {
             var failStamps = this.connector.failStamps || {};
-            failStamps.push(new Date);
+            failStamps.push(new Date());
             if (failStamps.length > 2 && Math.floor((failStamps.slice(-1)[0] - failStamps.slice(-3)[0])/1000) < 30) {
               location.reload();
             }
@@ -138,17 +140,17 @@ var Account = function (core) {
         });
       }
     }
-  }
+  };
   
   // Download roster and register callbacks for roster updates handling
   this.sync = function (callback) {
     this.connector.sync(callback);
-  }
+  };
   
   // Bring account to foreground
   this.show = function () {
     Accounts.current = Accounts.find(this.core.fullJid);
-  }
+  };
   
   // Render everything for this account
   this.allRender = function () {
@@ -156,7 +158,7 @@ var Account = function (core) {
     this.chatsRender();
     this.avatarsRender();
     this.presenceRender();
-  }
+  };
   
   // Changes some styles based on presence and connection status
   this.accountRender = function (front) {
@@ -215,6 +217,23 @@ var Account = function (core) {
       ul.attr('style', oldUl.attr('style'));
     }
     if (this.core.chats && this.core.chats.length) {
+      var liClickDefault= function (){
+          click(this);
+      };
+      var liClickFallback= function () {
+        account.chatGet(this.dataset.jid).show();
+      };
+      var liHoldDefault= function (){
+          hold(this);
+      };
+      var liHoldFallback= function () {
+        window.navigator.vibrate([100]);
+        if (this.dataset.jid.match(/\-/)) {
+          Messenger.mucProfile(this.dataset.jid);
+        } else {
+          Messenger.contactProfile(this.dataset.jid);
+        }
+      };
       for (var i in this.core.chats) {
         var chat = this.core.chats[i];
         var title = App.emoji[Providers.data[this.core.provider].emoji].fy(chat.title);
@@ -235,16 +254,7 @@ var Account = function (core) {
           account.chats[i].save();
         }
         li[0].dataset.muc = chat.muc ? true : false;
-        li.bind('click', click ? function () {click(this)} : function () {
-          account.chatGet(this.dataset.jid).show();
-        }).bind('hold', hold ? function () {hold(this)} : function () {
-          window.navigator.vibrate([100]);
-          if (this.dataset.jid.match(/\-/)) {
-            Messenger.mucProfile(this.dataset.jid);
-          } else {
-            Messenger.contactProfile(this.dataset.jid);
-          }
-        });
+        li.bind('click', click ? liClickDefault : liClickFallback).bind('hold', hold ? liHoldDefault : liHoldFallback);
         ul.prepend(li);
       }
     } else {
@@ -287,7 +297,7 @@ var Account = function (core) {
     }
     var ul = $('<ul/>').addClass('list').addClass('scroll');
     var frag = f;
-    var account = this;
+    account = this;
     this.contacts = {};
     this.core.roster.forEach(function (contact, i, roster) {
       var name = contact.name || contact.jid;
@@ -327,7 +337,7 @@ var Account = function (core) {
       header.append($('<button/>').addClass('new').text(_('GroupNew'))
       .on('click', function (event) {
         Menu.show('mucCreateForm', account);
-      }))
+      }));
     }
     if (account.supports('mucJoin')) {
       header.append($('<button/>').addClass('join').text(_('GroupJoin'))
@@ -337,7 +347,7 @@ var Account = function (core) {
     }
     var ul = $('<ul/>').addClass('list').addClass('scroll');
     var frag = f;
-    var account = this;
+    account = this;
     this.core.chats.forEach(function (chat, i, chats) {
       if (chat.muc) {
         var title = chat.title;
@@ -456,7 +466,7 @@ var Account = function (core) {
     article.append(header).append($('<h1/>').text('Type some characters to start searching'));
     var frag = f;
     frag.appendChild(article[0]);
-  }
+  };
 
   // Search through contacts for a loose match and append a list
   this.search = function (article, text, click) {
@@ -481,7 +491,7 @@ var Account = function (core) {
         matches.push(match);
     }
     var ul = $('<ul/>').addClass('list').addClass('scroll');
-    for(var _i = 0, _len = matches.length; _i < _len; _i++) {
+    for(_i = 0, _len = matches.length; _i < _len; _i++) {
       var jids = account.contacts[matches[_i]].split(' ');
       for(var _j = 0, _l = jids.length; _j < _l; _j++) {
         var name = account.jidToNameMap[jids[_j]];
@@ -489,14 +499,12 @@ var Account = function (core) {
         li.dataset.jid = jids[_j];
         li.innerHTML = '<span class=\'name\'>' + name + '</span>'
                        + '<span class=\'status\'>' + jids[_j] + '</span>';
-        li.addEventListener('click', function (e) {
-          click(this);
-        });
+        li.addEventListener('click', click.bind(li, li));
         ul[0].appendChild(li);
       }
     }
     article.append(ul[0]);
-  }
+  };
   
   this.OTRMenu = function () {
     var account = this;
@@ -513,7 +521,7 @@ var Account = function (core) {
           account.OTR.key = key;
           account.core.OTR = $.extend({}, account.OTR, {
             key: account.OTR.key.packPrivate()
-          })
+          });
           account.save();
           Lungo.Notification.success(_('OTRKeyReady'), _('OTRKeyReadyDesc'), 'ok', 5);
           OTRSettings();
@@ -539,7 +547,7 @@ var Account = function (core) {
       OTRSettings();
     }
     Lungo.Router.section('otrMenu');
-  }
+  };
   
   // Push message to sendQ
   this.toSendQ = function (storageIndex) {
@@ -549,7 +557,7 @@ var Account = function (core) {
     }
     this.core.sendQ.push(storageIndex);
     this.save();
-  }
+  };
   
   // Send every message in SendQ
   this.sendQFlush = function () {
@@ -576,7 +584,7 @@ var Account = function (core) {
     } else {
       this.save();
     }
-  }
+  };
   
   // Find chat in chat array
   this.chatFind = function (jid) {
@@ -588,23 +596,24 @@ var Account = function (core) {
       }
     }
     return index;
-  }
+  };
   
   // Get a chat for a jid (create if none)
   this.chatGet = function (jid, title) {
     var ci = this.chatFind(jid);
+    var chat= null;
     if (ci >= 0) {
-      var chat = this.chats[ci];
+      chat = this.chats[ci];
     } else { 
-      var chat = new Chat({
+      chat = new Chat({
         jid: jid,
         title: title || jid,
         chunks: []
       }, this);
     }
     return chat;
-  }
-  
+  };
+
   this.messageSent = function(from, msgId){
     var chat = this.chatGet(from);
     var account = this;
@@ -643,12 +652,12 @@ console.log('MARKING AS DELIVERED', from, msgId, chat, account, lastIndex, secon
         }
       });
     });
-  }
+  };
     
   // Check for feature support
   this.supports = function (feature) {
     return this.connector.provider.features.indexOf(feature) >= 0;
-  }
+  };
   
   // Save to store
   this.save = function () {
@@ -658,9 +667,9 @@ console.log('MARKING AS DELIVERED', from, msgId, chat, account, lastIndex, secon
 		  accounts[index] = this;
 		  App.accounts = accounts;
 	  }
-  }
+  };
 
-}
+};
 
 var Accounts = {
 
@@ -691,4 +700,4 @@ var Accounts = {
     return index;
   }
   
-}
+};

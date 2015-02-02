@@ -1,3 +1,5 @@
+/* global App, Menu, Tools, Messenger, Accounts, Store, Plus, UI, Lungo */
+
 'use strict';
 
 Lungo.init({
@@ -84,7 +86,7 @@ document.addEventListener("visibilitychange", function() {
     if (document.hidden) {
       account.connector.presence.set('away');
     } else {
-      App.lastActive = new Date;
+      App.lastActive = new Date();
       account.connector.presence.set('a');
 
       var section = $('section#chat');
@@ -119,7 +121,7 @@ $('section#chat article#main div#text').on('keydown', function (e) {
     $('section#chat nav#plus').addClass('show');
     var ul = $('section#chat ul#messages');
     ul[0].scrollTop = ul[0].scrollHeight;
-    if ($(this).text().length == 0) {
+    if ($(this).text().length === 0) {
       Messenger.csn('composing');
     }
   }
@@ -146,8 +148,8 @@ $('section#me #card span.avatar').on('click', function (e) {
     pick.onsuccess = function() {
       var image = this.result;
       Messenger.avatarSet(image.blob);
-    }
-    pick.onerror = function() { }
+    };
+    pick.onerror = function(){};
   } else {
     Lungo.Notification.error(_('NoDevice'), _('FxOSisBetter', 'exclamation-sign'));
   }
@@ -156,7 +158,7 @@ $('section#me #card span.avatar').on('click', function (e) {
 // Change background
 $('section#me #card button.background.change').on('click', function (e) {
   if (typeof MozActivity != 'undefined') {
-    var e = new MozActivity({
+    e = new MozActivity({
       name: 'pick',
       data: {
         type: ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/bmp']
@@ -178,10 +180,10 @@ $('section#me #card button.background.change').on('click', function (e) {
           Lungo.Notification.show('star', _('backChanged'), 3);
         }.bind(this)); 
       });
-    }
+    };
     e.onerror = function () {
       Tools.log('Picture selection was canceled');
-    }
+    };
   } else {
     Lungo.Notification.error(_('NoDevice'), _('FxOSisBetter', 'exclamation-sign'));
   }
@@ -298,7 +300,7 @@ var bindings = function () {
     if (option[0].dataset.reveal) {
       select.siblings('[name="' + option[0].dataset.reveal + '"]').removeClass('hidden');
     } else {
-      option = select.find('[data-reveal]')
+      option = select.find('[data-reveal]');
       select.siblings('[name="' + option[0].dataset.reveal + '"]').addClass('hidden').val('');
     }
   });
@@ -306,4 +308,4 @@ var bindings = function () {
     var name = script.getAttribute('name');
     UI.insert(UI.render(Template[name]), script.parentNode, script);
   });
-}
+};

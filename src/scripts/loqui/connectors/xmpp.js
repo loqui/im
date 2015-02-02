@@ -1,6 +1,8 @@
+/* global App, Providers, Tools, Lungo, $build, $pres, $msg, Avatar, Store, Chat, Message, Account */
+
 'use strict';
 
-App.connectors['XMPP'] = function (account) {
+App.connectors.XMPP = function (account) {
   
   this.account = account;
   this.provider = Providers.data[account.core.provider];
@@ -9,7 +11,7 @@ App.connectors['XMPP'] = function (account) {
     status: this.account.core.presence ? this.account.core.presence.status : App.defaults.Connector.presence.status
   };
   this.handlers = {onDisco: [], onTime: []};
-  this.events = {}
+  this.events = {};
   this.chat = {};
   this.muc = {};
   this.contacts = {};
@@ -73,23 +75,23 @@ App.connectors['XMPP'] = function (account) {
     }.bind(this);
     this.connection.reset();
     this.connection.connect(user, pass, handler, this.provider.connector.timeout);
-  }
+  };
   
   this.disconnect = function () {
     this.connected = false;
     this.connection.disconnect();
-  }
+  };
   
   this.isConnected = function () {
     return App.online && this.connected;
-  }
+  };
   
   this.start = function () {
     this.handlers.init();
     this.capabilize();
     this.presence.set();
     this.muc.init();
-  }
+  };
   
   this.sync = function (callback) {
     var account = this.account;
@@ -134,7 +136,7 @@ App.connectors['XMPP'] = function (account) {
         this.connection.caps.addFeature(caps[i][1]);
       }
     }
-  }
+  };
   
   this.presence.set = function (show, status) {
     this.presence.show = show || this.presence.show;
@@ -143,14 +145,14 @@ App.connectors['XMPP'] = function (account) {
     this.account.core.presence = {
       show: this.presence.show,
       status: this.presence.status
-    }
+    };
     this.account.save();
   }.bind(this);
   
   this.presence.send = function (show, status) {
-    var show = show || this.presence.show;
-    var status = status || this.presence.status;
-    var idle = document.hidden ? new Date - App.lastActive : 0;
+    show = show || this.presence.show;
+    status = status || this.presence.status;
+    var idle = document.hidden ? new Date() - App.lastActive : 0;
     var priority =
       idle < 1000 ? 100 :
       idle < 5000 ? 80 :
@@ -183,14 +185,15 @@ App.connectors['XMPP'] = function (account) {
   }.bind(this);
   
   this.send = function (to, text, options) {
+    var stanza = null;
     if (options.muc) {
-      var stanza = this.connection.muc.message(to, Strophe.getNodeFromJid(this.account.core.fullJid), text, null, 'groupchat');
+      stanza = this.connection.muc.message(to, Strophe.getNodeFromJid(this.account.core.fullJid), text, null, 'groupchat');
     } else {
       var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', to);
       var caps = contact && contact.presence.caps;
       var features = caps in App.caps && App.caps[caps].features;
       var wantsReceipt = features && Tools.toArray(features).indexOf(Strophe.NS.XEP0184);
-      var stanza = this.connection.Messaging.send(to, text, options.delay, wantsReceipt);
+      stanza = this.connection.Messaging.send(to, text, options.delay, wantsReceipt);
     }
     if (App.online && this.connection.connected) {
       setTimeout(function () {
@@ -202,23 +205,24 @@ App.connectors['XMPP'] = function (account) {
   
   this.attentionSend = function (to) {
     this.connection.attention.request(to);
-  }
+  };
   
   this.avatar = function (callback, jid) {
     var extract = function (vcard) {
+      var url= '';
       if (vcard.find('BINVAL').length) {
         var img = vcard.find('BINVAL').text();
         var type = vcard.find('TYPE').text();
-        var url = 'data:' + type + ';base64,' + img;
+        url = 'data:' + type + ';base64,' + img;
       } else {
-        var url = 'img/foovatar.png';
+        url = 'img/foovatar.png';
       }
       if (callback) {
         var a = new Avatar();
         a.url = url;
         callback(a);
       }
-    }
+    };
     if (jid) {
       this.connection.vcard.get(function(data) {
         var vcard = $(data).find('vCard');
@@ -250,11 +254,11 @@ App.connectors['XMPP'] = function (account) {
         $('section#me .avatar img').attr('src', url);
       }.bind(this), vCardEl.tree());
     }.bind(this));
-  }
+  };
   
   this.csnSend = function (to, state) {
     this.connection.Messaging.csnSend(to, state);
-  }
+  };
   
   this.emojiRender = function (img, emoji) {
     App.emoji[Providers.data[this.account.core.provider].emoji].render(img, emoji);
@@ -263,7 +267,7 @@ App.connectors['XMPP'] = function (account) {
   this.contacts.remove = function (jid) {
     this.connection.roster.remove(jid);
     this.connection.roster.get(function(){});
-  }
+  };
   
   this.muc.init = function () {
     for (let [i, chat] in Iterator(this.account.core.chats)) {
@@ -271,7 +275,7 @@ App.connectors['XMPP'] = function (account) {
         this.muc._join(chat.jid);
       }
     }
-  }.bind(this)
+  }.bind(this);
   
   this.muc.explore = function (server, resolve, reject) {
     var disco = this.connection.disco;
@@ -299,9 +303,9 @@ App.connectors['XMPP'] = function (account) {
           reject(s);
         }
       }
-    }
+    };
     process(server);    
-  }.bind(this)
+  }.bind(this);
   
   this.muc.join = function (jid, title, password) {
     var account = this.account;
@@ -318,7 +322,7 @@ App.connectors['XMPP'] = function (account) {
     chat.save(true);
     chat.show();
     this.muc._join(jid, password);
-  }.bind(this)
+  }.bind(this);
   
   this.muc._join = function (jid, password) {
     Tools.log('JOINING', jid);
@@ -354,15 +358,15 @@ App.connectors['XMPP'] = function (account) {
       password,
       history
     );
-  }.bind(this)
+  }.bind(this);
   
   this.muc.avatar = function (callback, id) {
     callback(new Avatar({url: 'https://raw.githubusercontent.com/loqui/im/dev/src/img/goovatar.png'}));
-  }
+  };
   
   this.muc.participantsGet = function (jid) {
     // Not necessary
-  }
+  };
   
   this.muc.expel = function (gid, jid) {
     if (jid) {
@@ -372,21 +376,21 @@ App.connectors['XMPP'] = function (account) {
         Tools.log('MUC LEAVE', e);
       });
     }
-  }.bind(this)
+  }.bind(this);
   
   this.muc.create = function (title, domain, members) {
     var node = title.toLowerCase().replace(/ /g, '').replace(/ñ/g, 'n');
     var jid = node + '@' + domain;
     this.muc.join(jid, title);
     this.muc.invite(jid, members, title);
-  }.bind(this)
+  }.bind(this);
   
   this.muc.invite = function (gid, members, title) {
     for (let i in members) {
       let jid = members[i];
       this.connection.muc.directInvite(gid, jid, _('MucInvitationText', {title: title}));
     }
-  }.bind(this)
+  }.bind(this);
   
   this.handlers.init = function () {
     this.connection.deleteHandler(this.handlers.onMessage);
@@ -447,7 +451,7 @@ App.connectors['XMPP'] = function (account) {
       }
     }
     if (request && !(composing) && !(paused)) {
-      var out = $msg({to: from, from: to, id: this.connection.getUniqueId()}),
+      var out = $msg({to: from, from: to, id: this.connection.getUniqueId()});
       request = Strophe.xmlElement('received', {'xmlns': Strophe.NS.XEP0184, 'id': tree.attr('id')});
       out.tree().appendChild(request);
       this.connection.send(out);
@@ -456,7 +460,7 @@ App.connectors['XMPP'] = function (account) {
       this.events.onMessageDelivered(stanza);
     }
     if (x) {
-      var x = tree.find('x');
+      x = tree.find('x');
       switch (x.attr('xmlns')) {
         case 'jabber:x:delay':
           break;
@@ -539,7 +543,7 @@ App.connectors['XMPP'] = function (account) {
               caps: caps
             }
           });
-        }
+        };
         async.map(connector.roster, map.bind(account), function (err, result) {
           account.core.roster = result;
           account.presenceRender();
@@ -554,8 +558,8 @@ App.connectors['XMPP'] = function (account) {
   }.bind(this);
   
   this.events.onAttention = function (stanza) {
+    var from = Strophe.getBareJidFromJid($(stanza).attr('from'));
     if (App.settings.boltGet) {
-      var from = Strophe.getBareJidFromJid($(stanza).attr('from'));
       var chat = this.account.chats[this.account.chatFind(from)];
       if (!chat) {
         var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', from);
@@ -563,7 +567,7 @@ App.connectors['XMPP'] = function (account) {
           jid: from,
           title: contact ? contact.name || from : from,
           chunks: []
-        }, connector.account);
+        }, account);
       }
       window.navigator.vibrate([100,30,100,30,100,200,200,30,200,30,200,200,100,30,100,30,100]);
       App.notify({
@@ -581,7 +585,7 @@ App.connectors['XMPP'] = function (account) {
   }.bind(this);
   
   this.events.onDisco = function (stanza) {
-    var stanza = $(stanza);
+    stanza = $(stanza);
     var key = stanza.find('query').attr('node');
     var caps= App.caps;
     var value = {
@@ -601,9 +605,9 @@ App.connectors['XMPP'] = function (account) {
     return true;
   }.bind(this);
   
-}
+};
 
-App.logForms['XMPP'] = function (provider, article) {
+App.logForms.XMPP = function (provider, article) {
   var data = Providers.data[provider];
   return {
     get html () {
@@ -611,16 +615,16 @@ App.logForms['XMPP'] = function (provider, article) {
         article
           .append($('<h1/>').css('color', data.color).html(_('SettingUp', { provider: data.longName })))
           .append($('<img/>').attr('src', 'img/providers/' + provider + '.svg'))
-          .append($('<label/>').attr('for', 'user').text(_(data.terms['user'], { provider: data.altname })))
-          .append($('<input/>').attr('type', data.terms.userInputType).attr('x-inputmode', 'verbatim').attr('name', 'user').attr('placeholder', (data.terms.placeholder || _(data.terms['user'], { provider: data.altname }) )))
-          .append($('<label/>').attr('for', 'pass').text(_(data.terms['pass'])))
+          .append($('<label/>').attr('for', 'user').text(_(data.terms.user, { provider: data.altname })))
+          .append($('<input/>').attr('type', data.terms.userInputType).attr('x-inputmode', 'verbatim').attr('name', 'user').attr('placeholder', (data.terms.placeholder || _(data.terms.user, { provider: data.altname }) )))
+          .append($('<label/>').attr('for', 'pass').text(_(data.terms.pass)))
           .append($('<input/>').attr('type', 'password').attr('name', 'pass').attr('placeholder', '******'));
         if (data.notice) {
           article.append($('<small/>').html(_(provider + 'Notice')));
         }
         var buttongroup = $('<div/>').addClass('buttongroup')
           .append($('<button/>').addClass('submit').css('backgroundColor', data.color).text(_('LogIn')))
-          .append($('<button/>').addClass('back').text(_('GoBack')))
+          .append($('<button/>').addClass('back').text(_('GoBack')));
         article.append(buttongroup);
       }
     },
@@ -644,10 +648,10 @@ App.logForms['XMPP'] = function (provider, article) {
         }      
       }
     }
-  }
-}
+  };
+};
 
-App.emoji['XMPP'] = {
+App.emoji.XMPP = {
   
   map: [
     ['emoji1', '>:-(', '>:('],
@@ -674,7 +678,7 @@ App.emoji['XMPP'] = {
   fy: function (text) {
     var mapped = text;
     var map = this.map;
-    if (mapped && map.length != undefined) {
+    if (mapped && map.length !== undefined) {
       for (var i in map) {
         var original = map[i][0];
         for (var j in map[i].slice(1)) {
@@ -695,9 +699,9 @@ App.emoji['XMPP'] = {
     img[0].dataset.emoji= emoji[1];
   }
   
-}
+};
 
-App.emoji['FB'] = {
+App.emoji.FB = {
   
   map: [
     ['emoji1', '>:('],
@@ -732,7 +736,7 @@ App.emoji['FB'] = {
   fy: function (text) {
     var mapped = text;
     var map = this.map;
-    if (mapped && map.length != undefined) {
+    if (mapped && map.length !== undefined) {
       for (var i in map) {
         var original = map[i][0],
             emoji = map[i].slice(1);
@@ -752,13 +756,13 @@ App.emoji['FB'] = {
   },
   
   render: function (img, emoji) {
-    img.attr('src', 'img/emoji/fb/' + emoji[0] + '.png')
+    img.attr('src', 'img/emoji/fb/' + emoji[0] + '.png');
     img[0].dataset.emoji=emoji[1];
   }
   
-}
+};
 
-App.emoji['GTALK'] = {
+App.emoji.GTALK = {
   
   map: [
     ['angry', 'x-('],
@@ -790,7 +794,7 @@ App.emoji['GTALK'] = {
   fy: function (text) {
     var mapped = text;
     var map = this.map;
-    if (mapped && map.length != undefined) {
+    if (mapped && map.length !== undefined) {
       for (var i in map) {
         var original = map[i][0];
         for (var j in map[i].slice(1)) {
@@ -807,8 +811,8 @@ App.emoji['GTALK'] = {
   },
   
   render: function (img, emoji) {
-    img.attr('src', 'img/emoji/gtalk/' + emoji[0] + '.gif')
+    img.attr('src', 'img/emoji/gtalk/' + emoji[0] + '.gif');
     img[0].dataset.emoji= emoji[1];
   }
   
-}
+};

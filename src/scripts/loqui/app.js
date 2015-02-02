@@ -1,3 +1,5 @@
+/* global Store, Account, Chat, Messenger, Accounts, Menu, Tools, Lungo */
+
 'use strict';
 
 var App = {
@@ -123,9 +125,9 @@ var App = {
     Store.put('avatars', val);
     this._avatars.set($.extend({}, val));
   },
-  
+
   get unread () {
-    return this.accounts.reduce(function (prev, cur) {return prev + cur.unread}, 0);
+    return this.accounts.reduce(function (prev, cur) {return prev + cur.unread;}, 0);
   },
 
   // This is the main procedure
@@ -336,14 +338,15 @@ var App = {
       App.audio(altSound);    
     };
     if (force || document.hidden) {
+      var notification= null;
       if ('Notification' in window) {
-        var notification = new Notification(core.subject, {body: core.text, icon: core.pic, tag: core.from});
+        notification = new window.Notification(core.subject, {body: core.text, icon: core.pic, tag: core.from});
         notification.onclick = function () {
           core.callback();
           App.notifications.length = 0;
         };
       } else if ('mozNotification' in navigator) {
-        var notification = navigator.mozNotification.createNotification(core.subject, core.text, core.pic);
+        notification = navigator.mozNotification.createNotification(core.subject, core.text, core.pic);
         notification.onclick = function () {
           core.callback();
           App.notifications.length = 0;

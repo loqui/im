@@ -1,3 +1,5 @@
+/* global App, Plus */
+
 'use strict';
 
 var Tools = {
@@ -38,7 +40,7 @@ var Tools = {
   },
   
   stamp: function (date) {
-    var date = date ? new Date(parseInt(date)*1000) : new Date();
+    date = date ? new Date(parseInt(date)*1000) : new Date();
     return date.getUTCFullYear()+"-"
   	  +("0"+(date.getUTCMonth()+1)).slice(-2)+"-"
   	  +("0"+(date.getUTCDate())).slice(-2)+"T"
@@ -116,7 +118,7 @@ var Tools = {
     xhr.onload = function (e) {
       $('progress').val('0');
       cb(xhr.response);
-    }
+    };
     xhr.onprogress = progress;
     xhr.send();
   },
@@ -146,7 +148,7 @@ var Tools = {
   },
   
   textUnblob: function (blob, cb) {
-    var fr = new FileReader;
+    var fr = new FileReader();
     fr.addEventListener('loadend', function () {
       var text = fr.result;
       cb(text);
@@ -165,12 +167,12 @@ var Tools = {
         canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
         var url = canvas.toDataURL('image/jpeg');
         callback(url);
-      }
+      };
       img.src = reader.result;
-    }
+    };
     reader.onerror = function (e) {
       Tools.log(e);
-    }
+    };
     reader.readAsDataURL(blob);
   },
 
@@ -218,10 +220,10 @@ var Tools = {
       	fileType = 'audio/ogg';
       	break;
     	case 'mp3':
-    	  fileType = 'audio/mp3'
+    	  fileType = 'audio/mp3';
     	  break;
     	case 'aac':
-    	  fileType = 'audio/mp3'
+    	  fileType = 'audio/mp3';
     	  break;
       default:
         fileType = 'text/plain';
@@ -231,8 +233,8 @@ var Tools = {
   },
 
   b64ToBlob: function(b64Data, contentType, sliceSize) {
-    var contentType = contentType || '';
-    var sliceSize = sliceSize || 512;
+    contentType = contentType || '';
+    sliceSize = sliceSize || 512;
     var byteCharacters = atob(b64Data);
     var byteArrays = [];
     for (var offset = 0; offset < byteCharacters.length; offset+= sliceSize) {
@@ -249,11 +251,11 @@ var Tools = {
   },
   
   blobToBase64: function (blob, cb) {
-    var reader = new FileReader;
+    var reader = new FileReader();
     reader.onloadend = function (e) {
       var res = e.target.result;
       cb(res);
-    }
+    };
     reader.readAsDataURL(blob);
   },
 
@@ -300,10 +302,10 @@ var Tools = {
   
   toArray: function (o) {
     var a = [];
-    for (i in o) {
+    for (var i in o) {
       a.push(o[i]);
     }
     return a;
   }
 
-}
+};

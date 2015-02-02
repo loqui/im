@@ -590,7 +590,7 @@ section > nav[data-control="menu"] a:before {
   padding: 1.3rem 0 1.2rem 0;
   overflow: hidden;
   white-space: nowrap;
-  text-overflow: ellipsis;  
+  text-overflow: ellipsis;
 }
 #activity article header.beige button:not(:last-child) {
   border-right: .1rem solid #BBB;

@@ -1,3 +1,5 @@
+/* global Accounts, App, Tools, Lungo, Messenger, Geo, Chat, OTR, Message */
+
 'use strict';
 
 var Plus = {
@@ -35,7 +37,7 @@ var Plus = {
       e.onsuccess = function () {
         var blob = this.result.blob;
         account.connector.fileSend(to, blob);      
-      }
+      };
     } else {
       Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign');
     }
@@ -54,7 +56,7 @@ var Plus = {
       e.onsuccess = function () {
         var blob = this.result.blob;
         account.connector.fileSend(to, blob);      
-      }
+      };
     } else {
       Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign');
     }
@@ -73,7 +75,7 @@ var Plus = {
       e.onsuccess = function () {
         var blob = this.result.blob;
         account.connector.fileSend(to, blob);      
-      }
+      };
     } else {
       Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign');
     }
@@ -97,11 +99,12 @@ var Plus = {
   
   switchOTR: function (jid, account) {
     $('section#chat nav#plus').removeClass('show');
-    var account = account || Accounts.current;
+    account = account || Accounts.current;
     var ci = account.chatFind(jid);
+    var chat= null;
     if (ci < 0) {
       var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
-      var chat = new Chat({
+      chat = new Chat({
         jid: jid, 
         title: contact ? contact.name || jid : jid,
         chunks: [],
@@ -109,7 +112,7 @@ var Plus = {
       account.chats.push(chat);
       account.core.chats.push(chat.core);
     } else {
-      var chat = account.chats[ci];
+      chat = account.chats[ci];
       account.chats.push(chat);
       account.chats.splice(ci, 1);
     }
@@ -166,7 +169,7 @@ var Plus = {
     });
     chat.OTR.on('error', function (err) {
       Tools.log('OTR-ERROR', err);
-    })
+    });
     chat.OTR.on('status', function (state) {
       switch (state) {
         case OTR.CONST.STATUS_AKE_SUCCESS:
@@ -217,4 +220,4 @@ var Plus = {
     document.getElementById('logConsole').innerHTML='';
   }
   
-}
+};
