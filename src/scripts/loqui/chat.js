@@ -269,6 +269,53 @@ var Chat = function (core, account) {
     this.save();
     Lungo.Router.section('chat');
   };
+
+  this.findMessage= function(msgId, chunkIndex, exists){
+    var chat= this.core;
+    return new Promise(function(success, faild){
+      var found= false;
+      var checkChunk= function(chunk, chunkIndex){
+        var result= null;
+        chunk.forEach(function(item, i){
+          if(item.id == msgId){
+            found= true;
+            result= {
+              index : i,
+              chunk : chunk,
+              chunkIndex : chat.chunks[chunkIndex],
+              message : item
+            };
+          }
+        });
+        return result;
+      };
+      if(chunkIndex || chunkIndex === 0){
+        Store.recover(chunkIndex, function(chunk){
+          var result= checkChunk(chunk, chunkIndex);
+          if(found){
+            success(result);
+          }else{
+            faild();
+          }
+        });
+      }else{
+        var currentChunk, lastChunk;
+        currentChunk = lastChunk = chat.chunks.length - 1;
+        var afterRecover= function(chunk){
+          var result= checkChunk(chunk, currentChunk);
+          if(found){
+            success(result);
+          }else if((exists || (lastChunk - currentChunk < 2)) && currentChunk > 0){
+            currentChunk--;
+            Store.recover(chat.chunks[currentChunk], afterRecover);
+          }else{
+            faild();
+          }
+        };
+        Store.recover(chat.chunks[currentChunk], afterRecover);
+      }
+    });
+  };
   
   // Save or update this chat in store
   this.save = function (up) {

@@ -894,9 +894,8 @@ section > nav[data-control="menu"] a:before {
   text-align: right;
   font-size: .8em;
   color: #71C837;
-  opacity: .5;
 }
-#messages > li > div[data-type='out'][data-ack='delivered']:after {
+#messages > li > div[data-type='out'][data-ack='delivered']:after, #messages > li > div[data-type='out'][data-ack='viewed']:after {
   content: "✔✔";
   position: absolute;
   top: 1.6rem;
@@ -905,7 +904,9 @@ section > nav[data-control="menu"] a:before {
   font-size: .8em;
   color: #71C837;
   letter-spacing: -.5em;
-  opacity: .5;
+}
+#messages > li > div[data-type='out'][data-ack='viewed']:after{
+  color: #373dc8;
 }
 #messages > li:last-child {
   margin-bottom: 3.5rem;

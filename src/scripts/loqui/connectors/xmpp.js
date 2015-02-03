@@ -480,7 +480,7 @@ App.connectors.XMPP = function (account) {
     var chat = account.chatGet(from);
     chat.core.lastAck = Tools.localize(Tools.stamp());
     chat.save();
-    account.messageSent(from, msgId);
+    account.markMessage.push({from : from, msgId : msgId});
     return true;
   }.bind(this);
   
