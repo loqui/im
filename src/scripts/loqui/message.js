@@ -154,7 +154,6 @@ var Message = function (account, core, options) {
       } else {
         chat.unread++;
         chat.core.unread++;
-        account.unread++;
       }
     });
   };
