@@ -51,6 +51,23 @@ var Message = function (account, core, options) {
     }
     return chat;
   }.bind(this));
+
+  this.read = function(chat){
+    var type = (this.core.from == this.account.core.user || this.core.from == this.account.core.realJid) ? 'out' : 'in';
+    chat= chat || this.chat;
+    if('id' in this.core && type == 'in' && 'ack' in this.account.connector){
+      chat.findMessage(this.core.id, null, true).then(function(result){
+        if(!result.message.viewed){
+          result.message.viewed= true;
+          Store.update(result.chunkIndex, result.chunk, null);
+          if(!chat.core.muc){
+            account.connector.ack(result.message.id, result.message.from, 'read');
+          }
+          Tools.log("VIEWED", result.message.text, result.message.id, result.message.from, result);
+        }
+      });
+    }
+  };
   
   // Try to send this message
   this.send = function (delay) {
@@ -150,6 +167,11 @@ var Message = function (account, core, options) {
         if (!$('section#chat').hasClass('show')) {
           chat.unread++;
           chat.core.unread++;
+          chat.unreadList.push(message);
+        }else if(document.hidden){
+          chat.unreadList.push(message);
+        }else{
+          message.read();
         }
       } else {
         chat.unread++;
