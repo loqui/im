@@ -4,7 +4,7 @@ var jsdom = require('jsdom');
 jsdom.env('src/index.html', {
   scripts: ['scripts/meteor/blaze.js'],
   done: function (errors, window) {
-    var renderers = 'Renderers = {};';
+    var renderers = '/* jshint -W069 */\nRenderers = {};';
     var scripts = window.document.getElementsByTagName('script');
     for (var i in scripts) {
       var script = scripts[i];
