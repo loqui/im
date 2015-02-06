@@ -56,16 +56,18 @@ var Message = function (account, core, options) {
     var type = (this.core.from == this.account.core.user || this.core.from == this.account.core.realJid) ? 'out' : 'in';
     chat= chat || this.chat;
     if('id' in this.core && type == 'in' && 'ack' in this.account.connector){
-      chat.findMessage(this.core.id, null, true).then(function(result){
-        if(!result.message.viewed){
-          result.message.viewed= true;
-          Store.update(result.chunkIndex, result.chunk, null);
-          if(!chat.core.muc){
-            account.connector.ack(result.message.id, result.message.from, 'read');
+      chat.processQueue.push(function(){
+        return chat.findMessage(this.core.id, null, true).then(function(result){
+          if(!result.message.viewed){
+            result.message.viewed= true;
+            Store.update(result.chunkIndex, result.chunk, null);
+            if(!chat.core.muc){
+              account.connector.ack(result.message.id, result.message.from, 'read');
+            }
+            Tools.log("VIEWED", result.message.text, result.message.id, result.message.from, result);
           }
-          Tools.log("VIEWED", result.message.text, result.message.id, result.message.from, result);
-        }
-      });
+        });
+      }.bind(this));
     }
   };
   

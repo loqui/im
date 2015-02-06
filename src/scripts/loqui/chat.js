@@ -14,6 +14,10 @@ var Chat = function (core, account) {
   this.lastRead = Tools.localize(Tools.stamp());
   this.unread = this.core.unread;
   this.unreadList= [];
+  this.processQueue= async.queue(function(job, callback){
+    job().then(callback);
+  });
+  this.processQueue.drain= function(){};
   if (!('settings' in this.core)) {
     this.core.settings = {};
     $.extend(this.core.settings, App.defaults.Chat.core.settings);
