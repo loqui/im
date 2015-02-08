@@ -81,6 +81,7 @@ $(window).on('beforeunload', function () {
 
 // Go "away" when app is hidden
 document.addEventListener("visibilitychange", function() {
+  var chat= null;
   for (var i in App.accounts) {
     var account = App.accounts[i];
     if (document.hidden) {
@@ -92,13 +93,21 @@ document.addEventListener("visibilitychange", function() {
       var section = $('section#chat');
       if(section.hasClass('show')){
         var current = section[0].dataset.jid;
-        var chat = account.chatGet(current);
+        chat = account.chatGet(current);
         if(chat.notification && 'close' in chat.notification){
             chat.notification.close();
             chat.notification= null;
         }
       }
     }
+  }
+  if(!document.hidden){
+    var jid = $('section#chat')[0].dataset.jid;
+    chat = Accounts.current.chatGet(jid);
+    chat.unreadList.forEach(function(item){
+        item.read();
+    });
+    chat.unreadList= [];
   }
 });
 

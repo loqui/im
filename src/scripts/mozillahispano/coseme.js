@@ -7931,8 +7931,8 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
 
     //Message and Notification Acks
 
-    message_ack: function(aJid, aMsgId) {
-      self.sendReceipt(aJid, aMsgId);
+    message_ack: function(aJid, aMsgId, type) {
+      self.sendReceipt(aJid, aMsgId, type);
     },
     notification_ack: function(aJid, aNotificationId) {
       self.sendReceipt(aJid, aNotificationId);

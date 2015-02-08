@@ -13,6 +13,11 @@ var Chat = function (core, account) {
   this.notification = null;
   this.lastRead = Tools.localize(Tools.stamp());
   this.unread = this.core.unread;
+  this.unreadList= [];
+  this.processQueue= async.queue(function(job, callback){
+    job().then(callback);
+  });
+  this.processQueue.drain= function(){};
   if (!('settings' in this.core)) {
     this.core.settings = {};
     $.extend(this.core.settings, App.defaults.Chat.core.settings);
@@ -49,12 +54,13 @@ var Chat = function (core, account) {
           var prevRead = true;
           var lastRead = Tools.unstamp(chat.lastRead || chat.core.lastRead);
           for (var i in chunk) {
-            var msg = new Message(chat.account, chunk[i]);
+            var msg = new Message(chat.account, chunk[i], { muc : chat.core.muc });
             var type = msg.core.from == chat.account.core.fullJid ? undefined : msg.core.from;
             var time = Tools.unstamp(msg.core.stamp);
             var timeDiff = time - prevTime;
             var ack = chat.core.lastAck ? time < Tools.unstamp(chat.core.lastAck) : false;
             var avatarize = type && type != prevType;
+            msg.read();
             // Append the message
             // New messages mark
             if (chat.unread && prevRead && time > lastRead) {
@@ -253,12 +259,19 @@ var Chat = function (core, account) {
           }
         }
         this.lastChunkRender();
+        this.unreadList= [];
       }.bind(this), 0);
     }
     this.unread = this.core.unread;
     if (this.core.unread) {
       this.core.unread = 0;
       $('section#main ul[data-jid="' + (this.account.core.fullJid || this.account.core.user) + '"] li[data-jid="' + this.core.jid + '"]')[0].dataset.unread = 0;
+    }
+    if(this.unreadList.length){
+      this.unreadList.forEach(function(msg){
+          msg.read();
+      });
+      this.unreadList= [];
     }
     if (this.notification && 'close' in this.notification){
       this.notification.close();
