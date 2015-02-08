@@ -47,7 +47,27 @@ var Messenger = {
     var account = this.account();
     var muc = account.chatGet(to).core.muc;
     if (account.connector.isConnected() && account.supports('csn') && App.settings.csn && !muc) {
-      account.connector.csnSend(to, state);
+      if(this.typingTimeout){
+        clearTimeout(this.typingTimeout);
+        this.typingTimeout= null;
+      }
+      if(state == 'composing'){
+        if(!this.composingInterval){
+          this.composingInterval= setInterval(function(){
+            account.connector.csnSend(to, 'composing');
+          }, 15000);
+          account.connector.csnSend(to, state);
+        }
+        this.typingTimeout= setTimeout(function(){
+          account.connector.csnSend(to, 'paused');
+          clearInterval(this.composingInterval);
+          this.composingInterval= null;
+        }.bind(this), 5000);
+      }else{
+        account.connector.csnSend(to, state);
+        clearInterval(this.composingInterval);
+        this.composingInterval= null;
+      }
     }
   },
   
