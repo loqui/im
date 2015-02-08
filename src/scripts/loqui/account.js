@@ -614,45 +614,30 @@ var Account = function (core) {
     return chat;
   };
 
-  this.messageSent = function(from, msgId){
+  this.markMessage = async.queue(function(task, callback){
+    var from= task.from;
+    var msgId= task.msgId;
     var chat = this.chatGet(from);
     var account = this;
-    var lastIndex = chat.core.chunks[chat.core.chunks.length-1];
-    var secondLastIndex = chat.core.chunks[chat.core.chunks.length-2];
-console.log('MARKING AS DELIVERED', from, msgId, chat, account, lastIndex, secondLastIndex);
-    Store.recover(lastIndex, function(chunk) {
-      for (var i in chunk) {
-        var msg = chunk[i];
-        if (msg.id == msgId) {
-		      if (msg.ack == 'sent') {
-		        msg.ack = 'delivered';
-		      } else {
-		        msg.ack = 'sent';
-		      }
-          msg = new Message(account, msg);
-          Store.update(lastIndex, chunk, null);
-		      msg.reRender(lastIndex);
-          return;
-        }
+    chat.findMessage(msgId, null, true).then(function(result){
+      var msg= result.message;
+      if (msg.ack == 'sent') {
+        console.log('MARKING AS DELIVERED', from, msgId, chat, account, result);
+        msg.ack = 'delivered';
+      } else if (msg.ack == 'delivered') {
+        console.log('MARKING AS VIEWED', from, msgId, chat, account, result);
+        msg.ack = 'viewed';
+      } else {
+        console.log('MARKING AS SENT', from, msgId, chat, account, result);
+        msg.ack = 'sent';
       }
-      Store.recover(secondLastIndex, function(chunk) {
-        for (var i in chunk) {
-          var msg = chunk[i];
-          if (msg.id == msgId) {
-		        if (msg.ack == 'sent') {
-		          msg.ack = 'delivered';
-		        } else {
-		          msg.ack = 'sent';
-		        }
-            msg = new Message(account, msg);
-            Store.update(secondLastIndex, chunk, null);
-		        msg.reRender(secondLastIndex);
-            return;
-          }
-        }
-      });
+      msg = new Message(account, msg);
+      Store.update(result.chunkIndex, result.chunk, callback);
+      msg.reRender(result.chunkIndex);
     });
-  };
+  }.bind(this));
+
+  this.markMessage.drain= function(){};
     
   // Check for feature support
   this.supports = function (feature) {

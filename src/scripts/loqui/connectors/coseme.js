@@ -195,8 +195,9 @@ App.connectors.coseme = function (account) {
     return MI.call(method, params);
   }.bind(this);
   
-  this.ack = function (id, from) {
-    MI.call('message_ack', [from, id]);
+  this.ack = function (id, from, type) {
+    type = type || 'delivery';
+    MI.call('message_ack', [from, id, type]);
   };
   
   this.avatar = function (callback, id) {
@@ -495,7 +496,7 @@ App.connectors.coseme = function (account) {
   
   this.events.onMessageSent = function (from, msgId) {
     Tools.log('SENT', from, msgId);
-    account.messageSent(from, msgId);
+    account.markMessage.push({from : from, msgId : msgId});
   };
 
   this.events.onMessageDelivered = function (from, msgId) {
@@ -503,7 +504,7 @@ App.connectors.coseme = function (account) {
     var chat = account.chatGet(from);
     chat.core.lastAck = Tools.localize(Tools.stamp());
     chat.save();
-	  account.messageSent(from, msgId);
+    account.markMessage.push({from : from, msgId : msgId});
     Tools.log('DELIVERED', from, msgId);
     MI.call('delivered_ack', [from, msgId]);
   };
@@ -642,6 +643,7 @@ App.connectors.coseme = function (account) {
         to: to,
         text: body,
         stamp: stamp,
+        id : msgId,
         pushName: (pushName && pushName != fromUser) ? (fromUser + ': ' + pushName) : pushName
       }, {
         muc: true
