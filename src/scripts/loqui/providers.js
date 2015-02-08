@@ -11,7 +11,7 @@ var Providers = {
       },
       features: ['localContacts', 'receipts', 'imageSend', 'videoSend', 
         'audioSend', 'locationSend', 'pay', 'muc', 'csn', 'avatarChange', 
-        'nickChange', 'statusChange', 'presence', 'mucCreate', 'show'],
+        'nickChange', 'statusChange', 'presence', 'mucCreate'],
       color: '#254242',
       terms: {
         user: 'YourNumber',
@@ -125,7 +125,8 @@ var Providers = {
       autodomain: false,
       features: ['multi', 'vcard', 'presence', 'easyAvatars', 'rosterMgmt', 
         'avatarChange', 'attention', 'csn', 'delay', 'time', 'statusChange', 
-        'show', 'muc', 'mucCreate', 'mucJoin', 'receipts', 'federation'],
+        'show', 'muc', 'mucCreate', 'mucJoin', 'receipts', 'federation', 
+        'time'],
       color: '#149ED2',
       terms: {
         user: 'FullJID',
@@ -134,41 +135,6 @@ var Providers = {
         userInputType: 'email'
       },
       emoji: 'XMPP'
-    }
-  },
-  
-  // Dinamically prints the provider list
-  list: function () {
-    var ul = $('section#providers ul');
-    for (var provider in this.data) {
-      var data = this.data[provider];
-      var li = $('<li/>');
-      var a = $('<a/>').data('view-section', provider);
-      a.text(data.longName);
-      var img = $('<img/>').attr('src', 'img/providers/' + provider + '.svg');
-      a.prepend(img);
-      li.append(a);
-      li.on('click', function (e) {
-        Lungo.Router.section(e.target.dataset.viewSection);      
-      });
-      ul.append(li);
-      var section = $('<section/>').attr('id', provider).addClass('setup')
-        .data('transition', 'horizontal');
-      var article = $('<article/>').addClass('headless simple form show');
-      App.logForms[data.connector.type](article, provider, data);
-      section.append(article);
-      section.find('[data-view-section]').each(function () {
-        $(this).on('click', function (e) {
-          Lungo.Router.section(e.target.dataset.viewSection);      
-        });
-      });
-      section.find('[data-menu-onclick]').each(function () {
-        var menu = $(this).data('menu-onclick');
-        $(this).on('click', function (e) {
-          Menu.show(menu, this);
-        });
-      });
-      $('body').append(section);
     }
   },
   

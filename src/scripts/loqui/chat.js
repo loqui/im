@@ -1,3 +1,5 @@
+/* global Tools, App, Store, Message, Avatar, Providers, Plus, Lungo */
+
 'use strict';
 
 var Chat = function (core, account) {
@@ -11,6 +13,11 @@ var Chat = function (core, account) {
   this.notification = null;
   this.lastRead = Tools.localize(Tools.stamp());
   this.unread = this.core.unread;
+  this.unreadList= [];
+  this.processQueue= async.queue(function(job, callback){
+    job().then(callback);
+  });
+  this.processQueue.drain= function(){};
   if (!('settings' in this.core)) {
     this.core.settings = {};
     $.extend(this.core.settings, App.defaults.Chat.core.settings);
@@ -27,7 +34,7 @@ var Chat = function (core, account) {
     if (index >= 0) {
       this.chunkRender(index);
     }
-  }
+  };
   
   // Render a chunk of messages
   this.chunkRender = function (index) {
@@ -41,18 +48,19 @@ var Chat = function (core, account) {
           var li = $('<li/>');
           var frag = document.createDocumentFragment();
           li.addClass('chunk');
-          li.data('chunk', stIndex);
-          li.data('index', index);
+          li[0].dataset.chunk= stIndex;
+          li[0].dataset.index= index;
           var prevType, prevTime, prevAck;
           var prevRead = true;
           var lastRead = Tools.unstamp(chat.lastRead || chat.core.lastRead);
           for (var i in chunk) {
-            var msg = new Message(chat.account, chunk[i]);
+            var msg = new Message(chat.account, chunk[i], { muc : chat.core.muc });
             var type = msg.core.from == chat.account.core.fullJid ? undefined : msg.core.from;
             var time = Tools.unstamp(msg.core.stamp);
             var timeDiff = time - prevTime;
             var ack = chat.core.lastAck ? time < Tools.unstamp(chat.core.lastAck) : false;
             var avatarize = type && type != prevType;
+            msg.read();
             // Append the message
             // New messages mark
             if (chat.unread && prevRead && time > lastRead) {
@@ -97,7 +105,7 @@ var Chat = function (core, account) {
         chat.account.avatarsRender();
       });
     }
-  }
+  };
   
   // Push messages to this queue to append them to this chat
   this.messageAppend = async.queue(function (task, callback) {
@@ -112,7 +120,7 @@ var Chat = function (core, account) {
       Store.recover(blockIndex, function (chunk) {
         if (!chunk || chunk.length >= App.defaults.Chat.chunkSize) {
           Tools.log('FULL OR NULL');
-          var chunk = [msg];
+          chunk = [msg];
           blockIndex = Store.save(chunk);
           Tools.log('PUSHING', blockIndex, chunk);
           chat.core.chunks.push(blockIndex);
@@ -157,28 +165,27 @@ var Chat = function (core, account) {
         chat.account.show();
         chat.show();
         App.toForeground();
-      }
+      };
       var contact = Lungo.Core.findByProperty(chat.account.core.roster, 'jid', Strophe.getBareJidFromJid(last.from));
       var subject = (chat.core.muc && chat.core.unread < 2) ? ((contact ? (contact.name || last.pushName) : last.pushName) + ' @ ' + chat.core.title) : chat.core.title;
       var text = chat.core.unread > 1 ? _('NewMessages', {number: chat.core.unread}) : last.text;
       if (last.media) {
-        var text = _('SentYou', {type: _('MediaType_' + last.media.type)});
+        text = _('SentYou', {type: _('MediaType_' + last.media.type)});
       }
-
       if (pic) {
         pic.url.then(function (src) {
           if (src.slice(0, 1) == '/' && chat.core.muc) {
-            src = 'https://raw.githubusercontent.com/loqui/im/dev/img/goovatar.png';
+            src = 'https://raw.githubusercontent.com/loqui/im/dev/src/img/goovatar.png';
           }
           chat.notification = App.notify({ subject: subject, text: text, pic: src, from : chat.core.jid, callback: callback }, 'received');
         }.bind(chat));
       } else {
-        chat.notification = App.notify({ subject: subject, text: text, pic: 'img/foovatar.png', from : chat.core.jid, callback: callback }, 'received');
+        chat.notification = App.notify({ subject: subject, text: text, pic: 'https://raw.githubusercontent.com/loqui/im/dev/src/img/foovatar.png', from : chat.core.jid, callback: callback }, 'received');
       }
       chat.core.lastAck = last.stamp;
       var section = $('section#chat');
-      if (chat.account.supports('receipts') && section.hasClass('show') && section.data('jid') == last.from) {
-        var li = section.find('article#main ul li').last();
+      if (chat.account.supports('receipts') && section.hasClass('show') && section[0].dataset.jid == last.from) {
+        var li = section.find('ul li').last();
         section.find('span.lastACK').remove();
         li.append($('<span/>').addClass('lastACK')[0]);
       }
@@ -191,83 +198,143 @@ var Chat = function (core, account) {
   // Create a chat window for this contact
   this.show = function () {
     var section = $('section#chat');
-    var header = section.children('header');
-    var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.jid);
-    section.data('jid', this.core.jid);
-    section.data('features', $('section#main').data('features'));
-    section.data('caps', contact && contact.presence.caps in App.caps ? App.caps[contact.presence.caps].features.join(' ') : 'false');
-    section.data('muc', this.core.muc || false);
-    section.data('mine', this.core.muc && this.core.info && this.core.info.owner == this.account.core.fullJid);
-    header.children('.title').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(this.core.title));
-    section.find('#plus').removeClass('show');
-    section.find('#typing').hide();
-    section.find('#messages').empty();
-    section.data('otr', 'OTR' in this);
-    Lungo.Router.section('chat');
-    var avatarize = function (url) {
-      header.children('.avatar').children('img').attr('src', url);
-    }
-    if (App.avatars[this.core.jid]) {
-      var existant = $('ul li[data-jid="' + this.core.jid + '"] .avatar img');
-      if (existant.length) {
-        avatarize(existant.attr('src'));
+    if (!(section[0].dataset.jid == this.core.jid && section[0].dataset.account == this.account.core.fullJid)) {
+      var header = section.children('header');
+      var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.jid);
+      section[0].dataset.jid = this.core.jid;
+      section[0].dataset.account = this.account.core.fullJid;
+      section[0].dataset.features = $('section#main')[0].dataset.features;
+      //section[0].dataset.caps = contact && contact.presence.caps in App.caps ? App.caps[contact.presence.caps].features.join(' ') : 'false';
+      section[0].dataset.muc = this.core.muc || false;
+      section[0].dataset.mine = this.core.muc && this.core.info && this.core.info.owner == this.account.core.fullJid;
+      section[0].dataset.unread = App.unread - this.core.unread;
+      header.children('.title').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(this.core.title));
+      section.find('#plus').removeClass('show');
+      section.find('#typing').hide();
+      section.find('#messages').empty();
+      section[0].dataset.otr= ('OTR' in this);
+      var avatarize = function (url) {
+        header.children('.avatar').children('img').attr('src', url);
+      };
+      if (App.avatars[this.core.jid]) {
+        var existant = $('ul li[data-jid="' + this.core.jid + '"] .avatar img');
+        if (existant.length) {
+          avatarize(existant.attr('src'));
+        } else {
+          if (this.core.jid in App.avatars) {
+            (new Avatar(App.avatars[this.core.jid])).url.then(function (val) {
+              avatarize(val);
+            });
+          }
+        }
       } else {
-        if (this.core.jid in App.avatars) {
-          (new Avatar(App.avatars[this.core.jid])).url.then(function (val) {
+        header.children('.avatar').children('img').attr('src', 'img/foovatar.png');
+        var method = this.core.muc ? this.account.connector.muc.avatar : this.account.connector.avatar;
+        method(function (a) {
+          a.url.then(function (val) {
             avatarize(val);
           });
-        }
+        }, this.core.jid);
       }
-    } else {
-      header.children('.avatar').children('img').attr('src', 'img/foovatar.png');
-      var method = this.core.muc ? this.account.connector.muc.avatar : this.account.connector.avatar;
-      method(function (a) {
-        a.url.then(function (val) {
-          avatarize(val);
-        });
-      }, this.core.jid);
-    }
-    if (this.core.settings.otr[0]) {
-      Plus.switchOTR(this.core.jid, this.account);
-    }
-    setTimeout(function () {
-      if (this.core.muc) {
-        if (this.core.participants) {
-          header.children('.status').text(_('NumParticipants', {number: this.core.participants.length}));
+      if (this.core.settings.otr[0]) {
+        Plus.switchOTR(this.core.jid, this.account);
+      }
+      setTimeout(function () {
+        if (this.core.muc) {
+          if (this.core.participants) {
+            header.children('.status').text(_('NumParticipants', {number: this.core.participants.length}));
+          } else {
+            this.account.connector.muc.participantsGet(this.core.jid);
+            header.children('.status').text(' ');
+          }
         } else {
-          this.account.connector.muc.participantsGet(this.core.jid);
-          header.children('.status').text(' ');
+          var show = contact ? (contact.presence.show || 'na') : 'na';
+          var status = contact ? (contact.presence.status || _('show' + show)) : ' ';
+          if (this.account.connector.presence.get) {
+            this.account.connector.presence.get(this.core.jid);
+          }
+          header.children('.status').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(status));
+          if (this.account.supports('show')) {
+            section[0].dataset.show = show;
+          }
         }
-      } else {
-        var show = this.account.connector.isConnected() && contact ? (contact.presence.show || 'na') : 'na';
-        var status = contact ? (contact.presence.status || _('show' + show)) : ' ';
-        if (this.account.connector.presence.get) {
-          this.account.connector.presence.get(this.core.jid);
-        }
-        header.children('.status').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(status));
-        section.data('show', show);
-      }
-      this.lastChunkRender();
-    }.bind(this), 0);
+        this.lastChunkRender();
+        this.unreadList= [];
+      }.bind(this), 0);
+    }
     this.unread = this.core.unread;
     if (this.core.unread) {
-      this.account.unread -= this.core.unread;
       this.core.unread = 0;
-      Accounts.unread();
+      $('section#main ul[data-jid="' + (this.account.core.fullJid || this.account.core.user) + '"] li[data-jid="' + this.core.jid + '"]')[0].dataset.unread = 0;
     }
-    if(this.notification && 'close' in this.notification){
-        this.notification.close();
-        this.notification= null;
+    if(this.unreadList.length){
+      this.unreadList.forEach(function(msg){
+          msg.read();
+      });
+      this.unreadList= [];
+    }
+    if (this.notification && 'close' in this.notification){
+      this.notification.close();
+      this.notification = null;
     }
     this.lastRead = this.core.lastRead;
     this.core.lastRead = Tools.localize(Tools.stamp());
     this.save();
-  }
+    Lungo.Router.section('chat');
+  };
+
+  this.findMessage= function(msgId, chunkIndex, exists){
+    var chat= this.core;
+    return new Promise(function(success, faild){
+      var found= false;
+      var checkChunk= function(chunk, chunkIndex){
+        var result= null;
+        chunk.forEach(function(item, i){
+          if(item.id == msgId){
+            found= true;
+            result= {
+              index : i,
+              chunk : chunk,
+              chunkIndex : chat.chunks[chunkIndex],
+              message : item
+            };
+          }
+        });
+        return result;
+      };
+      if(chunkIndex || chunkIndex === 0){
+        Store.recover(chunkIndex, function(chunk){
+          var result= checkChunk(chunk, chunkIndex);
+          if(found){
+            success(result);
+          }else{
+            faild();
+          }
+        });
+      }else{
+        var currentChunk, lastChunk;
+        currentChunk = lastChunk = chat.chunks.length - 1;
+        var afterRecover= function(chunk){
+          var result= checkChunk(chunk, currentChunk);
+          if(found){
+            success(result);
+          }else if((exists || (lastChunk - currentChunk < 2)) && currentChunk > 0){
+            currentChunk--;
+            Store.recover(chat.chunks[currentChunk], afterRecover);
+          }else{
+            faild();
+          }
+        };
+        Store.recover(chat.chunks[currentChunk], afterRecover);
+      }
+    });
+  };
   
   // Save or update this chat in store
   this.save = function (up) {
     this.account.save();
     this.account.singleRender(this, up);
-  }
+  };
     
-}
+};
+

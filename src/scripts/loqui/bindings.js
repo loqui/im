@@ -1,3 +1,5 @@
+/* global App, Menu, Tools, Messenger, Accounts, Store, Plus, UI, Lungo */
+
 'use strict';
 
 Lungo.init({
@@ -11,12 +13,12 @@ $('document').ready(function(){
   
   setTimeout(function(){
     $('input[data-l10n-placeholder]').each(function () {
-      var original = $(this).data('l10n-placeholder');
+      var original = this.dataset.l10nPlaceholder;
       var local = _(original);
       $(this).attr('placeholder', local);
     });
     $('[data-menu-onclick]').each(function () {
-      var menu = $(this).data('menu-onclick');
+      var menu = this.dataset.menuOnclick;
       $(this).on('click', function (e) {
         Menu.show(menu, this);
       });
@@ -35,6 +37,28 @@ if (navigator.mozAlarms) {
     App.alarmSet(message.data);
   });
 }
+
+setInterval(function () {
+  $('time[datetime].ago').each(function () {
+    var ts = $(this).attr('datetime');
+    var now = new Date();
+    var then = Tools.unstamp(ts);
+    var diff = now - then;
+    var string;
+    if (diff < 60000) {
+      string = 'right now';
+    } else if (diff < 3600000) {
+      string = Math.floor(diff / 60000) + ' min.';
+    } else if (diff < 7200000) {
+      string = '1 hour';
+    } else if (now.toLocaleDateString() == then.toLocaleDateString()) {
+      string = Math.floor(diff / 3600000) + ' hours';
+    } else {
+      string = then.toLocaleDateString() + '@' + then.toLocaleTimeString().split(':').slice(0, 2).join(':');
+    }
+    $(this).text(string);
+  });
+}, 60000);
 
 // Reconnect on new WiFi / 3G connection
 document.body.addEventListener('online', function () {
@@ -57,24 +81,33 @@ $(window).on('beforeunload', function () {
 
 // Go "away" when app is hidden
 document.addEventListener("visibilitychange", function() {
+  var chat= null;
   for (var i in App.accounts) {
     var account = App.accounts[i];
     if (document.hidden) {
-      account.connector.presence.send('away');
+      account.connector.presence.set('away');
     } else {
-      App.lastActive = new Date;
-      account.connector.presence.send();
+      App.lastActive = new Date();
+      account.connector.presence.set('a');
 
       var section = $('section#chat');
       if(section.hasClass('show')){
-        var current = section.data('jid');
-        var chat = account.chatGet(current);
+        var current = section[0].dataset.jid;
+        chat = account.chatGet(current);
         if(chat.notification && 'close' in chat.notification){
             chat.notification.close();
             chat.notification= null;
         }
       }
     }
+  }
+  if(!document.hidden){
+    var jid = $('section#chat')[0].dataset.jid;
+    chat = Accounts.current.chatGet(jid);
+    chat.unreadList.forEach(function(item){
+        item.read();
+    });
+    chat.unreadList= [];
   }
 });
 
@@ -123,8 +156,8 @@ $('section#me #card span.avatar').on('click', function (e) {
     pick.onsuccess = function() {
       var image = this.result;
       Messenger.avatarSet(image.blob);
-    }
-    pick.onerror = function() { }
+    };
+    pick.onerror = function(){};
   } else {
     Lungo.Notification.error(_('NoDevice'), _('FxOSisBetter', 'exclamation-sign'));
   }
@@ -132,40 +165,44 @@ $('section#me #card span.avatar').on('click', function (e) {
 
 // Change background
 $('section#me #card button.background.change').on('click', function (e) {
-  var e = new MozActivity({
-    name: 'pick',
-    data: {
-      type: ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/bmp']
-    }
-  });
-  e.onsuccess = function () {
-    var account = Messenger.account();
-    var blob = this.result.blob;
-    var sh = window.innerHeight;
-    Tools.picThumb(blob, null, sh, function (url) {
-      if (account.core.background) {
-        Store.update(account.core.background, url);
-      } else{
-        account.core.background = Store.save(url);
+  if (typeof MozActivity != 'undefined') {
+    e = new MozActivity({
+      name: 'pick',
+      data: {
+        type: ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/bmp']
       }
-      Store.recover(account.core.background, function (url) {
-        $('section#chat ul#messages').style('background', 'url('+url+') no-repeat center center fixed');
-        $('section.profile div#card').style('background', 'url('+url+') no-repeat center center fixed'); 
-        Lungo.Notification.show('star', _('backChanged'), 3);
-      }.bind(this)); 
     });
-  }
-  e.onerror = function () {
-    Tools.log('Picture selection was canceled');
+    e.onsuccess = function () {
+      var account = Accounts.current;
+      var blob = this.result.blob;
+      var sh = window.innerHeight;
+      Tools.picThumb(blob, null, sh, function (url) {
+        if (account.core.background) {
+          Store.update(account.core.background, url);
+        } else{
+          account.core.background = Store.save(url);
+        }
+        Store.recover(account.core.background, function (url) {
+          $('section#chat ul#messages').css('background-image', 'url('+url+')');
+          $('section.profile div#card').css('background-image', 'url('+url+')');
+          Lungo.Notification.show('star', _('backChanged'), 3);
+        }.bind(this)); 
+      });
+    };
+    e.onerror = function () {
+      Tools.log('Picture selection was canceled');
+    };
+  } else {
+    Lungo.Notification.error(_('NoDevice'), _('FxOSisBetter', 'exclamation-sign'));
   }
 });
 
 $('section#me #card button.background.delete').on('click', function (e) {
-  var account = Messenger.account();
+  var account = Accounts.current;
   if (account.core.background) {
     Store.blockDrop(account.core.background, function () {
-      $('section#chat ul#messages').style('background', 'none');
-      $('section.profile div#card').style('background', 'none');
+      $('section#chat ul#messages').css('background-image', 'none');
+      $('section.profile div#card').css('background-image', 'none');
       Lungo.Notification.show('star', _('backChanged'), 3); 
     });
   }
@@ -191,7 +228,7 @@ $('section#me #nick input').on('blur', function (e) {
 });
 
 $('[data-var]').each(function () {
-  var key = $(this).data('var');
+  var key = this.dataset.var;
   var value = App[key];
   $(this).text(value);
 });
@@ -212,7 +249,7 @@ Strophe.Connection.rawOutput = function (data) {
 
 var bindings = function () {
   $('section#success button.start').on('click', function() {
-    App.start();
+    App.start(true);
   });
   $('section#contactAdd button.add').on('click', function() {
     Messenger.contactAdd();
@@ -228,6 +265,29 @@ var bindings = function () {
   });
   $('section#welcome').on('click', function(){
      Menu.show('providers');
+  });
+  $('section#chat').on('swipeRight', function () {
+    Lungo.Router.section('back');
+  });
+  $('section#main').on('click', function(e){
+    if($(e.target).hasClass('asided')){
+      Lungo.Aside.hide();
+    }
+  }).on('swipeLeft', function(e){
+    if($(e.target).hasClass('asided')){
+      Lungo.Aside.hide();
+    } else if($('section#chat[data-jid]').length > 0) {
+      Lungo.Router.section('chat');
+    }
+  }).on('swipeRight', function () {
+    Lungo.Aside.show('accounts');
+  }).on('swipeUp', function () {
+    $('.floater').addClass('hidden');
+  }).on('swipeDown', function () {
+    $('.floater').removeClass('hidden');
+  });
+  $('aside').on('swipeLeft', function () {
+    Lungo.Aside.hide();
   });
   $('#debugConsole #showConsole').on('click', function () {
     Plus.showConsole();
@@ -245,11 +305,15 @@ var bindings = function () {
   $('select').on('change', function () {
     var select = $(this);
     var option = select.find('option[value="' + select.val() + '"]');
-    if (option.data('reveal')) {
-      select.siblings('[name="' + option.data('reveal') + '"]').removeClass('hidden');
+    if (option[0].dataset.reveal) {
+      select.siblings('[name="' + option[0].dataset.reveal + '"]').removeClass('hidden');
     } else {
-      option = select.find('[data-reveal]')
-      select.siblings('[name="' + option.data('reveal') + '"]').addClass('hidden').val('');
+      option = select.find('[data-reveal]');
+      select.siblings('[name="' + option[0].dataset.reveal + '"]').addClass('hidden').val('');
     }
   });
-}
+  $("script[type='text/spacebars']").each(function(index, script) {
+    var name = script.getAttribute('name');
+    UI.insert(UI.render(Template[name]), script.parentNode, script);
+  });
+};

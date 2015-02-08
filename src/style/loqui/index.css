@@ -12,28 +12,41 @@ input {
   pointer-events: auto;
 }
 small {
-  font-size: .9rem;
+  font-size: .9em;
   font-weight: 100;
 }
 article.form {
   overflow: auto;
 }
+a {
+  cursor: pointer;
+}
 input[type='search'] {
   width: 100%;
   border-radius: 0;
+}
+input[type='text'] {
+  width: calc(100% - 2rem);
+  height: 4.2rem;
+  font-size: 1.5rem;
+  border: .1rem solid #DFDFDF;
+  border-radius: .2rem;
+  padding: 0 1rem;
 }
 .spaced {
   margin-right: .5rem;
 }
 .buttongroup {
-  margin: 1.5rem 0;
+  margin: 2.5rem 0;
 }
 .buttongroup > button {
+  margin-top: .5rem;
   margin-bottom: .4rem;
   width: 100%;
 }
 article.form button[data-view-section='back'],
-article.form button[data-role='back'] {
+article.form button[data-role='back'],
+article.form button.back {
   width: 100%;
   background-color: #DDD;
   color: #666;
@@ -43,27 +56,32 @@ article.form button[data-role='submit'] {
 }
 article.form label {
   width: 100%;
+  font-size: 1.4rem;
 }
-
+article.form small {
+  display: block;
+  margin-top: 1.5rem;
+}
 section > article.simple {
-  padding: 2rem;
+  padding: 3.2rem;
   color: #333;
 }
 section > article.simple > h1 {
   position: relative;
-  width: 11rem;
-  font-size: 1.6rem;
-  line-height: 2rem;
+  width: calc(100vw - 6.4rem);
+  font-size: 2.6rem;
+  line-height: 2.6rem;
   margin: 0 0 1rem 0;
   font-weight: 100;
   color: #E95644;
 }
 section > article.simple > p {
   font-weight: 100;
+  font-size: 1.6rem;
 }
 section > article.simple > div > p {
   font-weight: 300;
-  font-size: 1em;
+  font-size: 1.6rem;
   margin-bottom: .5rem;
 }
 #welcome {
@@ -75,29 +93,27 @@ section > article.simple > div > p {
 }
 #welcome h1 {
   position: absolute;
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-style: italic;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 1rem;
-  margin-bottom: 3rem;
+  margin-bottom: 9rem;
   text-align: center;
   color: white;
-  background-color: transparent;
 }
-section.setup img[src^='img/providers']{
+section.setup img[src^='img/providers'] {
   position: absolute;
-  top: 2rem; right: 2rem;
-  width: 4rem;
+  top: 3.5rem; right: 3rem;
+  width: 5.6rem;
 }
 #providers {
   z-index: 100;
 }
 #avatar {
   position: relative;
-  width: 8rem;
-  left: calc(50% - 4rem);
+  width: 14rem;
+  left: calc(50% - 7rem);
   padding: .2rem;
   border: .1rem solid #DDD;
   background-color: #FFF;
@@ -106,30 +122,29 @@ section.setup img[src^='img/providers']{
   box-sizing: content-box;
 }
 section > header {
-  background-color: #312F34;
+  background-color: #222;
 }
-section > header > h1 {
+section > header h1 {
   position: absolute;
-  right: 3rem;
-  left: 3rem;
-  top: -.4rem;
+  left: 5.6rem;
+  right: 5.6rem;
   color: white;
   text-align: center;
+  font-weight: 100;
+  font-size: 2rem;
   font-style: italic;
-  font-size: 1.2em;
+}
+section > header.simple > h1 {
+  right: 3rem;
+  left: 3rem;
+  top: .2rem;
+  font-style: italic;
+  font-size: 1.5em;
 }
 section > header > nav {
   overflow: hidden;
   float: right;
   display: block;
-}
-section > header > nav button.tab {
-  background: none;
-  border: none;
-  height: 2.5rem;
-  margin-top: .5rem;
-  border-radius: 0;
-  width: 3.2rem;
 }
 section > header > nav .up {
   border: none;
@@ -137,20 +152,7 @@ section > header > nav .up {
   color: white;
   font-size: 1.2em;
 }
-section > header > .on-right button.tab {
-  background-image: url('/img/tab-decoration-right.svg');
-  background-size: 3.2rem 2.5rem;
-  -webkit-background-size: 3.2rem 2.5rem;
-  padding: 0 0 0 1.2rem;
-}
-section > header > .on-left button.tab {
-  background-image: url('/img/tab-decoration-left.svg');
-  background-size: 3.2rem 2.5rem;
-  -webkit-background-size: 3.2rem 2.5rem;
-  padding: 0 1.2rem 0 0;
-}
 section > header > nav.discreet {
-  margin-right: -.5rem;
 }
 section > header > nav.discreet button {
   border: none;
@@ -158,7 +160,8 @@ section > header > nav.discreet button {
   background: none;
   background-color: transparent;
   color: white;
-  width: 2.6rem;
+  width: 4.6rem;
+  font-size: 1.6rem;
 }
 
 section.extended > header {
@@ -168,8 +171,8 @@ section.extended > header {
   background-color: #E74C3C;
 }
 section.extended article {
-  top: 6rem;
-  height: calc(100% - 6rem);
+  top: 11.2rem;
+  height: calc(100% - 11.2rem);
 }
 section:not(.extended) nav[data-control="groupbar"] {
   display: none;
@@ -179,9 +182,9 @@ section:not(.extended) nav[data-control="groupbar"] {
 }
 section nav[data-control="groupbar"] {
   position: absolute;
-  top: 3rem;
+  top: 5.6rem;
   width: 100%;
-  height: 3rem;
+  height: 5.6rem;
   background-color: white;
   color: #333;
   border-bottom: .1rem solid #CECECE;
@@ -197,16 +200,15 @@ section nav[data-control="groupbar"] {
 }
 section nav[data-control="groupbar"] a {
   float: left;
-  margin: .55rem 0 0 .5rem;
-  padding: .4rem .8rem .4rem .8rem;
-  font-size: .8em;
+  margin: 1rem -1rem 0 1rem;
+  padding: .8rem 1.5rem .6rem 1.5rem;
+  font-size: 1.6rem;
   font-weight: 100;
   font-style: italic;
-  border-radius: 1rem;
+  border-radius: 3rem;
 }
 section nav[data-control="groupbar"] a.selected {
   background-color: #E74C3C;
-  padding: .4rem .8rem .4rem .8rem;
   color: white;
 }
 .aside {
@@ -216,10 +218,10 @@ section nav[data-control="groupbar"] a.selected {
 section > nav[data-control="menu"] {
   position: absolute;
   background-color: rgba(0, 0, 0, .8);
-  top: 3rem;
+  top: 5.4rem;
   left: 0;
   right: 0;
-  padding: .6rem 0 .6rem .2rem;
+  padding: 0;
   z-index: -1;
 }
 section > nav[data-control="menu"].show {
@@ -232,7 +234,7 @@ section > nav[data-control="menu"] a {
   font-size: .8em;
   font-weight: 100;
   color: #FFF;
-  padding: .5rem 0 0 0;
+  padding: 1.6rem .8rem;
   text-align: center;
   text-transform: capitalize;
   box-sizing: content-box;
@@ -254,18 +256,17 @@ section > nav[data-control="menu"] a:before {
   border: none;
   border-bottom: 1px solid #CCC;
   border-radius: 5px;
-  width: calc(100% - 1.6rem);
-  margin: 0.4rem;
+  width: calc(100% - 2.6rem);
+  margin: .8rem 1rem;
   padding: 0.3rem;
 }
-
 #reset {
   position: absolute;
   right: 0;
   height: 20px;
   width: 20px;
   background: url('../../img/console-inactive.png');
-  margin: 0.7rem;
+  margin: 1.3rem;
 }
 
 #search > h1 {
@@ -276,35 +277,40 @@ section > nav[data-control="menu"] a:before {
   padding: 1rem;
 }
 
-#main > header div.account,
-#main > header div.account * {
+#main > header > span {
   position: absolute;
   color: white;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  left: 3.2rem;
+  right: 3.2rem;
+}
+#main > header > span[data-unread]:not([data-unread="0"]):before {
+  content: attr(data-unread);
   display: block;
+  position: absolute;
+  top: 1.7rem;
+  left: -1.9rem;
+  background-color: #E74C3C;
+  color: #FFF;
+  padding: .35rem .8rem;
+  font-size: 1.2rem;
+  line-height: 1.4rem;
+  border-radius: 1.2rem;
+  pointer-events: none;
 }
-#main > header div.account img {
-  top: .5rem;
-  left: .3rem;
-  height: 2rem;
+#main > header select {
+  position: absolute;
+  top: 0;
+  height: 5.6rem;
+  width: calc(100% - 6.4rem);
+  opacity: 0;
 }
-#main > header div.account .provider {
-  top: .5rem;
-  left: 2.6rem;
-  font-size: .6em;
-  font-weight: 300;
-  width: calc(100vw - 11.2rem);
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-#main > header div.account .jid {
-  top: 1.3rem;
-  left: 2.6rem;
-  font-size: .8em;
-  width: calc(100vw - 11.2rem);
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+#main > header .jid {
+  padding: 1.7rem;
+  font-size: 1.6rem;
+  font-weight: 700;
 }
 #main > header span.counter {
   display: block;
@@ -319,6 +325,9 @@ section > nav[data-control="menu"] a:before {
   border-radius: .6rem;
   animation: blink .5s infinite alternate;
   -webkit-animation: blink .5s infinite alternate;
+}
+#chat > header .angle-left {
+  font-size: 2rem;
 }
 #chat > header span.counter {
   display: block;
@@ -347,11 +356,17 @@ section > nav[data-control="menu"] a:before {
   background-color: #FFF;
   height: calc(100vh - 4 rem);
 }
-#main article ul li,
+#main article ul li{
+  position: relative;
+  border-bottom: .05rem solid #E6E6E6;
+  height: 7.6rem;
+  cursor: pointer;
+  box-sizing: content-box;
+}
 #activity article ul li {
   position: relative;
   border-bottom: .05rem solid #E6E6E6;
-  height: 4rem;
+  height: 5.6rem;
   cursor: pointer;
   box-sizing: content-box;
 }
@@ -384,34 +399,38 @@ section > nav[data-control="menu"] a:before {
   line-height: 1rem;
   text-align: center;
 }
-#main article ul li span.name {
-  position: absolute;
-  left: 4.2rem;
-  top: .6rem;
-  color: #444;
-  max-width: calc(100% - 4.7rem);
-  max-height: 1.4em;
-  overflow: hidden;
-}
 #activity article ul li span.name {
   position: absolute;
-  left: 1rem;
+  left: 1.6rem;
   top: .6rem;
-  color: #444;
+  color: #222;
   max-width: calc(100% - 4.5rem);
-  max-height: 1.4em;
   overflow: hidden;
+  font-size: 1.6rem;
+  padding-top: .3rem;
+}
+#main article ul li span.name {
+  position: absolute;
+  left: 7.2rem;
+  top: 1.2rem;
+  color: #222;
+  width: calc(100% - 14rem);
+  overflow: hidden;
+  font-size: 1.6rem;
+  padding-top: .3rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 #main article ul li span.status,
 #main article ul li span.lastMessage {
   position: absolute;
-  left: 4.2rem;
-  top: 2rem;
-  color: #444;
+  left: 7.2rem;
+  bottom: 1.6rem;
+  color: #666;
   font-weight: 100;
-  font-size: .8em;
-  max-width: calc(100% - 6.5rem);
-  max-height: 1.4em;
+  font-size: 1.4rem;
+  max-width: calc(100% - 12rem);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -419,16 +438,16 @@ section > nav[data-control="menu"] a:before {
 #activity article ul li span.status,
 #activity article ul li span.lastMessage {
   position: absolute;
-  left: 1rem;
+  left: 1.6rem;
   top: 2rem;
   color: #444;
   font-weight: 100;
-  font-size: .8em;
+  font-size: 1.4rem;
   max-width: calc(100% - 4.5rem);
-  max-height: 1.4em;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  padding-top: 0.9rem;
 }
 #main article ul li span.name img,
 #main article ul li span.status img,
@@ -440,16 +459,15 @@ section > nav[data-control="menu"] a:before {
 #activity article ul li span.status img,
 #activity article ul li span.lastMessage img  {
   height: 1em;
-   
 }
-#main article ul li span.lastStamp {
+#main article ul li span.lastStamp > * {
   position: absolute;
-  right: .5rem;
-  top: 2rem;
+  right: 1.6rem;
+  top: 1.2rem;
   color: #999;
   font-weight: 100;
-  line-height: .9em;
-  font-size: .65em;
+  font-size: 1.2rem;
+  line-height: 1.2rem;
   max-width: calc(100% - 4.7rem);
   text-align: right;
 }
@@ -457,27 +475,17 @@ section > nav[data-control="menu"] a:before {
 #activity article ul li span.unread {
   display: none;
 }
-.main li .show {
-  display: block;
-  position: absolute;
-  left: 3rem;
-  top: .5rem;
-  width: .6rem;
-  height: .6rem;
-  border: .25rem solid #F9F9F9;
-  border-radius: 50%;
-  box-sizing: content-box;
-}
-#main article ul li:active .show {
-  border-color: #DDD;
+#main header {
+  border-bottom: .5rem solid;
+  transition: border-bottom .2s ease;
 }
 #main article ul li span.avatar {
   position: absolute;
   display: block;
-  height: 3.2rem;
-  width: 3.2rem;
-  top: .4rem;
-  left: .4rem;
+  height: 4.4rem;
+  width: 4.4rem;
+  top: 1.6rem;
+  left: 1.2rem;
 }
 #main article ul li span.avatar img {
   display: block;
@@ -487,35 +495,28 @@ section > nav[data-control="menu"] a:before {
   overflow: hidden;
 }
 #main article ul li span.avatar img:not([src]) {
-  height: 3.2rem;
-  width: 3.2rem;
   background-image: url('../../img/foovatar.png');
   background-size: 100%;
   -webkit-background-size: 100%;
   background-color: #D4D2C5;
 }
-#main article ul li span.unread {
+
+#chats ul li[data-hidden="1"]{
   display: none;
 }
 
-#chats ul li[data-hidden="1"]{
-    display: none;
-}
-
-#main article ul li[data-unread="1"] span.unread {
+#main article ul li[data-unread]:not([data-unread="0"]):after {
+  content: attr(data-unread);
   display: block;
   position: absolute;
-  top: .6rem;
-  right: .4rem;
+  bottom: 1.2rem;
+  right: 1.6rem;
   background-color: #E74C3C;
   color: #FFF;
-  padding: .4rem .5rem;
-  font-size: .6em;
-  line-height: .6em;
-  border-radius: .6rem;
-}
-#main article ul li[data-unread="1"] span.name {
-  max-width: calc(100% - 6.8rem);
+  padding: .35rem .8rem;
+  font-size: 1.2rem;
+  line-height: 1.4rem;
+  border-radius: 1.2rem;
 }
 #main .noChats {
   position: absolute;
@@ -523,7 +524,7 @@ section > nav[data-control="menu"] a:before {
   text-align: center;
   width: 16rem;
   left: calc(50% - 8rem);
-  top: calc(50% - 2rem);
+  top: calc(50% - 5rem);
 }
 #main .noChats strong {
   color: #444;
@@ -574,25 +575,29 @@ section > nav[data-control="menu"] a:before {
 }
 
 #activity article header.beige {
-  height: 3rem;
+  height: 4.4rem;
   background-color: #ECECEC;
   border-bottom: .1rem solid #CECECE;
   box-sizing: content-box;
 }
 #activity article header.beige button {
-  margin: .7rem 0;
-  padding: .3rem 1rem;
+  padding: 1.3rem 1.6rem 1.2rem 1.6rem;
   border: none;
   border-radius: 0;
   background: none;
-  font-size: .8em;
+  font-size: 1.4rem;
+  width: 50%;
+  padding: 1.3rem 0 1.2rem 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 #activity article header.beige button:not(:last-child) {
   border-right: .1rem solid #BBB;
 }
 #activity.extended article .list {
   position: absolute;
-  top: 3rem;
+  top: 4.4rem;
   right: 0;
   bottom: 0;
   left: 0;
@@ -610,7 +615,7 @@ section > nav[data-control="menu"] a:before {
 
 #settings ul li {
   position: relative;
-  padding: 1rem;
+  padding: 2rem 1.6rem;
   border-bottom: .1rem solid #DDD;
   list-style-type: none;
   cursor: pointer;
@@ -619,7 +624,7 @@ section > nav[data-control="menu"] a:before {
   display: block;
   max-width: calc(100% - 4rem);
   font-weight: 100;
-  font-size: .9em;
+  font-size: 1.6rem;
 }
 #chat header span {
   color: white;
@@ -628,24 +633,25 @@ section > nav[data-control="menu"] a:before {
 }
 #chat header .title {
   position: absolute;
-  top: .4rem;
-  left: 3rem;
+  top: .8rem;
+  right: 7.6rem;
   font-weight: 300;
-  font-size: 1em;
-  line-height: 1em;
+  font-size: 1.6rem;
+  text-align: right;
   height: 1.1em;
+  width: calc(100% - 11.6rem);
   overflow: hidden;
-  width: calc(100% - 7.5rem)
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 #chat header .status {
   position: absolute;
-  top: 1.6rem;
-  left: 3rem;
-  font-size: .8em;
-  line-height: 1.2em;
+  top: 2.8rem;
+  right: 7.6rem;
+  font-size: 1.2rem;
   font-weight: 100;
   height: 1.2em;
-  width: calc(100% - 7.5rem);
+  width: calc(100% - 11.6rem);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -654,52 +660,60 @@ section > nav[data-control="menu"] a:before {
   height: .8em;
 }
 #chat header .show {
-  display: block;
   position: absolute;
-  right: 3.3rem;
-  top: 0;
-  width: .6rem;
-  height: .6rem;
-  border: .3rem solid #312F34;
+  right: 5rem;
+  top: .1rem;
+  width: 1rem;
+  height: 1rem;
+  border: .5rem solid #222;
   border-radius: 50%;
   z-index: 1;
   box-sizing: content-box;
 }
 #chat header .avatar {
   position: absolute;
-  top: -.6rem;
-  right: -.3rem;
-  width: 4.2rem;
-  height: 4.2rem;
-  border-radius: 50%;
-  overflow: hidden;
-  background-color: #DDD;
-  transition: all 1s;
-  -webkit-transition: all 1s;
+  top: -1rem;
+  right: -1rem;
 }
 #chat header .avatar img {
-  width: 100%;
+  width: 7.2rem;
+  height: 7.2rem;
+  border-radius: 50%;
+}
+#chat[data-unread]:not([data-unread="0"]):before {
+  content: attr(data-unread);
+  display: block;
+  position: absolute;
+  top: 1.7rem;
+  left: 1.6rem;
+  background-color: #E74C3C;
+  color: #FFF;
+  padding: .35rem .8rem;
+  font-size: 1.2rem;
+  line-height: 1.4rem;
+  border-radius: 1.2rem;
+  pointer-events: none;
 }
 #footbox {
   position: absolute;
   right: 0;
   bottom: 0;
   left: 0;
-  padding: .6rem;
+  padding: 1rem;
   background-color: #F9F9F9;
   border-top: .1rem solid #E6E6E6;
 }
 #chat #footbox #typing {
   position: absolute;
-  top: -1.3rem;
+  top: -2.4rem;
   left: 0;
   height: 1.05rem;
-  padding: .2rem .7rem 0 .5rem;
+  padding: .4rem 1rem .9rem 1rem;
   border: .1rem solid #E6E6E6;
   border-bottom: none;
   border-left: none;
   background-color: inherit;
-  font-size: .8rem;
+  font-size: 1.2rem;
   font-weight: 100;
   color: #999;
   z-index: 1;
@@ -710,11 +724,11 @@ section > nav[data-control="menu"] a:before {
   position: relative;
   float: right;
   top: 0.05rem;
-  font-size: .9rem;
+  font-size: 1.2rem;
   line-height: 1.5rem;
   padding: .1rem 1rem .2rem 1rem;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 3.2rem;
+  height: 3.2rem;
   margin: 0;
   margin-left: 0.5rem;
   font-weight: bold;
@@ -728,16 +742,16 @@ section > nav[data-control="menu"] a:before {
 }
 #text {
   position: relative;
-  padding: .7rem .5rem .5rem .5rem;
-  min-height: 1.2rem;
-  max-height: 4rem;
+  padding: .6rem .5rem .7rem .5rem;
+  min-height: 1.8rem;
+  max-height: 6.2rem;
   background: none;
   border: none;
   border-bottom: .1rem solid #BBB;
   border-radius: .2rem;
-  font-size: 1rem;
+  font-size: 1.4rem;
+  line-height: 1.6rem;
   font-weight: 300;
-  line-height: 1.2rem;
   color: #666;
   outline: none;
   overflow: auto;
@@ -760,6 +774,7 @@ section > nav[data-control="menu"] a:before {
   padding-top: 1.5rem;
   background-size: cover;
   -webkit-background-size: cover;
+  background-position: center;
 }
 #messages > .more {
   width: calc(100vw - 1rem);
@@ -777,9 +792,9 @@ section > nav[data-control="menu"] a:before {
 #messages > li > div {
   position: relative;
   display: block;
-  padding: .5rem .5rem;
+  padding: .5rem 1.6rem;
   clear: both;
-  max-width: calc(100% - 3.5rem);
+  max-width: calc(100% - 5rem);
   animation: fadeIn .5s;
   -webkit-animation: fadeIn .5s;
 }
@@ -802,10 +817,10 @@ section > nav[data-control="menu"] a:before {
 }
 #messages > li > div .avatar img {
   position: absolute;
-  top: 1rem;
+  top: .8rem;
   border-radius: 100%;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 2.4rem;
+  height: 2.4rem;
 }
 #chat[data-muc='true'] #messages > li > div.extended .avatar img {
   top: 2.2rem;
@@ -828,9 +843,9 @@ section > nav[data-control="menu"] a:before {
 #messages > li > div > span.text {
   position: relative;
   display: block;
-  padding: .5rem 1rem;
+  padding: 1rem 1.6rem;
   font-weight: 100;
-  font-size: .9em;
+  font-size: 1.6rem;
   word-wrap: break-word;
   border-radius: .3rem;
 }
@@ -847,8 +862,8 @@ section > nav[data-control="menu"] a:before {
   content: '';
   display: block;
   position: absolute;
-  top: 1.4rem;
-  left: 2rem;
+  top: 1.7rem;
+  left: 3rem;
   width: .7rem;
   height: .7rem;
   background-color: #EEE;
@@ -863,28 +878,35 @@ section > nav[data-control="menu"] a:before {
   vertical-align: middle;
   height: 1.2em;
 }
-#messages > li > div[data-type='out'][data-receipt='sent']:after {
-  content: "";
-  display: block;
-  width: .5rem;
-  height: .5rem;
-  border-radius: 50%;
-  background-color: #3498DF;
-  position: absolute;
-  top: .3rem;
-  left: -1.9rem;
-  opacity: .3;
+#messages > li > div[data-type='out'][data-ack='sending'] > span.text {
+  background-color: #efcc12;
 }
-#messages > li > div[data-type='out'][data-receipt='delivered']:after {
-  content: "";
-  display: block;
-  width: .5rem;
-  height: .5rem;
-  border-radius: 50%;
-  background-color: #2ECC71;
+#messages > li > div[data-type='out'][data-ack='failed'] > span.text {
+  background-color: #EEE;
+  color: #000;
+  border: 2px solid #E95644;
+}
+#messages > li > div[data-type='out'][data-ack='sent']:after {
+  content: "✔";
   position: absolute;
-  top: .3rem;
-  right: 1.9rem;
+  top: 1.6rem;
+  left: -.3rem;
+  text-align: right;
+  font-size: .8em;
+  color: #71C837;
+}
+#messages > li > div[data-type='out'][data-ack='delivered']:after, #messages > li > div[data-type='out'][data-ack='viewed']:after {
+  content: "✔✔";
+  position: absolute;
+  top: 1.6rem;
+  left: -1rem;
+  text-align: right;
+  font-size: .8em;
+  color: #71C837;
+  letter-spacing: -.5em;
+}
+#messages > li > div[data-type='out'][data-ack='viewed']:after{
+  color: #373dc8;
 }
 #messages > li:last-child {
   margin-bottom: 3.5rem;
@@ -936,10 +958,10 @@ section > nav[data-control="menu"] a:before {
   clear: both;
   width: calc(100vw);
   text-align: center;  
-  font-size: .8rem;
+  font-size: 1.2rem;
   font-weight: 100;
   font-style: italic;
-  padding-top: .3rem;
+  padding: 1rem 0 .5rem 0;
   color: #666;
   text-shadow: 0 .05rem 0 white;
 }
@@ -949,7 +971,7 @@ section > nav[data-control="menu"] a:before {
   clear: both;
   width: calc(100vw);
   text-align: center;  
-  font-size: .8rem;
+  font-size: 1.2rem;
   font-weight: 100;
   font-style: italic;
   margin: .5rem 0;
@@ -981,29 +1003,23 @@ section > nav[data-control="menu"] a:before {
 }
 #emoji {
   background: none repeat scroll 0% 0% rgba(255, 255, 255, 0.8);
-  margin-top: 4.7rem;
-  height: calc(100vh - 12.7rem);
+  margin-top: 5.8rem;
+  height: calc(100vh - 17.9rem);
   padding: 0.5rem;
   overflow: scroll;
   border-top: .1rem solid #222;
-}
-#emoji h1 {
-  font-size: 1.2rem;
-  border-bottom: .1rem solid #AAA;
-  color: #444;
-  margin: 1rem;
 }
 #emoji ul {
   list-style-type: none;
 }
 #emoji ul li {
-  padding: 1rem;
+  padding: 1.38rem;
   float: left;
   cursor: pointer;
 }
 #emoji ul li img {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 2rem;
+  height: 2rem;
 }
 #emoji button {
   width: 100%;
@@ -1091,10 +1107,10 @@ section.profile #card {
 section.profile #card span.avatar {
   position: absolute;
   display: block;
-  height: 7rem;
-  width: 7rem;
+  height: 10rem;
+  width: 10rem;
   top: 2rem;
-  left: calc(50% - 3.5rem);
+  left: calc(50% - 5rem);
 }
 section.profile #card span.avatar img {
   display: block;
@@ -1105,49 +1121,51 @@ section.profile #card span.avatar img {
 }
 section.profile #card span.name {
   display: block;
-  margin: 8rem 1rem 0 1rem;
+  margin: 11rem 1rem 0 1rem;
   max-width: calc(100% - 2rem);
   text-align: center;
-  font-size: 1.1rem;
-  line-height: 1rem;
+  font-size: 1.6rem;
+  line-height: 1.6rem;
   color: #222;
   font-weight: 300;
   text-shadow: 0 .05rem 0 white;
 }
 section.profile #card .user {
   display: block;
-  margin: .5rem 1rem 1rem 1rem;
+  margin: 1rem 1rem 1rem 1rem;
   max-width: calc(100% - 2rem);
   text-align: center;
   margin-bottom: 0;
-  font-size: .9rem;
-  line-height: 1rem;
+  font-size: 1.4rem;
   font-weight: 200;
   word-break: break-all;
   text-shadow: 0 .05rem 0 white;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;  
 }
 section.profile #card span.provider {
   position: absolute;
   display: block;
-  width: 2rem;
-  height: 2rem;
-  top: 2rem;
-  left: calc(50% + 2rem);
-  border: .3rem solid white;
-  border-radius: .6rem;
+  width: 3rem;
+  height:3rem;
+  top: 1.4rem;
+  left: calc(50% + 2.6rem);
+  border: .4rem solid white;
+  border-radius: .8rem;
   background-color: white;
   box-sizing: content-box;
 }
 section.profile #card span.provider img {
   width: 100%;
-  border-radius: .3rem;
+  border-radius: .6rem;
 }
 section.profile #card button.background {
   position: absolute;
   display: block;
-  width: 2rem;
-  height: 2rem;
-  right: .3rem;
+  width: 3.6rem;
+  height: 3.6rem;
+  right: 1.6rem;
   padding: .3rem;
   border: none;
   border-radius: .3rem;
@@ -1156,10 +1174,10 @@ section.profile #card button.background {
   box-sizing: content-box;
 }
 section.profile #card .background.change {
-  top: .4rem;
+  top: 1.6rem;
 }
 section.profile #card .background.delete {
-  top: 2.7rem;
+  top: 6.2rem;
 }
 section.profile #card button.background.change img {
   width: 100%;
@@ -1171,14 +1189,14 @@ section.profile #settings ul {
 section.profile #settings li {
   display: block;
   position: relative;
-  height: 2.2rem;
+  height: 5.6rem;
 }
 section.profile #settings li .caption {
   display: block;
   position: relative;
-  top: .6rem;
+  top: 2rem;
   width: calc(100% - 4rem);
-  font-size: 1em;
+  font-size: 1.6rem;
 }
 #me:not([data-features~=nickChange]) #nick {
   display: none;
@@ -1207,34 +1225,27 @@ section.profile #settings li .caption {
 #chat:not([data-features~=attention]) .bolt {
   display: none;
 }
-#status input {
-  width: 100%;
-  height: 2.4rem;
-  font-size: 1rem;
-  margin-bottom: 1.5rem;
-}
+#status input,
 #nick input {
-  width: 100%;
-  height: 2.4rem;
-  font-size: 1rem;
-  margin-bottom: 1.5rem;
+  margin: .5rem 0 1.5rem 0;
 }
 section.profile article > div:not(#card) {
-  padding: 0 1rem;
+  padding: 0 1.6rem 0rem 1.6rem;
 /* border-top: .1rem solid #CCC; */
 }
 section.profile article > div:not(#card) h2 {
-  font-size: 1.1rem;
+  font-size: 1.6rem;
   color: #444;
   margin-bottom: 0;
 }
 section.profile article > div:not(#card) p {
-  font-weight: 200;
-  font-size: .9rem;
-  margin: .5rem 0 1rem 0;
+  font-weight: 100;
+  font-size: 1.4rem;
+  margin: .5rem 0 2rem 0;
+  color: #666;
 }
 section.profile article > div:not(#card) .buttongroup {
-  margin: .5rem 0;
+  margin: .5rem 0 1.6rem 0;
 }
 section.profile article > div:not(#card) ul li {
   list-style: none;
@@ -1252,139 +1263,172 @@ ul.mini {
   margin-top: 1rem;
   list-style-type: none;
 }
-ul.mini li {
-  border-bottom: .1rem solid #CCC;
+ul.mini li a {
+  border-bottom: .1rem solid #E3E3E3;
 }
-ul.mini li:last-child {
+ul.mini li:last-of-type a {
   border: none;
 }
 ul.mini li a {
+  position: relative;
   display: block;
-  padding: .9rem .2rem .7rem .2rem;
+  padding: 1rem .2rem 1rem 0;
+  font-size: 1.6rem;
+  margin-left: 4rem;
 }
 ul.mini li img {
-  height: 1.3rem;
-  margin-right: .5rem;
-  margin-top: -.2rem;
-}
-aside header {
-  display: block;
-  padding: .7rem .4rem;
-  font-size: .9em;
-  font-weight: 300;
-  text-transform: uppercase;
-  color: #222;
-}
-aside header nav {
   position: absolute;
-  top: .4rem;
-  right: .2rem;
+  height: 2.4rem;
+  left: -4rem;
+  top: .9rem;
 }
-aside header nav button {
-  height: 2rem;
-  width: 2rem;
-  border: none;
-}
-aside article ul li {
+
+aside .cover {
+  display: block;
   position: relative;
-  height: 3.6rem;
-  overflow: hidden;
-  border-top: .1rem solid #E6E6E6;
-  box-sizing: content-box;
+  background-color: #333;
+  height: 17rem;
+  transition: background-color .2s ease;
 }
-aside article ul li:first-child {
-  border-bottom: none;
-  border-top: none;
-}
-aside article ul li img.provIcon {
+aside .cover span {
+  color: white;
   position: absolute;
-  top: .5rem;
-  left: .8rem;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: .4rem;
+  left: 1.6rem;
 }
-aside article ul li span.provider {
-  position: absolute;
-  top: .7rem;
-  left: 3.9rem;
-  font-size: .7em;
-  color: #666;
-  max-width: calc(80vw - 5.5rem);
+aside .cover .provider {
+  font-size: 1.4rem;
+  bottom: 3.6rem;
+  text-transform: uppercase;
+}
+aside .cover .jid {
+  font-size: 1.6rem;
+  font-weight: 600;
+  bottom: 1.6rem;
+  max-width: calc(100% - 10rem);
   overflow: hidden;
   white-space: nowrap;
-  text-overflow: ellipsis;
+  text-overflow: ellipsis;  
 }
-aside article ul li span.jid {
-  position: absolute;
+aside .cover .avatar {
   top: 1.6rem;
-  left: 3.9rem;
-  font-size: .9em;
-  max-width: calc(80vw - 5.5rem);
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }
-aside article ul li span.counter {
+aside .cover .avatar img {
+  height: 8.2rem;
+  width: 8.2rem;
+  border-radius: 50%;
+}
+aside .cover .settings {
+  color: white;
+  font-size: 2.6rem;
+  line-height: 2.6rem;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: 2rem 1.6rem;
+}
+aside .menu li {
+  position: relative;
+  font-size: 1.6rem;
+  font-weight: 100;
+  padding: 1.2rem 3.6rem 1.2rem 4.8rem;
+  color: #444;
+}
+aside .menu li[data-unread]:not([data-unread="0"]):after {
+  content: attr(data-unread);
   display: block;
   position: absolute;
-  top: 1.1rem;
-  right: 4.2rem;
+  bottom: 1.3rem;
+  right: 7.2rem;
   background-color: #E74C3C;
   color: #FFF;
-  padding: .4rem .5rem;
-  font-size: .6em;
-  line-height: .6em;
-  border-radius: .6rem;
+  padding: .35rem .8rem;
+  font-size: 1.2rem;
+  line-height: 1.4rem;
+  border-radius: 1.2rem;
 }
-aside article ul li span.counter[data-value='0'] {
-  display: none;
+aside .menu li span {
+  display: block;
+  max-width: calc(100% - 6rem);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+aside .menu li .switch {
+  top: auto;
+  bottom: 1rem;
+  right: 1.6rem;
+}
+aside .menu li:first-of-type {
+  padding-top: 2.4rem;
+}
+aside .menu li:last-of-type {
+  margin-bottom: 1rem;
+}
+aside .menu li img.icon {
+  position: absolute;
+  bottom: .9rem;
+  height: 2.8rem;
+  left: 1.2rem;
+}
+aside .menu li img.provider {
+  position: absolute;
+  bottom: 1.3rem;
+  height: 2rem;
+  left: 1.6rem;
+}
+aside .menu hr {
+  border: none;
+  border-top: .01rem solid #DDD;
+  margin: 1rem 1.6rem;
 }
 
-li[data-show=a] .backchange,
-li[data-show=chat] .backchange,
-section[data-show=a] header .backchange,
-section[data-show=chat] header .backchange,
-section[data-show=a] footer .backchange,
-section[data-show=chat] footer .backchange {
+[data-show] .avatar:after {
+  content: '';
+  display: block;
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  border: .5rem solid white;
+  border-radius: 50%;
+  box-sizing: content-box;
+}
+li[data-show] .avatar:after {
+  left: 3.4rem;
+  top: -.4rem;
+}
+li[data-show]:active .avatar:after {
+  border-color: #DDD;
+}
+section[data-show] header .avatar:after {
+  right: 6rem;
+  top: 1rem;
+  border-color: #222;
+}
+li[data-show=a] .avatar:after,
+li[data-show=chat] .avatar:after,
+section[data-show=a] header .avatar:after,
+section[data-show=chat] header .avatar:after {
   background-color: #2ECC71;
 }
-li[data-show=away] .backchange,
-section[data-show=away] header .backchange,
-section[data-show=away] footer .backchange {
+li[data-show=away] .avatar:after,
+section[data-show=away] header .avatar:after {
   background-color: #3498DF;
 }
-li[data-show=xa] .backchange,
-section[data-show=xa] header .backchange,
-section[data-show=xa] footer .backchange {
+li[data-show=xa] .avatar:after,
+section[data-show=xa] header .avatar:after {
   background-color: #F1C40F;
 }
-li[data-show=dnd] .backchange,
-section[data-show=dnd] header .backchange,
-section[data-show=dnd] footer .backchange {
+li[data-show=dnd] .avatar:after,
+section[data-show=dnd] header .avatar:after {
   background-color: #E95644;
 }
-li[data-show='na'] .backchange,
-li:not([data-show]) .backchange,
-section[data-show='na'] header .backchange,
-section:not([data-show]) header .backchange
-section[data-show='na'] footer .backchange,
-section:not([data-show]) footer .backchange {
-  display: none !important;
-}
-
-.disHide #contacts li[data-show='na'] {
-  display: none !important;
-}
-
-#contacts li[data-show='na'] .status,
-#contacts li[data-show='na'] .show,
-#contacts li[data-muc='true'] .show {
-  display: none !important;
-}
-
-#chat[data-muc='true'] header .show {
-  display: none !important;
+li[data-show='na'] .avatar:after,
+li:not([data-show]) .avatar:after,
+section[data-show='na'] header .avatar:after,
+section:not([data-show]) header .avatar:after,
+body[data-online='false'] .avatar:after,
+ul:not([data-enabled='true']) .avatar:after {
+  content: none;
 }
 
 #settings nav #developer {
@@ -1431,7 +1475,7 @@ section:not([data-show]) footer .backchange {
 }
 #activity article ul.accounts li {
   position: relative;
-  height: 3.6rem;
+  height: 5.2rem;
   overflow: hidden;
 }
 #activity article ul.accounts li:not(:first-child) {
@@ -1441,23 +1485,23 @@ section:not([data-show]) footer .backchange {
   position: absolute;
   top: .5rem;
   left: .5rem;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 4rem;
+  height: 4rem;
   border-radius: .4rem;
 }
 #activity article ul.accounts li span.provider {
   position: absolute;
   top: .7rem;
-  left: 3.6rem;
-  font-size: .7em;
+  left: 6rem;
+  font-size: 1.3rem;
   color: #666;
 }
 #activity article ul.accounts li span.jid {
   position: absolute;
-  top: 1.6rem;
-  left: 3.6rem;
-  max-width: calc(80vw - 3rem);
-  font-size: .9em;
+  top: 2.5rem;
+  left: 6rem;
+  max-width: calc(100vw - 11rem);
+  font-size: 1.6rem;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -1491,12 +1535,12 @@ section:not([data-show]) footer .backchange {
 
 div.switch {
   position: absolute;
-  top: 1rem;
-  right: .8rem;
+  top: 2.1rem;
+  right: 1.6rem;
   display: block;
-  width: 3rem;
-  height: 1.4rem;
-  border-radius: 1.4rem;
+  width: 5.4rem;
+  height: 2.6rem;
+  border-radius: 2.4rem;
   background-color: #BDC6C8;
   transition: all .2s;
   -webkit-transition: all .2s;
@@ -1505,18 +1549,18 @@ div.switch {
 div.switch img.tick {
   display: none;
   position: absolute;
-  height: .9rem;
-  left: .3rem;
-  top: .25rem;
+  height: 1.4rem;
+  left: .6rem;
+  top: .6rem;
 }
 div.switch div.ball {
   position: absolute;
   display: block;
   top: -.35rem;
   left: -.3rem;
-  width: 1.1rem;
-  height: 1.1rem;
-  border: .5rem solid #ABB5B7;
+  width: 2rem;
+  height: 2rem;
+  border: .7rem solid #ABB5B7;
   border-radius: 50%;
   background-color: #FFF;
   transition: all .2s;
@@ -1530,14 +1574,14 @@ div.switch div.ball {
   background-color: #2EDF88;
 }
 [data-value="true"] div.switch div.ball {
-  left: 1.2rem;
+  left: 2.4rem;
   border-color: #2CC269;
 }
 [data-value="loading"] div.switch {
   background-color: #F1D726;
 }
 [data-value="loading"] div.switch div.ball {
-  left: 1.2rem;
+  left: 2.4rem;
   border-color: #EFBA07;
 }
 
@@ -1678,23 +1722,25 @@ article.form ul.listBox li.add:before {
   font-size: .9rem;
 }
 
-@media (min-width: 1024px) {
-  #main {
-    padding-top: 100px;
-    padding-left: 220px;
-    padding-right: 220px;
-  } 
-  
-  section.setup article {
-    padding-top: 100px;
-    padding-left: 220px;
-    padding-right: 220px;
-  } 
-  
-  .buttongroup {
-    padding-left: 20%;
-    padding-right: 20%;
-    margin: 1.5rem 0;
-  }
+.floater {
+  display: block;
+  background-color: #222;
+  border-radius: 100%;
+  position: fixed;
+  right: 2.3rem;
+  bottom: 2.3rem;
+  width: 5.6rem;
+  height: 5.6rem;
+  box-shadow: 0 .2rem .2rem rgba(0, 0, 0, .3);
+  transition: all .2s ease;
 }
-
+.floater:before {
+  color: white;
+  font-size: 2.4rem;
+  position: relative;
+  top: 1.5rem;
+  left: 1.7rem;
+}
+.hidden.floater {
+  bottom: -10rem;
+}

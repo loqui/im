@@ -1,3 +1,5 @@
+/* global Tools, Lungo */
+
 'use strict';
 
 var Store = {
@@ -21,7 +23,7 @@ var Store = {
         	callback(index);
         }
       });
-    }
+    };
   },
   
   save: function (value, callback) {
@@ -84,22 +86,22 @@ var Store = {
     card: 'getDeviceStorage' in navigator ? navigator.getDeviceStorage('sdcard') : null,
     
     save: function (path, content, onsuccess, onerror) {
+      var type = Tools.getFileType(path.split('.').pop());
       if (this.card) {
         Tools.log('SAVING', path);
-        var type = Tools.getFileType(path.split('.').pop());
         var file = content instanceof Blob ? content : new Blob(content, {type: type});
         var req = this.card.addNamed(file, path);
         req.onsuccess = function () {
           if (onsuccess) {
             onsuccess(this.result);
           }
-        }
+        };
         req.onerror = function () {
           if (onerror) {
             onerror(this.error);
             Lungo.Notification.error(_('Error'), _('NoSDAccess'), 'cloud-download', 5);
           }
-        }      
+        };
       } else {
         Tools.log('DS IS NOT SUPPORTED');
         Store.put('fakesdcard_' + path, {content: content, type: type}, onsuccess);
@@ -111,13 +113,13 @@ var Store = {
         var req = this.card.get(path);
         req.onsuccess = function () {
           onsuccess(this.result);
-        }
+        };
         req.onerror = function () {
           if (onerror) {
             onerror(this.error);
             Lungo.Notification.error(_('Error'), _('NoSDAccess'), 'cloud-download', 5);
           }
-        }
+        };
       } else {
         Tools.log('DS IS NOT SUPPORTED');
         Store.get('fakesdcard_' + path, function (value) {
@@ -137,13 +139,13 @@ var Store = {
         var req = this.card.get(from);
         req.onsuccess = function () {
           Store.SD.save(to, this.result, onsuccess, onerror);
-        }
+        };
         req.onerror = function () {
           if (onerror) {
             onerror(this.error);
             Lungo.Notification.error(_('Error'), _('NoSDAccess'), 'cloud-download', 5);
           }
-        }
+        };
       } else {
         Tools.log('DS IS NOT SUPPORTED');
         Store.get('fakesdcard_' + from, function (value) {
@@ -160,4 +162,4 @@ var Store = {
     
   }
       
-}
+};
