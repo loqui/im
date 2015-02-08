@@ -1475,7 +1475,7 @@ ul:not([data-enabled='true']) .avatar:after {
 }
 #activity article ul.accounts li {
   position: relative;
-  height: 3.6rem;
+  height: 5.2rem;
   overflow: hidden;
 }
 #activity article ul.accounts li:not(:first-child) {
@@ -1485,23 +1485,23 @@ ul:not([data-enabled='true']) .avatar:after {
   position: absolute;
   top: .5rem;
   left: .5rem;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 4rem;
+  height: 4rem;
   border-radius: .4rem;
 }
 #activity article ul.accounts li span.provider {
   position: absolute;
   top: .7rem;
-  left: 3.6rem;
-  font-size: .7em;
+  left: 6rem;
+  font-size: 1.3rem;
   color: #666;
 }
 #activity article ul.accounts li span.jid {
   position: absolute;
-  top: 1.6rem;
-  left: 3.6rem;
-  max-width: calc(80vw - 3rem);
-  font-size: .9em;
+  top: 2.5rem;
+  left: 6rem;
+  max-width: calc(100vw - 11rem);
+  font-size: 1.6rem;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -1744,5 +1744,3 @@ article.form ul.listBox li.add:before {
 .hidden.floater {
   bottom: -10rem;
 }
-
-
