@@ -3364,12 +3364,11 @@ CoSeMe.namespace('config', (function(){
     groupDomain: 'g.us',
 
     tokenData: {
-
       "v": "2.12.60",
-      // should be tokenData[d] + - + tokenData[v] + - + port
+      // XXX: it is tokenData[d] + - + tokenData[v] + - + port
       "r": "S40-2.12.60-5222",
       "u": "WhatsApp/2.12.60 S40Version/14.26 Device/Nokia302",
-      "d": "Nokia302"
+      "d": "S40"
     },
 
     auth: {
@@ -3869,6 +3868,14 @@ CoSeMe.namespace('utils', (function(){
     // but for some unknown reason, this is way slower...
   }
 
+  function encodeIdForURL(str) {
+    return str.split('').map(function (c) {
+      var hexrepr = c.charCodeAt(0).toString(16).toUpperCase();
+      if (hexrepr.length < 2) { hexrepr = '0' + hexrepr; }
+      return '%' + hexrepr;
+    }).join('');
+  }
+
   var utils = {
     urlencode: function _urlencode(params) {
       var pairs = [];
@@ -3878,11 +3885,14 @@ CoSeMe.namespace('utils', (function(){
           for (var i in params[paramName]) {
             aux.push(encodeURIComponent(paramName + '[]') + '=' +
                      encodeURIComponent(params[paramName][i]));
-          };
+          }
           pairs.push(aux.join('&'));
         } else {
-          pairs.push(encodeURIComponent(paramName) + '=' +
-                     encodeURIComponent(params[paramName]));
+          var encodedName = encodeURIComponent(paramName);
+          var encodedValue = paramName === 'id' ?
+                             encodeIdForURL(params[paramName]) :
+                             encodeURIComponent(params[paramName]);
+          pairs.push(encodedName + '=' + encodedValue);
         }
       }
       return pairs.join('&');
@@ -5779,20 +5789,20 @@ CoSeMe.namespace('registration', (function(){
   'use strict';
 
   function getToken(phone) {
-    return CryptoJS.MD5("PdA2DJyKoUrwLw1Bg6EIhzh502dF9noR9uFCllGk1418865329241"+phone).toString();
+    var plain = 'PdA2DJyKoUrwLw1Bg6EIhzh502dF9noR9uFCllGk1418865329241' + phone;
+    var data = CryptoJS.enc.Latin1.parse(plain);
+    var output = CryptoJS.MD5(data);
+    return output.toString();
   }
 
   function getRealDeviceId(aSeed) {
     var seed = aSeed || (Math.random() * 1e16).toString(36).substring(2, 10);
-    var id = CryptoJS.SHA1(seed).toString(CryptoJS.enc.Latin1).substring(0, 20)
-      .split('').map(function (e) {
-        return String.fromCharCode(e.charCodeAt(0) % 128)
-      }).join('');
+    var id = CryptoJS.SHA1(seed).toString(CryptoJS.enc.Latin1).substring(0, 20);
     return {
       seed: seed,
       id: id
     };
-  }  
+  }
 
   function pad(n, width, z) {
     z = z || '0';
@@ -5805,23 +5815,40 @@ CoSeMe.namespace('registration', (function(){
       var params = Object.create(null);
       params['cc'] = countryCode;
       params['in'] = phone;
-      params['lc'] = 'GB';
-      params['lg'] = 'en';
-      params['mcc'] = '000';
-      params['mnc'] = '000';
+      params['lc'] = locale.split('-')[1] || 'GB';
+      params['lg'] = locale.split('-')[0] || 'en';
       params['sim_mcc'] = pad(mcc, 3);
       params['sim_mnc'] = pad(mnc, 3);
       params['method'] = method in {'sms': 1, 'voice': 1} ? method : 'sms';
-      var seedAndId = getRealDeviceId(deviceId);
-      params['id'] = seedAndId.id;
-      params['network_radio_type'] = '1';
-      params['reason'] = 'self-send-jailbroken';
-
-      // Get token
       params['token'] = getToken(phone);
 
-      CoSeMe.http.doRequest('code', params, onready, onerror);
+      var seedAndId = getRealDeviceId(deviceId);
+      params['id'] = seedAndId.id;
+
+      this.exists(countryCode, phone, seedAndId.id,
+        function onSuccess(result) {
+          if (result && result['status'] === 'ok') {
+            onready(result);
+          }
+          else {
+            CoSeMe.http.doRequest('code', params, onready, onerror);
+          }
+        },
+        onerror
+      );
+
       return seedAndId.seed; // Return the deviceId we've used in case we want to store it.
+    },
+
+    exists: function(cc, phone, id, onready, onerror) {
+      var params = Object.create(null);
+      params['cc'] = cc;
+      params['in'] = phone;
+      params['id'] = id;
+      params['lg'] = 'en';
+      params['lc'] = 'GB';
+      params['token'] = getToken(phone);
+      CoSeMe.http.doRequest('exist', params, onready, onerror);
     },
 
     register: function(countryCode, phone, registerCode, onready, onerror, deviceId) {
@@ -5835,8 +5862,7 @@ CoSeMe.namespace('registration', (function(){
 
       CoSeMe.http.doRequest('register', params, onready, onerror);
       return seedAndId.id; // Return the deviceId we've used in case we want to store it.
-    },
-    
+    }
   };
 }()));
 CoSeMe.namespace('media', (function() {
@@ -7633,12 +7659,13 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
     },
 
     sendReceipt: function(jid, mid, type) {
-      self._writeNode(newProtocolTreeNode('receipt', {
+      attributes = {
         to: jid,
         id: mid,
-        t: Date.now(),
-        type: type
-      }));
+        t: Date.now()
+      };
+      type && (attributes.type = type);
+      self._writeNode(newProtocolTreeNode('receipt', attributes));
     },
 
     getReceiptAck: function(to, id, type, participant, from) {
