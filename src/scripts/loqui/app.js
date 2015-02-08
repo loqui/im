@@ -30,6 +30,7 @@ var App = {
         sound: true,
         csn: true,
         boltGet: true,
+		lockOrientation : true,
         devMode: false
       },
       devsettings: {
@@ -267,6 +268,10 @@ var App = {
     App.online = App.online;
     // If there is already a configured account
     if (App.accounts.length) {
+	  screen.unlockOrientation= screen.unlockOrientation || screen.mozUnlockOrientation;
+	  if(!App.settings.lockOrientation && screen.unlockOrientation){
+		  screen.unlockOrientation();
+	  }
       App.alarmSet({});
       this.connect();
       Menu.show('main');

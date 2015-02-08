@@ -22,6 +22,7 @@
       "alarm": "/index.html"
     }
   ],
+  "orientation": ["portrait"],
   "permissions": {
     "alarms": {
       "description": "Required for keeping the app always connected to server."
