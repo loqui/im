@@ -7,7 +7,7 @@
  * Implements http://xmpp.org/extensions/xep-0092.html
  */
  
-Strophe.addConnectionPlugin('time', {
+Strophe.addConnectionPlugin('version', {
 
   _connection: null,
   

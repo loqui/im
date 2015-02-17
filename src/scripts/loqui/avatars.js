@@ -1,3 +1,5 @@
+/* globals Store, Tools */
+
 'use strict';
 
 var Avatar = function (data) {
@@ -43,4 +45,4 @@ var Avatar = function (data) {
   this.chunk = (data && 'chunk' in data) ? data.chunk : false;
   this.url = (data && 'url' in data) ? data.url : false;
   
-}
+};

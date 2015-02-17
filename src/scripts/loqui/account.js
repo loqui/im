@@ -1,3 +1,5 @@
+/* global App, Providers, Store, Tools, Messenger, Activity, Menu, Avatar, Message, Chat, Lungo */
+
 'use strict';
 
 var Account = function (core) {
@@ -6,12 +8,43 @@ var Account = function (core) {
   this.core = core;
   this.core.sendQ = this.core.sendQ || [];
   this.connector = new App.connectors[Providers.data[this.core.provider].connector.type](this);
-  this.chats = [];
   this.OTR = {};
   this.contacts = {};
   this.names = [];
   this.jidToNameMap = {};
+  this._unread = new Blaze.Var(0);
+  this._chats = new Blaze.Var([]);
+  this._enabled = new Blaze.Var(false);
   
+  this.__defineGetter__('enabled', function () {
+    return this._enabled.get();
+  });
+  this.__defineSetter__('enabled', function (val) {
+    this._enabled.set(val);
+    if (val != 'loading') {
+      this.core.enabled = val;
+      if (!val) {
+        this.connector.disconnect();
+      } else {
+        this.connect();
+      }
+      this.save();
+    }
+  });
+  
+  this.__defineGetter__('chats', function () {
+    return this._chats.get();
+  });
+  this.__defineSetter__('chats', function (val) {
+    this._chats.set(val);
+  });
+
+  this.__defineGetter__('unread', function () {
+    var val = this.chats.reduce(function (prev, cur) {return prev + cur.core.unread;}, 0);
+    this._unread.set(val);
+    return this._unread.get();
+  });
+
   if ('OTR' in core) {
     $.extend(this.OTR, core.OTR);
     if (core.OTR.key) { // inflate the packed key
@@ -37,8 +70,8 @@ var Account = function (core) {
           if (Accounts.find(this.core.fullJid) < 0) {
             Tools.log('ADDING ACCOUNT', this);
             App.accounts.push(this);
-            App.smartpush('accountsCores', this.core);
             Lungo.Notification.hide();
+            this.show();
             $('section.setup#' + this.core.provider + ' input').val('');
             $('section#success span#imported').text(_('Imported', {number: (this.core.roster && this.core.roster.length) ? this.core.roster.length : 0}));
             this.connector.avatar(function (avatar) {
@@ -60,28 +93,25 @@ var Account = function (core) {
         Lungo.Notification.error(_('NoAuth'), _('NoAuthNotice'), 'signal', 5);
       }
     });
-  }
+  };
   
   // Connect
   this.connect = function () {
     if (this.connector.isConnected()) {
       this.connector.start();
       this.sendQFlush();
-      this.accountRender();
-      this.presenceRender();
     } else {
       if (navigator.onLine){
         this.connector.connect({
           connecting: function () {
-            $('aside#accounts li[data-jid="' + (this.core.fullJid || this.core.user) + '"]').data('value', 'loading');
+            this.enabled = 'loading';
           }.bind(this),
           connected: function () {
+            this.enabled = true;
             var cb = function (rcb) {
               App.audio('login');
               this.connector.start();
               this.sendQFlush();
-              this.accountRender();
-              this.presenceRender();
               if (rcb) {
                 rcb();
               }
@@ -89,179 +119,154 @@ var Account = function (core) {
             this.sync(cb);
           }.bind(this),
           authenticating: function () {
-            $('aside#accounts li[data-jid="' + (this.core.fullJid || this.core.user) + '"]').data('value', 'loading');
+            this.enabled = 'loading';
           }.bind(this),
           authfail: function () {
             var failStamps = this.connector.failStamps || {};
-            failStamps.push(new Date);
+            failStamps.push(new Date());
             if (failStamps.length > 2 && Math.floor((failStamps.slice(-1)[0] - failStamps.slice(-3)[0])/1000) < 30) {
               location.reload();
             }
             Lungo.Notification.error(_('NoAuth'), _('NoAuthNotice'), 'signal', 5);
           }.bind(this),
           disconnected: function () {
+            App.audio('logout');
+            this.presenceRender();
             this.connector.connected = false;
-            this.accountRender();
-            if (App.online && App.settings.reconnect && this.core.enabled) {
+            if (App.online && App.settings.reconnect && this.enabled) {
               this.connect();
             }
           }.bind(this)
         });
       }
     }
-  }
+  };
   
   // Download roster and register callbacks for roster updates handling
   this.sync = function (callback) {
     this.connector.sync(callback);
-  }
+  };
   
   // Bring account to foreground
   this.show = function () {
-    var account = this;
-    $('section#main').data('jid', this.core.fullJid);
-    var vCard = $(this.connector.vcard);
-    var address = ( vCard.length && vCard.find('FN').length ) ? vCard.find('FN').text() : this.core.user;
-    $('section#main header img').attr('src', 'img/providers/' + this.core.provider + '.svg');
-    $('section#main header .provider').text(this.connector.provider.longName);
-    $('section#main header .jid').text(address);
-    $('section#main article ul[data-jid="' + this.core.fullJid + '"]').show().siblings('ul').hide();
-    var index = Accounts.find(this.core.fullJid);
-    $('aside#accounts [data-jid="' + this.core.fullJid  + '"]').addClass('active').siblings('li').removeClass('active');
-    var features = Providers.data[this.core.provider].features;
-    var meSection = $('section#me');
-    var mainSection = $('section#main');
-    meSection.data('features', features.join(' '));
-    mainSection.data('features', features.join(' '));
-    meSection.find('#nick input').val(this.connector.presence.name);
-    meSection.find('#status input').val(this.connector.presence.status);
-    meSection.find('#card .name').text(address == this.core.user ? '' : address);
-    meSection.find('#card .user').text(this.core.user);
-    meSection.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + this.core.provider + '.svg'));
-    var show = function (a) {
-      a.url.then(function (val) {
-        $('section#me .avatar img').attr('src', val);
-      });
-    }
-    if (account.core.fullJid in App.avatars) {
-      show(new Avatar(App.avatars[account.core.fullJid]));
-    } else {
-      account.connector.avatar(function (src) {
-        show(src);
-      });
-    }
-    Accounts.unread(account.unread);
-    Store.recover(account.core.background, function (url) {
-      $('section#chat ul#messages').style('background', 'url('+url+') no-repeat center center fixed');
-      $('section.profile div#card').style('background', 'url('+url+') no-repeat center center fixed'); 
-    }.bind(this)); 
-  }
+    Accounts.current = Accounts.find(this.core.fullJid);
+  };
   
   // Render everything for this account
   this.allRender = function () {
     this.accountRender();
     this.chatsRender();
-    this.presenceRender();
     this.avatarsRender();
-  }
+    this.presenceRender();
+  };
   
   // Changes some styles based on presence and connection status
-  this.accountRender = function () {
-    var li = $('aside#accounts li[data-jid="' + (this.core.fullJid || this.core.user) + '"]');
-    li.data('value', this.connector.isConnected() ? true : (this.core.enabled ? 'loading' : false));
-    li.data('show', this.connector.presence.show);
-  }
+  this.accountRender = function (front) {
+    $('section#main header').css('border-color', this.connector.provider.color);
+    $('aside#accounts .cover').css('background-color', this.connector.provider.color);
+    $('aside#accounts .cover .avatar img').removeAttr('src');
+    $('.floater').css('background-color', this.connector.provider.color);
+    var vCard = $(this.connector.vcard);
+    var address = ( vCard.length && vCard.find('FN').length ) ? vCard.find('FN').text() : this.core.user;
+    var features = Providers.data[this.core.provider].features;
+    var meSection = $('section#me');
+    var mainSection = $('section#main');
+    meSection[0].dataset.features = features.join(' ');
+    mainSection[0].dataset.features = features.join(' ');
+    meSection.find('#nick input').val(this.connector.presence.name);
+    meSection.find('#status input').val(this.connector.presence.status);
+    meSection.find('#card .name').text(address == this.core.user ? '' : address);
+    meSection.find('#card .user').text(this.core.user);
+    meSection.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + this.core.provider + '.svg'));
+    if(this.core.background){
+      Store.recover(this.core.background, function (url) {
+        $('section#chat ul#messages').css('background-image', 'url('+url+')');
+        $('section.profile div#card').css('background-image', 'url('+url+')');
+      });
+    }else{
+        $('section#chat ul#messages').css('background-image', '');
+        $('section.profile div#card').css('background-image', '');
+    }
+  }.bind(this);
   
   this.singleRender = function (chat, up) {
     var ul = $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"]');
     var li = ul.children('li[data-jid="' + chat.core.jid + '"]');
     if (li.length) {
       if (up) {
-        li.remove();
+        li.detach();
         ul.prepend(li);
       }
       li.children('.lastMessage').html(chat.core.last.text ? App.emoji[Providers.data[this.core.provider].emoji].fy(chat.core.last.text) : (chat.core.media ? _('AttachedFile') : ''));
-      li.children('.lastStamp').html(chat.core.last.stamp ? Tools.convenientDate(chat.core.last.stamp).join('<br />') : '');
-      li.data('unread', chat.core.unread ? 1 : 0).children('.unread').text(chat.core.unread);
-      li.data('hidden', chat.core.settings.hidden[0] ? 1 : 0);
-      var totalUnread = this.chats.reduceRight(function (prev, cur, i, all) {
-        return prev + cur.core.unread;
-      }, 0);
-      Lungo.Element.count('aside li[data-jid="' + this.core.fullJid + '"]', totalUnread);
-      if (ul.style('display') == 'block') {
-        Lungo.Element.count('section#main header nav button[data-view-article="chats"]', totalUnread);
-        Accounts.unread(totalUnread);
-      }
-      Accounts.unread();
+      li.children('.lastStamp date').html(chat.core.last.stamp ? Tools.convenientDate(chat.core.last.stamp).join('<br />') : '');
+      li[0].dataset.unread = chat.core.unread;
+      li[0].dataset.hidden = chat.core.settings.hidden[0] ? 1 : 0;
     } else {
       this.allRender();
     }
-  }
+  }.bind(this);
   
   // List all chats for this account
   this.chatsRender = function (f, click, hold) {
     var account = this;
     var oldUl = $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"]');
-    var ul = $("<ul />");
+    var ul = oldUl.clone().empty();
     var media = _('AttachedFile');
-    ul.data('jid', account.core.fullJid);
+    ul[0].dataset.jid = account.core.fullJid;
     if (!f) {
       ul.attr('style', oldUl.attr('style'));
     }
-    var totalUnread = 0;
     if (this.core.chats && this.core.chats.length) {
+      var liClickDefault= function (){
+          click(this);
+      };
+      var liClickFallback= function () {
+        account.chatGet(this.dataset.jid).show();
+      };
+      var liHoldDefault= function (){
+          hold(this);
+      };
+      var liHoldFallback= function () {
+        window.navigator.vibrate([100]);
+        if (this.dataset.jid.match(/\-/)) {
+          Messenger.mucProfile(this.dataset.jid);
+        } else {
+          Messenger.contactProfile(this.dataset.jid);
+        }
+      };
       for (var i in this.core.chats) {
         var chat = this.core.chats[i];
         var title = App.emoji[Providers.data[this.core.provider].emoji].fy(chat.title);
         var lastMsg = chat.last ? (chat.last.text ? (App.emoji[Providers.data[account.core.provider].emoji].fy(chat.last.text)) : (chat.last.media ? media : '')) : ' ';
         var lastStamp = chat.last.stamp ? Tools.convenientDate(chat.last.stamp).join('<br />') : '';
-        var li = $('<li/>').data('jid', chat.jid);
+        var li = $('<li/>');
+        li[0].dataset.jid = chat.jid;
+        li[0].dataset.unread = chat.unread;
         li.append($('<span/>').addClass('avatar').append('<img/>'));
         li.append($('<span/>').addClass('name').html(title));
         li.append($('<span/>').addClass('lastMessage').html(lastMsg));
-        li.append($('<span/>').addClass('lastStamp').html(lastStamp));
+        li.append($('<span/>').addClass('lastStamp').append($('<date/>').attr('datetime', chat.last.stamp).html(lastStamp)));
         li.append($('<span/>').addClass('show').addClass('backchange'));
-        li.append($('<span/>').addClass('unread').text(chat.unread));
-        li.data('hidden', chat.settings.hidden[0] ? 1 : 0);
-        li.data('unread', chat.unread ? 1 : 0);
+        li[0].dataset.unread = chat.unread;
+        li[0].dataset.hidden= chat.settings.hidden[0] ? 1 : 0;
         if (!chat.muc && account.supports('muc') && chat.jid.substring(1).match(/\-/)) {
           account.chats[i].core.muc = true;
           account.chats[i].save();
         }
-        li.data('muc', chat.muc ? true : false);
-        li.bind('click', click ? function () {click(this)} : function () {
-          var ci = account.chatFind(this.dataset.jid);
-          if (ci >= 0) {
-            var chat = account.chats[ci];
-          } else {
-            var chat = new Chat({
-              jid: this.dataset.jid,
-              title: $(this).children('.name').text(),
-              chunks: []
-            }, account);
-          }
-          chat.show();
-        }).bind('hold', hold ? function () {hold(this)} : function () {
-          window.navigator.vibrate([100]);
-          if (this.dataset.jid.match(/\-/)) {
-            Messenger.mucProfile(this.dataset.jid);
-          } else {
-            Messenger.contactProfile(this.dataset.jid);
-          }
-        });
-        totalUnread += chat.unread;
+        li[0].dataset.muc = chat.muc ? true : false;
+        li.bind('click', click ? liClickDefault : liClickFallback).bind('hold', hold ? liHoldDefault : liHoldFallback);
         ul.prepend(li);
       }
     } else {
       var span = $('<span/>').addClass('noChats')
-        .append($('<strong/>').text(_('NoChats')))
-        .append($('<p/>').text(_('NoChatsExplanation')));
+      .append($('<strong/>').text(_('NoChats')))
+      .append($('<p/>').text(_('NoChatsExplanation')));
       span.on('click', function () {
-        var account = Messenger.account();
+        var account = Accounts.current;
         Activity('chat', account, null, {
           chats: false,
           groups: account.supports('muc')
-        });
+          });
       });
       ul.prepend(span);
     }
@@ -270,16 +275,12 @@ var Account = function (core) {
     } else {
       oldUl.replaceWith(ul);    
     }
-    Lungo.Element.count('aside li[data-jid="' + this.core.fullJid + '"]', totalUnread);
-    if (ul.style('display') == 'block') {
-      Lungo.Element.count('section#main header nav button[data-view-article="chats"]', totalUnread);
-    }
-    this.unread = totalUnread;
-  }
+  }.bind(this);
 
   // List all contacts for this account
   this.contactsRender = function (f, click, selected) {
     var account = this;
+    console.log(account);
     var article = $('<article/>').attr('id', 'contacts');
     var header = $('<header/>').addClass('beige')
       .append($('<button/>').addClass('new').text(_('ContactAdd')).on('click', function (event) {
@@ -296,7 +297,7 @@ var Account = function (core) {
     }
     var ul = $('<ul/>').addClass('list').addClass('scroll');
     var frag = f;
-    var account = this;
+    account = this;
     this.contacts = {};
     this.core.roster.forEach(function (contact, i, roster) {
       var name = contact.name || contact.jid;
@@ -325,7 +326,7 @@ var Account = function (core) {
     });
     article.append(header).append(ul);
     frag.appendChild(article[0]);
-  }
+  }.bind(this);
   
   // List all group chats for this account
   this.groupsRender = function (f, click) {
@@ -336,7 +337,7 @@ var Account = function (core) {
       header.append($('<button/>').addClass('new').text(_('GroupNew'))
       .on('click', function (event) {
         Menu.show('mucCreateForm', account);
-      }))
+      }));
     }
     if (account.supports('mucJoin')) {
       header.append($('<button/>').addClass('join').text(_('GroupJoin'))
@@ -346,7 +347,7 @@ var Account = function (core) {
     }
     var ul = $('<ul/>').addClass('list').addClass('scroll');
     var frag = f;
-    var account = this;
+    account = this;
     this.core.chats.forEach(function (chat, i, chats) {
       if (chat.muc) {
         var title = chat.title;
@@ -369,43 +370,48 @@ var Account = function (core) {
     });
     article.append(header).append(ul);
     frag.appendChild(article[0]);
-  }
+  }.bind(this);
   
   // Render presence for every contact
   this.presenceRender = function (jid) {
-    if (this.connector.isConnected() && this.supports('presence')) {
-      var contactPresenceRender = function (contact) {
+    var contactPresenceRender = function (jid) {
+      var contact = Lungo.Core.findByProperty(this.core.roster, 'jid', jid);
+      if (contact) {
         if (this.supports('show')) {
           var li = $('section#main article ul li[data-jid="'+contact.jid+'"]');
-          li.data('show', contact.presence.show || 'na');
-          li.find('.status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));
-          var section = $('section#chat');
-          if (section.data('jid') == contact.jid) {
-            section.data('show', contact.presence.show || 'na');
-            section.find('header .status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));
+          if (li.length > 0) {
+            li[0].dataset.show = contact.presence.show || 'na';
           }
         }
-      }.bind(this);
-      if (jid) {
-        if (typeof jid == 'object') {
-          contactPresenceRender(jid);
-        } else {
-          contactPresenceRender(Lungo.Core.findByProperty(this.core.roster, 'jid', jid));
+        var section = $('section#chat');
+        if (section[0].dataset.jid == contact.jid) {
+          section[0].dataset.show = (this.supports('show') && contact.presence.show) || 'na';
+          section.find('header .status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));
         }
-      } else{
-        for (var i in this.core.roster) {
-          contactPresenceRender(this.core.roster[i]);
+      }
+    }.bind(this);
+    if (jid) {
+      contactPresenceRender(jid);
+    } else {
+      var ul = $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"]');
+      if (ul.length > 0) {
+        ul[0].dataset.enabled = this.enabled;
+        for (var [key, val] in this.core.chats) {
+          if(!val.muc){
+            contactPresenceRender(val.jid);
+          }
         }
       }
     }
-  }
+  }.bind(this);
   
   // Render all the avatars
   this.avatarsRender = function () {
     var account = this;
     var avatars = App.avatars;
     $('span.avatar img:not([src])').each(function (i, el) {
-      var jid = Strophe.getBareJidFromJid($(el).closest('[data-jid]').data('jid')) || account.core.fullJid;
+      var closest = $(el).closest('[data-jid]');
+      var jid = closest.length ? closest[0].dataset.jid : account.core.fullJid;
       var me = jid == account.core.fullJid;
       if (avatars[jid]) {
         (new Avatar(avatars[jid])).url.then(function (val) {
@@ -416,20 +422,22 @@ var Account = function (core) {
           }
         });
       } else if (account.connector.isConnected() && account.supports('easyAvatars')) {
+        console.log('REQUESTING AVATAR FOR', jid);
         account.connector.avatar(function (a) {
           a.url.then(function (val) {
+            console.log(a.data);
             $(el).attr('src', val);
             if (me) {
               $('section#main footer .avatar img').attr('src', val);
               $('section#me .avatar img').attr('src', val);
             }
             avatars[jid] = a.data;
+            App.avatars = avatars;
           });
         }, jid);
       }
     });
-    App.smartupdate('avatars');
-  }
+  }.bind(this);
 
   // Manage search through contacts
   this.searchRender = function (f, click) {
@@ -458,7 +466,7 @@ var Account = function (core) {
     article.append(header).append($('<h1/>').text('Type some characters to start searching'));
     var frag = f;
     frag.appendChild(article[0]);
-  }
+  };
 
   // Search through contacts for a loose match and append a list
   this.search = function (article, text, click) {
@@ -483,7 +491,7 @@ var Account = function (core) {
         matches.push(match);
     }
     var ul = $('<ul/>').addClass('list').addClass('scroll');
-    for(var _i = 0, _len = matches.length; _i < _len; _i++) {
+    for(_i = 0, _len = matches.length; _i < _len; _i++) {
       var jids = account.contacts[matches[_i]].split(' ');
       for(var _j = 0, _l = jids.length; _j < _l; _j++) {
         var name = account.jidToNameMap[jids[_j]];
@@ -491,14 +499,12 @@ var Account = function (core) {
         li.dataset.jid = jids[_j];
         li.innerHTML = '<span class=\'name\'>' + name + '</span>'
                        + '<span class=\'status\'>' + jids[_j] + '</span>';
-        li.addEventListener('click', function (e) {
-          click(this);
-        });
+        li.addEventListener('click', click.bind(li, li));
         ul[0].appendChild(li);
       }
     }
     article.append(ul[0]);
-  }
+  };
   
   this.OTRMenu = function () {
     var account = this;
@@ -515,7 +521,7 @@ var Account = function (core) {
           account.OTR.key = key;
           account.core.OTR = $.extend({}, account.OTR, {
             key: account.OTR.key.packPrivate()
-          })
+          });
           account.save();
           Lungo.Notification.success(_('OTRKeyReady'), _('OTRKeyReadyDesc'), 'ok', 5);
           OTRSettings();
@@ -541,7 +547,7 @@ var Account = function (core) {
       OTRSettings();
     }
     Lungo.Router.section('otrMenu');
-  }
+  };
   
   // Push message to sendQ
   this.toSendQ = function (storageIndex) {
@@ -551,7 +557,7 @@ var Account = function (core) {
     }
     this.core.sendQ.push(storageIndex);
     this.save();
-  }
+  };
   
   // Send every message in SendQ
   this.sendQFlush = function () {
@@ -566,7 +572,8 @@ var Account = function (core) {
           from: content.from,
           to: content.to,
           text: content.text,
-          stamp: content.stamp
+          stamp: content.stamp,
+		  original : sendQ[0]
         }, {
           render: false
         });
@@ -577,7 +584,7 @@ var Account = function (core) {
     } else {
       this.save();
     }
-  }
+  };
   
   // Find chat in chat array
   this.chatFind = function (jid) {
@@ -589,115 +596,93 @@ var Account = function (core) {
       }
     }
     return index;
-  }
+  };
   
   // Get a chat for a jid (create if none)
   this.chatGet = function (jid, title) {
     var ci = this.chatFind(jid);
+    var chat= null;
     if (ci >= 0) {
-      var chat = this.chats[ci];
+      chat = this.chats[ci];
     } else { 
-      var chat = new Chat({
+      chat = new Chat({
         jid: jid,
         title: title || jid,
         chunks: []
       }, this);
     }
     return chat;
-  }
+  };
+
+  this.markMessage = async.queue(function(task, callback){
+    var from= task.from;
+    var msgId= task.msgId;
+    var chat = this.chatGet(from);
+    var account = this;
+    chat.findMessage(msgId, null, true).then(function(result){
+      var msg= result.message;
+      if (msg.ack == 'sent') {
+        console.log('MARKING AS DELIVERED', from, msgId, chat, account, result);
+        msg.ack = 'delivered';
+      } else if (msg.ack == 'delivered') {
+        console.log('MARKING AS VIEWED', from, msgId, chat, account, result);
+        msg.ack = 'viewed';
+      } else {
+        console.log('MARKING AS SENT', from, msgId, chat, account, result);
+        msg.ack = 'sent';
+      }
+      msg = new Message(account, msg);
+      Store.update(result.chunkIndex, result.chunk, callback);
+      msg.reRender(result.chunkIndex);
+    });
+  }.bind(this));
+
+  this.markMessage.drain= function(){};
     
   // Check for feature support
   this.supports = function (feature) {
     return this.connector.provider.features.indexOf(feature) >= 0;
-  }
+  };
   
   // Save to store
   this.save = function () {
     var index = Accounts.find(this.core.fullJid || this.core.user);
-	  if(index > -1) {
-		  App.accountsCores[index] = this.core;
-		  App.smartupdate('accountsCores');
+	  if (index > -1) {
+		  var accounts = App.accounts;
+		  accounts[index] = this;
+		  App.accounts = accounts;
 	  }
-  }
+  };
 
-}
+};
 
 var Accounts = {
+
+  _current: Blaze.Var(0),
+
+  get current () {
+    return App.accounts[this._current.get()];
+  },
+  set current (i) {
+    this._current.set(i);
+    setTimeout(function () {
+      var ul = $('section#main ul[data-jid="' + (this.core.fullJid || this.core.user) + '"]');
+      ul.show().siblings('ul').hide();
+      this.allRender();
+    }.bind(this.current));
+  },
 
   // Find the index of an account
   find: function (jid) {
     var index = -1;
-    for (var i in App.accountsCores) {
-      var account = App.accountsCores[i];
+    for (var i in App.accounts) {
+      var account = App.accounts[i].core;
       if (account.fullJid ? (account.fullJid == jid) : (account.user == jid)) {
         index = i;
         break;
       }
     }
     return index;
-  },
-  
-  // Create accounts icons
-  aside: function () {
-    var accountSwitch = function (e) {
-      e.stopPropagation();
-      var sw = $(this);
-      var li = sw.closest('li');
-      var account = App.accounts[Accounts.find(li.data('jid'))];
-      if (li.data('value') == 'true') {
-        if (confirm(_('AccountDisable', {account: account.core.fullJid}))) {
-          account.core.enabled = false;
-          account.connector.disconnect();
-        }
-      } else {
-        account.connect();
-        account.core.enabled = true;
-      }
-      account.save();
-    }
-    var ul = $('aside#accounts ul');
-    ul.empty();
-    for (var i in App.accounts) {
-      var account = App.accounts[i];
-      var li = $('<li/>').data('jid', account.core.fullJid || account.core.user).append(
-        $('<span/>').addClass('provider').text(account.connector.provider.longName)
-      ).append(
-        $('<span/>').addClass('jid').text(account.core.user)
-      ).append(
-        $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>').bind('click', accountSwitch)
-      ).data('value', 'loading');
-      li.on('click', function () {
-        var index = Accounts.find(this.dataset.jid);
-        if (index) {
-          App.accounts[index].show();
-          Lungo.Aside.hide();
-        }
-      });
-      var img = $('<img/>').addClass('provIcon').attr('src', 'img/providers/squares/' + account.core.provider + '.svg');
-      ul.append(li.append(img));
-    }
-  },
-  
-  // Create main sections 
-  main: function () {
-    var chats = $('section#main article#chats').empty();
-    var contacts = $('section#main article#contacts').empty();
-    for (var i in App.accounts) {
-      var account = App.accounts[i];
-      chats.append($("<ul/>").data('jid', account.core.fullJid));
-      contacts.append($("<ul/>").data('jid', account.core.fullJid));
-      account.allRender();
-    }
-  },
-  
-  // Total unread messages
-  unread: function (partial) {
-    var total = App.accounts.reduce(function(prev, cur){return prev + cur.unread}, 0);
-    Lungo.Element.count('section#chat header .tab', total);
-    if (partial) {
-      total -= partial;
-    }
-    Lungo.Element.count('section#main header .tab', total);
   }
   
-}
+};

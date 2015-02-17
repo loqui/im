@@ -1,3 +1,5 @@
+/* global Tools */
+
 'use strict';
 
 var Chungo = {
@@ -33,7 +35,7 @@ var Chungo = {
         });
         $$('[data-view-aside]').each(function () {
           $$(this).on('click', function (e) {
-            Chungo.Aside.toggle(e.target.dataset.viewAside);      
+            Chungo.Aside.toggle(e.target.dataset.viewAside);
           });
         });
         $$('[data-icon]').each(function () {
@@ -42,7 +44,7 @@ var Chungo = {
         });
         $$('[data-image]').each(function () {
           var image = this.dataset.image;
-          $$(this).style('backgroundImage', 'url(' + image + ')');
+          $$(this).prepend($$('<img/>').attr('src', image).addClass('icon'));
         });
         $$('[data-control="groupbar"]').each(function () {
           var links = $$(this).children('[data-view-article]');
@@ -134,10 +136,11 @@ var Chungo = {
     _stack: [],
     
     section: function (to) {
+      var from = null;
       if (this._stack[this._stack.length - 1] != to) {
         if (to == 'back' && this._stack.length > 1) {
-          var from = this._stack.pop();
-          var to = this._stack[this._stack.length - 1];
+          from = this._stack.pop();
+          to = this._stack[this._stack.length - 1];
           $$('section#' + from)
             .removeClass('show')
             .removeClass('forth')
@@ -155,7 +158,7 @@ var Chungo = {
             }, 300);
           }
         } else {
-          var from = this._stack[this._stack.length - 1];
+          from = this._stack[this._stack.length - 1];
           if (to != from) {
             this._stack.push(to);
             if ($$('section#' + to).data('transition') != 'vertical') {
@@ -196,12 +199,13 @@ var Chungo = {
     },
     
     show: function (id) {
+      $$('aside#' + id)[0].scrollTop = 0;
       $$('aside#' + id).addClass('show');
       $$('section.show').addClass('asided');
       this._current = {
         id: id,
         open: true
-      }
+      };
     },
     
     hide: function () {

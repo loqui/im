@@ -1,3 +1,6 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 /*
 CryptoJS v3.1.2
 code.google.com/p/crypto-js
@@ -2785,7 +2788,7 @@ code.google.com/p/crypto-js/wiki/License
           throw new Error("Update not supported!");
         },
 
-        // This append doesn't actually append... 
+        // This append doesn't actually append...
         // It just stores a ref to data. So any previous data will be lost!
         _append: function (data) {
           this._data = data;
@@ -2907,7 +2910,7 @@ code.google.com/p/crypto-js/wiki/License
            this._doProcessBlock(dataWords, offset);
          }
        }
-       // Remove processed even if we didn't process any words... 
+       // Remove processed even if we didn't process any words...
        // the hard way. Let's assume dataWords is NOT an array
        var l = dataWords.length;
        var dataLeft = new Array(l - offset)
@@ -3361,12 +3364,11 @@ CoSeMe.namespace('config', (function(){
     groupDomain: 'g.us',
 
     tokenData: {
-      "v": "2.11.453",
-      // should be tokenData[d] + - + tokenData[v] + - + port
-      "r": "Android-2.11.453-5222",
-      "u": "WhatsApp/2.11.453 Android/4.3 Device/GalaxyS3",
-      "t": "PdA2DJyKoUrwLw1Bg6EIhzh502dF9noR9uFCllGk1377032097395{phone}",
-      "d": "Android"
+      "v": "2.12.60",
+      // XXX: it is tokenData[d] + - + tokenData[v] + - + port
+      "r": "S40-2.12.60-5222",
+      "u": "WhatsApp/2.12.60 S40Version/14.26 Device/Nokia302",
+      "d": "S40"
     },
 
     auth: {
@@ -3866,6 +3868,14 @@ CoSeMe.namespace('utils', (function(){
     // but for some unknown reason, this is way slower...
   }
 
+  function encodeIdForURL(str) {
+    return str.split('').map(function (c) {
+      var hexrepr = c.charCodeAt(0).toString(16).toUpperCase();
+      if (hexrepr.length < 2) { hexrepr = '0' + hexrepr; }
+      return '%' + hexrepr;
+    }).join('');
+  }
+
   var utils = {
     urlencode: function _urlencode(params) {
       var pairs = [];
@@ -3875,11 +3885,14 @@ CoSeMe.namespace('utils', (function(){
           for (var i in params[paramName]) {
             aux.push(encodeURIComponent(paramName + '[]') + '=' +
                      encodeURIComponent(params[paramName][i]));
-          };
+          }
           pairs.push(aux.join('&'));
         } else {
-          pairs.push(encodeURIComponent(paramName) + '=' +
-                     encodeURIComponent(params[paramName]));
+          var encodedName = encodeURIComponent(paramName);
+          var encodedValue = paramName === 'id' ?
+                             encodeIdForURL(params[paramName]) :
+                             encodeURIComponent(params[paramName]);
+          pairs.push(encodedName + '=' + encodedValue);
         }
       }
       return pairs.join('&');
@@ -5776,57 +5789,66 @@ CoSeMe.namespace('registration', (function(){
   'use strict';
 
   function getToken(phone) {
-    var signature = atob(
-      'MIIDMjCCAvCgAwIBAgIETCU2pDALBgcqhkjOOAQDBQAwfDELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFDASBgNVBAcTC1NhbnRhIENsYXJhMRYwFAYDVQQKEw1XaGF0c0FwcCBJbmMuMRQwEgYDVQQLEwtFbmdpbmVlcmluZzEUMBIGA1UEAxMLQnJpYW4gQWN0b24wHhcNMTAwNjI1MjMwNzE2WhcNNDQwMjE1MjMwNzE2WjB8MQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEUMBIGA1UEBxMLU2FudGEgQ2xhcmExFjAUBgNVBAoTDVdoYXRzQXBwIEluYy4xFDASBgNVBAsTC0VuZ2luZWVyaW5nMRQwEgYDVQQDEwtCcmlhbiBBY3RvbjCCAbgwggEsBgcqhkjOOAQBMIIBHwKBgQD9f1OBHXUSKVLfSpwu7OTn9hG3UjzvRADDHj+AtlEmaUVdQCJR+1k9jVj6v8X1ujD2y5tVbNeBO4AdNG/yZmC3a5lQpaSfn+gEexAiwk+7qdf+t8Yb+DtX58aophUPBPuD9tPFHsMCNVQTWhaRMvZ1864rYdcq7/IiAxmd0UgBxwIVAJdgUI8VIwvMspK5gqLrhAvwWBz1AoGBAPfhoIXWmz3ey7yrXDa4V7l5lK+7+jrqgvlXTAs9B4JnUVlXjrrUWU/mcQcQgYC0SRZxI+hMKBYTt88JMozIpuE8FnqLVHyNKOCjrh4rs6Z1kW6jfwv6ITVi8ftiegEkO8yk8b6oUZCJqIPf4VrlnwaSi2ZegHtVJWQBTDv+z0kqA4GFAAKBgQDRGYtLgWh7zyRtQainJfCpiaUbzjJuhMgo4fVWZIvXHaSHBU1t5w//S0lDK2hiqkj8KpMWGywVov9eZxZy37V26dEqr/c2m5qZ0E+ynSu7sqUD7kGx/zeIcGT0H+KAVgkGNQCo5Uc0koLRWYHNtYoIvt5R3X6YZylbPftF/8ayWTALBgcqhkjOOAQDBQADLwAwLAIUAKYCp0d6z4QQdyN74JDfQ2WCyi8CFDUM4CaNB+ceVXdKtOrNTQcc0e+t'
-    );
-    var classesMd5 = atob('U8Rv0Yqm6qUsIGkGbBBaZA==');
-    var key2 = atob('/UIGKU1FVQa+ATM2A0za7G2KI9S/CwPYjgAbc67v7ep42eO/WeTLx1lb1cHwxpsEgF4+PmYpLd2YpGUdX/A2JQitsHzDwgcdBpUf7psX1BU=');
-    var data = CryptoJS.enc.Latin1.parse(signature + classesMd5 + phone);
-
-    var opad = new Uint8Array(64);
-    var ipad = new Uint8Array(64);
-    for (var i = 0; i < 64; i++) {
-      opad[i] = 0x5C ^ key2.charCodeAt(i);
-      ipad[i] = 0x36 ^ key2.charCodeAt(i);
-    }
-    ipad = CryptoJS.enc.UInt8Array.parse(ipad);
-    opad = CryptoJS.enc.UInt8Array.parse(opad);
-
-    var output = CryptoJS.SHA1(
-      opad.concat(CryptoJS.SHA1(ipad.concat(data)))
-    );
-
-    return output.toString(CryptoJS.enc.Base64);
+    var plain = 'PdA2DJyKoUrwLw1Bg6EIhzh502dF9noR9uFCllGk1418865329241' + phone;
+    var data = CryptoJS.enc.Latin1.parse(plain);
+    var output = CryptoJS.MD5(data);
+    return output.toString();
   }
 
   function getRealDeviceId(aSeed) {
-    var seed = aSeed || (Math.random() * 1e16).toString(36).substring(2,10);
-    var id = CryptoJS.SHA1(seed).toString(CryptoJS.enc.Latin1).substring(0,20);
+    var seed = aSeed || (Math.random() * 1e16).toString(36).substring(2, 10);
+    var id = CryptoJS.SHA1(seed).toString(CryptoJS.enc.Latin1).substring(0, 20);
     return {
       seed: seed,
       id: id
     };
   }
 
+  function pad(n, width, z) {
+    z = z || '0';
+    n = n + '';
+    return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+  }
+
   return {
-    getCode: function(countryCode, phone, onready, onerror, deviceId, method) {
+    getCode: function(countryCode, phone, onready, onerror, deviceId, mcc, mnc, locale, method) {
       var params = Object.create(null);
       params['cc'] = countryCode;
       params['in'] = phone;
-      params['to'] = countryCode + phone;
-      params['lc'] = 'US';
-      params['lg'] = 'en';
-      params['mcc'] = '000';
-      params['mnc'] = '000';
+      params['lc'] = locale.split('-')[1] || 'GB';
+      params['lg'] = locale.split('-')[0] || 'en';
+      params['sim_mcc'] = pad(mcc, 3);
+      params['sim_mnc'] = pad(mnc, 3);
       params['method'] = method in {'sms': 1, 'voice': 1} ? method : 'sms';
+      params['token'] = getToken(phone);
+
       var seedAndId = getRealDeviceId(deviceId);
       params['id'] = seedAndId.id;
 
-      // Get token
-      params['token'] = getToken(phone);
+      this.exists(countryCode, phone, seedAndId.id,
+        function onSuccess(result) {
+          if (result && result['status'] === 'ok') {
+            onready(result);
+          }
+          else {
+            CoSeMe.http.doRequest('code', params, onready, onerror);
+          }
+        },
+        onerror
+      );
 
-      CoSeMe.http.doRequest('code', params, onready, onerror);
       return seedAndId.seed; // Return the deviceId we've used in case we want to store it.
+    },
+
+    exists: function(cc, phone, id, onready, onerror) {
+      var params = Object.create(null);
+      params['cc'] = cc;
+      params['in'] = phone;
+      params['id'] = id;
+      params['lg'] = 'en';
+      params['lc'] = 'GB';
+      params['token'] = getToken(phone);
+      CoSeMe.http.doRequest('exist', params, onready, onerror);
     },
 
     register: function(countryCode, phone, registerCode, onready, onerror, deviceId) {
@@ -5847,33 +5869,6 @@ CoSeMe.namespace('media', (function() {
   'use strict';
 
   var logger = new CoSeMe.common.Logger('media');
-
-  /**
-   * Per Yowsup.
-   */
-  var MAX_UPLOAD_BODY_ANSWER = 8192*7;
-
-  /**
-   * Converts into Latin1 an array of bytes.
-   */
-  function _latin1(array) {
-    //return CryptoJS.enc.Latin1.parse(array).toString();
-    var c, latinarray = [];
-    for (var i = 0, l = array.length; i < l; i++) {
-      c = String.fromCharCode(array[i]);
-      latinarray.push(c);
-    }
-    return latinarray.join('');
-  }
-
-  function _str2ab(str) {
-    var buf = new ArrayBuffer(str.length);
-    var bufView = new Uint8Array(buf);
-    for (var i=0, strLen=str.length; i<strLen; i++) {
-      bufView[i] = str.charCodeAt(i);
-    }
-    return buf;
-  }
 
   function download(url, successCb, errorCb, progressCb) {
     var blob = null;
@@ -5918,219 +5913,56 @@ CoSeMe.namespace('media', (function() {
 
   function upload(toJID, blob, uploadUrl,
                   successCb, errorCb, progressCb, sizeToHash) {
-    var TCPSocket = navigator.mozTCPSocket;
-    if (!TCPSocket) {
-      if (errorCb) {
-        errorCb('No TCPSocket available.');
-      }
-      return;
+    var filesize = blob.size;
+    var filetype = blob.type;
+    logger.log('size:', filesize, 'filetype:', filetype);
+
+    var reader = new FileReader();
+    reader.addEventListener('loadend', function() {
+      var buffer = reader.result;
+      sizeToHash = typeof sizeToHash === 'undefined' ?
+                   buffer.byteLength :
+                   Math.min(sizeToHash, buffer.byteLength);
+      var md5 = CoSeMe.crypto.MD5_IP(buffer.slice(0, sizeToHash));
+      var crypto = md5 + '.' + filetype.split('/')[1];
+      logger.log('MD5+ext:', crypto);
+      onCryptoReady(crypto, reader.result);
+    })
+    reader.readAsArrayBuffer(blob);
+
+    var xhr = new XMLHttpRequest({mozSystem: true});
+
+    function onCryptoReady(crypto, blobAsArrayBuffer) {
+      var formData = new FormData();
+      formData.append('to', toJID);
+      formData.append('from', CoSeMe.yowsup.connectionmanager.jid.replace('@whatsapp.net', ''));
+      formData.append('file', blob, crypto);
+
+      xhr.open('POST', uploadUrl);
+      xhr.responseType = 'json';
+      xhr.setRequestHeader('User-Agent', CoSeMe.config.tokenData.u);
+      xhr.send(formData);
     }
 
-    var url = uploadUrl.replace('https://', '');
-    var host = url.slice(0, url.indexOf('/'));
-    var port = host.split(':')[1] || 443;
-
-    logger.log('Going to open TCPSocket to host ', host, 'and port', port);
-
-    var _socket;
-    try {
-      _socket = TCPSocket.open(
-        host,
-        port,
-        {
-          binaryType: 'arraybuffer',
-          useSSL: true,
-          useSecureTransport: true
-        }
-      );
-    } catch(e) {
-      logger.error('Media Exception:', e.data);
-      if (errorCb) {
-        errorCb(e.data);
-      }
-      return;
-    }
-
-    _socket.onerror = function (evt) {
-      logger.log('Socket error:', evt.data);
-      var err = evt.data;
-      var wrappedErr;
-      if (err && typeof(err) === 'object') {
-        wrappedErr = {
-          name: err.name,
-          type: err.type,
-          message: err.message
-        };
-      } else {
-        wrappedErr = err;
-      }
-
-      logger.log('Wrapped error:', wrappedErr);
-
-      if (errorCb) {
-        errorCb(wrappedErr);
-      }
-    };
-
-    _socket.onopen = function () {
-      logger.log('Socket.onopen() called');
-
-      var filesize = blob.size;
-      var filetype = blob.type;
-      logger.log('size:', filesize, 'filetype:', filetype);
-
-      var reader = new FileReader();
-      reader.addEventListener('loadend', function() {
-        var buffer = reader.result;
-        sizeToHash = typeof sizeToHash === 'undefined' ?
-                     buffer.byteLength :
-                     Math.min(sizeToHash, buffer.byteLength);
-        var md5 = CoSeMe.crypto.MD5_IP(buffer.slice(0, sizeToHash));
-        var crypto = md5 + '.' + filetype.split('/')[1];
-        logger.log('MD5+ext:', crypto);
-        onCryptoReady(crypto, reader.result);
-      })
-      reader.readAsArrayBuffer(blob);
-
-      function onCryptoReady(crypto, blobAsArrayBuffer) {
-        var boundary = 'zzXXzzYYzzXXzzQQ';
-        var contentLength = 0;
-
-        /**
-         * Header BAOS
-         */
-        var hBAOS = '--' + boundary + '\r\n';
-        hBAOS += 'Content-Disposition: form-data; name="to"\r\n\r\n';
-        hBAOS += toJID + '\r\n';
-        hBAOS += '--' + boundary + '\r\n';
-        hBAOS += 'Content-Disposition: form-data; name="from"\r\n\r\n';
-        hBAOS += CoSeMe.yowsup.connectionmanager.jid.replace('@whatsapp.net', '') + '\r\n';
-
-        hBAOS += '--' + boundary + '\r\n';
-        hBAOS += 'Content-Disposition: form-data; name="file"; filename="' + crypto + '"\r\n';
-        hBAOS += 'Content-Type: ' + filetype + '\r\n\r\n';
-
-        /**
-         * Final BAOS
-         */
-        var fBAOS = '\r\n--' + boundary + '--\r\n';
-
-        contentLength += hBAOS.length;
-        contentLength += fBAOS.length;
-        contentLength += blob.size;
-
-        /**
-         * Initial data to be sent
-         */
-        var POST = 'POST ' + uploadUrl + '\r\n';
-        POST += 'Content-Type: multipart/form-data; boundary=' + boundary + '\r\n';
-        POST += 'Host: ' + host + '\r\n';
-        POST += 'User-Agent: ' + CoSeMe.config.tokenData.u + '\r\n';
-        POST += 'Content-Length: ' + contentLength + '\r\n\r\n';
-
-        /**
-         * Send initial data and header BAOS
-         */
-        logger.log('Sending headers...');
-
-        logger.log('POST:', POST);
-        _socket.send(_str2ab(POST));
-
-        logger.log('hBAOS:', hBAOS);
-        _socket.send(_str2ab(hBAOS));
-
-        logger.log('Sending body of ', blob.size, 'bytes...');
-        sendBody(function _sendFinale() {
-            _socket.send(_str2ab(fBAOS));
-            logger.log('All sent. Have fun with _socket.ondata()!');
-        });
-
-        function sendBody(callback, offset) {
-          offset = offset || 0;
-          var chunksize = Math.min(1024, blob.size - offset);
-          var waitForDrain = false;
-
-          var MAX_LOOP_TIME = 20; // 20ms (50fps)
-          var tooMuchTime = false;
-          var startTime = Date.now();
-
-          while(offset < blob.size && !waitForDrain && !tooMuchTime) {
-            logger.log('Next', chunksize, 'bytes sent!');
-            waitForDrain = !_socket.send(blobAsArrayBuffer, offset, chunksize);
-            offset += chunksize;
-            tooMuchTime = (Date.now() - startTime) > MAX_LOOP_TIME;
-          }
-
-          var completed = 100 * Math.min(1, offset / blob.size);
-          progressCb && setTimeout(progressCb.bind(null, completed));
-          logger.log(completed.toFixed(2), '% completed!');
-
-          if (offset >= blob.size) {
-            logger.log('All data sent!');
-            _socket.ondrain = undefined;
-            callback && setTimeout(callback);
-          } else if (waitForDrain) {
-            logger.log('Waiting for drain before continuing...');
-            _socket.ondrain = sendBody.bind(null, callback, offset);
-          } else {
-            logger.log('Too much time on the loop. Releasing CPU...');
-            setTimeout(sendBody, 0, callback, offset);
-          }
+    xhr.upload.onprogress = function(e) {
+      logger.log('XHR fired onprogress...');
+      if (progressCb) {
+        if (e.lengthComputable) {
+          var pr = Math.floor((e.loaded/e.total) * 100);
+          progressCb(pr);
         }
       }
     };
 
-    var datalatin1 = '';
-    _socket.ondata = function(event) {
-      logger.log('Got some data!');
+    xhr.onload = function(event) {
+      logger.log('XHR fired onload. xhr.status:', xhr.status);
 
-      datalatin1 += _latin1(new Uint8Array(event.data));
-
-      var contentLength = (function() {
-        var idx = datalatin1.indexOf('Content-Length: ');
-        var doubleRC = datalatin1.indexOf('\r\n\r\n');
-        if (idx === -1 || !doubleRC) {
-          return undefined;
-        }
-        var a = datalatin1.substring(idx, datalatin1.indexOf('\r\n', idx));
-        var b = a.split(':')[1];
-        contentLength = parseInt(b, 10);
-        logger.log('Content length:', contentLength);
-        return contentLength;
-      })();
-
-      var body = '';
-      if (typeof contentLength === 'number') {
-        body = (function() {
-          logger.log('Current data:', datalatin1);
-          var rv = datalatin1.substring(datalatin1.length - contentLength,
-                                        datalatin1.length);
-          if (rv.length !== contentLength) {
-            rv = undefined;
-          }
-          return rv;
-        })();
-      }
-
-      if (datalatin1.length > MAX_UPLOAD_BODY_ANSWER ||
-           typeof body === 'string') {
-        logger.log('Enough data, closing socket and start parsing');
-
+      if (xhr.status === 200) {
         if (progressCb) {
-          progressCb(100);
+            progressCb(100);
         }
 
-        var json;
-        try {
-          json = JSON.parse(body);
-        } catch (e) {
-          logger.error('Media exception:', e);
-          if (errorCb) {
-            errorCb('JSON not valid -- ' + e);
-            return;
-          }
-        }
-
+        var json = xhr.response;
         if (json.url) {
           logger.log('We got an URL on the result:', json.url);
           if (successCb) {
@@ -6141,12 +5973,17 @@ CoSeMe.namespace('media', (function() {
             errorCb('No URL in result');
           }
         }
-
-        // Let's close the socket and remove the errorCb handler
-        errorCb = undefined;
-        _socket.close();
       } else {
-        logger.log('Not enough data, continue reading from the socket');
+        logger.log('Got error status:', xhr.status);
+        if (errorCb) {
+          errorCb(xhr.status);
+        }
+      }
+    };
+
+    xhr.onerror = function(e) {
+      if (errorCb) {
+        errorCb(xhr.status);
       }
     };
   }
@@ -6255,10 +6092,34 @@ CoSeMe.namespace('auth', (function() {
   var Tree = CoSeMe.protocol.Tree;
 
   var username, password, callback;
+  var mnc, mcc;
   var connection, outputKey;
   var authenticated = false;
 
-  function authenticate(user, pass, cb) {
+  function pad(value, positions) {
+    var padding = '';
+    var str = value + '';
+    if (str.length < positions) {
+      padding = new Array(positions - str.length + 1).join('0');
+    }
+    return padding + str;
+  }
+
+  /*
+   * Performs authentication with server given a user and a password.
+   * If authentication succed, a valid connection is passed to the callback
+   * as second parameter.
+   *
+   * Errors can be:
+   *  - connection-refused if the connection can no be stablished.
+   *  - auth-failed if the authentication fails for the given user and password
+   *  - expired if the account has expired
+   *
+   *  Other errors can be possible but the former ones are the most important.
+   */
+  function authenticate(user, pass, mcc, mnc, cb) {
+    mcc = pad(mcc, 3);
+    mnc = pad(mnc, 3);
     username = user;
     password = pass;
     callback = cb;
@@ -6272,7 +6133,7 @@ CoSeMe.namespace('auth', (function() {
         // Try to authenticate if we have a one-shot-rejected error, instead of
         // bubbling it up to the app
         if (err === 'one-shot-rejected') {
-          authenticate(username, password, callback);
+          authenticate(username, password, mcc, mnc, callback);
           return;
         }
 
@@ -6402,9 +6263,7 @@ CoSeMe.namespace('auth', (function() {
 
       function sendResponseFor(challenge) {
         var authBlob = getAuthBlob(challenge);
-        var response = new Tree('response', { attributes: {
-          xmlns: 'urn:ietf:params:xml:ns:xmpp-sasl'
-        }, data: authBlob });
+        var response = new Tree('response', { data: authBlob });
         connection.writer.write(response);
       }
 
@@ -6425,6 +6284,11 @@ CoSeMe.namespace('auth', (function() {
           return callback('expired');
         }
         logger.log('Authentication success!');
+        var expiration = successTree.getAttributeValue('expiration');
+        expiration = parseInt(expiration, 10);
+        if (!isNaN(expiration)) {
+          connection.expiration = new Date(expiration * 1000);
+        }
         setNextChallenge(successTree.data);
         callback(null);
       }
@@ -6447,7 +6311,7 @@ CoSeMe.namespace('auth', (function() {
     msg.concat(CryptoJS.enc.Latin1.parse(challenge));
     msg.concat(utcNow);
     msg.concat(CryptoJS.enc.Latin1.parse(CoSeMe.config.tokenData.u));
-    msg.concat(CryptoJS.enc.Latin1.parse(' MccMnc/000000'));
+    msg.concat(CryptoJS.enc.Latin1.parse(' MccMnc/' + mcc + mnc));
 
     // Encode response
     var buffer = new ByteArray(msg.sigBytes).writeAll(msg);
@@ -6491,7 +6355,6 @@ CoSeMe.namespace('auth', (function() {
       data = getAuthBlob(existingChallenge);
     }
     return new Tree('auth', { attributes: {
-      xmlns: 'urn:ietf:params:xml:ns:xmpp-sasl',
       mechanism: 'WAUTH-2',
       user: username
     }, data: data });
@@ -6712,7 +6575,11 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
 
   var processNode = {
     result: function(iqType, idx, node) {
-      if (idx in _requests) {
+      var props = node.getChild('props');
+      if (props) {
+        getProperties(props.getAllChildren());
+      }
+      else if (idx in _requests) {
         _requests[idx](node);
         delete _requests[idx];
       }
@@ -6761,6 +6628,21 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
       }
     }
   };
+
+  function getProperties(propertyNodes) {
+    var properties = {};
+    var stringProperties = {};
+    propertyNodes.forEach(function (node) {
+      var name = node.getAttributeValue('name');
+      if (name) {
+        properties[name] = node.getAttributeValue('value');
+        if (!stringProperties[name]) {
+          properties[name] = parseInt(properties[name], 10);
+        }
+      }
+    });
+    _signalInterface.send('got_properties', [properties]);
+  }
 
   function onError(evt) {
     var reason = evt.data;
@@ -6914,9 +6796,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
                                  author]);
         }
         else if (type === 'status') {
-          
           _signalInterface.send('notification_status', [from, msgId]);
-          
         }
 
       }
@@ -7551,8 +7431,8 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
       return alive;
     },
 
-    terminate: function() {
-      return true;
+    terminate: function(){
+	  return true;
     },
 
     sendDisconnected: function(reason) {
@@ -7636,6 +7516,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
       notification_groupParticipantRemoved: [],
       notification_status: [],
 
+
       contact_gotProfilePictureId: [],
       contact_gotProfilePicture: [],
       contact_typing: [],
@@ -7649,6 +7530,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
 
       ping: [],
       pong: [],
+      got_properties: [],
       disconnected: [],
 
       media_uploadRequestSuccess: [],
@@ -7700,15 +7582,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
     },
 
     getMessageNode: function(aJid, aChild) {
-      var requestNode = null;
-      var serverNode = newProtocolTreeNode('server');
-      var xNode = newProtocolTreeNode('x', {xmlns: 'jabber:x:event'},
-                                      [serverNode]);
-      // was (0 if requestNode is None else 1) + 2
-      var childCount = 2;
-      var messageChildren = [ ]; // [None]*childCount;
-      messageChildren.push(xNode);
-
+      var messageChildren = [];
       if (aChild instanceof Array) {
         messageChildren = messageChildren.concat(aChild);
       } else {
@@ -7784,11 +7658,14 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
       return mmNode;
     },
 
-    sendReceipt: function(jid, mid) {
-      self._writeNode(newProtocolTreeNode('receipt', {
+    sendReceipt: function(jid, mid, type) {
+      attributes = {
         to: jid,
-        id: mid
-      }));
+        id: mid,
+        t: Date.now()
+      };
+      type && (attributes.type = type);
+      self._writeNode(newProtocolTreeNode('receipt', attributes));
     },
 
     getReceiptAck: function(to, id, type, participant, from) {
@@ -7869,7 +7746,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
 
       var picture = newProtocolTreeNode(
         'picture',
-        { xmlns: 'w:profile:picture' },
+        { },
         null,
         aImageData
       );
@@ -7916,10 +7793,10 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
   }
 
   function sendPostAuthentication() {
-    sendClientConfig('android', 'en', 'US');
+    sendClientConfig('S40', 'en', 'GB');
     sendGetServerProperties();
     sendGetGroups();
-    //sendGetPrivacyList();
+    sendGetPrivacyList();
   }
 
   function sendClientConfig(platform, language, country) {
@@ -7992,12 +7869,14 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
     /*
      * Authentication
      */
-    auth_login: function(aUsername, aPassword) {
+    auth_login: function(aUsername, aPassword, mcc, mnc) {
         logger.log('auth_login called for', aUsername);
-        CoSeMe.auth.authenticate(aUsername, aPassword, function(err, aConn) {
+        CoSeMe.auth.authenticate(aUsername, aPassword, mcc, mnc,
+        function(err, aConn) {
           try {
             if (!err && aConn) {
               self.socket = aConn;
+              self.expiration = aConn.expiration;
               self.socket.onconnectionclosed = self._onErrorSendDisconnected;
               self.socket.onconnectionlost = self._onErrorSendDisconnected;
               self.readerThread.socket = self.socket;
@@ -8013,7 +7892,8 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
               sendPostAuthentication();
               fireEvent('auth_success', [aUsername, null]);
             } else {
-              fireEvent('auth_fail', [aUsername, null]);
+              logger.warn('Authentication failed: ', err);
+              fireEvent('auth_fail', [aUsername, null, err]);
             }
           } catch (x) {
             logger.error('Error authenticating!', x);
@@ -8070,7 +7950,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
           null, aPreview);
     }),
     message_vcardSend: self.sendMessage.bind(self, function(aJid, aData, aName) {
-      aName = utf8FromString(aName)
+      aName = utf8FromString(aName);
       var cardNode = newProtocolTreeNode('vcard', {name: aName}, null, aData);
       return newProtocolTreeNode('media',
           {xmlns: 'urn:xmpp:whatsapp:mms', type: 'vcard'}, [cardNode]);
@@ -8078,8 +7958,8 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
 
     //Message and Notification Acks
 
-    message_ack: function(aJid, aMsgId) {
-      self.sendReceipt(aJid, aMsgId);
+    message_ack: function(aJid, aMsgId, type) {
+      self.sendReceipt(aJid, aMsgId, type);
     },
     notification_ack: function(aJid, aNotificationId) {
       self.sendReceipt(aJid, aNotificationId);
@@ -8091,6 +7971,9 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
     },
     visible_ack: function(aJid, aMsgId) {
       self._writeNode(self.getReceiptAck(aJid, aMsgId, 'visible'));
+    },
+    read_ack: function(aJid, aMsgId) {
+      self._writeNode(self.getReceiptAck(aJid, aMsgId, 'read'));
     },
     subject_ack: function(aJid, aMessageId) {
       logger.log('Sending subject recv receipt...');
@@ -8245,7 +8128,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
       if (aPushname) {
         attrs.name = utf8FromString(aPushname);
       }
-      var presenceNode = newProtocolTreeNode('presence', attrs)
+      var presenceNode = newProtocolTreeNode('presence', attrs);
       self._writeNode(presenceNode);
     },
 
@@ -8361,6 +8244,10 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
 
     getVersion: function() { return CoSeMe.config.tokenData['v']; },
 
+    getExpirationDate: function () {
+     return self.expiration;
+    },
+
     disconnect: function(aReason) {
       logger.log('Disconnect sequence initiated...');
       logger.log('Sending term signal to reader thread');
@@ -8436,8 +8323,8 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
      var idx = self.makeId('get_groups_');
      self.readerThread.requests[idx] = self.readerThread.parseGroups;
 
-     var queryNode = newProtocolTreeNode('list',{type: aGtype});
-     var iqNode = newProtocolTreeNode('iq',{id: idx, type: 'get', to: 'g.us', xmlns: 'w:g'},
+     var queryNode = newProtocolTreeNode('list',{xmlns: 'w:g', type: aGtype});
+     var iqNode = newProtocolTreeNode('iq',{id: idx, type: 'get', to: 'g.us'},
                                       [queryNode]);
 
      self._writeNode(iqNode);
@@ -8576,3 +8463,4 @@ CoSeMe.namespace('contacts', (function(){
     }
   };
 }()));
+

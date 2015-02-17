@@ -7,7 +7,7 @@
   "type": "privileged",
   "launch_path": "/index.html",
   "description": "Loqui Instant Messenger unifies all your chat accounts in just one app.",
-  "version": "v0.3.4a",
+  "version": "v0.4.0",
   "icons": {
     "32": "/img/icon-32.png",
     "60": "/img/icon-60.png",
@@ -22,6 +22,7 @@
       "alarm": "/index.html"
     }
   ],
+  "orientation": ["portrait"],
   "permissions": {
     "alarms": {
       "description": "Required for keeping the app always connected to server."
@@ -67,6 +68,80 @@
         "type": ["image/*", "video/*", "audio/*", "url"]
       },
       "returnValue": false
+    }
+  },
+   "locales": {
+    "eo": {
+      "name": "Loqui IM",
+      "description": "Loqui estas tujmesaĝilo, kiu unuigas ĉiujn viajn babilkontojn en nur unu aplikaĵo.",
+      "permissions": {
+        "alarms": {
+          "description": "Necesata por manteni la aplikaĵon ĉiam konektite al serviloj."
+        },
+        "desktop-notification": {
+          "description": "Necesata por montri atentigojn kiam la aplikaĵo rulas fone."
+        },
+        "tcp-socket": {
+          "description": "CoSeMe necesas TCP por konekti al serviloj."
+        },
+        "systemXHR": {
+          "description": "CoSeMe necesas XHR for kelkaj duarangaj agadoj."
+        },
+        "contacts": {
+          "description": "Necesata por trovi novajn kontaktojn."
+        },
+        "device-storage:sdcard": {
+          "description": "Necesata por mastrumi dosierojn"
+        },
+        "device-storage:pictures": {
+          "description": "Necesata por mastrumi bildojn"
+        },
+        "device-storage:videos": {
+          "description": "Necesata por mastrumi filmetojn"
+        },
+        "device-storage:music": {
+          "description": "Necesata por mastrumi sondosierojn"
+        },
+        "geolocation": {
+          "description": "Necesata por sendi lokalizon al aliaj uzantoj"
+        }
+      }
+    },
+    "it": {
+      "name": "Loqui IM",
+      "description": "Loqui IM unisce tutti i tuoi account di messaggistica istantanea in una sola app.",
+      "permissions": {
+        "alarms": {
+          "description": "Necessario per mantenere l'app sempre connessa con i server."
+        },
+        "desktop-notification": {
+          "description": "Necessario per mostrare le notifiche quando l'app è in background."
+        },
+        "tcp-socket": {
+          "description": "CoSeMe necessita di TCP per connettersi ai server."
+        },
+        "systemXHR": {
+          "description": "CoSeMe necessita XHR per alcune operazioni secondarie."
+        },
+        "contacts": {
+          "description": "Necessario per cercare nuovi contatti."
+        },
+        "device-storage:sdcard": {
+          "description": "Necessario per gestire i file"
+        },
+        "device-storage:pictures": {
+          "description": "Necessario per gestire le immagini"
+        },
+        "device-storage:videos": {
+          "description": "Necessario per gestire i video"
+        },
+        "device-storage:music": {
+          "description": "Necessario per gestire i file audio"
+        },
+        "geolocation": {
+          "description": "Necessario per inviare la geolocalizzazione ad altri utenti"
+        }
+      }
     }
   }
 }
