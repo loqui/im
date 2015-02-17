@@ -172,7 +172,6 @@ section.extended > header {
 }
 section.extended article {
   top: 11.2rem;
-  height: calc(100% - 11.2rem);
 }
 section:not(.extended) nav[data-control="groupbar"] {
   display: none;
@@ -890,10 +889,11 @@ section > nav[data-control="menu"] a:before {
   content: "✔";
   position: absolute;
   top: 1.6rem;
-  left: -.3rem;
-  text-align: right;
-  font-size: .8em;
+  left: -.4rem;
+  text-align: center;
+  font-size: .79em;
   color: #71C837;
+  background: rgba(0,0,0,0.01);
 }
 #messages > li > div[data-type='out'][data-ack='delivered']:after, #messages > li > div[data-type='out'][data-ack='viewed']:after {
   content: "✔✔";
@@ -901,12 +901,14 @@ section > nav[data-control="menu"] a:before {
   top: 1.6rem;
   left: -1rem;
   text-align: right;
-  font-size: .8em;
+  font-size: .79em;
   color: #71C837;
   letter-spacing: -.5em;
+  background: rgba(0,0,0,0.01);
+  padding-right: 0.4em;
 }
 #messages > li > div[data-type='out'][data-ack='viewed']:after{
-  color: #373dc8;
+  color: #44A6F2;
 }
 #messages > li:last-child {
   margin-bottom: 3.5rem;
