@@ -6,7 +6,7 @@ var App = {
 
   name: 'Loqui IM',
   shortName: 'Loqui',
-  version: 'v0.4.0',
+  version: 'v0.4.1',
   minorVersion: 'a',
   connectors: [],
   logForms: [],
@@ -254,7 +254,12 @@ var App = {
           }
           account.save();
         }
-      }
+        from['v0.4.0']();
+      },
+      'v0.4.0': function(){
+        from['v0.4.1']();
+      },
+      'v0.4.1': function(){}
     };
     if (last < App.version && last in from) {
       Lungo.Notification.show('forward', _('Upgrading'), 5);
