@@ -30,7 +30,8 @@ var App = {
         sound: true,
         csn: true,
         boltGet: true,
-		lockOrientation : true,
+        readReceipts: true,
+		    lockOrientation : true,
         devMode: false
       },
       devsettings: {
@@ -259,7 +260,16 @@ var App = {
       'v0.4.0': function(){
         from['v0.4.1']();
       },
-      'v0.4.1': function(){}
+      'v0.4.1': function(){
+        var settings = App.settings;
+        if (!('lockOrientation' in App.settings)) {
+          settings.lockOrientation = true;
+        }
+        if (!('readReceipts' in App.settings)) {
+          settings.readReceipts = true;
+        }
+        App.settings = settings;
+      }
     };
     if (last < App.version && last in from) {
       Lungo.Notification.show('forward', _('Upgrading'), 5);
