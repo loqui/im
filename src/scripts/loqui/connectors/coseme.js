@@ -1173,9 +1173,9 @@ App.logForms.coseme = function (provider, article) {
       } else if (target.hasClass('valCode')) {
         provider = article.parentNode.id;
         user = form.find('[name="user"]').val() ||
-          form.siblings('sms').find('[name="user"]').val();
+          form.siblings('.sms').find('[name="user"]').val();
         cc  = form.find('[name="country"]').val() ||
-          form.siblings('sms').find('[name="country"]').val();
+          form.siblings('.sms').find('[name="country"]').val();
         var rCode = form.find('[name="rCode"]').val().replace(/\D/g,'');
         if (rCode) {
           var register = function (deviceId) {
