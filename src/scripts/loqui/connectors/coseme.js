@@ -1082,7 +1082,7 @@ App.logForms.coseme = function (provider, article) {
                 form.addClass('hidden');
                 form.siblings('.code').removeClass('hidden');
               } else if (data.status == 'ok') {
-                if (data.type == 'existing') {
+                if (data.type == 'existing' || data.type == 'new') {
                     var account = new Account({
                       user: user,
                       cc: cc,
@@ -1134,7 +1134,7 @@ App.logForms.coseme = function (provider, article) {
                   form.addClass('hidden');
                   form.siblings('.code').removeClass('hidden');
                 } else if (data.status == 'ok') {
-                  if (data.type == 'existing') {
+                  if (data.type == 'existing' || data.type == 'new') {
                       var account = new Account({
                         user: user,
                         cc: cc,
