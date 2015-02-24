@@ -1188,6 +1188,7 @@ App.logForms.coseme = function (provider, article) {
                   data: data,
                   provider: provider,
                   resource: App.defaults.Account.core.resource,
+                  enabled: true,
                   chats: []
                 });
                 account.test();  
