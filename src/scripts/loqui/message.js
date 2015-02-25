@@ -55,7 +55,7 @@ var Message = function (account, core, options) {
   this.read = function(chat){
     var type = (this.core.from == this.account.core.user || this.core.from == this.account.core.realJid) ? 'out' : 'in';
     chat= chat || this.chat;
-    if('id' in this.core && type == 'in' && 'ack' in this.account.connector){
+    if('id' in this.core && type == 'in' && this.account.supports('readReceipts') && App.settings.readReceipts){
       chat.processQueue.push(function(){
         return chat.findMessage(this.core.id, null, true).then(function(result){
           if(!result.message.viewed){

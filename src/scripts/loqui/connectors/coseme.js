@@ -1082,7 +1082,7 @@ App.logForms.coseme = function (provider, article) {
                 form.addClass('hidden');
                 form.siblings('.code').removeClass('hidden');
               } else if (data.status == 'ok') {
-                if (data.type == 'existing') {
+                if (data.type == 'existing' || data.type == 'new') {
                     var account = new Account({
                       user: user,
                       cc: cc,
@@ -1134,7 +1134,7 @@ App.logForms.coseme = function (provider, article) {
                   form.addClass('hidden');
                   form.siblings('.code').removeClass('hidden');
                 } else if (data.status == 'ok') {
-                  if (data.type == 'existing') {
+                  if (data.type == 'existing' || data.type == 'new') {
                       var account = new Account({
                         user: user,
                         cc: cc,
@@ -1173,9 +1173,9 @@ App.logForms.coseme = function (provider, article) {
       } else if (target.hasClass('valCode')) {
         provider = article.parentNode.id;
         user = form.find('[name="user"]').val() ||
-          form.siblings('sms').find('[name="user"]').val();
+          form.siblings('.sms').find('[name="user"]').val();
         cc  = form.find('[name="country"]').val() ||
-          form.siblings('sms').find('[name="country"]').val();
+          form.siblings('.sms').find('[name="country"]').val();
         var rCode = form.find('[name="rCode"]').val().replace(/\D/g,'');
         if (rCode) {
           var register = function (deviceId) {
@@ -1188,6 +1188,7 @@ App.logForms.coseme = function (provider, article) {
                   data: data,
                   provider: provider,
                   resource: App.defaults.Account.core.resource,
+                  enabled: true,
                   chats: []
                 });
                 account.test();  
