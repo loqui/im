@@ -289,18 +289,22 @@ var Chat = function (core, account) {
       var found= false;
       var checkChunk= function(chunk, chunkIndex){
         var result= null;
-        chunk.forEach(function(item, i){
-          if(item.id == msgId){
-            found= true;
-            result= {
-              index : i,
-              chunk : chunk,
-              chunkIndex : chat.chunks[chunkIndex],
-              message : item
-            };
-          }
-        });
-        return result;
+        if(chunk){
+          chunk.forEach(function(item, i){
+            if(item.id == msgId){
+              found= true;
+              result= {
+                index : i,
+                chunk : chunk,
+                chunkIndex : chat.chunks[chunkIndex],
+                message : item
+              };
+            }
+          });
+          return result;
+        }else{
+          return null;
+        }
       };
       if(chunkIndex || chunkIndex === 0){
         Store.recover(chunkIndex, function(chunk){

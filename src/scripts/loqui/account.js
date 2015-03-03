@@ -634,6 +634,9 @@ var Account = function (core) {
       msg = new Message(account, msg);
       Store.update(result.chunkIndex, result.chunk, callback);
       msg.reRender(result.chunkIndex);
+    }, function(e){
+        Tools.log('UNABLE TO FIND MESSAGE! CARRY ON', from, msgId, e);
+        callback();
     });
   }.bind(this));
 
