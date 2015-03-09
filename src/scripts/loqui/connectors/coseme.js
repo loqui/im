@@ -402,7 +402,7 @@ App.connectors.coseme = function (account) {
     var body = msgData;
     if (body) {
       var date = new Date(timeStamp);
-      var stamp = Tools.localize(Tools.stamp(stamp));
+      var stamp = Tools.localize(Tools.stamp(timeStamp));
       var msg = new Message(account, {
         id: msgId,
         from: from,
