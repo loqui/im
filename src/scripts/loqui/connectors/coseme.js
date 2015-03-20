@@ -571,7 +571,7 @@ App.connectors.coseme = function (account) {
   
   this.events.onGroupGotPicture = function (jid, picId, blob) {
     var account = this.account;
-    var avatars= this.avatars;
+    var avatars= App.avatars;
 
     Tools.picThumb(blob, 96, 96, function (url) {
       $('ul[data-jid="' + account.core.fullJid + '"] li[data-jid="' + jid + '"] span.avatar img').attr('src', url);
