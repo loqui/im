@@ -113,11 +113,13 @@ document.addEventListener("visibilitychange", function() {
 
 // Type in chat text box
 $('section#chat article#main div#text').on('keydown', function (e) {
-  if (e.which == 13) {
-    e.preventDefault();
-    Messenger.say();
-    Messenger.csn('active');
-  } else if (e.which == 8 || e.which == 46) {
+  if (e.key === "Enter") {
+    if(!e.shiftKey) {
+      e.preventDefault();
+      Messenger.say();
+      Messenger.csn('active');
+    }
+  } else if (e.key === "Backspace" || e.key === "Delete") {
     if (this.textContent.length < 2) {
       $('section#chat article#main button#plus').show();
       $('section#chat article#main button#say').hide();
