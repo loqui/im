@@ -474,7 +474,7 @@ App.connectors.XMPP = function (account) {
   
   this.events.onMessageDelivered = function (stanza) {
     var msg = $(stanza);
-    var msgId = msg.attr('id');
+    var msgId = (msg.children('received').length > 0) ? msg.children('received').attr('id') : msg.attr('id');
     var from = Strophe.getBareJidFromJid(msg.attr('from'));
     var account = this.account;
     var chat = account.chatGet(from);
