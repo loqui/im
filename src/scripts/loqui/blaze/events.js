@@ -58,6 +58,7 @@ Template.accounts_list.events({
       App.accounts[index].enabled = (status == 'false' || status === undefined);
     } else {
       $('#main header select').val(index);
+      delete $('section#chat')[0].dataset.jid;
       Accounts.current = index;
       Chungo.Aside.hide();    
     }
