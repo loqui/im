@@ -19,8 +19,8 @@ var Messenger = {
     var to = $('section#chat')[0].dataset.jid;
     var muc = $('section#chat')[0].dataset.muc == "true";
     var account = Accounts.current;
-    text = text || $('section#chat div#text')[0].innerHTML;
-    text = text.replace('<br>', String.fromCharCode(10), 'g').trim();
+    text = text || $('section#chat div#text').text();
+    text = text.trim();
     if (text.length) {
       var msg = new Message(account, 
       {
