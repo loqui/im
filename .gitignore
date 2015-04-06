@@ -4,3 +4,4 @@ package/*
 cache/*
 *.log
 .DS_Store
+src/scripts/loqui/blaze/renderers.js
