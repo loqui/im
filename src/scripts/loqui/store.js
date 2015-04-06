@@ -158,6 +158,30 @@ var Store = {
           }
         });
       }
+    },
+
+    dir : function(path, onsuccess, onerror){
+      if(this.card){
+        var list= [];
+        var req = this.card.enumerate(path);
+
+        req.onsuccess= function(){
+            if(this.result){
+                list.push(this.result);
+                this.continue();
+            }else{
+                onsuccess(list);
+            }
+        };
+
+        req.onerror= function(){
+          if(onerror){
+            onerror(this.error);
+            Lungo.Notification.error(_('Error'), _('NoSDAccess'), 'cloud-download', 5);
+          }
+        };
+
+      }
     }
     
   }

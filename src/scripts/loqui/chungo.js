@@ -245,6 +245,7 @@ var Chungo = {
       this._timeout = [
         setTimeout(function () {
           this.hide();
+          if(cb) cb();
         }.bind(this), seconds ? seconds * 1000 : 20000),
         cb
       ];

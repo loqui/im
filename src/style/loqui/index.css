@@ -25,7 +25,7 @@ input[type='search'] {
   width: 100%;
   border-radius: 0;
 }
-input[type='text'] {
+input[type='text'], input[type='password'] {
   width: calc(100% - 2rem);
   height: 4.2rem;
   font-size: 1.5rem;
@@ -1228,7 +1228,7 @@ section.profile #settings li .caption {
   display: none;
 }
 #status input,
-#nick input {
+#nick input, input[type="password"] {
   margin: .5rem 0 1.5rem 0;
 }
 section.profile article > div:not(#card) {
@@ -1283,6 +1283,16 @@ ul.mini li img {
   height: 2.4rem;
   left: -4rem;
   top: .9rem;
+}
+
+section#pickBackup.extended article {
+  top: 5.6rem;
+}
+
+ul.fileList li {
+  border-bottom: 0.1rem solid #B4B2B2;
+  font-size: 1.6rem;
+  padding: 2.2rem 3rem;
 }
 
 aside .cover {

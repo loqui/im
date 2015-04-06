@@ -21,7 +21,7 @@ var App = {
   pathFiles: 'loqui/files/',
   pathBackup: 'loqui/backup/',
   caps: {},
-  
+
   // Default values
   defaults: {
     App: {
@@ -31,12 +31,12 @@ var App = {
         csn: true,
         boltGet: true,
         readReceipts: true,
-		    lockOrientation : true,
+        lockOrientation : true,
         devMode: false
       },
       devsettings: {
-		    devConsole: false,
-        debug: false        
+        devConsole: false,
+        debug: false
       },
       online: true
     },
@@ -62,7 +62,7 @@ var App = {
       }
     },
     Connector: {
-      presence: { 
+      presence: {
         show: 'a'
       }
     },
@@ -72,15 +72,15 @@ var App = {
       }
     }
   },
-  
+
   get accounts () {
-    return this._accounts.get();  
+    return this._accounts.get();
   },
   set accounts (val) {
     this._accounts.set([].concat(val));
     this.accountsCores = [].concat(this.accountsCores);
   },
-  
+
   get accountsCores () {
     return this.accounts.map(function (e, i, a) {
       return e.core;
@@ -89,7 +89,7 @@ var App = {
   set accountsCores (val) {
     Store.put('accountsCores', val);
   },
-  
+
   get settings () {
     return this._settings.get();
   },
@@ -100,7 +100,7 @@ var App = {
     Store.put('settings', val);
     this._settings.set($.extend({}, val));
   },
-  
+
   get devsettings () {
     return this._devsettings.get();
   },
@@ -111,7 +111,7 @@ var App = {
     Store.put('devsettings', val);
     this._devsettings.set($.extend({}, val));
   },
-  
+
   get online () {
     return this._online.get();
   },
@@ -119,7 +119,7 @@ var App = {
     this._online.set(val);
     $('body')[0].dataset.online = val;
   },
-  
+
   get avatars () {
     return this._avatars.get();
   },
@@ -138,60 +138,60 @@ var App = {
     Store.init();
     // Load settings and data from storage
     App.load().then(function () {
-      // Log in or show wizard 
+      // Log in or show wizard
       App.upgrade();
       App.start();
     });
   },
-  
+
   // Load settings and data from storage
   load: function () {
     return Promise.all([
-        new Promise(function (callback) {
-          Store.get('accountsCores', function (cores) {
-            if (cores && cores.length) {
-              var accounts = App.accounts;
-              // Inflate accounts
-              for (let [i, core] in Iterator(cores)) {
-                var account = new Account(core);
-                for (let [i, core] in Iterator(core.chats)) {
-                  let chat = new Chat(core, account);
-                  account.chats.push(chat);
-                }
-                accounts.push(account);
+      new Promise(function (callback) {
+        Store.get('accountsCores', function (cores) {
+          if (cores && cores.length) {
+            var accounts = App.accounts;
+            // Inflate accounts
+            for (let [i, core] in Iterator(cores)) {
+              var account = new Account(core);
+              for (let [i, core] in Iterator(core.chats)) {
+                let chat = new Chat(core, account);
+                account.chats.push(chat);
               }
-              App.accounts = accounts;
+              accounts.push(account);
             }
-            callback(null);
-          });
-        }),
-        new Promise(function (callback) {
-          Store.get('settings', function (val) {
-            App.settings = (val && Object.keys(val).length) ? val : App.defaults.App.settings;
-            callback(null);
-          });
-        }),
-        new Promise(function (callback) {
-          Store.get('devsettings', function (val) {
-            App.devsettings = (val && Object.keys(val).length) ? val : App.defaults.App.devsettings;
-            callback(null);
-          });
-        }),
-        new Promise(function (callback) {
-          Store.get('avatars', function (val) {
-            App.avatars = val || {};
-            callback(null);
-          });
-        }),
-        new Promise(function (callback) {
-          Store.get('caps', function (val) {
-            App.caps = val || {};
-            callback(null);
-          });
-        })
-      ]);
+            App.accounts = accounts;
+          }
+          callback(null);
+        });
+      }),
+      new Promise(function (callback) {
+        Store.get('settings', function (val) {
+          App.settings = (val && Object.keys(val).length) ? val : App.defaults.App.settings;
+          callback(null);
+        });
+      }),
+      new Promise(function (callback) {
+        Store.get('devsettings', function (val) {
+          App.devsettings = (val && Object.keys(val).length) ? val : App.defaults.App.devsettings;
+          callback(null);
+        });
+      }),
+      new Promise(function (callback) {
+        Store.get('avatars', function (val) {
+          App.avatars = val || {};
+          callback(null);
+        });
+      }),
+      new Promise(function (callback) {
+        Store.get('caps', function (val) {
+          App.caps = val || {};
+          callback(null);
+        });
+      })
+    ]);
   },
-  
+
   // Perform special processes if upgrading from older version
   upgrade: function () {
     var last = localStorage.getItem('version');
@@ -277,16 +277,16 @@ var App = {
     }
     localStorage.setItem('version', App.version);
   },
-  
+
   // Bootstrap logins and so on
   start: function (last) {
     App.online = App.online;
     // If there is already a configured account
     if (App.accounts.length) {
-	  screen.unlockOrientation= screen.unlockOrientation || screen.mozUnlockOrientation;
-	  if(!App.settings.lockOrientation && screen.unlockOrientation){
-		  screen.unlockOrientation();
-	  }
+      screen.unlockOrientation= screen.unlockOrientation || screen.mozUnlockOrientation;
+      if(!App.settings.lockOrientation && screen.unlockOrientation){
+        screen.unlockOrientation();
+      }
       App.alarmSet({});
       this.connect();
       Menu.show('main');
@@ -307,7 +307,7 @@ var App = {
       Menu.show('providers', null, 500);
     }
   },
-  
+
   // Connect with every enabled account
   connect: function () {
     for (var i in this.accounts) {
@@ -317,7 +317,7 @@ var App = {
       }
     }
   },
-  
+
   // Disconnect from every account
   disconnect: function () {
     for (var i in this.accounts) {
@@ -330,20 +330,20 @@ var App = {
     }
     $('section#main').attr('data-show', 'na');
   },
-  
+
   // Update an array and put it in storage
   smartpush: function (key, value, callback) {
     this[key].push(value);
     Tools.log('PUSHING', value, 'TO', key, this[key]);
     Store.put(key, this[key], callback);
   },
-  
+
   // Update an object and put it in storage
   smartupdate: function (key, callback) {
     /*Tools.log('SAVING', key, this[key]);
     Store.put(key, this[key], callback);*/
   },
-  
+
   // Disconnect from every account
   killAll: function () {
     this.settings.reconnect = false;
@@ -351,11 +351,11 @@ var App = {
       this.accounts[i].connector.disconnect();
     }
   },
-  
+
   // Display a system notification or play a sound accordingly
   notify: function (core, altSound, force) {
     var alt = function () {
-      App.audio(altSound);    
+      App.audio(altSound);
     };
     if (force || document.hidden) {
       var notification= null;
@@ -381,14 +381,14 @@ var App = {
       alt();
     }
   },
-  
+
   // Play a sound
   audio: function (file) {
     if (App.settings.sound && !document.hidden) {
       $('audio[src="audio/' + file + '.ogg"]')[0].play();
     }
   },
-  
+
   // Set an alarm for 90 seconds later so that app automatically reopens
   alarmSet: function (data) {
     if (navigator.mozAlarms) {
@@ -397,7 +397,7 @@ var App = {
       req.onerror = function () { };
     }
   },
-  
+
   // Bring app to foreground
   toForeground: function () {
     navigator.mozApps.getSelf().onsuccess = function (e) {
@@ -406,7 +406,260 @@ var App = {
         app.launch('Loqui IM');
       }
     };
+  },
+
+
+  exportData : function(){
+    var accounts= null;
+    var chatChunks= {};
+    var avatars= {};
+    var avatarChunks= {};
+
+    Store.get('accountsCores', function(accounts){
+      var jobs= [];
+
+      Tools.log('EXPORTING DATA', accounts);
+      Lungo.Notification.show('upload', _('ExportData'));
+
+      accounts.forEach(function(account){
+
+        account.chats.forEach(function(chat){
+
+          chat.chunks.forEach(function(index){
+
+            jobs.push(new Promise(function(done){
+
+              Store.recover(index, function(chunk){
+                chatChunks[index.toString()]= chunk;
+                done();
+              });
+
+            }));
+
+          });
+
+        });
+
+        avatars[account.fullJid]= App.avatars[account.fullJid];
+
+        jobs.push(new Promise(function(done){
+          Store.recover(avatars[account.fullJid].chunk, function(chunk){
+            avatarChunks[avatars[account.fullJid].chunk.toString()]= chunk;
+            done();
+          });
+        }));
+
+        if(avatars[account.fullJid].original){
+          jobs.push(new Promise(function(done){
+            Store.recover(avatars[account.fullJid].original, function(chunk){
+              avatarChunks[avatars[account.fullJid].original.toString()]= chunk;
+              done();
+            });
+          }));
+        }
+
+      });
+
+      Promise.all(jobs).then(function(){
+        Lungo.Notification.hide();
+        App.requestPassword('Backup', function(password){
+          Lungo.Notification.show('lock', _('EncryptingData'));
+          setTimeout(function(){
+            Object.keys(chatChunks).forEach(function(key){
+              this[key]= CryptoJS.AES.encrypt(JSON.stringify(this[key]), password).toString();
+            }.bind(chatChunks));
+
+            accounts.forEach(function(account, key){
+              this[key]= CryptoJS.AES.encrypt(JSON.stringify(account), password).toString();
+            }.bind(accounts));
+
+            Object.keys(avatars).forEach(function(key){
+              this[key]= CryptoJS.AES.encrypt(JSON.stringify(this[key]), password).toString();
+            }.bind(avatars));
+
+            Object.keys(avatarChunks).forEach(function(key){
+              this[key]= CryptoJS.AES.encrypt(JSON.stringify(this[key]), password).toString();
+            }.bind(avatarChunks));
+
+            Lungo.Notification.show('save', _('SavingBackup'));
+            var blob= new Blob([JSON.stringify({accounts : accounts, avatars : avatars, chatChunks : chatChunks, avatarChunks : avatarChunks})], { type : 'application/json' });
+
+            Store.SD.save('loqui/backups/'+ (new Date()).getTime() +'.backup', blob, function(){
+              Lungo.Notification.success(_('Backup'), _('BackupStored'), 'save', 3);
+            }, function(e){
+              Lungo.Notification.error(_('Backup'), _('BackupFailed'), 'info-sign', 5);
+              console.log('FAILED TO SAVE THE BACKUP', e, blob);
+            });
+
+          }, 100);
+        });
+      });
+
+    });
+  },
+
+  importData : function(){
+    var restore= function(backupPack){
+      App.requestPassword('Restore', function(password){
+        var backup= JSON.parse(backupPack);
+        Lungo.Notification.show('unlock', _('DecryptingData'));
+        setTimeout(function(){
+          try{
+            Object.keys(backup.chatChunks).forEach(function(key){
+              var chat= backup.chatChunks[key];
+
+              backup.chatChunks[key]= JSON.parse(CryptoJS.AES.decrypt(chat, password).toString(CryptoJS.enc.Utf8));
+            });
+
+            backup.accounts.forEach(function(account, key){
+              backup.accounts[key]= JSON.parse(CryptoJS.AES.decrypt(account, password).toString(CryptoJS.enc.Utf8));
+            });
+
+            Object.keys(backup.avatars).forEach(function(key){
+              var avatar= backup.avatars[key];
+
+              backup.avatars[key]= JSON.parse(CryptoJS.AES.decrypt(avatar, password).toString(CryptoJS.enc.Utf8));
+            });
+
+            Object.keys(backup.avatarChunks).forEach(function(key){
+              var avatar= backup.avatarChunks[key];
+
+              backup.avatarChunks[key]= JSON.parse(CryptoJS.AES.decrypt(avatar, password).toString(CryptoJS.enc.Utf8));
+            });
+
+            console.log('BACKUP DECRYPTED', backup);
+
+            if(confirm(_('BackupApplyRequest'))){
+              console.log('REMOVING CURRENT DATA');
+              Lungo.Notification.show('trash', _('RemovingCurrentData'));
+
+              var jobs= [];
+
+              for(var i= 0; i <= Store.size; i++){
+                jobs.push(new Promise(function(done){ Store.blockDrop(i, done); }));
+              }
+
+              Promise.all(jobs).then(function(){
+                Lungo.Notification.show('download', _('ApplyingBackup'));
+
+                Store.size= 0;
+                jobs= [];
+
+                backup.accounts.forEach(function(account){
+
+                  account.chats.forEach(function(chat){
+
+                    chat.chunks.forEach(function(index, i){
+
+                      jobs.push(new Promise(function(done){
+                        Store.save(backup.chatChunks[index.toString()], function(index){
+                          chat.chunks[i]= index;
+                          done();
+                        });
+                      }));
+
+                    });
+
+                  });
+
+                });
+
+                Object.keys(backup.avatars).forEach(function(index){
+                  var avatar= backup.avatars[index];
+
+                  jobs.push(new Promise(function(done){
+                    Store.save(backup.avatarChunks[avatar.chunk.toString()], function(index){
+                      avatar.chunk= index;
+                      done();
+                    });
+                  }));
+
+                  if(avatar.original){
+                    jobs.push(new Promise(function(done){
+                      Store.save(backup.avatarChunks[avatar.original.toString()], function(index){
+                        avatar.original= index;
+                        done();
+                      });
+                    }));
+                  }
+
+                });
+
+                Promise.all(jobs).then(function(){
+                  App.accountsCores= backup.accounts;
+                  App.avatars= backup.avatars;
+
+                  Store.update(0, Store.size, function(){
+                    window.location.reload();
+                  });
+                });
+
+              });
+            }
+          }catch(e){
+            Lungo.Notification.error(_('DecryptionFailed'), _('DecryptionFailedLong'), 'info-sign', 4, restore.bind(null, [backupPack]));
+          }
+        }, 100);
+      });
+    };
+
+    Store.SD.dir('loqui/backups', function(list){
+      var files= [];
+
+      list.forEach(function(item){
+        if(item.name.substr(item.name.lastIndexOf('.')+1) == 'backup'){
+          files.push({
+
+            from : Tools.convenientDate((new Date(parseInt(
+              item.name.substring(
+                item.name.lastIndexOf('/')+1,
+                item.name.lastIndexOf('.')
+              )
+            ))).toISOString()),
+
+            file : item,
+            name : item.name.substr(item.name.lastIndexOf('/')+1)
+
+          });
+        }
+      });
+
+      $('#pickBackup ul')[0].innerHTML= '';
+
+      files.sort(function(a, b){
+        a = parseInt(a.name.substring(0, a.name.lastIndexOf('.')));
+        b = parseInt(b.name.substring(0, b.name.lastIndexOf('.')));
+
+        return (a > b) ? 1 : 0;
+      }).forEach(function(item, index){
+        var element= document.createElement('li');
+        $('#pickBackup ul').append(element);
+
+        element.dataset.index= index;
+        element.textContent= _('BackupRestoreLabel') + ' ' + item.from.join(' ');
+      });
+
+      Lungo.Router.section('pickBackup');
+
+      $('#pickBackup ul')[0].onclick= function(e){
+        Lungo.Router.section('back');
+        var index= e.target.dataset.index;
+
+        App.disconnect();
+        Tools.textUnblob(files[index].file, restore);
+      };
+    });
+  },
+
+  requestPassword : function(type, callback){
+    $('#backupPassword p')[0].dataset.l10nId= "PasswordExplanation" + type;
+
+    Lungo.Router.section('backupPassword');
+    $('#selectPassword')[0].onclick= function(){
+      Lungo.Router.section('back');
+      callback($('section#backupPassword input')[0].value);
+    };
   }
-  
+
 };
 
