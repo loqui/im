@@ -319,6 +319,30 @@
     </header>
     <article id="main" class="active scroll"></article>
   </section>
+  <section class="extended" id="backupPassword" data-transition="vertical">
+    <header data-title="Password" data-l10n-title="Password">
+      <nav class="on-left">
+        <button data-view-section="back" data-icon="remove" class="up"></button>
+      </nav>
+    </header>
+    <article class="scroll simple">
+      <p data-l10n-id="PasswordExplanationBackup"></p>
+      <input type="password" name="password" placeholder="enter your password" value="">
+      <div class="buttongroup">
+        <button id="selectPassword" data-l10n-id="SelectPassword">Select</button>
+      </div>
+    </article>
+  </section>
+  <section class="extended" id="pickBackup" data-transition="vertical">
+      <header data-title="Select Backup" data-l10n-title="SelectBackup">
+          <nav class="on-left">
+            <button class="up" data-view-section="back" data-icon="remove"></button>
+          </nav>
+      </header>
+      <article class="scroll">
+          <ul class="fileList"></ul>
+      </article>
+  </section>
   <section id="otrMenu" data-transition="vertical">
     <header data-title="OTR Settings" data-l10n-title="OTRMenu">
       <nav class="on-left">
@@ -460,10 +484,12 @@
   <script type="text/javascript;version=1.7" src="scripts/strophe/plugins/version.js"></script>
   <script type="text/javascript;version=1.7" src="scripts/arlolra/dep/salsa20.js"></script>
   <script type="text/javascript;version=1.7" src="scripts/arlolra/dep/bigint.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/arlolra/dep/crypto.js"></script>
   <script type="text/javascript;version=1.7" src="scripts/arlolra/dep/eventemitter.js"></script>
   <script type="text/javascript;version=1.7" src="scripts/arlolra/dsa-webworker.js"></script>
   <script type="text/javascript;version=1.7" src="scripts/arlolra/otr.js"></script>
+  <script type="text/javascript;version=1.7" src="scripts/cryptoJS/aes.js"></script>
+  <script type="text/javascript;version=1.7" src="scripts/cryptoJS/evpkdf.js"></script>
+  <script type="text/javascript;version=1.7" src="scripts/cryptoJS/cipher-core.js"></script>
   <script type="text/javascript;version=1.7" src="scripts/mozillahispano/coseme.js"></script>
   <script type="text/javascript;version=1.7" src="scripts/loqui/store.js"></script>
   <script type="text/javascript;version=1.7" src="scripts/loqui/app.js"></script>
