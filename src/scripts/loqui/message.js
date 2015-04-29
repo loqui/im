@@ -255,7 +255,7 @@ var Message = function (account, core, options) {
   };
 
   this.reRender= function(blockIndex){
-    if($('section#chat')[0].dataset.jid == this.core.to && $('section#chat').hasClass('show')){
+    if($('section#chat')[0].dataset.jid == this.core.to){
       var element= $('section#chat ul#messages li[data-chunk="' + blockIndex + '"] div[data-id="' + this.core.id + '"]');
       element.replaceWith(this.preRender());
     }
