@@ -77,14 +77,23 @@ App.connectors.coseme = function (account) {
   
   this.sync = function (callback) {
     var getStatusesAndPics = function () {
-      var contacts = this.account.core.chats.map(function(e){return e.jid;});
+      var contacts = this.account.core.chats.map(function(e){ return e.jid; });
+
+      contacts.forEach(function(item, index){
+        if (item.indexOf('@g.us') > 0) {
+          contacts.splice(index, 1);
+        }
+      });
+
       MI.call('contacts_getStatus', [contacts]);
       this.avatar(null, [contacts]);
     }.bind(this);
+
     if (!('roster' in this.account.core) || !this.account.core.roster.length) {
       this.contacts.sync(function () {
         callback(getStatusesAndPics);
       });
+
     } else {
       callback(getStatusesAndPics);
     }
