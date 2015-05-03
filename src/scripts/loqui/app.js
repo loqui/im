@@ -7,7 +7,7 @@ var App = {
   name: 'Loqui IM',
   shortName: 'Loqui',
   version: 'v0.4.2',
-  minorVersion: 'a',
+  minorVersion: 'b',
   connectors: [],
   logForms: [],
   emoji: [],
