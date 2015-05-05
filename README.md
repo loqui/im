@@ -8,7 +8,6 @@ Providers support
 At the moment it supports accounts from:
  * WhatsApp
  * Google Hangouts
- * Facebook Chat
  * Nimbuzz
  * Nokia ovi
  * Microsoft Lync
