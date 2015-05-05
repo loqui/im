@@ -354,35 +354,44 @@ var Message = function (account, core, options) {
     div[0].dataset.index = index;
     div[0].dataset.stamp = this.core.stamp;
     div[0].dataset.from = this.core.from;
+
     if (this.core.id) {
       div[0].dataset.id = this.core.id;
     }
+
     if (this.core.media) {
       div[0].dataset.mediaType = this.core.media.type;
     }
+
     if(type == 'out' && this.core.ack){
       div[0].dataset.ack= this.core.ack;
     }
-    if (avatarize) {
+
+    if (avatarize && type == 'in') {
       var img = $('<img/>');
-      img[0].dataset.jid = type == 'in' ? this.core.from : this.account.core.user;
-      var pic = $('<span/>').addClass('avatar hideable').append(
-        img
-      );
+
+      img[0].dataset.jid = this.core.from;
+
+      var pic = $('<span/>').addClass('avatar hideable').append(img);
       var nameSpan = $('<span/>').addClass('name').css('color', Tools.nickToColor(this.core.from)).text(name);
+
       div.append(pic).append(nameSpan).addClass('extended');
     }
+
     if (html) {
       var textSpan = $('<span/>').addClass('text').html(html);
       div.append(textSpan);
     }
+
     if (onDivClick !== undefined) {
       div[0].onclick = onDivClick;
     }
+
     div.on('hold', function (e) {
-      Activity('chat', null, $(this).children('.text').text());
+      Activity('chat', null, Tools.stripHTML(this));
     });
-  	return div[0];
+
+    return div[0];
   };
   
 };
