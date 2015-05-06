@@ -1,5 +1,7 @@
 body{
   background-color: #312F34;
+  -moz-user-select : none;
+  -webkit-user-select : none;
 }
 button {
   border-radius: .2rem;
@@ -797,6 +799,12 @@ section > nav[data-control="menu"] a:before {
   animation: fadeIn .5s;
   -webkit-animation: fadeIn .5s;
 }
+
+#messages > li .text {
+  -moz-user-select : text;
+  -webkit-user-select : text;
+}
+
 #messages > li > div a{
   color: #E95644;
 }

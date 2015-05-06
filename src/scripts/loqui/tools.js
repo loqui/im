@@ -306,6 +306,28 @@ var Tools = {
       a.push(o[i]);
     }
     return a;
+  },
+
+  stripHTML : function(element) {
+    var result = '';
+
+    var strip = function(element) {
+      if (element.firstChild == null) {
+        if (element.nodeName == 'IMG') {
+          result+= element.alt;
+
+        } else {
+          result+= element.textContent;
+        }
+
+      } else {
+        Array.prototype.forEach.apply(element.childNodes, [strip]);
+      }
+    }
+
+    strip(element);
+
+    return result;
   }
 
 };
