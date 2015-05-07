@@ -20,6 +20,9 @@
   "messages": [
     {
       "alarm": "/index.html"
+    },
+    {
+      "notification" : "/index.html"
     }
   ],
   "orientation": ["portrait"],

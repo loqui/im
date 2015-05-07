@@ -177,7 +177,7 @@ var Chat = function (core, account) {
           if (src.slice(0, 1) == '/' && chat.core.muc) {
             src = 'https://raw.githubusercontent.com/loqui/im/dev/src/img/goovatar.png';
           }
-          chat.notification = App.notify({ subject: subject, text: text, pic: src, from : chat.core.jid, callback: callback }, 'received');
+          chat.notification = App.notify({ subject: subject, text: text, pic: src, from : chat.account.core.fullJid+'#'+chat.core.jid, callback: callback }, 'received');
         }.bind(chat));
       } else {
         chat.notification = App.notify({ subject: subject, text: text, pic: 'https://raw.githubusercontent.com/loqui/im/dev/src/img/foovatar.png', from : chat.core.jid, callback: callback }, 'received');
