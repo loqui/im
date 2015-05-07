@@ -237,6 +237,16 @@ if (navigator.mozAlarms) {
   navigator.mozSetMessageHandler("alarm", function (message) {
     App.alarmSet(message.data);
   });
+
+  navigator.mozSetMessageHandler('notification', function(notification){
+    var accountJid = notification.tag.split('#')[0];
+    var chatJid    = notification.tag.split('#')[1];
+    var chat       = Accounts.find(accountJid).chatGet(chatJid);
+
+    chat.account.show();
+    chat.show();
+    App.toForground();
+  });
 }
 
 Strophe.Connection.rawInput = function (data) {
