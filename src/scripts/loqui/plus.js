@@ -113,8 +113,6 @@ var Plus = {
       account.core.chats.push(chat.core);
     } else {
       chat = account.chats[ci];
-      account.chats.push(chat);
-      account.chats.splice(ci, 1);
     }
     if (chat.core.settings.otr[0]) {
       // This chat should be private

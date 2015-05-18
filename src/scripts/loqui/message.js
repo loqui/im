@@ -44,10 +44,6 @@ var Message = function (account, core, options) {
       this.account.core.chats.push(chat.core);
     } else {
       chat = this.account.chats[ci];
-      this.account.chats.push(chat);
-      this.account.core.chats.push(chat.core);
-      this.account.chats.splice(ci, 1);
-      this.account.core.chats.splice(ci, 1);
     }
     return chat;
   }.bind(this));
