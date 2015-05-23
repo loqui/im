@@ -115,7 +115,7 @@ var Chat = function (core, account) {
     var chunkListSize = this.core.chunks.length;
     var blockIndex = this.core.chunks[chunkListSize - 1];
     var storageIndex;
-    chat.core.last = msg;
+
     if (chunkListSize > 0) {
       Store.recover(blockIndex, function (chunk) {
         if (!chunk || chunk.length >= App.defaults.Chat.chunkSize) {
@@ -126,17 +126,22 @@ var Chat = function (core, account) {
           chat.core.chunks.push(blockIndex);
           storageIndex = [blockIndex, 0];
           callback(blockIndex);
+
         } else {
           Tools.log('FITS');
           chunk.push(msg);
           chunk.sort(function (a, b) {
             return Tools.unstamp(a.stamp) > Tools.unstamp(b.stamp);
           });
+
           blockIndex = chat.core.chunks[chunkListSize - 1];
           Tools.log('PUSHING', blockIndex, chunk);
           Store.update(blockIndex, chunk, callback);
           storageIndex = [blockIndex, chunk.length-1];
         }
+
+        chat.core.last = chunk[chunk.length-1];
+
         if (delay) {
           chat.account.toSendQ(storageIndex);
         }
