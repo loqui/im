@@ -419,9 +419,14 @@ App.connectors.coseme = function (account) {
         text: body,
         stamp: stamp
       });
-      msg.receive();
+
       if (wantsReceipt) {
-        this.ack(msgId, from);
+        msg.receive(function(){
+          this.ack(msgId, from);
+        });
+
+      } else {
+        msg.receive();
       }
     }
     return true;
@@ -683,9 +688,12 @@ App.connectors.coseme = function (account) {
         muc: true
       });
       Tools.log('RECEIVED', msg);
-      msg.receive();
       if (wantsReceipt) {
-        this.ack(msgId, to);
+        msg.receive(function(){
+          this.ack(msgId, to);
+        });
+      } else {
+        msg.receive();
       }
     }
     return true;
