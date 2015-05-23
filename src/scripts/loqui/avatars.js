@@ -36,7 +36,8 @@ var Avatar = function (data) {
     return {
       id: this.id,
       stamp: this.stamp,
-      chunk: this.chunk
+      chunk: this.chunk,
+      original: this.original
     };
   }.bind(this));
   
@@ -44,5 +45,6 @@ var Avatar = function (data) {
   this.stamp = (data && 'stamp' in data) ? data.stamp : Tools.localize(Tools.stamp());
   this.chunk = (data && 'chunk' in data) ? data.chunk : false;
   this.url = (data && 'url' in data) ? data.url : false;
+  this.original= (data && 'original' in data) ? data.original : false;
   
 };
