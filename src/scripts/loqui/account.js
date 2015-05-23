@@ -650,7 +650,13 @@ var Account = function (core) {
   // Save to store
   this.save = function () {
     var index = Accounts.find(this.core.fullJid || this.core.user);
-	  if (index > -1) {
+      this.core.chats.sort(function(a, b){
+        a = new Date(a.last.stamp);
+        b = new Date(b.last.stamp);
+        return a.getTime() > b.getTime();
+      });
+
+      if (index > -1) {
 		  var accounts = App.accounts;
 		  accounts[index] = this;
 		  App.accounts = accounts;
