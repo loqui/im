@@ -113,7 +113,7 @@ var Message = function (account, core, options) {
   };
   
   // Receive this message, process and store it properly
-  this.receive = function () {
+  this.receive = function (callback) {
     Tools.log('RECEIVE', this.core.text, this.options);
     var message = this;
     var chat = this.chat;
@@ -126,15 +126,17 @@ var Message = function (account, core, options) {
         Plus.switchOTR(this.core.from, this.account);
       }
     } else {
-      this.postReceive();
+      this.postReceive(callback);
     }
   };
   
   // Incoming
-  this.postReceive = function() {
+  this.postReceive = function(callback) {
     var message = this;
     var chat = this.chat;
     chat.messageAppend.push({msg: message.core}, function (blockIndex) {
+      callback(message.core);
+
       if ($('section#chat')[0].dataset.jid == chat.core.jid) {
         var ul = $('section#chat ul#messages');
         var li = ul.children('li[data-chunk="' + blockIndex + '"]');
@@ -283,6 +285,12 @@ var Message = function (account, core, options) {
             });
           };
           break;
+        case 'vCard':
+          var onClick = function(e){
+            e.preventDefault();
+
+            return alert('vCard');
+          }
         default:
           html.addClass(this.core.media.type);
           var open = function (blob) {
