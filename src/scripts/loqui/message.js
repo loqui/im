@@ -135,7 +135,7 @@ var Message = function (account, core, options) {
     var message = this;
     var chat = this.chat;
     chat.messageAppend.push({msg: message.core}, function (blockIndex) {
-      callback(message.core);
+      if (callback) callback();
 
       if ($('section#chat')[0].dataset.jid == chat.core.jid) {
         var ul = $('section#chat ul#messages');
