@@ -102,23 +102,23 @@ App.connectors.XMPP = function (account) {
       account.save();
     }
     connector.connection.roster.registerCallback(connector.events.onPresence);
-    var iqId = connector.connection.roster.get( function (ret) {
+    connector.connection.roster.get( function (ret) {
       connector.events.onPresence(ret, null, account.core.user);
       if (account.supports('vcard')) {
-        connector.connection.vcard.get( function (data) {
+        var iqId = connector.connection.vcard.get( function (data) {
           connector.vcard = $(data).find('vCard').get(0);
           callback();
         });
+        // Send initial vcard if none is present (#181)
+        connector.connection.addHandler(function () {
+          connector.connection.vcard.set(function () {
+            callback();
+          }, $build('JABBERID').t(fullJid).tree());
+        }, null, 'iq', 'error', iqId);
       } else {
         callback();
       }
     });
-    // Send initial vcard if none is present (#181)
-    connector.connection.addHandler(function () {
-      connector.connection.vcard.set(function () {
-        callback();
-      }, $build('JABBERID').t(fullJid).tree());
-    }, null, 'iq', 'error', iqId);
   }.bind(this);
   
   this.capabilize = function () {
