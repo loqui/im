@@ -423,7 +423,7 @@ App.connectors.coseme = function (account) {
       if (wantsReceipt) {
         msg.receive(function(){
           this.ack(msgId, from);
-        });
+        }.bind(this));
 
       } else {
         msg.receive();
@@ -691,7 +691,7 @@ App.connectors.coseme = function (account) {
       if (wantsReceipt) {
         msg.receive(function(){
           this.ack(msgId, to);
-        });
+        }.bind(this));
       } else {
         msg.receive();
       }
