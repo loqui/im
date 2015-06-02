@@ -76,16 +76,11 @@ App.connectors.coseme = function (account) {
   };
   
   this.sync = function (callback) {
-    var getStatusesAndPics = function () {
-      var contacts = this.account.core.chats.map(function(e){ return e.jid; });
+    var getStatusesAndPics = function (contacts) {
+      contacts = contacts || this.account.core.chats.map(function(e){ return e.jid; });
+      var status_contacts= contacts.filter(function(item){ return item.indexOf('@g.us') < 0; });
 
-      contacts.forEach(function(item, index){
-        if (item.indexOf('@g.us') > 0) {
-          contacts.splice(index, 1);
-        }
-      });
-
-      MI.call('contacts_getStatus', [contacts]);
+      MI.call('contacts_getStatus', [status_contacts]);
       this.avatar(null, [contacts]);
     }.bind(this);
 
