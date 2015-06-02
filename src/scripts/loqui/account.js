@@ -675,6 +675,7 @@ var Accounts = {
   set current (i) {
     this._current.set(i);
     setTimeout(function () {
+      $('section#main header select')[0].selectedIndex = i;
       var ul = $('section#main ul[data-jid="' + (this.core.fullJid || this.core.user) + '"]');
       ul.show().siblings('ul').hide();
       this.allRender();
