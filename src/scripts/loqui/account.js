@@ -396,11 +396,13 @@ var Account = function (core) {
       var ul = $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"]');
       if (ul.length > 0) {
         ul[0].dataset.enabled = this.enabled;
-        for (var [key, val] in this.core.chats) {
+        Object.keys(this.core.chats).forEach(function(key){
+          var val = this[key];
+
           if(!val.muc){
             contactPresenceRender(val.jid);
           }
-        }
+        }.bind(this.core.chats));
       }
     }
   }.bind(this);
