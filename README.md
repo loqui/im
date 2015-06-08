@@ -13,6 +13,10 @@ At the moment it supports accounts from:
  * Microsoft Lync
  * Any other XMPP/Jabber provider in the world
 
+Build The Source
+===
+See the [How To Build](https://github.com/loqui/im/wiki/Build-Loqui) page on the wiki.
+
 Contribute
 ===
 See the [Contribute](https://github.com/loqui/im/wiki/Contribute) page on the wiki.
