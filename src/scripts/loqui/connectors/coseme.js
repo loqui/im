@@ -433,23 +433,22 @@ App.connectors.coseme = function (account) {
 
   this.events.onImageReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast) {
     var to = this.account.core.fullJid;
-    var isGroup = false;
-    return this.mediaProcess('image', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, isGroup);
+    return this.mediaProcess('image',  msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, wantsReceipt, false);
   };
 
   this.events.onVideoReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast) {
     var to = this.account.core.fullJid;
-    return this.mediaProcess('video', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, false);
+    return this.mediaProcess('video', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, wantsReceipt, false);
   };
 
   this.events.onAudioReceived = function (msgId, fromAttribute, mediaUrl, mediaSize, wantsReceipt, isBroadcast) {
     var to = this.account.core.fullJid;
-    return this.mediaProcess('audio', msgId, fromAttribute, to, null, mediaUrl, mediaSize, false);
+    return this.mediaProcess('audio', msgId, fromAttribute, to, null, mediaUrl, mediaSize, wantsReceipt, false);
   };
 
   this.events.onLocationReceived = function (msgId, fromAttribute, name, mediaPreview, mlatitude, mlongitude, wantsReceipt, isBroadcast) {
     var to = this.account.core.fullJid;
-    return this.mediaProcess('url', msgId, fromAttribute, to, [mlatitude, mlongitude, name], null, null, false);
+    return this.mediaProcess('url', msgId, fromAttribute, to, [mlatitude, mlongitude, name], null, null, wantsReceipt, false);
   };
   
   this.events.onAvatar = function (jid, picId, blob) {
@@ -728,28 +727,24 @@ App.connectors.coseme = function (account) {
     }
   };
 
-  this.events.onGroupImageReceived = function (msgId, fromAttribute, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt) {
-    var to = fromAttribute;
-    fromAttribute = author;
-    return this.mediaProcess('image', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, wantsReceipt, true);
+  this.events.onGroupImageReceived = function (msgId, group, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt) {
+    var to = this.account.core.fullJid;
+    return this.mediaProcess('image', msgId, group, to, mediaPreview, mediaUrl, mediaSize, wantsReceipt, true, author);
   };
 
-  this.events.onGroupVideoReceived = function (msgId, fromAttribute, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt) {
-    var to = fromAttribute;
-    fromAttribute = author;
-    return this.mediaProcess('video', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, wantsReceipt, true);
+  this.events.onGroupVideoReceived = function (msgId, group, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt) {
+    var to = this.account.core.fullJid;
+    return this.mediaProcess('video', msgId, group, to, mediaPreview, mediaUrl, mediaSize, wantsReceipt, true, author);
   };
 
-  this.events.onGroupAudioReceived = function (msgId, fromAttribute, author, mediaUrl, mediaSize, wantsReceipt) {
-    var to = fromAttribute;
-    fromAttribute = author;
-    return this.mediaProcess('audio', msgId, fromAttribute, to, null, mediaUrl, mediaSize, wantsReceipt, true);
+  this.events.onGroupAudioReceived = function (msgId, group, author, mediaUrl, mediaSize, wantsReceipt) {
+    var to = this.account.core.fullJid;
+    return this.mediaProcess('audio', msgId, group, to, null, mediaUrl, mediaSize, wantsReceipt, true, author);
   };
 
-  this.events.onGroupLocationReceived = function (msgId, fromAttribute, author, name, mediaPreview, mlatitude, mlongitude, wantsReceipt) {
-    var to = fromAttribute;
-    fromAttribute = author;
-    return this.mediaProcess('url', fromAttribute, to, [mlatitude, mlongitude, name], null, null, wantsReceipt, true);
+  this.events.onGroupLocationReceived = function (msgId, group, author, name, mediaPreview, mlatitude, mlongitude, wantsReceipt) {
+    var to = this.account.core.fullJid;
+    return this.mediaProcess('url', group, to, [mlatitude, mlongitude, name], null, null, wantsReceipt, true, author);
   };
   
   this.events.onContactsGotStatus = function (id, statuses) {
@@ -933,7 +928,7 @@ App.connectors.coseme = function (account) {
     msg.addToChat();
   };
 
-  this.mediaProcess = function (fileType, msgId, fromAttribute, to, payload, mediaUrl, mediaSize, wantsReceipt, isGroup) {
+  this.mediaProcess = function (fileType, msgId, from, to, payload, mediaUrl, mediaSize, wantsReceipt, isGroup, author) {
     Tools.log('Processing file of type', fileType);
     var process = function (thumb) {
       var media = {
@@ -945,19 +940,19 @@ App.connectors.coseme = function (account) {
       var stamp = Tools.localize(Tools.stamp());
       var msg = {
         id: msgId,
-        from: fromAttribute,
-        to: to,
+        from: author,
+        to: from,
         media: media,
         stamp: stamp
       };
       if (isGroup) {
-        msg.pushName = fromAttribute;
+        msg.pushName = author;
       }
       msg = new Message(this.account, msg, {
         muc: isGroup
       });
       msg.receive();
-      this.ack(msgId, fromAttribute);
+      this.ack(msgId, from);
       Tools.log('Finished processing file of type', fileType);
     }.bind(this);
     switch (fileType) {
