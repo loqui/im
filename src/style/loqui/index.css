@@ -1641,6 +1641,10 @@ article.form ul.listBox li.add:before {
   #messages {
     display: none;
   }
+  #footbox {
+    position: fixed;
+    top: 0;
+  }
   #text {
     position: fixed;
     top: 0;
@@ -1650,6 +1654,18 @@ article.form ul.listBox li.add:before {
     bottom: 0;
     border: none;
     border-radius: 0;
+  }
+  section#chat #footbox #typing {
+    position: fixed;
+    z-index: 9;
+    bottom: 0.1rem;
+    top: auto;
+  }
+  button {
+    z-index: 9;
+  }
+  section#chat nav#plus {
+    display: none;
   }
 }
 
