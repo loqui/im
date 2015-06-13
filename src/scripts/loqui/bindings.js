@@ -124,17 +124,32 @@ $('section#chat article#main div#text').on('keydown', function (e) {
       $('section#chat nav#plus').removeClass('show');
       Messenger.csn('paused');
     }
+    // if user wants to hide keyboard in landscape
+    // user can clear the box and press backspace to hide it
+    if (this.textContent.length === 0 && e.which == 8 && window.matchMedia('(orientation:landscape)').matches) {
+      $('section#chat article#main div#text').blur();
+    }
   } else {
     $('section#chat article#main button#plus').hide();
     $('section#chat article#main button#say').show();
-    $('section#chat nav#plus').addClass('show');
+    // only show plus bar when in portrait mode
+    if (window.matchMedia('(orientation:portrait)').matches) {
+      $('section#chat nav#plus').addClass('show');
+    } else {
+      $('section#chat nav#plus').removeClass('show');
+    }
     var ul = $('section#chat ul#messages');
     ul[0].scrollTop = ul[0].scrollHeight;
     Messenger.csn('composing');
   }
 }).on('tap', function (e) {
   Lungo.Router.article('chat', 'main');
-  $('section#chat nav#plus').addClass('show');
+  // only show plus bar when in portrait mode
+  if (window.matchMedia('(orientation:portrait)').matches) {
+    $('section#chat nav#plus').addClass('show');
+  } else {
+    $('section#chat nav#plus').removeClass('show');
+  }
   var ul = $('section#chat ul#messages');
   ul[0].scrollTop = ul[0].scrollHeight + 500;
 }).on('blur', function (e) {
