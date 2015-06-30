@@ -249,7 +249,8 @@ var Account = function (core) {
         li.append($('<span/>').addClass('show').addClass('backchange'));
         li[0].dataset.unread = chat.unread;
         li[0].dataset.hidden= chat.settings.hidden[0] ? 1 : 0;
-        if (!chat.muc && account.supports('muc') && chat.jid.substring(1).match(/\-/)) {
+        li[0].dataset.lastAck = chat.last.ack;
+        if (!chat.muc && account.supports('muc') && chat.jid && chat.jid.substring(1).match(/\-/)) {
           account.chats[i].core.muc = true;
           account.chats[i].save();
         }
