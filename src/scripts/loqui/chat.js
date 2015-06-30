@@ -17,13 +17,35 @@ var Chat = function (core, account) {
   this.processQueue= async.queue(function(job, callback){
     job().then(callback);
   });
+
   this.processQueue.drain= function(){};
+
   if (!('settings' in this.core)) {
     this.core.settings = {};
     $.extend(this.core.settings, App.defaults.Chat.core.settings);
   }
+
   if (!('info' in this.core)) {
     this.core.info = {};
+  }
+
+  if (this.core.jid === null) {
+    this.core.jid = Date.now() + '@fakeJid.org';
+  }
+
+  if (!this.core.last.id) {
+    if(this.core.chunks.length > 0){
+      var chunk = this.core.chunks[this.core.chunks.length-1];
+      var chat = this;
+
+      Store.recover(chunk, function(chunk){
+        var lastMsg = chunk[chunk.length - 1];
+
+        chat.core.last = lastMsg;
+
+        chat.save();
+      });
+    }
   }
   
   // Render last chunk of messages
