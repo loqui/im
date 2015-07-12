@@ -6594,7 +6594,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
 
     get: function(iqType, idx, node) {
       var childNode = node.getChild(0);
-      if (childNode.getAttributeValue('xmlns') === 'urn:xmpp:ping') {
+      if (node.getAttributeValue('xmlns') === 'urn:xmpp:ping') {
         if (_autoPong) {
           _onPing(idx);
         }
