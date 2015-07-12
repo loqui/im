@@ -368,7 +368,7 @@ App.connectors.coseme = function (account) {
       profile_setPictureSuccess: this.events.onProfileSetPictureSuccess,
       profile_setPictureError: this.events.onProfileSetPictureError,
       profile_setStatusSuccess: this.events.onMessageDelivered,
-      ping: this.events.onPing,
+      ping: null,
       pong: null,
       disconnected: null,
       media_uploadRequestSuccess: this.events.onUploadRequestSuccess,
@@ -385,10 +385,6 @@ App.connectors.coseme = function (account) {
     }.bind(this));
   }.bind(this);
 
-  this.events.onPing = function (idx) {
-    MI.call('pong', [idx]);
-  };
-  
   this.events.onStatusDirty = function (categories) {
     var method = 'cleardirty';
     MI.call(method, [categories]);
