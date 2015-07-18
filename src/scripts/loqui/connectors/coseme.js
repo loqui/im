@@ -545,10 +545,11 @@ App.connectors.coseme = function (account) {
       if (ci >= 0) {
         let chat = account.chats[ci];
         let newTitle = group.subject;
-        if (chat.core.title != newTitle) {
-          chat.core.title = newTitle;
-          chat.save(ci, true);
-        }
+
+        chat.core.title = newTitle;
+        chat.core.participants = group.participants;
+        chat.save(ci, true);
+
       } else {
         MI.call('group_getInfo', [group.gid + '@g.us']);
       }
