@@ -312,7 +312,7 @@ var Tools = {
     var result = '';
 
     var strip = function(element) {
-      if (element.firstChild == null) {
+      if (element.firstChild === null) {
         if (element.nodeName == 'IMG') {
           result+= element.alt;
 
@@ -323,7 +323,7 @@ var Tools = {
       } else {
         Array.prototype.forEach.apply(element.childNodes, [strip]);
       }
-    }
+    };
 
     strip(element);
 

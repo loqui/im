@@ -286,11 +286,11 @@ var Message = function (account, core, options) {
           };
           break;
         case 'vCard':
-          var onClick = function(e){
+          onClick = function(e){
             e.preventDefault();
-
             return alert('vCard');
-          }
+          };
+          break;
         default:
           html.addClass(this.core.media.type);
           var open = function (blob) {
