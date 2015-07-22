@@ -696,13 +696,10 @@ section > nav[data-control="menu"] a:before {
   pointer-events: none;
 }
 #footbox {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
   padding: 1rem;
   background-color: #F9F9F9;
   border-top: .1rem solid #E6E6E6;
+  display: flex;
 }
 #chat #footbox #typing {
   position: absolute;
@@ -723,7 +720,6 @@ section > nav[data-control="menu"] a:before {
 }
 #footbox button {
   position: relative;
-  float: right;
   top: 0.05rem;
   font-size: 1.2rem;
   line-height: 1.5rem;
@@ -755,20 +751,21 @@ section > nav[data-control="menu"] a:before {
   font-weight: 300;
   color: #666;
   outline: none;
-  overflow: auto;
   transition: all .2s;
   -webkit-transition: all .2s;
+  align-self: stretch;
+  -moz-user-select: text;
+  -webkit-user-select: text;
+  user-select: text;
+  flex: 1 1 auto;
 }
 #text:focus {
   border-bottom: .1rem solid #E95644;
 }
 
 #messages {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  bottom: 4rem;
+  flex: 1 1 auto;
+  align-self: stretch;
   overflow-x: hidden;
   list-style-type: none;
   background-color: #FFF;
@@ -919,7 +916,7 @@ section > nav[data-control="menu"] a:before {
   color: #44A6F2;
 }
 #messages > li:last-child {
-  margin-bottom: 3.5rem;
+  margin-bottom: 1rem;
 }
 #messages span.text img.image {
     margin: -0.5rem -1rem;
