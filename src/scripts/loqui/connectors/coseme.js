@@ -37,8 +37,8 @@ App.connectors.coseme = function (account) {
       callback.connected();
       if(!pulse){
         pulse= setInterval(function(){
-          console.log('keep alive: sending pong!');
-          MI.call('pong', ['0']);
+          console.log('keep alive!');
+          MI.call('keepalive', []);
         }, 60000);
       }
     }.bind(this));
