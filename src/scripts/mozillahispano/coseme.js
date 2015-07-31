@@ -7704,9 +7704,10 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
       self._writeNode(null);
     },
 
-    sendPing: function(aIdx) {
+    sendPing: function() {
+      var idx = self.makeId('ping_');
       var iqNode =
-        newProtocolTreeNode('iq', {type: 'get', xmlns: 'w:p', to: self.domain, id: aIdx});
+        newProtocolTreeNode('iq', {type: 'get', xmlns: 'w:p', to: self.domain, id: idx});
       self._writeNode(iqNode);
     },
 
