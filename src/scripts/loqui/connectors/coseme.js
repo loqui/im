@@ -48,6 +48,10 @@ App.connectors.coseme = function (account) {
       callback.authfail();
     }.bind(this));
     SI.registerListener('disconnected', function () {
+      if (pulse) {
+        clearInterval(pulse);
+        pulse = null;
+      }
       if (callback.disconnected) {
         callback.disconnected();
       }
@@ -60,8 +64,10 @@ App.connectors.coseme = function (account) {
     this.connected = false;
     var method = 'disconnect';
     var params = ['undefined'];
-    clearInterval(pulse);
-    pulse= null;
+    if (pulse) {
+      clearInterval(pulse);
+      pulse = null;
+    }
     MI.call(method, params);
   };
   
