@@ -15,7 +15,22 @@ var Account = function (core) {
   this._unread = new Blaze.Var(0);
   this._chats = new Blaze.Var([]);
   this._enabled = new Blaze.Var(false);
-  
+  this._pendingReconnect = null;
+  this._reconnectBackoff = 1;
+  this._initialConnect = true;
+  this._scheduleReconnect = function () {
+    if (App.settings.reconnect && ! this._initialConnect && this.enabled) {
+      // schedule reconnect after a short (exponentially increasing( timeout
+      this._reconnectBackoff = Math.min(this._reconnectBackoff * 2, 300);
+      this._pendingReconnect = setTimeout(function () {
+        if (this._pendingReconnect && App.online && this.enabled) {
+          this._pendingReconnect = null;
+          this.connect();
+        }
+      }.bind(this), 1000 * this._reconnectBackoff);
+    }
+  };
+
   this.__defineGetter__('enabled', function () {
     return this._enabled.get();
   });
@@ -26,6 +41,7 @@ var Account = function (core) {
       if (!val) {
         this.connector.disconnect();
       } else {
+        this._initialConnect = true;
         this.connect();
       }
       this.save();
@@ -97,6 +113,10 @@ var Account = function (core) {
   
   // Connect
   this.connect = function () {
+    if (this._pendingReconnect) {
+      clearTimeout(this._pendingReconnect);
+      this._pendingReconnect = null;
+    }
     if (this.connector.isConnected()) {
       this.connector.start();
       this.sendQFlush();
@@ -108,6 +128,8 @@ var Account = function (core) {
           }.bind(this),
           connected: function () {
             this.enabled = true;
+            this._initialConnect = false;
+            this._reconnectBackoff = 1;
             var cb = function (rcb) {
               App.audio('login');
               this.connector.start();
@@ -122,20 +144,18 @@ var Account = function (core) {
             this.enabled = 'loading';
           }.bind(this),
           authfail: function () {
-            var failStamps = this.connector.failStamps || {};
-            failStamps.push(new Date());
-            if (failStamps.length > 2 && Math.floor((failStamps.slice(-1)[0] - failStamps.slice(-3)[0])/1000) < 30) {
-              location.reload();
-            }
+            this._initialConnect = false;
             Lungo.Notification.error(_('NoAuth'), _('NoAuthNotice'), 'signal', 5);
+          }.bind(this),
+          connfail: function () {
+            if (this.enabled == 'loading') {
+              this._scheduleReconnect();
+            }
           }.bind(this),
           disconnected: function () {
             App.audio('logout');
             this.presenceRender();
-            this.connector.connected = false;
-            if (App.online && App.settings.reconnect && this.enabled) {
-              this.connect();
-            }
+            this._scheduleReconnect();
           }.bind(this)
         });
       }
