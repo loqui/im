@@ -4782,6 +4782,7 @@ Strophe.Websocket.prototype = {
      * (Object) error - The websocket error.
      */
     _onError: function(error) {
+        this._conn._changeConnectStatus(Strophe.Status.CONNFAIL, "The WebSocket connection could not be established was disconnected.");
         Strophe.error("Websocket error " + error);
     },
 

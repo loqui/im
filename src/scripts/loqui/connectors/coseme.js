@@ -54,6 +54,7 @@ App.connectors.coseme = function (account) {
     }.bind(this));
     Yowsup.connectionmanager.signals['disconnected'].length = 0;
     SI.registerListener('disconnected', function () {
+      this.connected = false;
       if (pulse) {
         clearInterval(pulse);
         pulse = null;
@@ -61,7 +62,7 @@ App.connectors.coseme = function (account) {
       if (callback.disconnected) {
         callback.disconnected();
       }
-    });
+    }.bind(this));
     MI.call(method, params);
     callback.connecting();
   };
@@ -531,14 +532,14 @@ App.connectors.coseme = function (account) {
     account.markMessage.push({from : from, msgId : msgId});
   };
 
-  this.events.onMessageDelivered = function (from, msgId) {
+  this.events.onMessageDelivered = function (from, msgId, type) {
     var account = this.account;
     var chat = account.chatGet(from);
     chat.core.lastAck = Tools.localize(Tools.stamp());
     chat.save();
     account.markMessage.push({from : from, msgId : msgId});
-    Tools.log('DELIVERED', from, msgId);
-    MI.call('delivered_ack', [from, msgId]);
+    Tools.log('DELIVERED', from, msgId, type);
+    MI.call('delivered_ack', [from, msgId, type]);
   };
   
   this.events.onMessageVisible = function (from, msgId) {

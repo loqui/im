@@ -4677,13 +4677,11 @@ CoSeMe.namespace('protocol', (function(){
    */
   BinaryWriter.prototype.streamStart = function(domain, resource, callback) {
     var writerTask = this.newWriteTask(callback);
-    setTimeout(function() {
-      writerTask._sendProtocol(IS_COUNTING);
-      writerTask._sendProtocol();
+    writerTask._sendProtocol(IS_COUNTING);
+    writerTask._sendProtocol();
 
-      writerTask._streamStart(domain, resource, IS_COUNTING);
-      writerTask._streamStart(domain, resource);
-    });
+    writerTask._streamStart(domain, resource, IS_COUNTING);
+    writerTask._streamStart(domain, resource);
   };
 
   BinaryWriter.prototype._sendProtocol = function(counting) {
@@ -4711,10 +4709,8 @@ CoSeMe.namespace('protocol', (function(){
    */
   BinaryWriter.prototype.write = function(tree, callback) {
     var writerTask = this.newWriteTask(callback);
-    setTimeout(function() {
-      writerTask._write(tree, IS_COUNTING);
-      writerTask._write(tree);
-    });
+    writerTask._write(tree, IS_COUNTING);
+    writerTask._write(tree);
   };
 
   /*
@@ -5145,7 +5141,9 @@ CoSeMe.namespace('protocol', (function(){
 
     var self = this;
     this.socket.ondata = function(evt) {
-     self.onSocketData(evt.data);
+      var lock = navigator.requestWakeLock('cpu');
+      self.onSocketData(evt.data);
+      lock.unlock();
     };
   };
 
@@ -5178,7 +5176,7 @@ CoSeMe.namespace('protocol', (function(){
   BinaryReader.prototype.onSocketData = function(rawData) {
     logger.log('Received socket data:', rawData.byteLength, 'bytes!')
     rawData && this.addDataChunk(rawData);
-    setTimeout(this.checkForAnotherTree.bind(this));
+    this.checkForAnotherTree();
   };
 
   /**
@@ -5187,16 +5185,15 @@ CoSeMe.namespace('protocol', (function(){
    * are more trees.
    */
   BinaryReader.prototype.checkForAnotherTree = function() {
-    if (this.waitingForMessage()) return;
+    while (!this.waitingForMessage()) {
 
-    if (!this.isStreamStartRead) {
-      this.readStreamStart();
-      this.isStreamStartRead = true;
-    } else {
-      this.readNextTree();
+       if (!this.isStreamStartRead) {
+        this.readStreamStart();
+        this.isStreamStartRead = true;
+      } else {
+        this.readNextTree();
+      }
     }
-
-    setTimeout(this.checkForAnotherTree.bind(this));
   }
 
   /**
@@ -5205,9 +5202,7 @@ CoSeMe.namespace('protocol', (function(){
    */
   BinaryReader.prototype.readStreamStart = function() {
     var readerTask = this.newReaderTask();
-    setTimeout(function() {
-      readerTask._readStreamStart();
-    });
+    readerTask._readStreamStart();
   };
 
   /**
@@ -5215,9 +5210,7 @@ CoSeMe.namespace('protocol', (function(){
    */
   BinaryReader.prototype.readNextTree = function() {
     var readerTask = this.newReaderTask();
-    setTimeout(function() {
-      readerTask._readNextTree();
-    });
+    readerTask._readNextTree();
   };
 
   /**
@@ -5305,22 +5298,24 @@ CoSeMe.namespace('protocol', (function(){
    * Tree dispatching occurs in the same order than they were received.
    */
   BinaryReader.prototype.attendPendingTrees = function() {
-    var args, err, tree, callbackName;
+    var args, err, tree, callbackName, lock;
     var currentSocket = Object.getPrototypeOf(this).socket;
     while (args = this.pendingTrees.shift()) {
 
       err = args[0];
       tree = args[1];
       callbackName = args[2];
+      lock = navigator.requestWakeLock('cpu');
 
-      setTimeout((function _processTree(callbackName, err, tree) {
-        if (this.sourceSocket !== currentSocket) { return; }
-
-        var method = this[callbackName];
-        if (typeof method === 'function') {
-          method(err, tree);
+      setTimeout((function _processTree(callbackName, err, tree, lock) {
+        if (this.sourceSocket === currentSocket) {
+          var method = this[callbackName];
+          if (typeof method === 'function') {
+            method(err, tree);
+          }
         }
-      }).bind(this, callbackName, err, tree));
+        lock.unlock();
+      }).bind(this, callbackName, err, tree, lock));
     }
   };
 
@@ -6330,19 +6325,10 @@ CoSeMe.namespace('auth', (function() {
 
   function getFeatures() {
     var features = [
-      new Tree('receipt_acks'),
-      new Tree('w:profile:picture', { attributes: {
-        type: 'all'
-      }}),
-      new Tree('w:profile:picture', { attributes: {
-        type: 'group'
-      }}),
-      new Tree('notification', { attributes: {
-        type: 'participant'
-      }}),
-      new Tree('status', { attributes: {
-        notification: 'true'
-      }})
+      new Tree('readreceipts'),
+      new Tree('groups_v2'),
+      new Tree('privacy'),
+      new Tree('presence')
     ];
 
     return new Tree('stream:features', { children: features });
@@ -6595,9 +6581,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
     get: function(iqType, idx, node) {
       var childNode = node.getChild(0);
       if (node.getAttributeValue('xmlns') === 'urn:xmpp:ping') {
-        if (_autoPong) {
-          _onPing(idx);
-        }
+        _signalInterface.onPing && _signalInterface.onPing(idx);
         _signalInterface.send('ping', [idx]);
       } else if (ProtocolTreeNode.tagEquals(childNode,'query') &&
                  node.getAttributeValue('from') &&
@@ -6798,7 +6782,10 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
         else if (type === 'status') {
           _signalInterface.send('notification_status', [from, msgId]);
         }
-
+        else {
+          // ignore, but at least acknowledge it
+          _signalInterface.onUnknownNotification(from, msgId, type);
+        }
       }
 
     } catch (x) {
@@ -7338,35 +7325,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
 
   var alive = false;
 
-  var _onPing;
-  var _ping;
-  var _autoPong;
-
   return {
-    set onPing(aFun) {
-      _onPing = aFun;
-    },
-
-    get onPing() {
-      return _onPing;
-    },
-
-    set autoPong(aValue) {
-      _autoPong = aValue;
-    },
-
-    get autoPong() {
-      return _autoPong;
-    },
-
-    set ping(aFun) {
-      _ping = aFun;
-    },
-
-    get ping() {
-      return _ping;
-    },
-
     set socket(aSocket) {
       if (aSocket) {
         _connection = aSocket;
@@ -7455,7 +7414,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
     // To-do: To be faithful with Yowsup, this should spawn a thread per handler
     signalHandlers[aSignal].forEach(function (aHandler) {
       try {
-        setTimeout(function() {aHandler.apply(undefined, aParams);}, 0);
+        aHandler.apply(undefined, aParams);
       } catch (x) {
         logger.error('FireEvent exception!', x);
       }
@@ -7671,14 +7630,25 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
       self._writeNode(newProtocolTreeNode('receipt', attributes));
     },
 
+    sendNotificationAck: function(to, id, type) {
+      var attributes = {
+        'class': 'notification',
+        id: id,
+        'to' : to
+      };
+      type && (attributes.type = type);
+
+      self._writeNode(newProtocolTreeNode('ack', attributes));
+    },
+
     getReceiptAck: function(to, id, type, participant, from) {
       var attributes = {
         'class': 'receipt',
-        type: type,
-        id: id
+        id: id,
+        'to' : to
       };
-      to && (attributes.to = to);
       from && (attributes.from = from);
+      type && (attributes.type = type);
       participant && (attributes.participant = participant);
 
       return newProtocolTreeNode('ack', attributes);
@@ -7894,9 +7864,9 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
               self.socket.onconnectionclosed = self._onErrorSendDisconnected;
               self.socket.onconnectionlost = self._onErrorSendDisconnected;
               self.readerThread.socket = self.socket;
-              self.readerThread.autoPong = self.autoPong;
-              self.readerThread.onPing = self.sendPong;
               self.readerThread.signalInterface = {
+                onPing: (self.autoPong ? self.sendPong : null),
+                onUnknownNotification: self.sendNotificationAck,
                 send: fireEvent
               };
               self.jid = self.socket.jid;
@@ -7975,12 +7945,12 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
     message_ack: function(aJid, aMsgId, type) {
       self.sendReceipt(aJid, aMsgId, type);
     },
-    notification_ack: function(aJid, aNotificationId) {
-      self.sendReceipt(aJid, aNotificationId);
+    notification_ack: function(aJid, aNotificationId, type) {
+      self.sendNotificationAck(aJid, aNotificationId, type);
     },
     delivered_ack: function(aTo, aMsgId, type, participant, from) {
       self._writeNode(
-        self.getReceiptAck(aTo, aMsgId, 'delivery', participant, from)
+        self.getReceiptAck(aTo, aMsgId, type, participant, from)
       );
     },
     visible_ack: function(aJid, aMsgId) {
@@ -8023,8 +7993,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
 
     group_create: function(aSubject) {
       var idx = self.makeId('create_group_');
-      var groupNode = newProtocolTreeNode('group', {
-        action: 'create',
+      var groupNode = newProtocolTreeNode('create', {
         subject: utf8FromString(aSubject)
       });
       var iqNode = newProtocolTreeNode('iq', {
