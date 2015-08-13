@@ -67,6 +67,7 @@ App.connectors.XMPP = function (account) {
           break;
         case Strophe.Status.DISCONNECTED:
           Tools.log('Disconnected');
+          this.connected = false;
           if (callback.disconnected) {
             callback.disconnected();
           }
