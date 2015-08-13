@@ -3366,14 +3366,14 @@ CoSeMe.namespace('config', (function(){
     tokenData: {
       "v": "2.12.88",
       // XXX: it is tokenData[d] + - + tokenData[v] + - + port
-      "r": "S40-2.12.88-5222",
+      "r": "S40-2.12.88-443",
       "u": "WhatsApp/2.12.88 S40Version/14.26 Device/Nokia302",
       "d": "S40"
     },
 
     auth: {
       host: 'c2.whatsapp.net',
-      port: 5222,
+      port: 443,
 //      host: 'localhost',
 //      port: 8080,
       connectionOptions: {
