@@ -134,8 +134,10 @@ var Message = function (account, core, options) {
   this.postReceive = function(callback) {
     var message = this;
     var chat = this.chat;
+    var lock = navigator.requestWakeLock('cpu');
     chat.messageAppend.push({msg: message.core}, function (blockIndex) {
       if (callback) callback();
+      lock.unlock();
 
       if ($('section#chat')[0].dataset.jid == chat.core.jid) {
         var ul = $('section#chat ul#messages');

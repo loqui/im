@@ -11,6 +11,7 @@ var Chat = function (core, account) {
   this.core.lastAck = this.core.lastAck || undefined;
   this.account = account;
   this.notification = null;
+  this.wakeLock = null;
   this.lastRead = Tools.localize(Tools.stamp());
   this.unread = this.core.unread;
   this.unreadList= [];
@@ -138,6 +139,10 @@ var Chat = function (core, account) {
     var blockIndex = this.core.chunks[chunkListSize - 1];
     var storageIndex;
 
+    if (!chat.wakeLock) {
+      chat.wakeLock = navigator.requestWakeLock('cpu');
+    }
+
     if (chunkListSize > 0) {
       Store.recover(blockIndex, function (chunk) {
         if (!chunk || chunk.length >= App.defaults.Chat.chunkSize) {
@@ -221,6 +226,10 @@ var Chat = function (core, account) {
     $('#chat #messages span.lastRead').remove();
     this.core.settings.hidden[0]= false;
     this.save(true);
+    if (this.wakeLock) {
+      this.wakeLock.unlock();
+      this.wakeLock = null;
+    }
   }.bind(this);
   
   // Create a chat window for this contact
