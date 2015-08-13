@@ -175,6 +175,7 @@ var Chat = function (core, account) {
       Tools.log('PUSHING', blockIndex, chunk);
       chat.core.chunks.push(blockIndex);
       storageIndex = [blockIndex, 0];
+      chat.core.last = msg;
       if (delay) {
         chat.account.toSendQ(storageIndex);
       }
