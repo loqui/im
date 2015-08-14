@@ -249,7 +249,7 @@ App.connectors.coseme = function (account) {
   };
   
   this.muc.participantsGet = function (jid) {
-    var method = 'group_getParticipants';
+    var method = 'group_getInfo';
     MI.call(method, [jid]);
   }.bind(this);
   
@@ -371,6 +371,8 @@ App.connectors.coseme = function (account) {
       notification_groupPictureRemoved: this.events.onGroupPictureRemoved,
       notification_groupParticipantAdded: this.events.onGroupParticipantAdded,
       notification_groupParticipantRemoved: this.events.onGroupParticipantRemoved,
+      notification_groupCreated: this.events.onGroupCreated,
+      notification_groupSubjectUpdated: this.events.onGroupSubjectUpdated,
       notification_status: this.events.onNotification,
       contact_gotProfilePictureId: this.events.onAvatar,
       contact_gotProfilePicture: this.events.onAvatar,
@@ -553,23 +555,11 @@ App.connectors.coseme = function (account) {
 
   this.events.onGroupGotParticipating = function (groups, id) {
     for (let [i, group] in Iterator(groups)) {
-      let account = this.account;
-      let ci = account.chatFind(group.gid + '@g.us');
-      if (ci >= 0) {
-        let chat = account.chats[ci];
-        let newTitle = group.subject;
-
-        chat.core.title = newTitle;
-        chat.core.participants = group.participants;
-        chat.save(ci, true);
-
-      } else {
-        MI.call('group_getInfo', [group.gid + '@g.us']);
-      }
+      this.events.onGroupGotInfo.bind(this)(group.gid + '@g.us', group.owner, group.subject, group.subjectOwner, group.subjectT, group.creation, group.participants);
     }
   };
 
-  this.events.onGroupGotInfo = function (jid, owner, subject, subjectOwner, subjectTime, creation) {
+  this.events.onGroupGotInfo = function (jid, owner, subject, subjectOwner, subjectTime, creation, participants) {
     var info = {
       owner: owner,
       subjectOwner: subjectOwner,
@@ -582,11 +572,10 @@ App.connectors.coseme = function (account) {
     if (ci >= 0) {
       chat = account.chats[ci];
       var newTitle = decodeURIComponent(subject);
-      if (chat.core.title != newTitle) {
-        chat.core.title = newTitle;
-        chat.core.info = info;
-        chat.save(ci, true);
-      }
+      chat.core.title = newTitle;
+      chat.core.info = info;
+      chat.core.participants = participants;
+      chat.save(ci, true);
     } else {
       chat = new Chat({
         jid: jid,
@@ -594,6 +583,7 @@ App.connectors.coseme = function (account) {
         muc: true,
         creation: creation,
         owner: owner,
+        participants: participants,
         chunks: [],
         info: info
       }, account);
@@ -665,7 +655,6 @@ App.connectors.coseme = function (account) {
   this.events.onGroupCreateSuccess = function (gid, idx) {
     Lungo.Notification.show('download', _('Synchronizing'), 5);
     Lungo.Router.section('back');
-    MI.call('group_getGroups', ['participating']);
     var members = this.muc.membersCache[idx];
     MI.call('group_addParticipants', [gid, members]);
     delete this.muc.membersCache[idx];
@@ -726,15 +715,27 @@ App.connectors.coseme = function (account) {
   this.events.onGroupParticipantAdded = function (from, jid, _, stamp, msgId) {
     var method = 'notification_ack';
     MI.call(method, [from, msgId]);
-    this.account.connector.muc.participantsGet(from);
+    this.muc.participantsGet(from);
   };
 
   this.events.onGroupParticipantRemoved = function (from, jid, _, stamp, msgId) {
     var method = 'notification_ack';
     MI.call(method, [from, msgId]);
     if (jid != this.account.core.fullJid) {
-      this.account.connector.muc.participantsGet(from);
+      this.muc.participantsGet(from);
     }
+  };
+
+  this.events.onGroupCreated = function (from, stamp, msgId, subject, displayName, author) {
+    var method = 'notification_ack';
+    MI.call(method, [from, msgId]);
+    this.muc.participantsGet(from);
+  };
+
+  this.events.onGroupSubjectUpdated = function (from, stamp, msgId, subject, displayName, author) {
+    var method = 'notification_ack';
+    MI.call(method, [from, msgId]);
+    this.muc.participantsGet(from);
   };
 
   this.events.onGroupImageReceived = function (msgId, group, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt) {
