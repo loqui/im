@@ -6745,6 +6745,49 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
           _signalInterface
             .send(notification, [from, jid, null, timestamp, msgId, null]);
 
+        } else if (type === 'w:gp2') {
+          // map new notifications to existing interface for now...
+          var notification = 'notification_group';
+          var action = node.getChild(0).tag;
+
+          if (action === 'add') {
+            notification += 'ParticipantAdded';
+            var jid = node.getChild(0).getChild(0).getAttributeValue('jid');
+            _signalInterface
+              .send(notification, [from, jid, null, timestamp, msgId, null]);
+
+          } else if (action === 'create') {
+            notification += 'Created';
+            var displayName = node.getAttributeValue('notify');
+            var author = node.getAttributeValue('participant');
+            var bodyNode = node.getChild(0).getChild(0);
+            var subject = stringFromUtf8(bodyNode.getAttributeValue('subject'));
+
+            _signalInterface
+              .send(notification, [from, timestamp, msgId, subject, displayName,
+                                   author]);
+
+          } else if (action === 'remove') {
+            notification += 'ParticipantRemoved';
+            var jid = node.getChild(0).getChild(0).getAttributeValue('jid');
+            _signalInterface
+              .send(notification, [from, jid, null, timestamp, msgId, null]);
+
+          } else if (action === 'subject') {
+            notification += 'SubjectUpdated';
+            var displayName = node.getAttributeValue('notify');
+            var author = node.getAttributeValue('participant');
+            var bodyNode = node.getChild(0);
+            var subject = stringFromUtf8(bodyNode.getAttributeValue('subject'));
+
+            _signalInterface
+              .send(notification, [from, timestamp, msgId, subject, displayName,
+                                   author]);
+          } else {
+            // ignore, but at least acknowledge it
+            _signalInterface.onUnknownNotification(from, msgId, type);
+          }
+
         } else if (type === 'picture') {
           var prefix = from.indexOf('-') >= 0 ? 'group' : 'contactProfile';
           var notification = 'notification_' + prefix + 'Picture';
@@ -7068,8 +7111,11 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
       var subjectT = groupNode.getAttributeValue("s_t");
       var subjectOwner = groupNode.getAttributeValue("s_o");
       var creation = groupNode.getAttributeValue("creation");
+      var participants = groupNode.children.map(function(child){
+        return child.getAttributeValue('jid');
+      });
 
-      _signalInterface.send("group_gotInfo",[jid, owner, subject, subjectOwner, subjectT, creation]);
+      _signalInterface.send("group_gotInfo",[jid, owner, subject, subjectOwner, subjectT, creation, participants]);
     }
   }
 
@@ -7077,9 +7123,13 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
     var groups = [];
     var id = node.getAttributeValue('id');
     node.children[0].children.forEach(function (groupNode) {
-      groups.push({
+	groups.push({
         gid: groupNode.getAttributeValue('id'),
+        owner: groupNode.getAttributeValue('owner'),
         subject: stringFromUtf8(groupNode.getAttributeValue('subject')),
+        subjectT: groupNode.getAttributeValue('s_t'),
+        subjectOwner: groupNode.getAttributeValue('s_o'),
+        creation: groupNode.getAttributeValue('creation'),
         participants : groupNode.children.map(function(child){
           return child.getAttributeValue('jid');
         })
@@ -7131,13 +7181,8 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
 
     for (var i = 0, l = addNodes.length; i < l; i++) {
       child = addNodes[i];
-      type = child.getAttributeValue('type');
-      if (type === 'success') {
-        jabberIds.push(child.getAttributeValue('participant'));
-      }
-      else {
-        logger.log('Failed to add',
-                   childCount.getAttributeValue('participant'));
+      if (child.tagName === 'participant') {
+        jabberIds.push(child.getAttributeValue('jid'));
       }
     }
 
@@ -7152,13 +7197,8 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
 
     for (var i = 0, l = removeNodes.length; i < l; i++) {
       child = removeNodes[i];
-      type = child.getAttributeValue('type');
-      if (type === 'success') {
-        jabberIds.push(child.getAttributeValue('participant'));
-      }
-      else {
-        logger.log('Failed to remove',
-                    childCount.getAttributeValue('participant'));
+      if (child.tagName === 'participant') {
+        jabberIds.push(child.getAttributeValue('jid'));
       }
     }
 
