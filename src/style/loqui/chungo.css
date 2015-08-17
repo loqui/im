@@ -125,8 +125,7 @@ header button {
 }
 
 section > article {
-  display: flex;
-  flex-direction: column;
+  display: none;
   position: absolute;
   top: 5.6rem;
   bottom: 0;
@@ -137,8 +136,8 @@ section > article {
 section > .headless {
   top: 0;
 }
-section.show > article:not(.show), section:not(.show) > article:not(.show) {
-  display: none;
+section.show > article.show {
+  display: block;
 }
 
 section:after {
@@ -206,6 +205,10 @@ nav[data-control=menu] {
 
 .hidden {
   display: none;
+}
+
+show {
+  display: block!important;
 }
 
 .scroll {
