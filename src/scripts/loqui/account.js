@@ -395,8 +395,8 @@ var Account = function (core) {
   }.bind(this);
   
   // Render presence for every contact
-  this.presenceRender = function (jid) {
-    var contactPresenceRender = function (jid) {
+  this.presenceRender = function (jid, last) {
+    var contactPresenceRender = function (jid, last) {
       var contact = Lungo.Core.findByProperty(this.core.roster, 'jid', jid);
       if (contact) {
         if (this.supports('show')) {
@@ -408,12 +408,23 @@ var Account = function (core) {
         var section = $('section#chat');
         if (section[0].dataset.jid == contact.jid) {
           section[0].dataset.show = (this.supports('show') && contact.presence.show) || 'na';
-          section.find('header .status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));
+
+          var show =_('show' + (contact.presence.show || 'na'));
+          var time = (contact.presence.show != 'a') && last && Tools.convenientDate(Tools.localize(Tools.stamp(last)));
+          var prefix = time
+            ? _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})})
+            : show;
+
+          var status = ((contact.presence.status || time) ? (prefix + ' - ') : '') +
+            (contact.presence.status
+              ? App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status)
+             : show);
+          section.find('header .status').html(status);
         }
       }
     }.bind(this);
     if (jid) {
-      contactPresenceRender(jid);
+      contactPresenceRender(jid, last);
     } else {
       var ul = $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"]');
       if (ul.length > 0) {
@@ -422,7 +433,7 @@ var Account = function (core) {
           var val = this[key];
 
           if(!val.muc){
-            contactPresenceRender(val.jid);
+            contactPresenceRender(val.jid, undefined);
           }
         }.bind(this.core.chats));
       }
