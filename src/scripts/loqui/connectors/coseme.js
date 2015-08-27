@@ -794,30 +794,12 @@ App.connectors.coseme = function (account) {
     var account = this.account;
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
     if (contact) {
-      var time = Tools.convenientDate(Tools.localize(Tools.stamp( Math.floor((new Date()).valueOf()/1000) - parseInt(lastSeen) )));
       if (!('presence' in contact)) {
         contact.presence = {};
       }
-      if (msg) {
-        if (msg != contact.presence.status) {
-          contact.presence.status = msg;
-          if (msg == 'Hey there! I am using WhatsApp.') {
-            contact.presence.show = 'na';
-          } else {
-            contact.presence.show = contact.presence.show != 'na' ? contact.presence.show : 'away';
-          }
-          account.presenceRender(jid);
-        }
-      } else {
-        Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', parseInt(lastSeen) < 300 ? 'a' : 'away');
-        var present= (parseInt(lastSeen) < 1);
-        contact.presence.show = present ? 'a' : 'away';
+      if (msg && msg != contact.presence.status) {
+        contact.presence.status = msg;
         account.presenceRender(jid);
-        var chatSection = $('section#chat[data-jid="' + jid + '"]');
-        if (chatSection.length) {
-          var status = chatSection.find('header .status');
-          status.html((present ? (_('showa') + (contact.presence.status ? (' - ' + status.html()) : '')) : (_('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})}) + ' - ' + status.html()) ));
-        }
       }
     }
   }.bind(this);
@@ -828,12 +810,6 @@ App.connectors.coseme = function (account) {
       Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', 'a');
       contact.presence.show = 'a';
       account.presenceRender(jid);
-
-      var chatSection = $('section#chat[data-jid="' + jid + '"]');
-      if (chatSection.length) {
-        var status = chatSection.find('header .status');
-        status.html(_('showa') + (contact.presence.status ? (' - ' + status.html()) : ''));
-      }
     }
   };
   
@@ -842,14 +818,7 @@ App.connectors.coseme = function (account) {
     if (contact) {
       Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', 'away');
       contact.presence.show = 'away';
-      account.presenceRender(jid);
-
-      var chatSection = $('section#chat[data-jid="' + jid + '"]');
-      if (chatSection.length) {
-        var status = chatSection.find('header .status');
-        var time = Tools.convenientDate(Tools.localize(Tools.stamp(last || Math.floor(Date.now()/1000))));
-        status.html(_('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})}) +  ' - ' + status.html());
-      }
+      account.presenceRender(jid, last);
     }
   };
   
