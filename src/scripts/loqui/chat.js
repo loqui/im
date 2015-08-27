@@ -287,8 +287,8 @@ var Chat = function (core, account) {
         } else {
           var show = contact ? (contact.presence.show || 'na') : 'na';
           var status = contact ? (contact.presence.status || _('show' + show)) : ' ';
-          if (this.account.connector.presence.get) {
-            this.account.connector.presence.get(this.core.jid);
+          if (this.account.connector.presence.subscribe) {
+            this.account.connector.presence.subscribe(this.core.jid);
           }
           header.children('.status').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(status));
           if (this.account.supports('show')) {

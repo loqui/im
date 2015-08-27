@@ -119,6 +119,7 @@ var Account = function (core) {
     }
     if (this.connector.isConnected()) {
       this.connector.start();
+      this.connector.presence.set(document.hidden ? 'away' : 'a');
       this.sendQFlush();
     } else {
       if (navigator.onLine){
@@ -133,6 +134,7 @@ var Account = function (core) {
             var cb = function (rcb) {
               App.audio('login');
               this.connector.start();
+              this.connector.presence.set(document.hidden ? 'away' : 'a');
               this.sendQFlush();
               if (rcb) {
                 rcb();
@@ -301,7 +303,6 @@ var Account = function (core) {
   // List all contacts for this account
   this.contactsRender = function (f, click, selected) {
     var account = this;
-    console.log(account);
     var article = $('<article/>').attr('id', 'contacts');
     var header = $('<header/>').addClass('beige')
       .append($('<button/>').addClass('new').text(_('ContactAdd')).on('click', function (event) {
