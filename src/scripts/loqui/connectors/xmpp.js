@@ -90,7 +90,6 @@ App.connectors.XMPP = function (account) {
   this.start = function () {
     this.handlers.init();
     this.capabilize();
-    this.presence.set();
     this.muc.init();
   };
   

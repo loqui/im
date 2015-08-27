@@ -85,7 +85,6 @@ App.connectors.coseme = function (account) {
   this.start = function () {
     Tools.log('CONNECTOR START');
     this.handlers.init();
-    this.presence.set();
   };
   
   this.sync = function (callback) {
@@ -170,17 +169,20 @@ App.connectors.coseme = function (account) {
   
   this.contacts.remove = function () {
   };
-    
-  this.presence.get = function (jid) {
-    var method = 'presence_request';
-    MI.call(method, [jid]);
-  };
-  
+
+  this.presence.subscribe = function (jid) {
+    MI.call('presence_subscribe', [jid]);
+  }.bind(this);
+
+  this.presence.unsubscribe = function (jid) {
+    MI.call('presence_unsubscribe', [jid]);
+  }.bind(this);
+
   this.presence.set = function (show, status, name) {
+    this.presence.send(show, status, name);
     this.presence.show = show || this.presence.show;
     this.presence.status = status || this.presence.status;
     this.presence.name = name || this.presence.name;
-    this.presence.send();
     this.account.core.presence = {
       name: this.presence.name,
       show: this.presence.show,
@@ -189,11 +191,10 @@ App.connectors.coseme = function (account) {
     this.account.save();
   }.bind(this);
   
-  this.presence.send = function (show, status, priority) {
-    show = show || this.presence.show;
-    status = status || this.presence.status;
-    priority = priority || '127';
+  this.presence.send = function (show, status, name) {
     if (App.online) {
+      show = show || this.presence.show;
+      name = name || this.presence.name;
       var method = {
         a: 'presence_sendAvailable',
         away: 'presence_sendUnavailable',
@@ -201,8 +202,12 @@ App.connectors.coseme = function (account) {
         dnd: 'presence_sendUnavailable',
         chat: 'presence_sendAvailableForChat'
       };
-      MI.call(method[show], [this.presence.name]);
-      MI.call('profile_setStatus', [status]);
+      MI.call(method[show], [name]);
+
+      var newStatus = status || this.presence.status;
+      if (newStatus != this.presence.status) {
+        MI.call('profile_setStatus', [newStatus]);
+      }
     }
   }.bind(this);
   
@@ -769,6 +774,7 @@ App.connectors.coseme = function (account) {
         jid: contact.jid,
         name: this.contacts._pre[contact.phone],
         presence: {
+          last: null,
           show: 'na',
           status: null
         }
@@ -831,7 +837,7 @@ App.connectors.coseme = function (account) {
     }
   };
   
-  this.events.onPresenceUnavailable = function (jid) {
+  this.events.onPresenceUnavailable = function (jid, last) {
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
     if (contact) {
       Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', 'away');
@@ -841,7 +847,7 @@ App.connectors.coseme = function (account) {
       var chatSection = $('section#chat[data-jid="' + jid + '"]');
       if (chatSection.length) {
         var status = chatSection.find('header .status');
-        var time = Tools.convenientDate(Tools.localize(Tools.stamp( Math.floor(Date.now()/1000))));
+        var time = Tools.convenientDate(Tools.localize(Tools.stamp(last || Math.floor(Date.now()/1000))));
         status.html(_('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})}) +  ' - ' + status.html());
       }
     }

@@ -6656,7 +6656,8 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
         if (!xmlns || ((xmlns == 'urn:xmpp') && jid )) {
           var presenceType = node.getAttributeValue('type');
           if (presenceType == 'unavailable') {
-            _signalInterface.send('presence_unavailable', [jid]);
+            var last = node.getAttributeValue('last');
+            _signalInterface.send('presence_unavailable', [jid, last && parseInt(last, 10)]);
           } else if (!presenceType || (presenceType == 'available')) {
             _signalInterface.send('presence_available', [jid]);
           }
