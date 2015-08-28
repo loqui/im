@@ -429,8 +429,9 @@ var App = {
 
             jobs.push(new Promise(function(done){
 
-              Store.recover(index, function(chunk){
+              Store.recover(index, function(key, chunk, free){
                 chatChunks[index.toString()]= chunk;
+                free();
                 done();
               });
 
@@ -443,17 +444,19 @@ var App = {
         avatars[account.fullJid]= App.avatars[account.fullJid];
 
         jobs.push(new Promise(function(done){
-          Store.recover(avatars[account.fullJid].chunk, function(chunk){
+          Store.recover(avatars[account.fullJid].chunk, function(key, chunk, free){
             avatarChunks[avatars[account.fullJid].chunk.toString()]= chunk;
             done();
+            free();
           });
         }));
 
         if(avatars[account.fullJid].original){
           jobs.push(new Promise(function(done){
-            Store.recover(avatars[account.fullJid].original, function(chunk){
+            Store.recover(avatars[account.fullJid].original, function(key, chunk, free){
               avatarChunks[avatars[account.fullJid].original.toString()]= chunk;
               done();
+              free();
             });
           }));
         }
@@ -586,10 +589,14 @@ var App = {
                 });
 
                 Promise.all(jobs).then(function(){
+                  var key = Store.lock(0);
+
                   App.accountsCores= backup.accounts;
                   App.avatars= backup.avatars;
 
-                  Store.update(0, Store.size, function(){
+                  Store.update(key, 0, Store.size, function(){
+                    Store.unlock(0);
+
                     window.location.reload();
                   });
                 });

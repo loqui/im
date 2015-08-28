@@ -39,12 +39,12 @@ var Chat = function (core, account) {
       var chunk = this.core.chunks[this.core.chunks.length-1];
       var chat = this;
 
-      Store.recover(chunk, function(chunk){
+      Store.recover(chunk, function(key, chunk, free){
         var lastMsg = chunk[chunk.length - 1];
 
         chat.core.last = lastMsg;
 
-        chat.save();
+        free();
       });
     }
   }
@@ -66,7 +66,7 @@ var Chat = function (core, account) {
     if (index >= 0 && ul.children('li[data-index="' + index + '"]').length < 1) {
       var stIndex = this.core.chunks[index];
       var height = ul[0].scrollHeight - ul[0].scrollTop;
-      Store.recover(stIndex, function (chunk) {
+      Store.recover(stIndex, function (key, chunk, free) {
         if (chunk) {
           var li = $('<li/>');
           var frag = document.createDocumentFragment();
@@ -126,6 +126,8 @@ var Chat = function (core, account) {
           chat.chunkRender(index - 1);
         }
         chat.account.avatarsRender();
+
+        free();
       });
     }
   };
@@ -144,7 +146,7 @@ var Chat = function (core, account) {
     }
 
     if (chunkListSize > 0) {
-      Store.recover(blockIndex, function (chunk) {
+      Store.recover(blockIndex, function (key, chunk, free) {
         if (!chunk || chunk.length >= App.defaults.Chat.chunkSize) {
           Tools.log('FULL OR NULL');
           chunk = [msg];
@@ -152,6 +154,8 @@ var Chat = function (core, account) {
           Tools.log('PUSHING', blockIndex, chunk);
           chat.core.chunks.push(blockIndex);
           storageIndex = [blockIndex, 0];
+
+          free();
           callback(blockIndex);
 
         } else {
@@ -163,7 +167,10 @@ var Chat = function (core, account) {
 
           blockIndex = chat.core.chunks[chunkListSize - 1];
           Tools.log('PUSHING', blockIndex, chunk);
-          Store.update(blockIndex, chunk, callback);
+          Store.update(key, blockIndex, chunk, function(index){
+            free();
+            callback(index);
+          });
           storageIndex = [blockIndex, chunk.length-1];
         }
 
@@ -322,11 +329,14 @@ var Chat = function (core, account) {
 
   this.findMessage= function(msgId, chunkIndex, exists){
     var chat= this.core;
+
     return new Promise(function(success, faild){
       var found= false;
+
       var checkChunk= function(chunk, chunkIndex){
         var result= null;
-        if(chunk){
+
+        if (chunk) {
           chunk.forEach(function(item, i){
             if(item.id == msgId){
               found= true;
@@ -338,34 +348,45 @@ var Chat = function (core, account) {
               };
             }
           });
+
           return result;
-        }else{
+        } else {
           return null;
         }
       };
-      if(chunkIndex || chunkIndex === 0){
-        Store.recover(chunkIndex, function(chunk){
+
+      if (chunkIndex || chunkIndex === 0) {
+        Store.recover(chunkIndex, function(key, chunk, free){
           var result= checkChunk(chunk, chunkIndex);
           if(found){
-            success(result);
+            success({key : key, result : result, free : result});
           }else{
+            free();
             faild();
           }
         });
-      }else{
+
+      } else {
         var currentChunk, lastChunk;
+
         currentChunk = lastChunk = chat.chunks.length - 1;
-        var afterRecover= function(chunk){
+
+        var afterRecover= function(key, chunk, free){
           var result= checkChunk(chunk, currentChunk);
-          if(found){
-            success(result);
-          }else if((exists || (lastChunk - currentChunk < 2)) && currentChunk > 0){
+
+          if (found) {
+            success({key : key, result : result, free : result});
+
+          } else if((exists || (lastChunk - currentChunk < 2)) && currentChunk > 0) {
             currentChunk--;
+            free();
             Store.recover(chat.chunks[currentChunk], afterRecover);
-          }else{
+
+          } else {
             faild();
           }
         };
+
         Store.recover(chat.chunks[currentChunk], afterRecover);
       }
     });

@@ -7,10 +7,16 @@ var Store = {
   size: 0,
   
   cache: [],
+
+  locks : {},
+
+  waiting : [],
   
   init: function (){
-    Store.recover(0, function (size) {
+    Store.recover(0, function (key, size, free) {
       Store.size = size || 0;
+
+      free();
     });
   },
   
@@ -18,9 +24,9 @@ var Store = {
     this.value = value;
     this.save = function (callback) {
       var index = this.index;
-      asyncStorage.setItem('b'+this.index, this.value, function () {
+      asyncStorage.setItem('b'+this.index, this.value, function(){
         if (callback) {
-        	callback(index);
+          callback(index);
         }
       });
     };
@@ -28,6 +34,7 @@ var Store = {
   
   save: function (value, callback) {
     var block = new Store.block(JSON.stringify(value));
+    var key = Store.lock(0);
     block.index = ++Store.size;
     Store.cache[block.index] = block.value;
     block.save(function (index) {
@@ -36,37 +43,110 @@ var Store = {
       	callback(index);
       }
     });
-    Store.update(0, Store.size);
+
+    Store.update(key, 0, Store.size);
+
+    Store.unlock(0, key);
     return block.index;
   },
   
   recover: function (index, callback) {
-    if (Store.cache[index]) {
-      callback(JSON.parse(Store.cache[index]));
-    } else {
-      asyncStorage.getItem('b'+index, function (value){ 
-        callback(JSON.parse(value));
+    var stack = stack || Tools.currentStack();
+
+    var promise = new Promise(function(ready){
+
+      if (!this.locks[index]) {
+
+        if (Store.cache[index]) {
+          var key = this.lock(index);
+
+          ready([key, JSON.parse(Store.cache[index])]);
+
+        } else {
+            asyncStorage.getItem('b'+index, function (value){
+              var key = this.lock(index, stack);
+
+              ready([key, JSON.parse(value)]);
+            }.bind(this));
+        }
+
+      } else {
+        this.onUnlock(index, function(){
+          Store.recover(index, callback);
+        });
+      }
+
+    }.bind(this)).then(function(values){
+      new Promise(function(release){
+        values.push(release);
+
+        callback.apply(null, values);
+      }).then(function(){
+        Store.unlock(index, values[0]);
       });
-    }
+    });
+
   },
   
-  update: function (index, value, callback) {
-    var block = new Store.block(JSON.stringify(value));
-    block.index = index;
-    Store.cache[block.index] = block.value;
-    block.save(function (index) {
-      delete Store.cache[index];
-      if (callback) {
-      	callback(index);
-      }
-    });
-    return block.index;
+  update: function (key, index, value, callback) {
+    if(this.locks[index] == key){
+      var block = new Store.block(JSON.stringify(value));
+      block.index = index;
+      Store.cache[block.index] = block.value;
+      block.save(function (index) {
+        delete Store.cache[index];
+        if (callback) {
+          callback(index);
+        }
+      });
+      return block.index;
+    } else {
+      console.error('unable to write block '+ index +'! Free the current lock!');
+    }
   },
   
   drop: function (key, callback) {
     asyncStorage.removeItem(key, callback);
   },
   
+  lock : function(index, stack) {
+    var key = {
+      hash : (Date.now() * Math.random() * Date.now()).toString(16),
+      createdAt : stack || Tools.currentStack(1)
+    };
+
+    if (!this.locks[index]) {
+      this.locks[index] = key;
+      return key;
+
+    } else {
+      console.error('Block ' + index + ' is already locked!');
+    }
+  },
+
+  unlock : function(index, key) {
+    if (this.locks[index] == key) {
+      delete this.locks[index];
+
+      var next = this.waiting.find(function(item){
+        return (item.index == index);
+      });
+
+      if (next) {
+        var i = this.waiting.indexOf(next);
+
+        this.waiting.splice(i, 1);
+        next.callback();
+      }
+    } else {
+      console.error('invalide key for current lock!', index);
+    }
+  },
+
+  onUnlock : function(index, callback) {
+    this.waiting.push({ index : index, callback : callback });
+  },
+
   blockDrop: function (index, callback) {
     this.drop('b' + index, callback);
   },

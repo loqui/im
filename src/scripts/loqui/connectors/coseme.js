@@ -495,14 +495,23 @@ App.connectors.coseme = function (account) {
             App.avatars= avatars;
           };
           if (jid in App.avatars) {
+            var key = Store.lock(App.avatars[jid].chunk);
+
             Promise.all([
-                new Promise(function(done){ Store.update(App.avatars[jid].chunk, tumb, done); }),
+                new Promise(function(done){ Store.update(key, App.avatars[jid].chunk, tumb, done); Store.unlock(App.avatars[jid].chunk, key); }),
                 new Promise(function(done){
                     if(App.avatars[jid].original){
-                        Store.update(App.avatars[jid].original, original, done);
+                      var key_o = Store.lock(App.avatars[jid].original);
+
+                      Store.update(key_o, App.avatars[jid].original, original, function(){
+                        Store.unlock(App.avatars[jid].original, key_o);
+                        done();
+                      });
+
                     }else{
                         Store.save(original, done);
                     }
+
                 })
             ]).then(cb);
           } else {
@@ -580,7 +589,7 @@ App.connectors.coseme = function (account) {
       chat.core.title = newTitle;
       chat.core.info = info;
       chat.core.participants = participants;
-      chat.save(ci, true);
+      chat.save();
     } else {
       chat = new Chat({
         jid: jid,
@@ -594,7 +603,7 @@ App.connectors.coseme = function (account) {
       }, account);
       account.chats.push(chat);
       account.core.chats.push(chat.core);
-      chat.save(ci);
+      chat.save(true);
     }
   };
   
@@ -602,23 +611,25 @@ App.connectors.coseme = function (account) {
     var account = this.account;
     var avatars= App.avatars;
 
-    Promise.all([
-      new Promise(function(done){ Tools.picThumb(blob, 96, 96, done); }),
-      new Promise(function(done){ Tools.blobToBase64(blob, done); })
-    ]).then(function (values) {
-      var thumb= values[0];
-      var original= values[1];
-
-      $('ul[data-jid="' + account.core.fullJid + '"] li[data-jid="' + jid + '"] span.avatar img').attr('src', thumb);
-      $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', thumb);
+    if (blob) {
       Promise.all([
-        new Promise(function(done){ Store.save(thumb, done); }),
-        new Promise(function(done){ Store.save(original, done); })
-      ]).then(function(values) {
-        avatars[jid] = (new Avatar({id: picId, chunk: values[0], original : values[1]})).data;
-        App.avatars= avatars;
+        new Promise(function(done){ Tools.picThumb(blob, 96, 96, done); }),
+        new Promise(function(done){ Tools.blobToBase64(blob, done); })
+      ]).then(function (values) {
+        var thumb= values[0];
+        var original= values[1];
+
+        $('ul[data-jid="' + account.core.fullJid + '"] li[data-jid="' + jid + '"] span.avatar img').attr('src', thumb);
+        $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', thumb);
+        Promise.all([
+          new Promise(function(done){ Store.save(thumb, done); }),
+          new Promise(function(done){ Store.save(original, done); })
+        ]).then(function(values) {
+          avatars[jid] = (new Avatar({id: picId, chunk: values[0], original : values[1]})).data;
+          App.avatars= avatars;
+        });
       });
-    });
+    }
   };
   
   this.events.onGroupGotParticipants = function (jid, participants) {
@@ -700,6 +711,7 @@ App.connectors.coseme = function (account) {
   this.events.onContactProfilePictureUpdated = function (from, stamp, msgId, pictureId, jid) {
     var method = 'notification_ack';
     MI.call(method, [from, msgId]);
+    this.events.onAvatar(from, pictureId);
   };
 
   this.events.onContactProfilePictureRemoved = function (from, stamp, msgId, pictureId, jid) {
@@ -715,6 +727,7 @@ App.connectors.coseme = function (account) {
   this.events.onGroupPictureRemoved = function (from, stamp, msgId, pictureId, jid) {
     var method = 'notification_ack';
     MI.call(method, [from, msgId]);
+    this.events.onAvatar(from, pictureId);
   };
 
   this.events.onGroupParticipantAdded = function (from, jid, _, stamp, msgId) {

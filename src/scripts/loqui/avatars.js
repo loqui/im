@@ -8,7 +8,11 @@ var Avatar = function (data) {
     return this.urlWritePromise || new Promise(
       function (res, rej) {
         if (this.chunk) {
-          Store.recover(this.chunk, res);
+          Store.recover(this.chunk, function(key, value, free){
+            res(value);
+
+            free();
+          });
         } else {
           res('/img/foovatar.png');
         }
