@@ -359,7 +359,7 @@ var Chat = function (core, account) {
         Store.recover(chunkIndex, function(key, chunk, free){
           var result= checkChunk(chunk, chunkIndex);
           if(found){
-            success({key : key, result : result, free : result});
+            success({key : key, result : result, free : free});
           }else{
             free();
             faild();
@@ -375,7 +375,7 @@ var Chat = function (core, account) {
           var result= checkChunk(chunk, currentChunk);
 
           if (found) {
-            success({key : key, result : result, free : result});
+            success({key : key, result : result, free : free});
 
           } else if((exists || (lastChunk - currentChunk < 2)) && currentChunk > 0) {
             currentChunk--;
