@@ -328,6 +328,22 @@ var Tools = {
     strip(element);
 
     return result;
+  },
+
+  currentStack : function(offset) {
+    offset = offset || 0;
+
+    try { throw Error(''); } catch (e) {
+      var stack = e.stack.split('\n');
+
+      stack.shift();
+
+      for (var i= 0; i < offset; i++) {
+        stack.shift();
+      }
+
+      return stack;
+    }
   }
 
 };

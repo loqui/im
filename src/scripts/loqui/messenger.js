@@ -215,8 +215,10 @@ var Messenger = {
       });
     }
     if (App.avatars[jid]) {
-      Store.recover(App.avatars[jid].chunk, function (val) {
+      Store.recover(App.avatars[jid].chunk, function (key, val, free) {
         section.find('#card .avatar').children('img').attr('src', val);
+
+        free();
       });
     } else {
       section.find('#card .avatar').children('img').attr('src', 'img/goovatar.png');

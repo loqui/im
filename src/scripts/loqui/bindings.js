@@ -169,7 +169,7 @@ var listener= function(muc){
   var avatar= App.avatars[jid];
 
   if(avatar){
-    Store.recover((avatar.original || avatar.chunk), function(url){
+    Store.recover((avatar.original || avatar.chunk), function(key, url, free){
       var blob = Tools.b64ToBlob(url.split(',').pop(), url.split(/[:;]/)[1]);
       new MozActivity({
         name: "open",
@@ -178,6 +178,8 @@ var listener= function(muc){
           blob: blob
         }
       });
+
+      free();
     });
   }
 };
@@ -200,14 +202,20 @@ $('section#me #card button.background.change').on('click', function (e) {
       var sh = window.innerHeight;
       Tools.picThumb(blob, null, sh, function (url) {
         if (account.core.background) {
-          Store.update(account.core.background, url);
-        } else{
+          var key = Store.lock(account.core.background);
+
+          Store.update(key, account.core.background, url);
+
+          Store.unlock(account.core.background, key);
+        } else {
           account.core.background = Store.save(url);
         }
-        Store.recover(account.core.background, function (url) {
+        Store.recover(account.core.background, function (key, url, free) {
           $('section#chat ul#messages').css('background-image', 'url('+url+')');
           $('section.profile div#card').css('background-image', 'url('+url+')');
           Lungo.Notification.show('star', _('backChanged'), 3);
+
+          free();
         }.bind(this)); 
       });
     };

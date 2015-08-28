@@ -201,9 +201,11 @@ var Account = function (core) {
     meSection.find('#card .user').text(this.core.user);
     meSection.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + this.core.provider + '.svg'));
     if(this.core.background){
-      Store.recover(this.core.background, function (url) {
+      Store.recover(this.core.background, function (key, url, free) {
         $('section#chat ul#messages').css('background-image', 'url('+url+')');
         $('section.profile div#card').css('background-image', 'url('+url+')');
+
+        free();
       });
     }else{
         $('section#chat ul#messages').css('background-image', '');
@@ -268,6 +270,7 @@ var Account = function (core) {
         li.append($('<span/>').addClass('name').html(title));
         li.append($('<span/>').addClass('lastMessage').html(lastMsg));
         li.append($('<span/>').addClass('lastStamp').append($('<date/>').attr('datetime', chat.last.stamp).html(lastStamp)));
+        li.append($('<span/>').addClass('lastAck'));
         li.append($('<span/>').addClass('show').addClass('backchange'));
         li[0].dataset.unread = chat.unread;
         li[0].dataset.hidden= chat.settings.hidden[0] ? 1 : 0;
@@ -601,7 +604,7 @@ var Account = function (core) {
       var sendQ = this.core.sendQ;
       var block = sendQ[0][0];
       Tools.log('[sendQ] Flushing', sendQ, sendQ[0]);
-      Store.recover(block, function (data) {
+      Store.recover(block, function (key, data, free) {
         var content = data[sendQ[0][1]];
         var msg = new Message(account, {
           from: content.from,
@@ -612,6 +615,9 @@ var Account = function (core) {
         }, {
           render: false
         });
+
+        free();
+
         msg.send(true, true);
         sendQ.splice(0, 1);
         account.sendQFlush();
@@ -654,21 +660,30 @@ var Account = function (core) {
     var msgId= task.msgId;
     var chat = this.chatGet(from);
     var account = this;
-    chat.findMessage(msgId, null, true).then(function(result){
-      var msg= result.message;
+
+    chat.findMessage(msgId, null, true).then(function(values){
+      var msg = values.result.message;
+      var free = values.free;
+      var key = values.key;
+
       if (msg.ack == 'sent') {
-        console.log('MARKING AS DELIVERED', from, msgId, chat, account, result);
+        console.log('MARKING AS DELIVERED', from, msgId, chat, account, values);
         msg.ack = 'delivered';
       } else if (msg.ack == 'delivered') {
-        console.log('MARKING AS VIEWED', from, msgId, chat, account, result);
+        console.log('MARKING AS VIEWED', from, msgId, chat, account, values);
         msg.ack = 'viewed';
-      } else if (msg.ack != 'viewed') {
-        console.log('MARKING AS SENT', from, msgId, chat, account, result);
+      } else if (msg.ack != 'viewd') {
+        console.log('MARKING AS SENT', from, msgId, chat, account, values);
         msg.ack = 'sent';
       }
+      Store.update(key, values.result.chunkIndex, values.result.chunk, function(){
+        free();
+        callback();
+      });
+
       msg = new Message(account, msg);
-      Store.update(result.chunkIndex, result.chunk, callback);
-      msg.reRender(result.chunkIndex);
+      msg.reRender(values.result.chunkIndex);
+
     }, function(e){
         Tools.log('UNABLE TO FIND MESSAGE! CARRY ON', from, msgId, e);
         callback();

@@ -53,15 +53,22 @@ var Message = function (account, core, options) {
     chat= chat || this.chat;
     if('id' in this.core && type == 'in' && this.account.supports('readReceipts') && App.settings.readReceipts){
       chat.processQueue.push(function(){
-        return chat.findMessage(this.core.id, null, true).then(function(result){
-          if(!result.message.viewed){
-            result.message.viewed= true;
-            Store.update(result.chunkIndex, result.chunk, null);
+        return chat.findMessage(this.core.id, null, true).then(function(values){
+          var message = values.result.message;
+          var free = values.free;
+          var key = values.key;
+
+          if(!message.viewed){
+            message.viewed= true;
+            Store.update(key, values[1].chunkIndex, values.result.chunk, free);
             if(!chat.core.muc){
-              account.connector.ack(result.message.id, result.message.from, 'read');
+              account.connector.ack(message.id, message.from, 'read');
             }
-            Tools.log("VIEWED", result.message.text, result.message.id, result.message.from, result);
+            Tools.log("VIEWED", message.text, message.id, message.from, values.result);
+          } else {
+            free();
           }
+
         });
       }.bind(this));
     }
@@ -90,7 +97,7 @@ var Message = function (account, core, options) {
 		    var block = this.core.original[0];
 		    var index = this.core.original[1];
 		    var receipts = this.account.supports('receipts');
-		    Store.recover(block, function(chunk){
+		    Store.recover(block, function(key, chunk, free){
 			    var message = chunk[index];
 			    if (!triedToSend) {
 				    message.ack = 'failed';
@@ -102,7 +109,7 @@ var Message = function (account, core, options) {
 			    } else {
 				    message.ack = '';
 			    }
-			    Store.update(block, chunk, null);
+			    Store.update(key, block, chunk, free);
 			    (new Message(msg.account, message)).reRender(block);
 		    });
 	    }
@@ -187,7 +194,7 @@ var Message = function (account, core, options) {
 	  var account= this.account;
       var msg= null;
 	  setTimeout(function(){
-		  Store.recover(block, function(chunk){
+		  Store.recover(block, function(key, chunk, free){
 			if(index !== null){
 				msg= chunk[index];
 			}else{
@@ -201,10 +208,14 @@ var Message = function (account, core, options) {
 				if(msg.ack == 'sending'){
 					msg.ack = 'failed';
 					msg= new Message(account, msg);
-					Store.update(block, chunk, null);
+					Store.update(key, block, chunk, free);
 					msg.reRender(block);
-				}
-			}
+				} else {
+                  free();
+                }
+			} else {
+              free();
+            }
 		  });
 	  }, 30000);
   };
@@ -293,6 +304,7 @@ var Message = function (account, core, options) {
             return alert('vCard');
           };
           break;
+
         default:
           html.addClass(this.core.media.type);
           var open = function (blob) {
@@ -321,10 +333,10 @@ var Message = function (account, core, options) {
                 Store.SD.save(localUrl, blob, function () {
                   open(blob);
                   var index = [$(img).closest('li[data-chunk]')[0].dataset.chunk, $(img).closest('div[data-index]')[0].dataset.index];
-                  Store.recover(index[0], function (chunk) {
+                  Store.recover(index[0], function (key, chunk, free) {
                     Tools.log(chunk, index);
                     chunk[index[1]].media.downloaded = true;
-                    Store.update(index[0], chunk, function () {
+                    Store.update(key, index[0], chunk, function () {
                       img.dataset.downloaded = true;
                       Tools.log('SUCCESS');
                     });
