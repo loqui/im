@@ -672,7 +672,7 @@ var Account = function (core) {
       } else if (msg.ack == 'delivered') {
         console.log('MARKING AS VIEWED', from, msgId, chat, account, values);
         msg.ack = 'viewed';
-      } else if (msg.ack != 'viewd') {
+      } else if (msg.ack != 'viewed') {
         console.log('MARKING AS SENT', from, msgId, chat, account, values);
         msg.ack = 'sent';
       }
