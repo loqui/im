@@ -60,7 +60,7 @@ var Message = function (account, core, options) {
 
           if(!message.viewed){
             message.viewed= true;
-            Store.update(key, values[1].chunkIndex, values.result.chunk, free);
+            Store.update(key, values.result.chunkIndex, values.result.chunk, free);
             if(!chat.core.muc){
               account.connector.ack(message.id, message.from, 'read');
             }
