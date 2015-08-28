@@ -221,10 +221,11 @@ var Account = function (core) {
         li.detach();
         ul.prepend(li);
       }
-      li.children('.lastMessage').html(chat.core.last.text ? App.emoji[Providers.data[this.core.provider].emoji].fy(chat.core.last.text) : (chat.core.media ? _('AttachedFile') : ''));
+      li.children('.lastMessage').html(chat.core.last.text ? App.emoji[Providers.data[this.core.provider].emoji].fy(chat.core.last.text) : (chat.core.last.media ? _('SentYou', {type: _('MediaType_' + chat.core.last.media.type)}) : ''));
       li.children('.lastStamp date').html(chat.core.last.stamp ? Tools.convenientDate(chat.core.last.stamp).join('<br />') : '');
       li[0].dataset.unread = chat.core.unread;
       li[0].dataset.hidden = chat.core.settings.hidden[0] ? 1 : 0;
+      li[0].dataset.lastAck = chat.core.last.ack;
     } else {
       this.allRender();
     }
@@ -261,7 +262,7 @@ var Account = function (core) {
       for (var i in this.core.chats) {
         var chat = this.core.chats[i];
         var title = App.emoji[Providers.data[this.core.provider].emoji].fy(chat.title);
-        var lastMsg = chat.last ? (chat.last.text ? (App.emoji[Providers.data[account.core.provider].emoji].fy(chat.last.text)) : (chat.last.media ? media : '')) : ' ';
+        var lastMsg = chat.last ? (chat.last.text ? App.emoji[Providers.data[this.core.provider].emoji].fy(chat.last.text) : (chat.last.media ? _('SentYou', {type: _('MediaType_' + chat.last.media.type)}) : '')) : '';
         var lastStamp = chat.last.stamp ? Tools.convenientDate(chat.last.stamp).join('<br />') : '';
         var li = $('<li/>');
         li[0].dataset.jid = chat.jid;
@@ -672,7 +673,7 @@ var Account = function (core) {
       } else if (msg.ack == 'delivered') {
         console.log('MARKING AS VIEWED', from, msgId, chat, account, values);
         msg.ack = 'viewed';
-      } else if (msg.ack != 'viewd') {
+      } else if (msg.ack != 'viewed') {
         console.log('MARKING AS SENT', from, msgId, chat, account, values);
         msg.ack = 'sent';
       }
@@ -681,8 +682,13 @@ var Account = function (core) {
         callback();
       });
 
+      if (chat.core.last.id == msg.id) {
+        chat.core.last = msg;
+      }
+
       msg = new Message(account, msg);
       msg.reRender(values.result.chunkIndex);
+      account.singleRender(chat);
 
     }, function(e){
         Tools.log('UNABLE TO FIND MESSAGE! CARRY ON', from, msgId, e);
@@ -690,7 +696,11 @@ var Account = function (core) {
     });
   }.bind(this));
 
-  this.markMessage.drain= function(){};
+  this.markMessage.drain= function(){
+    var account = this;
+
+    account.save();
+  }.bind(this);
     
   // Check for feature support
   this.supports = function (feature) {

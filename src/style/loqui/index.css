@@ -472,6 +472,32 @@ section > nav[data-control="menu"] a:before {
   max-width: calc(100% - 4.7rem);
   text-align: right;
 }
+#main article ul li span.lastAck {
+  position: absolute;
+  color: #999;
+  font-weight: 100;
+  line-height: 1.2rem;
+  max-width: calc(100% - 4.7rem);
+  text-align: right;
+  font-size: 1.4rem;
+  right: 2.1rem;
+  bottom: 1.9rem;
+  letter-spacing: -0.5rem;
+}
+
+#main article ul li[data-last-ack="sent"] span.lastAck::after {
+  content: "✔";
+}
+
+#main article ul li[data-last-ack="delivered"] span.lastAck::after,
+#main article ul li[data-last-ack="viewed"] span.lastAck::after{
+  content: "✔✔";
+}
+
+#main article ul li[data-last-ack="viewed"] span.lastAck::after{
+  color: #44A6F2;
+}
+
 #activity article ul li span.lastStamp,
 #activity article ul li span.unread {
   display: none;
