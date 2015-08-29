@@ -29,7 +29,7 @@ App.connectors.coseme = function (account) {
   this.connect = function (callback) {
     var method = 'auth_login';
     var params = [this.account.core.data.login, this.account.core.data.pw];
-    Yowsup.connectionmanager.signals['auth_success'].length = 0;
+    Yowsup.connectionmanager.signals.auth_success.length = 0;
     SI.registerListener('auth_success', function() {
       Tools.log("CONNECTED");
       this.connected = true;
@@ -42,7 +42,7 @@ App.connectors.coseme = function (account) {
         }, 60000);
       }
     }.bind(this));
-    Yowsup.connectionmanager.signals['auth_fail'].length = 0;
+    Yowsup.connectionmanager.signals.auth_fail.length = 0;
     SI.registerListener('auth_fail', function(username, _, reason) {
       Tools.log("AUTH FAIL");
       this.connected = false;
@@ -52,7 +52,7 @@ App.connectors.coseme = function (account) {
         callback.authfail(reason);
       }
     }.bind(this));
-    Yowsup.connectionmanager.signals['disconnected'].length = 0;
+    Yowsup.connectionmanager.signals.disconnected.length = 0;
     SI.registerListener('disconnected', function () {
       this.connected = false;
       if (pulse) {
