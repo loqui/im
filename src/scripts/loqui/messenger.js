@@ -95,67 +95,82 @@ var Messenger = {
   },
   
   contactProfile: function (jid) {
+	jid = jid || $('section#chat')[0].dataset.jid;
+
     var account = Accounts.current;
-    jid = jid || $('section#chat')[0].dataset.jid;
     var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
     var chat = account.chatGet(jid);
-    if (contact) {
-      var name = contact.name || jid;
-      var section = $('section#contact');
-      section[0].dataset.jid= jid;
-      section.find('#card .name').text(name == jid ? ' ' : name);
-      section.find('#card .user').text(jid);
-      section.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + account.core.provider + '.svg'));
-      section.find('#status p').html(App.emoji[Providers.data[account.core.provider].emoji].fy(contact.presence.status) || _('showna'));
-      var setUl = section.find('#settings ul').empty();
-      var accountSwitch = function (e) {
-        var sw = $(this);
-        var li = sw.closest('li');
-        var key = li[0].dataset.key;
-        var chat = account.chatGet(jid);
-        if(!Array.isArray(chat.core.settings[key])){
-            chat.core.settings[key]= App.defaults.Chat.core.settings[key];
-        }
-        if (li[0].dataset.value == 'true') {
-          chat.core.settings[key][0] = false;
-        } else {
-          chat.core.settings[key][0] = true;
-        }
-        li[0].dataset.value= chat.core.settings[key][0];
-        account.save();
-        account.singleRender(chat, false);
-      };
-      Object.keys(App.defaults.Chat.core.settings).forEach(function(key){
-        var value= chat.core.settings[key] || App.defaults.Chat.core.settings[key];
-        var li = $('<li/>');
-        li[0].dataset.key= key;
-        li[0].dataset.value= (value.length > 1 ? value[0] : value);
-        li.bind('click', accountSwitch);
-        li.append(
-          $('<span/>').addClass('caption').text(_('AccountSet' + key))
-        ).append(
-          $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>')
-        );
+    var name = contact ? contact.name : jid;
+    var status = contact ? contact.presence.status : _('showna');
+    var section = $('section#contact');
+    var setUl = section.find('#settings ul').empty();
 
-        if (value.length > 1 && value[1]) {
-          li.on('click', function (e) {
-            console.log(value, value[1]);
-            Menu.show(value[1], li[0]);
-          });
-        }
-        setUl.append(li);
-      });
-      if (App.avatars[jid]) {
-        Store.recover(App.avatars[jid].chunk, function (val) {
-          section.find('#card .avatar').children('img').attr('src', val);
-        });
-      } else {
-        section.find('#card .avatar').children('img').attr('src', 'img/foovatar.png');
+    section[0].dataset.jid= jid;
+    section.find('#card .name').text(name == jid ? jid.split('@')[0] : name);
+    section.find('#card .user').text(jid);
+    section.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + account.core.provider + '.svg'));
+    section.find('#status p').html(App.emoji[Providers.data[account.core.provider].emoji].fy(status));
+
+    var accountSwitch = function (e) {
+      var sw = $(this);
+      var li = sw.closest('li');
+      var key = li[0].dataset.key;
+      var chat = account.chatGet(jid);
+
+      if(!Array.isArray(chat.core.settings[key])){
+        chat.core.settings[key]= App.defaults.Chat.core.settings[key];
       }
-      Lungo.Router.section('contact');
+      if (li[0].dataset.value == 'true') {
+        chat.core.settings[key][0] = false;
+      } else {
+        chat.core.settings[key][0] = true;
+      }
+
+      li[0].dataset.value= chat.core.settings[key][0];
+
+      account.save();
+      account.singleRender(chat, false);
+    };
+
+    if (contact) {
+      $('section#contact button[data-menu-onclick="contactRemove"]').removeClass('hidden');
+      $('section#contact button[data-menu-onclick="contactAdd"]').addClass('hidden');
     } else {
-      Messenger.chatRemove(jid);
+      $('section#contact button[data-menu-onclick="contactAdd"]').removeClass('hidden');
+      $('section#contact button[data-menu-onclick="contactRemove"]').addClass('hidden');
     }
+
+    Object.keys(App.defaults.Chat.core.settings).forEach(function(key){
+      var value= chat.core.settings[key] || App.defaults.Chat.core.settings[key];
+      var li = $('<li/>');
+      li[0].dataset.key= key;
+      li[0].dataset.value= (value.length > 1 ? value[0] : value);
+      li.bind('click', accountSwitch);
+      li.append(
+        $('<span/>').addClass('caption').text(_('AccountSet' + key))
+      ).append(
+        $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>')
+      );
+
+      if (value.length > 1 && value[1]) {
+        li.on('click', function (e) {
+          console.log(value, value[1]);
+          Menu.show(value[1], li[0]);
+        });
+      }
+      setUl.append(li);
+    });
+
+    if (App.avatars[jid]) {
+      Store.recover(App.avatars[jid].chunk, function (key, val, free) {
+        section.find('#card .avatar').children('img').attr('src', val);
+
+        free();
+      });
+    } else {
+      section.find('#card .avatar').children('img').attr('src', 'img/foovatar.png');
+    }
+    Lungo.Router.section('contact');
   },
   
   mucProfile: function (jid) {
@@ -174,7 +189,17 @@ var Messenger = {
       for (var i in chat.core.participants) {
         var participantJid = chat.core.participants[i];
         var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', participantJid);
-        partUl.append($('<li/>').text(contact ? contact.name : participantJid.split('@')[0]));
+        var label = "";
+
+        if(contact) {
+          label = contact.name;
+        } else if (participantJid == account.core.fullJid) {
+          label = _('Me');
+        } else {
+          label = participantJid.split('@')[0];
+        }
+
+        partUl.append($('<li/>').text(label));
       }
       var setUl = section.find('#settings ul').empty();
       var accountSwitch = function (e) {
