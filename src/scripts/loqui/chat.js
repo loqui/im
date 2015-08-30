@@ -292,15 +292,13 @@ var Chat = function (core, account) {
             header.children('.status').text(' ');
           }
         } else {
-          var show = contact ? (contact.presence.show || 'na') : 'na';
-          var status = contact ? (contact.presence.status || _('show' + show)) : ' ';
-          if (this.account.connector.presence.subscribe) {
+          if (contact && this.account.connector.presence.subscribe) {
             this.account.connector.presence.subscribe(this.core.jid);
           }
-          header.children('.status').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(status));
-          if (this.account.supports('show')) {
-            section[0].dataset.show = show;
+          if (contact && this.account.connector.contacts.getStatus && (contact.presence.status === null)) {
+            this.account.connector.contacts.getStatus([this.core.jid]);
           }
+          this.account.presenceRender(this.core.jid);
         }
         this.lastChunkRender();
         this.unreadList= [];

@@ -228,6 +228,7 @@ var Account = function (core) {
       li[0].dataset.lastAck = chat.core.last.ack;
     } else {
       this.allRender();
+      this.presenceRender(chat.core.jid);
     }
   }.bind(this);
   
@@ -399,8 +400,10 @@ var Account = function (core) {
   }.bind(this);
   
   // Render presence for every contact
-  this.presenceRender = function (jid, last) {
-    var contactPresenceRender = function (jid, last) {
+  this.presenceRender = function (jid) {
+    var contactPresenceRender = function (jid) {
+      var section = $('section#chat');
+      var header = section.children('header');
       var contact = Lungo.Core.findByProperty(this.core.roster, 'jid', jid);
       if (contact) {
         if (this.supports('show')) {
@@ -409,12 +412,11 @@ var Account = function (core) {
             li[0].dataset.show = contact.presence.show || 'na';
           }
         }
-        var section = $('section#chat');
         if (section[0].dataset.jid == contact.jid) {
           section[0].dataset.show = (this.supports('show') && contact.presence.show) || 'na';
 
           var show =_('show' + (contact.presence.show || 'na'));
-          var time = (contact.presence.show != 'a') && last && Tools.convenientDate(Tools.localize(Tools.stamp(last)));
+          var time = (contact.presence.show != 'a') && contact.presence.last && Tools.convenientDate(Tools.localize(Tools.stamp(contact.presence.last)));
           var prefix = time
             ? _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})})
             : show;
@@ -423,12 +425,15 @@ var Account = function (core) {
             (contact.presence.status
               ? App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status)
              : show);
-          section.find('header .status').html(status);
+          header.find('.status').html(status);
         }
+      } else {
+        header.find('.status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(' '));
+        section[0].dataset.show = 'na';
       }
     }.bind(this);
     if (jid) {
-      contactPresenceRender(jid, last);
+      contactPresenceRender(jid);
     } else {
       var ul = $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"]');
       if (ul.length > 0) {
@@ -727,19 +732,21 @@ var Account = function (core) {
 
 var Accounts = {
 
-  _current: Blaze.Var(0),
+  _current: Blaze.Var(-1),
 
   get current () {
     return App.accounts[this._current.get()];
   },
   set current (i) {
-    this._current.set(i);
-    setTimeout(function () {
-      $('section#main header select')[0].selectedIndex = i;
-      var ul = $('section#main ul[data-jid="' + (this.core.fullJid || this.core.user) + '"]');
-      ul.show().siblings('ul').hide();
-      this.allRender();
-    }.bind(this.current));
+    if (this._current.get() != i) {
+      this._current.set(i);
+      setTimeout(function () {
+        $('section#main header select')[0].selectedIndex = i;
+        var ul = $('section#main ul[data-jid="' + (this.core.fullJid || this.core.user) + '"]');
+        ul.show().siblings('ul').hide();
+        this.allRender();
+      }.bind(this.current));
+    }
   },
 
   // Find the index of an account
