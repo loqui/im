@@ -36,7 +36,7 @@ var Message = function (account, core, options) {
       var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', chatJid);
       chat = new Chat({
         jid: chatJid, 
-        title: contact ? contact.name || chatJid : chatJid,
+        title: (contact ? contact.name : null) || this.core.pushName || chatJid,
         chunks: [],
         muc: this.options.muc
       }, this.account);
@@ -360,7 +360,7 @@ var Message = function (account, core, options) {
         }
       };
     }
-  	var type = (this.core.from == this.account.core.user || this.core.from == this.account.core.realJid) ? 'out' : 'in';
+    var type = (this.core.from == this.account.core.user || this.core.from == this.account.core.realJid) ? 'out' : 'in';
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', Strophe.getBareJidFromJid(this.core.from));
     var name = type == 'in' ? this._formatName((contact ? (contact.name || contact.jid) : (this.core.pushName || this.core.from))) : _('Me');
     var day = Tools.day(this.core.stamp);
