@@ -106,6 +106,9 @@ App.connectors.coseme = function (account) {
     }
   }.bind(this);
   
+  this.contacts.getStatus = function (jids) {
+    MI.call('contacts_getStatus', [jids]);
+  }.bind(this);
   
   this.contacts.sync = function (cb) {
     if (App.online) {
@@ -378,7 +381,7 @@ App.connectors.coseme = function (account) {
       notification_groupParticipantRemoved: this.events.onGroupParticipantRemoved,
       notification_groupCreated: this.events.onGroupCreated,
       notification_groupSubjectUpdated: this.events.onGroupSubjectUpdated,
-      notification_status: this.events.onNotification,
+      notification_status: this.events.onContactStatusUpdated,
       contact_gotProfilePictureId: this.events.onAvatar,
       contact_gotProfilePicture: this.events.onAvatar,
       contact_typing: this.events.onContactTyping,
@@ -410,7 +413,9 @@ App.connectors.coseme = function (account) {
     MI.call(method, [categories]);
   };
   
-  this.events.onNotification = function (jid, msgId) {
+  this.events.onContactStatusUpdated = function (jid, msgId, status) {
+    this.events.onPresenceUpdated(jid, undefined, status);
+
     var method = 'notification_ack';
     MI.call(method, [jid, msgId]);
   };
@@ -831,7 +836,8 @@ App.connectors.coseme = function (account) {
     if (contact) {
       Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', 'away');
       contact.presence.show = 'away';
-      account.presenceRender(jid, last);
+      contact.presence.last = last;
+      account.presenceRender(jid);
     }
   };
   

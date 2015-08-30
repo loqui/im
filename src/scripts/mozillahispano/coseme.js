@@ -6824,7 +6824,9 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
                                  author]);
         }
         else if (type === 'status') {
-          _signalInterface.send('notification_status', [from, msgId]);
+          var bodyNode = node.getChild(0);
+          var status = stringFromUtf8(bodyNode.data);
+          _signalInterface.send('notification_status', [from, msgId, status]);
         }
         else {
           // ignore, but at least acknowledge it
