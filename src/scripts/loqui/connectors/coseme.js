@@ -423,12 +423,14 @@ App.connectors.coseme = function (account) {
     if (body) {
       var date = new Date(timeStamp);
       var stamp = Tools.localize(Tools.stamp(timeStamp));
+      var fromUser = from.split('@')[0];
       var msg = new Message(account, {
         id: msgId,
         from: from,
         to: to,
         text: body,
-        stamp: stamp
+        stamp: stamp,
+        pushName: (pushName && pushName != fromUser) ? (fromUser + ': ' + pushName) : pushName
       });
 
       if (wantsReceipt) {
@@ -436,7 +438,7 @@ App.connectors.coseme = function (account) {
           this.ack(msgId, from);
         }.bind(this));
 
-      } else {
+      } else {
         msg.receive();
       }
     }
