@@ -8276,16 +8276,16 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
 
     disconnect: function(aReason) {
       logger.log('Disconnect sequence initiated...');
-      logger.log('Sending term signal to reader thread');
       if (self.readerThread.isAlive()) {
+        logger.log('Sending term signal to reader thread');
         self.readerThread.terminate();
         // TO-DO!!!! CHECK THE METHOD NAME!!!!
         self.socket.socket.close();
+        self.readerThread.sendDisconnected(aReason);
       }
 
       logger.log('Disconnected!', aReason);
       self.state = 0;
-      self.readerThread.sendDisconnected(aReason);
     },
 
     media_requestUpload: function(aB64Hash, aT, aSize, aB64OrigHash) {
