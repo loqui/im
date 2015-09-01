@@ -452,7 +452,8 @@ var Account = function (core) {
   this.avatarsRender = function () {
     var account = this;
     var avatars = App.avatars;
-    $('span.avatar img:not([src])').each(function (i, el) {
+    var ul = $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"]');
+    ul.find('span.avatar img:not([src])').each(function (i, el) {
       var closest = $(el).closest('[data-jid]');
       var jid = closest.length ? closest[0].dataset.jid : account.core.fullJid;
       var me = jid == account.core.fullJid;
