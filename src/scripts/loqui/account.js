@@ -119,7 +119,6 @@ var Account = function (core) {
     }
     if (this.connector.isConnected()) {
       this.connector.start();
-      this.connector.presence.set(document.hidden ? 'away' : 'a');
       this.sendQFlush();
     } else {
       if (navigator.onLine){
