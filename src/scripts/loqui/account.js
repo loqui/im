@@ -133,6 +133,10 @@ var Account = function (core) {
             var cb = function (rcb) {
               App.audio('login');
               this.connector.start();
+              if (this === Accounts.current) {
+                this.accountRender();
+                this.avatarsRender();
+              }
               this.connector.presence.set(document.hidden ? 'away' : 'a');
               this.sendQFlush();
               if (rcb) {
@@ -451,8 +455,7 @@ var Account = function (core) {
   this.avatarsRender = function () {
     var account = this;
     var avatars = App.avatars;
-    var ul = $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"]');
-    ul.find('span.avatar img:not([src])').each(function (i, el) {
+    var contactAvatarRender = function (i, el) {
       var closest = $(el).closest('[data-jid]');
       var jid = closest.length ? closest[0].dataset.jid : account.core.fullJid;
       var me = jid == account.core.fullJid;
@@ -479,7 +482,11 @@ var Account = function (core) {
           });
         }, jid);
       }
-    });
+    };
+
+    $('aside#accounts article#accounts div[data-jid="' + this.core.fullJid + '"] span.avatar img:not([src])').each(contactAvatarRender);
+    $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"] span.avatar img:not([src])').each(contactAvatarRender);
+    $('section#chat[data-account="' + this.core.fullJid + '"] article#main span.avatar img:not([src])').each(contactAvatarRender);
   }.bind(this);
 
   // Manage search through contacts
