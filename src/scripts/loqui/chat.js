@@ -260,13 +260,15 @@ var Chat = function (core, account) {
       var avatarize = function (url) {
         header.children('.avatar').children('img').attr('src', url);
       };
-      if (App.avatars[this.core.jid]) {
-        var existant = $('ul li[data-jid="' + this.core.jid + '"] .avatar img');
+      var avatars = App.avatars;
+      var jid = this.core.jid;
+      if (avatars[jid]) {
+        var existant = $('ul li[data-jid="' + jid + '"] .avatar img');
         if (existant.length) {
           avatarize(existant.attr('src'));
         } else {
           if (this.core.jid in App.avatars) {
-            (new Avatar(App.avatars[this.core.jid])).url.then(function (val) {
+            (new Avatar(avatars[jid])).url.then(function (val) {
               avatarize(val);
             });
           }
@@ -274,11 +276,14 @@ var Chat = function (core, account) {
       } else {
         header.children('.avatar').children('img').attr('src', 'img/foovatar.png');
         var method = this.core.muc ? this.account.connector.muc.avatar : this.account.connector.avatar;
+        console.log('REQUESTING AVATAR FOR', jid);
         method(function (a) {
           a.url.then(function (val) {
             avatarize(val);
+            avatars[jid] = a.data;
+            App.avatars = avatars;
           });
-        }, this.core.jid);
+        }, jid);
       }
       if (this.core.settings.otr[0]) {
         Plus.switchOTR(this.core.jid, this.account);
