@@ -1668,7 +1668,9 @@ article.form ul.listBox li.add:before {
   }
 }
 
-/* MEDIA QUERIES */
+/* MEDIA QUERIES
+ * this query improves the text input in landscape mode
+ * when the keyboard is open */
 @media only screen and (orientation:landscape) and (max-height: 18vw) {
   #chat header {
     display: none;
@@ -1679,6 +1681,11 @@ article.form ul.listBox li.add:before {
   #messages {
     display: none;
   }
+  /* display footbox and text across the whole rest of the screen */
+  #footbox {
+    position: fixed;
+    top: 0;
+  }
   #text {
     position: fixed;
     top: 0;
@@ -1688,6 +1695,25 @@ article.form ul.listBox li.add:before {
     bottom: 0;
     border: none;
     border-radius: 0;
+    z-index: 2;
+  }
+  /* adjust the typing notification
+   * to be on the bottom of the text area */
+  section#chat #footbox #typing {
+    position: fixed;
+    z-index: 3;
+    bottom: 0.1rem;
+    top: auto;
+  }
+  /* display buttons on top of the text field */
+  button {
+    z-index: 3;
+  }
+  /* hide the plus bar completely in this mode */
+  section#chat nav#plus {
+    display: none;
+    visibility: hidden;
+    z-index: -2;
   }
 }
 
