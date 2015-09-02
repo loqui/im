@@ -23,10 +23,14 @@ $('document').ready(function(){
         Menu.show(menu, this);
       });
     });
+
     App.defaults.Connector.presence.status = _('DefaultStatus', {
       app: App.name,
       platform: (Lungo.Core.environment().os ? Lungo.Core.environment().os.name : 'PC')
     });
+
+    App.defaults.Selects.language[0] = { caption : _('Default'), value : 'default' };
+
     bindings();
     App.run();
   });

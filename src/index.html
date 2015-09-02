@@ -102,6 +102,18 @@
           </li>
         {{/each}}
       </script>
+      <script type="text/spacebars" name="settings_selects">
+        {{#each settings}}
+          <li data-key="{{key}}" data-type="select">
+            <select>
+              {{#each options}}
+                <option value="{{value}}" {{Selected value ../index}}>{{caption}}</option>
+              {{/each}}
+            </select>
+            <span>{{caption}}</span>
+          </li>
+        {{/each}}
+      </script>
       </ul>
     </article>
     <article id="devmode" class="scroll">

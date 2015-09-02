@@ -6,13 +6,38 @@ Template.settings_features.helpers({
   settings: function () {
     var settings = [];
     for (var [key, value] in Iterator(App.settings)) {
-      settings.push({
-        key: key, 
-        value: value,
-        caption: _('Set' + key)
-      });
+      if (!value.type || value.type == 'switch') {
+        settings.push({
+          key: key,
+          value: value.value || value,
+          caption: _('Set' + key)
+        });
+      }
     }
     return settings;
+  }
+});
+
+Template.settings_selects.helpers({
+  settings: function () {
+    var settings = [];
+    for (var [key, value] in Iterator(App.settings)) {
+      if (value.type == 'select') {
+        settings.push({
+          key: key,
+          index: value.value,
+          options : App.defaults.Selects[key],
+          caption: _('Set' + key)
+        });
+      }
+    }
+    return settings;
+  },
+
+  Selected : function(value, index){
+    console.log(value, index);
+
+    return value == index ? 'selected' : '';
   }
 });
 

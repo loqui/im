@@ -32,13 +32,50 @@ var App = {
         boltGet: true,
         readReceipts: true,
         lockOrientation : true,
-        devMode: false
+        devMode: false,
+        language : {
+          type : 'select',
+          value : 'null',
+        }
       },
       devsettings: {
         devConsole: false,
         debug: false
       },
       online: true
+    },
+    Selects : {
+      language : [
+        {caption : 'Default',     value : 'default'},
+        {caption : 'العربية',     value : 'ar'},
+        {caption : 'ast',         value : 'ast'},
+        {caption : 'বাংলা',        value : 'bn-BD'},
+        {caption : 'català',      value : 'ca'},
+        {caption : 'čeština',     value : 'cs'},
+        {caption : 'Deutsch',     value : 'de'},
+        {caption : 'ελληνικά',    value : 'el'},
+        {caption : 'English',     value : 'en'},
+        {caption : 'Esperanto',   value : 'eo'},
+        {caption : 'español',     value : 'es'},
+        {caption : 'euskara',     value : 'eu'},
+        {caption : 'français',    value : 'fr'},
+        {caption : 'galego',      value : 'gl'},
+        {caption : 'עברית',       value : 'he'},
+        {caption : 'हिन्दी',         value : 'hi'},
+        {caption : 'magyar',      value : 'hu'},
+        {caption : 'Indonesia',   value : 'id'},
+        {caption : 'italiano',    value : 'it'},
+        {caption : 'にほんご',     value : 'ja'},
+        {caption : 'मराठी',        value : 'mr'},
+        {caption : 'Nederlands',  value : 'nl'},
+        {caption : 'polszczyzna', value : 'pl'},
+        {caption : 'português',   value : 'pt'},
+        {caption : 'română',      value : 'ro'},
+        {caption : 'Русский',     value : 'ru'},
+        {caption : 'සිංහල',      value : 'si'},
+        {caption : 'Türkçe',      value : 'tr'},
+        {caption : '中文',         value : 'zh-CN'},
+      ]
     },
     Account: {
       core: {
@@ -73,6 +110,13 @@ var App = {
     }
   },
 
+  events : {
+    language : function(value) {
+      localStorage.setItem('language', value);
+      window.location.reload();
+    }
+  },
+
   get accounts () {
     return this._accounts.get();
   },
@@ -95,7 +139,9 @@ var App = {
   },
   set settings (val) {
     for (var [key, value] in Iterator(val)) {
-      $('body')[value ? 'addClass' : 'removeClass'](key);
+      if (!value.type || value.type == 'switch') {
+        $('body')[value ? 'addClass' : 'removeClass'](key);
+      }
     }
     Store.put('settings', val);
     this._settings.set($.extend({}, val));
@@ -167,7 +213,7 @@ var App = {
       }),
       new Promise(function (callback) {
         Store.get('settings', function (val) {
-          App.settings = (val && Object.keys(val).length) ? val : App.defaults.App.settings;
+          App.settings = $.extend(App.defaults.App.settings, val);
           callback(null);
         });
       }),
@@ -281,12 +327,15 @@ var App = {
   // Bootstrap logins and so on
   start: function (last) {
     App.online = App.online;
+
     // If there is already a configured account
     if (App.accounts.length) {
+
       screen.unlockOrientation= screen.unlockOrientation || screen.mozUnlockOrientation;
       if(!App.settings.lockOrientation && screen.unlockOrientation){
         screen.unlockOrientation();
       }
+
       App.alarmSet({});
       this.connect();
       Menu.show('main');
