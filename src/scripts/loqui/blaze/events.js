@@ -8,8 +8,30 @@ Template.settings_features.events({
     var li = $(e.target).closest('li')[0];
     var key = li.dataset.key;
     var newVal = li.dataset.value == 'true' ? false : true;
-    settings[key] = newVal;
-    App.settings = settings;
+
+    if (!li.dataset.type || li.dataset.type == 'switch') {
+      settings[key] = newVal;
+      App.settings = settings;
+    }
+  }
+});
+
+Template.settings_selects.events({
+  'blur li>select': function (e, t) {
+    var settings = App.settings;
+    var li = $(e.target).closest('li')[0];
+    var select = $('select', li)[0];
+    var key = li.dataset.key;
+    var newVal = select.children[select.selectedIndex].value;
+
+    if (settings[key].value != newVal) {
+      settings[key].value = newVal;
+      App.settings = settings;
+
+      if (App.events[key]) {
+        App.events[key](newVal);
+      }
+    }
   }
 });
 

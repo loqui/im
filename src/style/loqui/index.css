@@ -653,6 +653,13 @@ section > nav[data-control="menu"] a:before {
   font-weight: 100;
   font-size: 1.6rem;
 }
+
+#settings ul li select {
+  float: right;
+  margin-top: -0.25rem;
+  width: 40%;
+}
+
 #chat header span {
   color: white;
   text-align: right;
