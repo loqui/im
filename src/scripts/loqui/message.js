@@ -150,8 +150,8 @@ var Message = function (account, core, options) {
         var ul = $('section#chat ul#messages');
         var li = ul.children('li[data-chunk="' + blockIndex + '"]');
         var last = ul.children('li[data-chunk]').last().children('div').last();
-        var avatarize = last[0].dataset.from != message.core.from;
-        var timeDiff = Tools.unstamp(message.core.stamp) - Tools.unstamp(last[0].dataset.stamp) > 300000;
+        var avatarize = !last.length || last[0].dataset.from != message.core.from;
+        var timeDiff = !last.length || (Tools.unstamp(message.core.stamp) - Tools.unstamp(last[0].dataset.stamp) > 300000);
         var conv = Tools.convenientDate(message.core.stamp);
         if (li.length) {
           if (timeDiff) {
