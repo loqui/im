@@ -31,6 +31,14 @@ $('document').ready(function(){
 
     App.defaults.Selects.language[0] = { caption : _('Default'), value : 'default' };
 
+
+//  wakelock shim
+    navigator.requestWakeLock = navigator.requestWakeLock || function(){
+      return {
+        unlock : function(){}
+      };
+    };
+
     bindings();
     App.run();
   });
