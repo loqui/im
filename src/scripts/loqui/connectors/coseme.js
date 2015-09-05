@@ -543,7 +543,7 @@ App.connectors.coseme = function (account) {
           }
         });
       }
-    } else {
+    } else if (picId) {
       if (!(jid in App.avatars) || App.avatars[jid].id != picId) {
         var method = 'contact_getProfilePicture';
         var params = [jid];
