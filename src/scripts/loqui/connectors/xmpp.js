@@ -101,6 +101,7 @@ App.connectors.XMPP = function (account) {
       account.core.fullJid = fullJid;
       account.save();
     }
+    connector.connection.roster.clearCallbacks();
     connector.connection.roster.registerCallback(connector.events.onPresence);
     connector.connection.roster.get( function (ret) {
       connector.events.onPresence(ret, null, account.core.user);
