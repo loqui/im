@@ -1,4 +1,4 @@
-/* global App, CoSeMe, Providers, Tools, Avatar, Store, Message, Chat, Account, Lungo */
+/* global App, CoSeMe, Providers, Tools, Avatar, Store, Message, Chat, Account, Accounts, Lungo */
 
 'use strict';
 
@@ -93,7 +93,19 @@ App.connectors.coseme = function (account) {
       var status_contacts= contacts.filter(function(item){ return item.indexOf('@g.us') < 0; });
 
       MI.call('contacts_getStatus', [status_contacts]);
-      this.avatar(null, [contacts]);
+
+      contacts.push(this.account.core.fullJid);
+      if ('roster' in this.account.core) {
+        this.account.core.roster.forEach(function (item) {
+          if (item.jid in App.avatars) { contacts.push(item.jid); }
+        });
+      }
+
+      contacts = contacts.sort().filter(function(item, pos, ary) {
+        return !pos || item != ary[pos - 1];
+      });
+
+      MI.call('picture_getIds', [contacts]);
     }.bind(this);
 
     if (!('roster' in this.account.core) || !this.account.core.roster.length) {
@@ -226,13 +238,12 @@ App.connectors.coseme = function (account) {
   };
   
   this.avatar = function (callback, id) {
-    var method = 'picture_getIds';
-    var params = id instanceof Array ? id : [[id || this.account.core.fullJid]];
-    MI.call(method, params);
+    var method = 'contact_getProfilePicture';
+    MI.call(method, [id]);
     if (callback) {
       callback(new Avatar({url: 'img/foovatar.png'}));
     }
-  }.bind(this);
+  };
   
   this.muc.avatar = function (callback, id) {
     var method = 'group_getPicture';
@@ -483,7 +494,10 @@ App.connectors.coseme = function (account) {
       if (jid == this.account.core.fullJid) {
         Tools.picThumb(blob, 96, 96, function (url) {
           $('section#main[data-jid="' + jid + '"] footer span.avatar img').attr('src', url);
-          $('section#me .avatar img').attr('src', url);
+          $('aside#accounts article#accounts div[data-jid="' + jid + '"] span.avatar img').attr('src', url);
+          if (Accounts.current === account) {
+            $('section#me .avatar img').attr('src', url);
+          }
           Store.save(url, function (index) {
             avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
             App.avatars= avatars;
@@ -532,7 +546,7 @@ App.connectors.coseme = function (account) {
     } else {
       if (!(jid in App.avatars) || App.avatars[jid].id != picId) {
         var method = 'contact_getProfilePicture';
-        var params = [jid || this.account.core.fullJid];
+        var params = [jid];
         MI.call(method, params);
       }
     }
@@ -845,7 +859,7 @@ App.connectors.coseme = function (account) {
   
   this.events.onProfileSetPictureSuccess = function (pictureId) {
     Tools.log('CHANGED AVATAR TO', pictureId);
-    this.avatar();
+    this.events.onAvatar(this.account.core.fullJid, pictureId);
   };
   
   this.events.onProfileSetPictureError = function (err) {
