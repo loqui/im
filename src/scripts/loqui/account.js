@@ -459,6 +459,7 @@ var Account = function (core) {
       var closest = $(el).closest('[data-jid]');
       var jid = closest.length ? closest[0].dataset.jid : account.core.fullJid;
       var me = jid == account.core.fullJid;
+
       if (avatars[jid]) {
         (new Avatar(avatars[jid])).url.then(function (val) {
           $(el).attr('src', val);

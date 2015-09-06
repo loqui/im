@@ -388,6 +388,7 @@ var Chat = function (core, account) {
             Store.recover(chat.chunks[currentChunk], afterRecover);
 
           } else {
+            free();
             faild();
           }
         };

@@ -28,6 +28,50 @@ var Message = function (account, core, options) {
     return parts.join(' ');
   };
   
+  this._replace = function() {
+    var msg = this;
+    var receipts = this.account.supports('receipts');
+
+    var afterRecover = function(key, block, message, chunk, free){
+      var old_id = message.id;
+
+      if (receipts) {
+        message.ack = 'sending';
+        message.id = msg.core.id;
+        msg.core.id = 0;
+        msg.setSendTimeout(block, index);
+      } else {
+        message.ack = '';
+      }
+
+      Store.update(key, block, chunk, free);
+
+      message = new Message(msg.account, message);
+      message.reRender(block, old_id);
+
+      message.chat.core.last = message.core;
+      message.chat.save();
+    };
+
+    if(Array.isArray(this.core.original)){
+      var block = this.core.original[0];
+      var index = this.core.original[1];
+
+      Store.recover(block, function(key, chunk, free){
+        var message = chunk[index];
+
+        afterRecover(key, block, message, chunk, free);
+      });
+
+    } else {
+      this.chat.findMessage(this.core.original, null).then(function(result){
+        afterRecover(result.key, result.result.chunkIndex, result.result.message, result.result.chunk, result.free);
+      }, function(result){
+        console.log('HOW SHOULD WE REPLACE A MESSAGE WE CAN\'T FIND?', result);
+      });
+    }
+  };
+
   this.__defineGetter__('chat', function () {
     var chatJid = Strophe.getBareJidFromJid(this.options.muc ? this.core.to : (this.core.from == (account.core.user || account.core.fullJid) ? this.core.to : this.core.from));
     var ci = this.account.chatFind(chatJid);
@@ -49,28 +93,30 @@ var Message = function (account, core, options) {
   }.bind(this));
 
   this.read = function(chat){
-    var type = (this.core.from == this.account.core.user || this.core.from == this.account.core.realJid) ? 'out' : 'in';
+    var isIncoming = (this.core.from != this.account.core.user && this.core.from != this.account.core.realJid);
+    var isUnread = !this.core.viewed;
+    var hasId = 'id' in this.core;
+    var account = this.account;
+    var readReceipts = App.settings.readReceipts;
+
     chat= chat || this.chat;
-    if('id' in this.core && type == 'in' && this.account.supports('readReceipts') && App.settings.readReceipts){
-      chat.processQueue.push(function(){
-        return chat.findMessage(this.core.id, null, true).then(function(values){
-          var message = values.result.message;
-          var free = values.free;
-          var key = values.key;
 
-          if(!message.viewed){
-            message.viewed= true;
-            Store.update(key, values.result.chunkIndex, values.result.chunk, free);
-            if(!chat.core.muc){
-              account.connector.ack(message.id, message.from, 'read');
-            }
-            Tools.log("VIEWED", message.text, message.id, message.from, values.result);
-          } else {
-            free();
-          }
+    if(hasId && isIncoming && account.supports('readReceipts') && readReceipts && isUnread) {
+      chat.findMessage(this.core.id, null, true).then(function(values){
+        var message = values.result.message;
+        var free = values.free;
+        var key = values.key;
 
-        });
-      }.bind(this));
+        message.viewed= true;
+
+        Store.update(key, values.result.chunkIndex, values.result.chunk, free);
+
+        if(!chat.core.muc){
+          account.connector.ack(message.id, message.from, 'read');
+        }
+
+        Tools.log("VIEWED", message.text, message.id, message.from, values.result);
+      });
     }
   };
   
@@ -79,43 +125,31 @@ var Message = function (account, core, options) {
     var message = this;
     var chat = this.chat;
     if (chat.OTR) {
-      chat.OTR.sendMsg(message.core.text);
       this.options.send = false;
       this.options.otr = true;
+      this.core.id = Date.now() + 'OTR';
+
+      this.postSend();
+
+      chat.OTR.sendMsg(this.core.id, message.core.text);
+    } else {
+      this.postSend();
     }
-    this.postSend();
   };
   
   this.postSend = function () {
-    var triedToSend = false;
-    Tools.log('SEND', this.core.text, this.options);
     if (this.account.connector.isConnected() && this.options.send) {
       this.core.id = account.connector.send(this.core.to, this.core.text, {delay: (this.options && 'delay' in this.options) ? this.core.stamp : this.options.delay, muc: this.options.muc});
-      triedToSend = true;
-	    if (this.core.original) {
-		    var msg = this;
-		    var block = this.core.original[0];
-		    var index = this.core.original[1];
-		    var receipts = this.account.supports('receipts');
-		    Store.recover(block, function(key, chunk, free){
-			    var message = chunk[index];
-			    if (!triedToSend) {
-				    message.ack = 'failed';
-			    } else if (receipts) {
-				    message.ack = 'sending';
-				    message.id = msg.core.id;
-				    msg.core.id = 0;
-				    msg.setSendTimeout(block, index);
-			    } else {
-				    message.ack = '';
-			    }
-			    Store.update(key, block, chunk, free);
-			    (new Message(msg.account, message)).reRender(block);
-		    });
-	    }
+
+      if (this.core.original) {
+        this._replace();
+      }
     }
+
+    Tools.log('SEND', this.core.id, this.core.text, this.options);
+
     if (this.options.render) {
-      this.addToChat(triedToSend);
+      this.addToChat();
     }
   };
   
@@ -221,22 +255,22 @@ var Message = function (account, core, options) {
   };
 
   //Outcoming
-  this.addToChat = function (triedToSend) {
+  this.addToChat = function () {
     var message = this;
     var chat = this.chat;
     var account = this.account;
     var to = this.core.to;
     var receipts = account.supports('receipts');
-    if (!triedToSend) {
-      message.core.ack = 'failed';
-    } else if (receipts) {
+
+    if (receipts) {
       message.core.ack = 'sending';
     }
+
     chat.messageAppend.push({
       msg: message.core,
       delay: !account.connector.isConnected()
     }, function (blockIndex) {
-	  if (triedToSend && receipts) {
+	  if (receipts) {
 		  message.setSendTimeout(blockIndex, null);
 	  }
       if ($('section#chat')[0].dataset.jid == to && $('section#chat').hasClass('show')) {
@@ -265,9 +299,9 @@ var Message = function (account, core, options) {
     });
   };
 
-  this.reRender= function(blockIndex){
+  this.reRender= function(blockIndex, old_id){
     if($('section#chat')[0].dataset.jid == this.core.to){
-      var element= $('section#chat ul#messages li[data-chunk="' + blockIndex + '"] div[data-id="' + this.core.id + '"]');
+      var element= $('section#chat ul#messages li[data-chunk="' + blockIndex + '"] div[data-id="' + (old_id || this.core.id) + '"]');
       element.replaceWith(this.preRender());
     }
   };

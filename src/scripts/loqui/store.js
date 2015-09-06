@@ -56,22 +56,20 @@ var Store = {
     var promise = new Promise(function(ready){
 
       if (!this.locks[index]) {
+        var key = this.lock(index, stack);
 
         if (Store.cache[index]) {
-          var key = this.lock(index);
-
           ready([key, JSON.parse(Store.cache[index])]);
 
         } else {
             asyncStorage.getItem('b'+index, function (value){
-              var key = this.lock(index, stack);
-
               ready([key, JSON.parse(value)]);
             }.bind(this));
         }
 
       } else {
         this.onUnlock(index, function(){
+          var stack = stack;
           Store.recover(index, callback);
         });
       }
