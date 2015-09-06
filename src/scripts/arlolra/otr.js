@@ -1409,7 +1409,7 @@
       )
       if (send[0]) return this.otr.error(send[0])
 
-      this.otr._sendMsg(send[1], true)
+      this.otr._sendMsg(0, send[1], true)
     },
 
     initiateAKE: function (version) {
@@ -2092,11 +2092,11 @@
     })
     this.sm.on('send', function (ssid, send) {
       if (self.ssid === ssid)
-        self._sendMsg(send)
+        self._sendMsg(0, send)
     })
   }
 
-  OTR.prototype.io = function (msg) {
+  OTR.prototype.io = function (id, msg) {
 
     // buffer
     this.outgoing = this.outgoing.concat(msg)
@@ -2106,7 +2106,7 @@
       if (!first) {
         if (!self.outgoing.length) return
         var msg = self.outgoing.shift()
-        self.trigger('io', [msg])
+        self.trigger('io', [id, msg])
       }
       setTimeout(send, first ? 0 : self.send_interval)
     }(true))
@@ -2413,21 +2413,21 @@
       msg += '?'
     }
 
-    this._sendMsg(msg, true)
+    this._sendMsg(0, msg, true)
     this.trigger('status', [CONST.STATUS_SEND_QUERY])
   }
 
-  OTR.prototype.sendMsg = function (msg) {
+  OTR.prototype.sendMsg = function (id, msg) {
     if ( this.REQUIRE_ENCRYPTION ||
          this.msgstate !== CONST.MSGSTATE_PLAINTEXT
     ) {
       msg = CryptoJS.enc.Utf8.parse(msg)
       msg = msg.toString(CryptoJS.enc.Latin1)
     }
-    this._sendMsg(msg)
+    this._sendMsg(id, msg)
   }
 
-  OTR.prototype._sendMsg = function (msg, internal) {
+  OTR.prototype._sendMsg = function (id, msg, internal) {
     if (!internal) {  // a user or sm msg
 
       switch (this.msgstate) {
@@ -2452,7 +2452,7 @@
       }
 
     }
-    if (msg) this.io(msg)
+    if (msg) this.io(id, msg)
   }
 
   OTR.prototype.receiveMsg = function (msg) {
@@ -2532,7 +2532,7 @@
     if (send) {
       if (!this.debug) err = "An OTR error has occurred."
       err = '?OTR Error:' + err
-      this._sendMsg(err, true)
+      this._sendMsg(0, err, true)
       return
     }
     this.trigger('error', [err])
@@ -2541,11 +2541,11 @@
   OTR.prototype.sendStored = function () {
     var self = this
     ;(this.storedMgs.splice(0)).forEach(function (msg) {
-      self._sendMsg(msg)
+      self._sendMsg(0, msg)
     })
   }
 
-  OTR.prototype.sendFile = function (filename) {
+  OTR.prototype.sendFile = function (id, filename) {
     if (this.msgstate !== CONST.MSGSTATE_ENCRYPTED)
       return this.error('Not ready to encrypt.')
 
@@ -2567,7 +2567,7 @@
     msg += l1name
 
     msg = this.prepareMsg(msg, filename)
-    if (msg) this._sendMsg(msg, true)
+    if (msg) this._sendMsg(id, msg, true)
   }
 
   OTR.prototype.endOtr = function () {

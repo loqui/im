@@ -152,12 +152,13 @@ var Plus = {
       });
       msg.postReceive();
     });
-    chat.OTR.on('io', function (text) {
+    chat.OTR.on('io', function (id, text) {
       var msg = new Message(account, {
         from: account.core.user,
         to: chat.core.jid,
         text: text,
-        stamp: Tools.localize(Tools.stamp())
+        stamp: Tools.localize(Tools.stamp()),
+        original: id
       }, {
         otr: true,
         logging: account.OTR.logging,
