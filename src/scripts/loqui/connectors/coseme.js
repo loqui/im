@@ -549,6 +549,11 @@ App.connectors.coseme = function (account) {
         var params = [jid];
         MI.call(method, params);
       }
+    } else {
+      if (jid in avatars) {
+        delete avatars[jid];
+        App.avatars = avatars;
+      }
     }
   };
 
