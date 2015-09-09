@@ -7,7 +7,6 @@ var Plus = {
   bolt: function () {
     var account = Accounts.current;
     var to = $('section#chat')[0].dataset.jid;
-    $('section#chat nav#plus').removeClass('show');
     if (to && App.online && account.connector.connection.connected){
       if (account.supports('attention')) {
         account.connector.attentionSend(to);
@@ -24,61 +23,35 @@ var Plus = {
     Messenger.add(emoji);
   },
   
-  imageSend: function () {
+  fileSend: function () {
     var account = Accounts.current;
+    var fileTypes = [];
+    var to = $('section#chat')[0].dataset.jid;
+
+
     if (account.supports('imageSend')) {
-    var to = $('section#chat')[0].dataset.jid;
-      var e = new MozActivity({
-        name: 'pick',
-        data: {
-          type: ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/bmp']
-        }
-      });
-      e.onsuccess = function () {
-        var blob = this.result.blob;
-        account.connector.fileSend(to, blob);      
-      };
-    } else {
-      Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign');
+      fileTypes = fileTypes.concat(['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/bmp']);
     }
-  },
 
-  videoSend: function () {
-    var account = Accounts.current;
     if (account.supports('videoSend')) {
-    var to = $('section#chat')[0].dataset.jid;
-      var e = new MozActivity({
-        name: 'pick',
-        data: {
-          type: ['video/webm', 'video/mp4', 'video/3gpp']
-        }
-      });
-      e.onsuccess = function () {
-        var blob = this.result.blob;
-        account.connector.fileSend(to, blob);      
-      };
-    } else {
-      Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign');
+      fileTypes = fileTypes.concat(['video/webm', 'video/mp4', 'video/3gpp']);
     }
-  },
 
-  audioSend: function () {
-    var account = Accounts.current;
     if (account.supports('audioSend')) {
-    var to = $('section#chat')[0].dataset.jid;
-      var e = new MozActivity({
-        name: 'pick',
-        data: {
-          type: ['audio/mpeg', 'audio/ogg', 'audio/mp4']
-        }
-      });
-      e.onsuccess = function () {
-        var blob = this.result.blob;
-        account.connector.fileSend(to, blob);      
-      };
-    } else {
-      Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign');
+      fileTypes = fileTypes.concat(['audio/mpeg', 'audio/ogg', 'audio/mp4']);
     }
+
+    var e = new MozActivity({
+      name: 'pick',
+      data: {
+        type: fileTypes
+      }
+    });
+
+    e.onsuccess = function () {
+      var blob = this.result.blob;
+      account.connector.fileSend(to, blob);
+    };
   },
   
   locationSend: function () {
@@ -98,7 +71,6 @@ var Plus = {
   },
   
   switchOTR: function (jid, account) {
-    $('section#chat nav#plus').removeClass('show');
     account = account || Accounts.current;
     var ci = account.chatFind(jid);
     var chat= null;

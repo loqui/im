@@ -133,7 +133,6 @@ $('section#chat article#main div#text').on('keydown', function (e) {
     if (this.textContent.length < 2) {
       $('section#chat article#main button#plus').show();
       $('section#chat article#main button#say').hide();
-      $('section#chat nav#plus').removeClass('show');
       Messenger.csn('paused');
     }
     // if user wants to hide keyboard in landscape
@@ -144,30 +143,17 @@ $('section#chat article#main div#text').on('keydown', function (e) {
   } else {
     $('section#chat article#main button#plus').hide();
     $('section#chat article#main button#say').show();
-    // only show plus bar when in portrait mode
-    if (window.matchMedia('(orientation:portrait)').matches) {
-      $('section#chat nav#plus').addClass('show');
-    } else {
-      $('section#chat nav#plus').removeClass('show');
-    }
+
     var ul = $('section#chat ul#messages');
     ul[0].scrollTop = ul[0].scrollHeight;
     Messenger.csn('composing');
   }
 }).on('tap', function (e) {
   Lungo.Router.article('chat', 'main');
-  // only show plus bar when in portrait mode
-  if (window.matchMedia('(orientation:portrait)').matches) {
-    $('section#chat nav#plus').addClass('show');
-  } else {
-    $('section#chat nav#plus').removeClass('show');
-  }
+
   var ul = $('section#chat ul#messages');
   ul[0].scrollTop = ul[0].scrollHeight + 500;
 }).on('blur', function (e) {
-  if ($(e.explicitOriginalTarget).closest('[data-control=menu]').length < 1) {
-    $('section#chat nav#plus').removeClass('show');
-  }
   Messenger.csn('paused');
 });
 
@@ -326,9 +312,6 @@ var bindings = function () {
   }).on('mousedown', function(e){
     e.preventDefault();
     e.target.classList.add('active');
-  });
-  $('section#chat nav#plus a.cancel').on('click', function() {
-    $(this).parent().removeClass('show');
   });
   $('section#welcome').on('click', function(){
      Menu.show('providers');

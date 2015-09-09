@@ -187,12 +187,7 @@ var Menu = {
       Messenger.accountRemove(jid);
     },
     plus: function () {
-      var menu = $('section#chat nav#plus');
-      if (menu.hasClass('show')) {
-        menu.removeClass('show');
-      } else {
-        menu.addClass('show');
-      }
+      Lungo.Router.section('attachment');
     },
     emoji: function () {
       var account = Accounts.current;
@@ -216,30 +211,35 @@ var Menu = {
           Lungo.Notification.hide();
         });
       }
-      $('#emoji').toggleClass('show');
+
+      $('#emoji').css('bottom', $('#footbox')[0].offsetHeight + 10 + 'px');
+
+      $('#emoji').addClass('show');
+      $('#screenBlocker').addClass('show');
     },
-    imageSend: function () {
-      Plus.imageSend();
+    emojiClose: function(){
+      $('#emoji').removeClass('show');
+      $('#screenBlocker').removeClass('show');
     },
-    videoSend: function () {
-      Plus.videoSend();
-    },
-    audioSend: function () {
-      Plus.audioSend();
+    fileSend: function () {
+      Lungo.Router.section('back');
+      Plus.fileSend();
     },
     locationSend: function () {
+      Lungo.Router.section('back');
       Plus.locationSend();
     },
     bolt: function () {
+      Lungo.Router.section('back');
       Plus.bolt();
     },
     call: function () {
-      $('section#chat nav#plus').removeClass('show');
+      Lungo.Router.section('back');
       Lungo.Router.article('chat', 'call');
       Plus.rtc({audio: true, video: false});
     },
     videocall: function () {
-      $('section#chat nav#plus').removeClass('show');
+      Lungo.Router.section('back');
       Lungo.Router.article('chat', 'videocall');
       Plus.rtc({audio: true, video: true});
     },

@@ -215,7 +215,7 @@ App.connectors.coseme = function (account) {
   }.bind(this);
   
   this.send = function (to, text, options) {
-    var method = 'message_send';
+    var method = options.isBroadcast ? 'message_broadcast' : 'message_send';
     var params = [to, text];
     return MI.call(method, params);
   }.bind(this);
@@ -339,7 +339,7 @@ App.connectors.coseme = function (account) {
       auth_fail: null,
       message_received: this.events.onMessage,
       image_received: this.events.onImageReceived,
-      vcard_received: null,
+      vcard_received: this.events.onVCardReceived,
       video_received: this.events.onVideoReceived,
       audio_received: this.events.onAudioReceived,
       location_received: this.events.onLocationReceived,
@@ -474,6 +474,11 @@ App.connectors.coseme = function (account) {
     return this.mediaProcess('url', msgId, fromAttribute, to, [mlatitude, mlongitude, name], null, null, wantsReceipt, false);
   };
   
+  this.events.onVCardReceived = function (msgId, fromAttribute, vcardName, vcardData, wantsReceipt, isBroadcast) {
+    var to = this.account.core.fullJid;
+    return this.mediaProcess('vCard', msgId, fromAttribute, to, vcardName, vcardData, null, wantsReceipt, false);
+  };
+
   this.events.onAvatar = function (jid, picId, blob) {
     var account = this.account;
     var avatars= App.avatars;
@@ -970,7 +975,10 @@ App.connectors.coseme = function (account) {
         break;
       case 'url':
         mediaUrl = 'https://maps.google.com/maps?q=' + payload[0] + ',' + payload[1];
-        process('img/blank.jpg');
+        process('img/location.jpg');
+        break;
+      case 'vCard':
+        process(null);
         break;
     }
   };
