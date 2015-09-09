@@ -196,8 +196,8 @@ var Account = function (core) {
     var features = Providers.data[this.core.provider].features;
     var meSection = $('section#me');
     var mainSection = $('section#main');
-    meSection[0].dataset.features = features.join(' ');
-    mainSection[0].dataset.features = features.join(' ');
+    var attachmentSection = $('section#attachment');
+    attachmentSection[0].dataset.features = meSection[0].dataset.features = mainSection[0].dataset.features = features.join(' ');
     meSection.find('#nick input').val(this.connector.presence.name);
     meSection.find('#status input').val(this.connector.presence.status);
     meSection.find('#card .name').text(address == this.core.user ? '' : address);

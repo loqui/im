@@ -16,27 +16,27 @@
 }
 @font-face {
   font-family:'FiraSans';
-  src: url('/style/fonts/FiraSans-Bold.ttf');
+  src: url('../fonts/FiraSans-Bold.ttf');
   font-weight: 700;
 }
 @font-face {
   font-family:'FiraSans';
-  src: url('/style/fonts/FiraSans-Medium.ttf');
+  src: url('../fonts/FiraSans-Medium.ttf');
   font-weight: 500;
 }
 @font-face {
   font-family:'FiraSans';
-  src: url('/style/fonts/FiraSans-Regular.ttf');
+  src: url('../fonts/FiraSans-Regular.ttf');
   font-weight: 300;
 }
 @font-face {
   font-family:'FiraSans';
-  src: url('/style/fonts/FiraSans-Light.ttf');
+  src: url('../fonts/FiraSans-Light.ttf');
   font-weight: 100;
 }
 @font-face {
   font-family:'FiraSans';
-  src: url('/style/fonts/FiraSans-LightItalic.ttf');
+  src: url('../fonts/FiraSans-LightItalic.ttf');
   font-weight: 100;
   font-style: italic; 
 }
@@ -269,10 +269,12 @@ show {
   border-bottom: .4rem solid #2ECC71;
 }
 .chungo .notifier.show {
+  display: block;
   animation: popUp .5s;
   -webkit-animation: popUp .5s;
 }
 .chungo .notifier.out {
+  display: block;
   animation: popDown .2s;
   -webkit-animation: popDown .2s;
 }

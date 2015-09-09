@@ -13,6 +13,7 @@
     <meta name="format-detection" content="telephone=no">
     <meta http-equiv="cleartype" content="on">
     <link rel="stylesheet" href="style/tapquo/lungo.icon.css">
+    <link rel="stylesheet" href="style/google/material-icons.css">
     <link rel="stylesheet" href="style/loqui/chungo.css">
     <link rel="stylesheet" href="style/loqui/index.css">
     <link rel="prefetch" type="application/l10n" href="l10n/main.ini" />
@@ -265,11 +266,19 @@
       <div id="footbox">
         <progress value="0" max="100"></progress>
         <div id="typing" data-l10n-id="Typing">Typing...</div>
-        <button id="plus" class="recommend" type="options" data-icon="plus" data-menu-onclick="plus" ></button>
-        <button id="say" class="recommend" type="send" data-icon="comments"></button>
+        <button id="emojis" class="recommend left" type="emojis" data-menu-onclick="emoji">
+          <i class="material-icons">&#xE24E;</i>
+        </button>
+        <button id="plus" class="recommend right" type="options" data-menu-onclick="plus" >
+          <i class="material-icons">&#xE226;</i>
+        </button>
+        <button id="say" class="recommend right" type="send">
+          <i class="material-icons">&#xE163;</i>
+        </button>
         <div id="text" contenteditable></div>
       </div>
     </article>
+    <article id="screenBlocker" class="hidden" data-menu-onclick="emojiClose"></article>
     <article id="emoji">
       <ul></ul>
     </article>
@@ -287,16 +296,6 @@
         <button data-role="back" data-view-article="main" data-l10n-id="Cancel">Cancel</button>
       </div>
     </article>
-    <nav id="plus" data-control="menu" class="icons">
-        <a class="emoji" data-menu-onclick="emoji" data-icon="star" data-l10n-id="Emoji">Emoji</a>
-        <a class="picture" data-menu-onclick="imageSend" data-icon="picture" data-l10n-id="MediaType_image">Picture</a>
-        <a class="video" data-menu-onclick="videoSend" data-icon="video" data-l10n-id="MediaType_video">Video</a>
-        <a class="audio" data-menu-onclick="audioSend" data-icon="music" data-l10n-id="MediaType_audio">Audio</a>
-        <a class="location" data-menu-onclick="locationSend" data-icon="map-marker" data-l10n-id="MediaType_url">Location</a>
-        <a class="bolt" data-menu-onclick="bolt" data-icon="bolt" data-l10n-id="MediaType_bolt">Bolt</a>
-        <!--<a class="call" data-menu-onclick="call" data-icon="mobile-phone" data-l10n-id="Call">Call</a>
-        <a class="videocall" data-menu-onclick="videocall" data-icon="video" data-l10n-id="VideoCall">VideoCall</a>-->
-    </nav>
   </section>
   <div id="debugConsole">
     <div id="showConsole">
@@ -319,9 +318,6 @@
       <h1></h1>
       <nav class="on-left">
         <button data-view-section="back" data-icon="remove" class="up"></button>
-      </nav>
-      <nav class="on-right">
-        <button data-menu-onclick="doSearch" data-icon="search" class="up"></button>
       </nav>
       <nav data-control="groupbar">
         <a data-l10n-id="Chats" data-view-article="chats">Chats</a>
@@ -352,7 +348,32 @@
           </nav>
       </header>
       <article class="scroll">
-          <ul class="fileList"></ul>
+          <ul class="itemList"></ul>
+      </article>
+  </section>
+  <section id="attachment" data-transition="vertical">
+      <header data-title="Attachment" data-l10n-title="Attachment">
+          <nav class="on-left">
+            <button class="up" data-view-section="back" data-icon="remove"></button>
+          </nav>
+      </header>
+      <article class="scroll">
+          <ul class="itemList">
+            <li class="file" data-menu-onclick="fileSend">
+              <i class="material-icons">&#xE24D;</i>
+              <span  data-l10n-id="MediaType_file">File</span>
+            </li>
+            <li class="location" data-menu-onclick="locationSend">
+              <i class="material-icons">&#xE0C8;</i>
+              <span data-l10n-id="MediaType_url">Location</span>
+            </li>
+            <li class="bolt" data-menu-onclick="bolt">
+              <i class="material-icons">&#xE3E7;</i>
+              <span data-l10n-id="MediaType_bolt">Bolt</span>
+            </li>
+        <!--<li class="call" data-menu-onclick="call" data-icon="mobile-phone" data-l10n-id="Call">Call</li>
+            <li class="videocall" data-menu-onclick="videocall" data-icon="video" data-l10n-id="VideoCall">VideoCall</li>-->
+          </ul>
       </article>
   </section>
   <section id="otrMenu" data-transition="vertical">

@@ -756,21 +756,33 @@ section > nav[data-control="menu"] a:before {
 }
 #footbox button {
   position: relative;
-  float: right;
   top: 0.05rem;
-  font-size: 1.2rem;
-  line-height: 1.5rem;
-  padding: .1rem 1rem .2rem 1rem;
-  width: 3.2rem;
-  height: 3.2rem;
-  margin: 0;
-  margin-left: 0.5rem;
+  padding: 0;
   font-weight: bold;
-  background: #E95644;
+  background: none;
   border: none;
-  color: white;
+  color: #E95644;
   box-sizing: border-box;
+  margin: 0;
 }
+
+#footbox button.left {
+  float: left;
+  margin-right: 0.5rem;
+}
+
+#footbox button.right {
+  float: right;
+  margin-left: 0.5rem;
+}
+
+#footbox button, #footbox button i {
+  font-size: 2.5rem;
+  line-height: 2.5rem;
+  height: 1em;
+  width: 1em;
+}
+
 #say {
   display: none;
 }
@@ -1049,25 +1061,39 @@ section > nav[data-control="menu"] a:before {
 #messages li:not(:last-of-type) .lastACK {
   display: none;
 }
+#screenBlocker {
+  height: 100vh;
+  width: 100%;
+  position: absolute;
+  top: 0;
+}
+
 #emoji {
-  background: none repeat scroll 0% 0% rgba(255, 255, 255, 0.8);
-  margin-top: 5.8rem;
-  height: calc(100vh - 17.9rem);
+  background: none repeat scroll 0% 0% #FFF;
+  height: 15rem;
+  box-shadow: 0px 0px 0.4rem rgba(0, 0, 0, 0.4);
+  position: absolute;
+  left: 10px;
+  top: auto;
+  bottom: 10rem;
+  width: 16.1rem;
   padding: 0.5rem;
-  overflow: scroll;
-  border-top: .1rem solid #222;
 }
 #emoji ul {
   list-style-type: none;
+  height: 100%;
+  width: 100%;
+  padding: 0px;
+  overflow: auto;
 }
 #emoji ul li {
-  padding: 1.38rem;
-  float: left;
+  display: inline-block;
+  padding: 0.5rem;
   cursor: pointer;
 }
 #emoji ul li img {
-  width: 2rem;
-  height: 2rem;
+  width: 2.2rem;
+  height: 2.2rem;
 }
 #emoji button {
   width: 100%;
@@ -1258,19 +1284,13 @@ section.profile #settings li .caption {
 #me:not([data-features~=pay]) .accountPurchase {
   display: none;
 }
-#chat:not([data-features~=imageSend]) .picture {
+section#attachment:not([data-features~=imageSend]):not([data-features~=videoSend]):not([data-features~=audioSend]) .file {
   display: none;
 }
-#chat:not([data-features~=videoSend]) .video {
+section#attachment:not([data-features~=locationSend]) .location {
   display: none;
 }
-#chat:not([data-features~=audioSend]) .audio {
-  display: none;
-}
-#chat:not([data-features~=locationSend]) .location {
-  display: none;
-}
-#chat:not([data-features~=attention]) .bolt {
+section#attachment:not([data-features~=attention]) .bolt {
   display: none;
 }
 #status input,
@@ -1335,10 +1355,14 @@ section#pickBackup.extended article {
   top: 5.6rem;
 }
 
-ul.fileList li {
+ul.itemList li {
   border-bottom: 0.1rem solid #B4B2B2;
   font-size: 1.6rem;
   padding: 2.2rem 3rem;
+}
+
+ul.itemList li i {
+  margin-right: 1rem;
 }
 
 aside .cover {
@@ -1708,12 +1732,6 @@ article.form ul.listBox li.add:before {
   /* display buttons on top of the text field */
   button {
     z-index: 3;
-  }
-  /* hide the plus bar completely in this mode */
-  section#chat nav#plus {
-    display: none;
-    visibility: hidden;
-    z-index: -2;
   }
 }
 
