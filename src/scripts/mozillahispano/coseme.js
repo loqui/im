@@ -7330,12 +7330,10 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
 
     for (var i = 0, l = children.length; i < l; i++) {
       child = children[i];
-      if (child.getAttributeValue('id') !== null) {
-        _signalInterface.send(
-          "contact_gotProfilePictureId",
-          [child.getAttributeValue("jid"), child.getAttributeValue("id")]
-        );
-      }
+      _signalInterface.send(
+        "contact_gotProfilePictureId",
+        [child.getAttributeValue("jid"), child.getAttributeValue("id")]
+      );
     }
   }
 
