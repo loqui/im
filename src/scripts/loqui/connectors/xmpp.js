@@ -1,4 +1,4 @@
-/* global App, Providers, Tools, Lungo, $build, $pres, $msg, Avatar, Store, Chat, Message, Account */
+/* global App, Providers, Tools, Lungo, $build, $pres, $msg, Avatar, Store, Chat, Message, Account, Accounts */
 
 'use strict';
 
@@ -251,8 +251,11 @@ App.connectors.XMPP = function (account) {
         this.account.core.avatarHash = b64_sha1(b64);
         this.account.save();
         this.presence.send();
-        $('section#main footer .avatar img').attr('src', url);
-        $('section#me .avatar img').attr('src', url);
+        $('section#main[data-jid="' + jid + '"] footer span.avatar img').attr('src', url);
+        $('aside#accounts article#accounts div[data-jid="' + jid + '"] span.avatar img').attr('src', url);
+        if (Accounts.current === this.account) {
+          $('section#me .avatar img').attr('src', url);
+        }
       }.bind(this), vCardEl.tree());
     }.bind(this));
   };

@@ -280,8 +280,10 @@ var Chat = function (core, account) {
         method(function (a) {
           a.url.then(function (val) {
             avatarize(val);
-            avatars[jid] = a.data;
-            App.avatars = avatars;
+            if (account.supports('easyAvatars')) {
+              avatars[jid] = a.data;
+              App.avatars = avatars;
+            }
           });
         }, jid);
       }
