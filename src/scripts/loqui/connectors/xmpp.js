@@ -268,7 +268,7 @@ App.connectors.XMPP = function (account) {
   this.contacts.remove = function (jid) {
     this.connection.roster.remove(jid);
     this.connection.roster.get(function(){});
-  };
+  }.bind(this);
   
   this.muc.init = function () {
     for (let [i, chat] in Iterator(this.account.core.chats)) {
