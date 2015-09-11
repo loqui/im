@@ -3364,10 +3364,10 @@ CoSeMe.namespace('config', (function(){
     groupDomain: 'g.us',
 
     tokenData: {
-      "v": "2.12.96",
+      "v": "2.13.4",
       // XXX: it is tokenData[d] + - + tokenData[v] + - + port
-      "r": "S40-2.12.96-443",
-      "u": "WhatsApp/2.12.96 S40Version/14.26 Device/Nokia302",
+      "r": "S40-2.13.4-443",
+      "u": "WhatsApp/2.13.4 S40Version/14.26 Device/Nokia302",
       "d": "S40"
     },
 
@@ -5784,7 +5784,7 @@ CoSeMe.namespace('registration', (function(){
   'use strict';
 
   function getToken(phone) {
-    var plain = 'PdA2DJyKoUrwLw1Bg6EIhzh502dF9noR9uFCllGk1439921524310' + phone;
+    var plain = 'PdA2DJyKoUrwLw1Bg6EIhzh502dF9noR9uFCllGk1441744889237' + phone;
     var data = CryptoJS.enc.Latin1.parse(plain);
     var output = CryptoJS.MD5(data);
     return output.toString();
