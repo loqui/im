@@ -704,6 +704,9 @@ var Account = function (core) {
 
     }, function(e){
         Tools.log('UNABLE TO FIND MESSAGE! CARRY ON', from, msgId, e);
+        setTimeout(function(){
+            account.markMesage(task);
+        }, 100);
         callback();
     });
   }.bind(this));
