@@ -163,7 +163,9 @@ $('section#me #card span.avatar').on('click', function (e) {
     var pick = new MozActivity({
       name: 'pick',
       data: {
-        type: ['image/png', 'image/jpg', 'image/jpeg']
+        type: ['image/*'],
+        width : 500,
+        height : 500
       }
     });
     pick.onsuccess = function() {
