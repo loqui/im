@@ -707,8 +707,12 @@ var Account = function (core) {
     }, function(e){
         Tools.log('UNABLE TO FIND MESSAGE! CARRY ON', from, msgId, e);
         setTimeout(function(){
-            account.markMesage(task);
-        }, 100);
+            task.retries = task.retries ? task.retries-1 : 2;
+
+            if (task.retires < 1) {
+              account.markMessage.push(task);
+            }
+        }, 200);
         callback();
     });
   }.bind(this));
