@@ -1,11 +1,11 @@
-/* global Tools, App, Store, Message, Avatar, Providers, Plus, Lungo, Make */
+/* global Tools, App, Store, Message, Avatar, Providers, Plus, Lungo, Make, hasPrototype */
 
 'use strict';
 
 var Chat = {
     _make : function (core, account) {
 
-      this.core = core;
+      this.core = hasPrototype(core, ChatCore) ? core : Make(core, ChatCore)();
       this.account = account;
       this.notification = null;
       this.wakeLock = null;
@@ -335,7 +335,7 @@ var Chat = {
 
           if (chunk) {
             chunk.forEach(function(item, i){
-              if(item.id.split('-')[0] == msgId.split('-')[0]){
+              if((item.id || '').split('-')[0] == msgId.split('-')[0]){
                 found= true;
                 result= {
                   index : i,
