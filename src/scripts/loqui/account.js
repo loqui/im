@@ -709,7 +709,8 @@ var Account = function (core) {
         setTimeout(function(){
             task.retries = task.retries ? task.retries-1 : 2;
 
-            if (task.retires < 1) {
+            if (task.retries > 0) {
+              Tools.log('GONING TO RETRRY!', task.retries, 'RETRIES ARE LEFT');
               account.markMessage.push(task);
             }
         }, 200);
