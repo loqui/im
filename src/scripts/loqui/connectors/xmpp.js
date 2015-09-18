@@ -174,7 +174,7 @@ App.connectors.XMPP = function (account) {
       if (status) {
         msg.c('status', {}, status);
       }
-      msg.c('priority', {}, priority);
+      msg.c('priority', {}, String(priority));
       msg.cnode(this.connection.caps.createCapsNode().tree()).up();
       if (this.account.core.avatarHash) {
         var photoNode = this.account.core.avatarHash ? $build('photo').t(this.account.core.avatarHash) : $build('photo');
