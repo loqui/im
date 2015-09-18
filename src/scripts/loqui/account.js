@@ -1,4 +1,4 @@
-/* global App, Providers, Store, Tools, Messenger, Activity, Menu, Avatar, Message, Chat, Lungo */
+/* global App, Providers, Store, Tools, Messenger, Activity, Menu, Avatar, Message, Chat, Lungo, Make */
 
 'use strict';
 
@@ -621,7 +621,7 @@ var Account = function (core) {
       Tools.log('[sendQ] Flushing', sendQ, sendQ[0]);
       Store.recover(block, function (key, data, free) {
         var content = data[sendQ[0][1]];
-        var msg = new Message(account, {
+        var msg = Make(Message)(account, {
           from: content.from,
           to: content.to,
           text: content.text,
@@ -661,7 +661,7 @@ var Account = function (core) {
     if (ci >= 0) {
       chat = this.chats[ci];
     } else { 
-      chat = new Chat({
+      chat = Make(Chat)({
         jid: jid,
         title: title || jid,
         chunks: []
@@ -700,7 +700,7 @@ var Account = function (core) {
         chat.core.last = msg;
       }
 
-      msg = new Message(account, msg);
+      msg = Make(Message)(account, msg);
       msg.reRender(values.result.chunkIndex);
       account.singleRender(chat);
 

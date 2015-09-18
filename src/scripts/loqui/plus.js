@@ -1,4 +1,4 @@
-/* global Accounts, App, Tools, Lungo, Messenger, Geo, Chat, OTR, Message */
+/* global Accounts, App, Tools, Lungo, Messenger, Geo, Chat, OTR, Message, Make */
 
 'use strict';
 
@@ -76,7 +76,7 @@ var Plus = {
     var chat= null;
     if (ci < 0) {
       var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
-      chat = new Chat({
+      chat = Make(Chat)({
         jid: jid, 
         title: contact ? contact.name || jid : jid,
         chunks: [],
@@ -113,7 +113,7 @@ var Plus = {
       priv: account.OTR.key
     });
     chat.OTR.on('ui', function (text) {
-      var msg = new Message(account, {
+      var msg = Make(Message)(account, {
         to: account.core.user,
         from: chat.core.jid,
         text: text,
@@ -125,7 +125,7 @@ var Plus = {
       msg.postReceive();
     });
     chat.OTR.on('io', function (id, text) {
-      var msg = new Message(account, {
+      var msg = Make(Message)(account, {
         from: account.core.user,
         to: chat.core.jid,
         text: text,

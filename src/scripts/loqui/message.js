@@ -1,20 +1,17 @@
-/* global Chat, Tools, Plus, App, Providers, Store, Activity, Lungo */
+/* global Chat, Tools, Plus, App, Providers, Store, Activity, Lungo, Make */
 
 'use strict';
 
-var Message = function (account, core, options) {
-  
-  this.account = account;
-  this.core = core;
-  this.options = {
-    send: (options && 'send' in options) ? options.send : true,
-    render: (options && 'render' in options) ? options.render : true,
-    otr: (options && 'otr' in options) ? options.otr : false,
-    logging: (options && 'logging' in options) ? options.logging : true,
-    muc: (options && 'muc' in options) ? options.muc : false
-  };
+var Message = {
+  _make : function (account, core, options) {
+    options = options || {};
 
-  this._formatName = function (name) {
+    this.account = account;
+    this.core = core;
+    this.options = Make(options, MessageOptions)();
+  },
+
+  _formatName : function (name) {
     var re = /[A-Za-z-]+/;
     var parts = name.split(' ');
     for (var idx in parts) {
@@ -26,9 +23,9 @@ var Message = function (account, core, options) {
       }
     }
     return parts.join(' ');
-  };
+  },
   
-  this._replace = function() {
+  _replace : function() {
     var msg = this;
     var receipts = this.account.supports('receipts');
 
@@ -46,7 +43,7 @@ var Message = function (account, core, options) {
 
       Store.update(key, block, chunk, free);
 
-      message = new Message(msg.account, message);
+      message = Make(Message)(msg.account, message);
       message.reRender(block, old_id);
 
       message.chat.core.last = message.core;
@@ -70,15 +67,15 @@ var Message = function (account, core, options) {
         console.log('HOW SHOULD WE REPLACE A MESSAGE WE CAN\'T FIND?', result);
       });
     }
-  };
+  },
 
-  this.__defineGetter__('chat', function () {
-    var chatJid = Strophe.getBareJidFromJid(this.options.muc ? this.core.to : (this.core.from == (account.core.user || account.core.fullJid) ? this.core.to : this.core.from));
+  get chat() {
+    var chatJid = Strophe.getBareJidFromJid(this.options.muc ? this.core.to : (this.core.from == (this.account.core.user || this.account.core.fullJid) ? this.core.to : this.core.from));
     var ci = this.account.chatFind(chatJid);
     var chat= null;
     if (ci < 0) {
       var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', chatJid);
-      chat = new Chat({
+      chat = Make(Chat)({
         jid: chatJid, 
         title: (contact ? contact.name : null) || this.core.pushName || chatJid,
         chunks: [],
@@ -90,9 +87,9 @@ var Message = function (account, core, options) {
       chat = this.account.chats[ci];
     }
     return chat;
-  }.bind(this));
+  },
 
-  this.read = function(chat){
+  read : function(chat){
     var isIncoming = (this.core.from != this.account.core.user && this.core.from != this.account.core.realJid);
     var isUnread = !this.core.viewed;
     var hasId = 'id' in this.core;
@@ -118,10 +115,10 @@ var Message = function (account, core, options) {
         Tools.log("VIEWED", message.text, message.id, message.from, values.result);
       });
     }
-  };
+  },
   
   // Try to send this message
-  this.send = function (delay) {
+  send : function (delay) {
     var message = this;
     var chat = this.chat;
     if (chat.OTR) {
@@ -135,11 +132,11 @@ var Message = function (account, core, options) {
     } else {
       this.postSend();
     }
-  };
+  },
   
-  this.postSend = function () {
+  postSend : function () {
     if (this.account.connector.isConnected() && this.options.send) {
-      this.core.id = account.connector.send(this.core.to, this.core.text, {delay: (this.options && 'delay' in this.options) ? this.core.stamp : this.options.delay, muc: this.options.muc});
+      this.core.id = this.account.connector.send(this.core.to, this.core.text, {delay: (this.options && 'delay' in this.options) ? this.core.stamp : this.options.delay, muc: this.options.muc});
 
       if (this.core.original) {
         this._replace();
@@ -151,10 +148,10 @@ var Message = function (account, core, options) {
     if (this.options.render) {
       this.addToChat();
     }
-  };
+  },
   
   // Receive this message, process and store it properly
-  this.receive = function (callback) {
+  receive : function (callback) {
     Tools.log('RECEIVE', this.core.text, this.options);
     var message = this;
     var chat = this.chat;
@@ -169,13 +166,15 @@ var Message = function (account, core, options) {
     } else {
       this.postReceive(callback);
     }
-  };
+  },
   
   // Incoming
-  this.postReceive = function(callback) {
+  postReceive : function(callback) {
     var message = this;
     var chat = this.chat;
     var lock = navigator.requestWakeLock('cpu');
+    var account = this.account;
+
     chat.messageAppend.push({msg: message.core}, function (blockIndex) {
       if (callback) callback();
       lock.unlock();
@@ -221,9 +220,9 @@ var Message = function (account, core, options) {
         chat.core.unread++;
       }
     });
-  };
+  },
 
-  this.setSendTimeout= function(block, index){
+  setSendTimeout : function(block, index){
 	  var message= this.core;
 	  var account= this.account;
       var msg= null;
@@ -241,7 +240,7 @@ var Message = function (account, core, options) {
 			if(msg){
 				if(msg.ack == 'sending'){
 					msg.ack = 'failed';
-					msg= new Message(account, msg);
+					msg= Make(Message)(account, msg);
 					Store.update(key, block, chunk, free);
 					msg.reRender(block);
 				} else {
@@ -252,10 +251,10 @@ var Message = function (account, core, options) {
             }
 		  });
 	  }, 30000);
-  };
+  },
 
   //Outcoming
-  this.addToChat = function () {
+  addToChat : function () {
     var message = this;
     var chat = this.chat;
     var account = this.account;
@@ -297,17 +296,17 @@ var Message = function (account, core, options) {
         chat.core.lastRead = Tools.localize(Tools.stamp());
       }
     });
-  };
+  },
 
-  this.reRender= function(blockIndex, old_id){
+  reRender : function(blockIndex, old_id){
     if($('section#chat')[0].dataset.jid == this.core.to){
       var element= $('section#chat ul#messages li[data-chunk="' + blockIndex + '"] div[data-id="' + (old_id || this.core.id) + '"]');
       element.replaceWith(this.preRender());
     }
-  };
+  },
 
   // Represent this message in HTML
-  this.preRender = function (index, avatarize) {
+  preRender : function (index, avatarize) {
     var message = this;
     var account = this.account;
     var html= null;
@@ -444,6 +443,13 @@ var Message = function (account, core, options) {
     });
 
     return div[0];
-  };
-  
+  }
+};
+
+var MessageOptions = {
+  send: true,
+  render: true,
+  otr: false,
+  logging: true,
+  muc: false
 };

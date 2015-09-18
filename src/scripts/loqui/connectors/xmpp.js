@@ -1,4 +1,4 @@
-/* global App, Providers, Tools, Lungo, $build, $pres, $msg, Avatar, Store, Chat, Message, Account, Accounts */
+/* global App, Providers, Tools, Lungo, $build, $pres, $msg, Avatar, Store, Chat, Message, Account, Accounts, Make */
 
 'use strict';
 
@@ -313,7 +313,7 @@ App.connectors.XMPP = function (account) {
   
   this.muc.join = function (jid, title, password) {
     var account = this.account;
-    var chat = new Chat({
+    var chat = Make(Chat)({
       jid: jid,
       title: title,
       muc: true,
@@ -434,7 +434,7 @@ App.connectors.XMPP = function (account) {
       var stamp = tree.children('delay').length
         ? Tools.localize(tree.children('delay').attr('stamp'))
         : Tools.localize(Tools.stamp());
-      var msg = new Message(account, {
+      var msg = Make(Message)(account, {
         from: Strophe.getBareJidFromJid(from),
         to: Strophe.getBareJidFromJid(to),
         text: body,
@@ -567,7 +567,7 @@ App.connectors.XMPP = function (account) {
       var chat = this.account.chats[this.account.chatFind(from)];
       if (!chat) {
         var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', from);
-        chat = new Chat({
+        chat = Make(Chat)({
           jid: from,
           title: contact ? contact.name || from : from,
           chunks: []

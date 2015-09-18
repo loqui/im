@@ -1,4 +1,4 @@
-/* global App, CoSeMe, Providers, Tools, Avatar, Store, Message, Chat, Account, Accounts, Lungo */
+/* global App, CoSeMe, Providers, Tools, Avatar, Store, Message, Chat, Account, Accounts, Lungo, Make */
 
 'use strict';
 
@@ -440,7 +440,7 @@ App.connectors.coseme = function (account) {
       var date = new Date(timeStamp);
       var stamp = Tools.localize(Tools.stamp(timeStamp));
       var fromUser = from.split('@')[0];
-      var msg = new Message(account, {
+      var msg = Make(Message)(account, {
         id: msgId,
         from: from,
         to: to,
@@ -622,7 +622,7 @@ App.connectors.coseme = function (account) {
       chat.core.participants = participants;
       chat.save();
     } else {
-      chat = new Chat({
+      chat = Make(Chat)({
         jid: jid,
         title: decodeURIComponent(subject),
         muc: true,
@@ -717,7 +717,7 @@ App.connectors.coseme = function (account) {
       var date = new Date(stamp);
       stamp = Tools.localize(Tools.stamp(stamp));
       var fromUser = from.split('@')[0];
-      var msg = new Message(account, {
+      var msg = Make(Message)(account, {
         from: from,
         to: to,
         text: body,
@@ -945,7 +945,7 @@ App.connectors.coseme = function (account) {
       downloaded: true
     };
     var stamp = Tools.localize(Tools.stamp());
-    var msg = new Message(account, {
+    var msg = Make(Message)(account, {
       from: account.core.user,
       id: id,
       to: to,
@@ -975,7 +975,7 @@ App.connectors.coseme = function (account) {
       if (isGroup) {
         msg.pushName = from;
       }
-      msg = new Message(this.account, msg, {
+      msg = Make(Message)(this.account, msg, {
         muc: isGroup
       });
       msg.receive();
