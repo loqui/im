@@ -1,4 +1,4 @@
-/* global Accounts, App, Message, Tools, Lungo, Providers, Menu, Store */
+/* global Accounts, App, Message, Tools, Lungo, Providers, Menu, Store, Make */
 
 'use strict';
 
@@ -22,7 +22,7 @@ var Messenger = {
     text = text || $('section#chat div#text').text();
     text = text.trim();
     if (text.length) {
-      var msg = new Message(account, 
+      var msg = Make(Message)(account,
       {
         from: account.core.user,
         to: to,
@@ -117,9 +117,6 @@ var Messenger = {
       var key = li[0].dataset.key;
       var chat = account.chatGet(jid);
 
-      if(!Array.isArray(chat.core.settings[key])){
-        chat.core.settings[key]= App.defaults.Chat.core.settings[key];
-      }
       if (li[0].dataset.value == 'true') {
         chat.core.settings[key][0] = false;
       } else {
@@ -140,8 +137,8 @@ var Messenger = {
       $('section#contact button[data-menu-onclick="contactRemove"]').addClass('hidden');
     }
 
-    Object.keys(App.defaults.Chat.core.settings).forEach(function(key){
-      var value= chat.core.settings[key] || App.defaults.Chat.core.settings[key];
+    Object.keys(chat.core.settings).forEach(function(key){
+      var value= chat.core.settings[key];
       var li = $('<li/>');
       li[0].dataset.key= key;
       li[0].dataset.value= (value.length > 1 ? value[0] : value);
@@ -207,9 +204,7 @@ var Messenger = {
         var li = sw.closest('li');
         var key = li[0].dataset.key;
         var chat = account.chatGet(jid);
-        if(!Array.isArray(chat.core.settings[key])){
-            chat.core.settings[key]= App.defaults.Chat.core.settings[key];
-        }
+
         if (li[0].dataset.value == 'true') {
           chat.core.settings[key][0] = false;
         } else {
@@ -219,8 +214,8 @@ var Messenger = {
         account.save();
         account.singleRender(chat, false);
       };
-      Object.keys(App.defaults.Chat.core.settings).forEach(function(key){
-        var value= chat.core.settings[key] || App.defaults.Chat.core.settings[key];
+      Object.keys(chat.core.settings).forEach(function(key){
+        var value= chat.core.settings[key];
         var li = $('<li/>');
         li[0].dataset.key= key;
         li.append(

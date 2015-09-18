@@ -1,4 +1,4 @@
-/* global Store, Account, Chat, Messenger, Accounts, Menu, Tools, Lungo */
+/* global Store, Account, Chat, Messenger, Accounts, Menu, Tools, Lungo, Make, ChatCore */
 
 'use strict';
 
@@ -90,13 +90,6 @@ var App = {
     },
     Chat: {
       chunkSize: 30,
-      core: {
-        settings: {
-          muted: [false],
-          otr: [false, 'switchOTR'],
-          hidden: [false]
-        }
-      }
     },
     Connector: {
       presence: {
@@ -200,8 +193,9 @@ var App = {
             // Inflate accounts
             for (let [i, core] in Iterator(cores)) {
               var account = new Account(core);
-              for (let [i, core] in Iterator(core.chats)) {
-                let chat = new Chat(core, account);
+              for (let [i, chcore] in Iterator(core.chats)) {
+                core.chats[i] = chcore = Make(chcore, ChatCore)();
+                let chat = Make(Chat)(chcore, account);
                 account.chats.push(chat);
               }
               accounts.push(account);
@@ -284,7 +278,6 @@ var App = {
           for (var ci in account.chats) {
             var chat = account.chats[ci];
             var muted = chat.core.settings.muted;
-            chat.core.settings = $.extend({}, App.defaults.Chat.core.settings);
             chat.core.settings.muted[0] = muted instanceof Array ? muted[0] : muted;
           }
           account.save();
@@ -297,7 +290,6 @@ var App = {
           for (var ci in account.chats) {
             var chat = account.chats[ci];
             var muted = chat.core.settings.muted;
-            chat.core.settings = $.extend(chat.core.settings, App.defaults.Chat.core.settings);
           }
           account.save();
         }
