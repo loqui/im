@@ -258,12 +258,14 @@ var Messenger = {
           account.connector.connection.roster.subscribe(jid);
 
           account.connector.connection.roster.registerCallback(function cb(items, item){
-            console.log(item);
-            if (item && item.ask == 'subscribe') {
+//            console.log(item);
+            if (item && item.ask == 'subscribe' && item.jid == 'jid') {
               account.connector.connection.roster.authorize(jid);
               account.connector.connection.roster.unregisterCallback(cb);
             }
           });
+
+          account.connector.connection.roster.authorize(jid);
 
           section.find('input').val('');
           account.core.roster.push({
