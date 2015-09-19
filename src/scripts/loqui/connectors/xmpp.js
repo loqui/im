@@ -557,7 +557,9 @@ App.connectors.XMPP = function (account) {
   }.bind(this);
   
   this.events.onSubRequest = function (stanza) {
-    this.connection.roster.authorize(Strophe.getBareJidFromJid($(stanza).attr('from')));
+    var bareJid = Strophe.getBareJidFromJid($(stanza).attr('from'));
+    this.connection.roster.authorize(bareJid);
+    this.connection.roster.subscribe(bareJid);
     return true;
   }.bind(this);
   
