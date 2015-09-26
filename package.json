@@ -19,14 +19,14 @@
   "pre-commit": ["jshint"],
   "devDependencies": {
     "grunt": "~0.4.1",
-    "grunt-contrib-clean": "~0.5.0",
-    "grunt-contrib-compress": "~0.9.1",
-    "grunt-contrib-connect": "~0.6.0",
-    "grunt-contrib-copy": "~0.5.0",
-    "grunt-contrib-watch": "~0.5.3",
+    "grunt-contrib-clean": "~0.6.0",
+    "grunt-contrib-compress": "~0.13.0",
+    "grunt-contrib-connect": "~0.11.2",
+    "grunt-contrib-copy": "~0.8.1",
+    "grunt-contrib-watch": "~0.6.1",
     "grunt-execute": "~0.2.2",
-    "grunt-node-webkit-builder": "~0.2.0",
-    "jsdom": "~2.0.0",
+    "grunt-node-webkit-builder": "~1.0.2",
+    "jsdom": "~6.5.1",
     "jshint": "^2.6.0",
     "pre-commit": "^1.0.1"
   }
