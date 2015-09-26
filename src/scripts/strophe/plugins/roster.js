@@ -143,11 +143,6 @@ Strophe.addConnectionPlugin('roster',
     {
         this._callbacks.push(call_back);
     },
-
-    unregisterCallback: function(call_back)
-    {
-        this._callbacks.splice(this._callbacks.indexOf(callback), 1);
-    },
     /** Function: clearCallbacks
      * clear all callbacks on roster
      */
