@@ -256,15 +256,7 @@ var Messenger = {
         if (jid && name) {
           account.connector.connection.roster.add(jid, name, false, false);
           account.connector.connection.roster.subscribe(jid);
-
-          account.connector.connection.roster.registerCallback(function cb(items, item){
-            console.log(item);
-            if (item && item.ask == 'subscribe') {
-              account.connector.connection.roster.authorize(jid);
-              account.connector.connection.roster.unregisterCallback(cb);
-            }
-          });
-
+          account.connector.connection.roster.authorize(jid);
           section.find('input').val('');
           account.core.roster.push({
             jid: jid,
