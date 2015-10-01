@@ -371,6 +371,7 @@ var Message = {
                     chunk[index[1]].media.downloaded = true;
                     Store.update(key, index[0], chunk, function () {
                       img.dataset.downloaded = true;
+                      free();
                       Tools.log('SUCCESS');
                     });
                   });
