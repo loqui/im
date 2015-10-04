@@ -13,10 +13,12 @@
   "license": {
     "type": "AGPL"
   },
-  "scripts" : {
+  "scripts": {
     "jshint": "node_modules/jshint/bin/jshint -c .jshintrc --exclude-path .gitignore src/scripts/loqui"
   },
-  "pre-commit": ["jshint"],
+  "pre-commit": [
+    "jshint"
+  ],
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-clean": "~0.6.0",
@@ -26,6 +28,7 @@
     "grunt-contrib-watch": "~0.6.1",
     "grunt-execute": "~0.2.2",
     "grunt-node-webkit-builder": "~1.0.2",
+    "grunt-sass": "^1.0.0",
     "jsdom": "~6.5.1",
     "jshint": "^2.6.0",
     "pre-commit": "^1.0.1"
