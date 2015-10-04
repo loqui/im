@@ -10,7 +10,10 @@ module.exports = function(grunt) {
         expand: true,
         cwd: 'src/',
         src: '**',
-        dest: '<%= meta.build %>/firefoxos/'
+        dest: '<%= meta.build %>/firefoxos/',
+        filter: function(src) {
+          return src.indexOf('.scss') < 0;
+        }
       },
       firefoxosToDist: {
         expand: true,
@@ -56,6 +59,10 @@ module.exports = function(grunt) {
     clean: {
       build: {
         src: ['<%= meta.build %>/*', '<%= meta.compress %>/*', '<%= meta.build %>/**/*', 'cache/*', 'cache/**/*']
+      },
+
+      css: {
+        src: ['src/style/loqui/index.css']
       }
     },
     compress: {
@@ -64,9 +71,9 @@ module.exports = function(grunt) {
           archive: '<%= meta.compress %>/LoquiIM-<%= pkg.version %>-firefoxos.zip'
         },
         files: [{
-          expand: true, 
-          cwd: '<%= meta.build %>/firefoxos/', 
-          src: ['**'], 
+          expand: true,
+          cwd: '<%= meta.build %>/firefoxos/',
+          src: ['**'],
           dest: ''
         }]
       },
@@ -75,9 +82,9 @@ module.exports = function(grunt) {
           archive: '<%= meta.compress %>/LoquiIM-<%= pkg.version %>-ubuntutouch.zip'
         },
         files: [{
-          expand: true, 
-          cwd: '<%= meta.build %>/ubuntu-touch/', 
-          src: ['**'], 
+          expand: true,
+          cwd: '<%= meta.build %>/ubuntu-touch/',
+          src: ['**'],
           dest: ''
         }]
       }
@@ -87,7 +94,7 @@ module.exports = function(grunt) {
         platforms: ['win', 'osx', 'linux32', 'linux64'],
         buildDir: '<%= meta.compress %>/desktop',
       },
-      src: ['dist/desktop/**/*'] 
+      src: ['dist/desktop/**/*']
     },
     connect: {
       server: {
@@ -116,6 +123,13 @@ module.exports = function(grunt) {
       renderersCompiler: {
         src: ['renderersCompiler.js']
       }
+    },
+    sass: {
+        compile: {
+            files: {
+                'src/style/loqui/index.css' : 'src/style/loqui/index.scss'
+            }
+        }
     }
   });
   grunt.loadNpmTasks('grunt-contrib-watch');
@@ -124,8 +138,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-node-webkit-builder');
+  grunt.loadNpmTasks('grunt-sass');
   grunt.loadNpmTasks('grunt-execute');
-  grunt.registerTask('default', ['clean', 'execute', 'copy', 'compress']);
-  grunt.registerTask('with-desktop', ['clean', 'execute', 'copy', 'compress', 'nodewebkit']);
+  grunt.registerTask('default', ['clean:build', 'execute', 'sass', 'copy', 'clean:css', 'compress']);
+  grunt.registerTask('with-desktop', ['clean', 'execute', 'sass', 'copy', 'clean:css', 'compress', 'nodewebkit']);
   grunt.registerTask('devel', ['connect', 'watch']);
 };

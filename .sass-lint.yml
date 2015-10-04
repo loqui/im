@@ -1,0 +1,13 @@
+rules:
+    indentation:
+        - 1
+        -
+            size: 4
+    hex-notation: 0
+    no-color-literals: 0
+    property-sort-order: 0
+    no-ids: 0
+    nesting-depth:
+        - 1
+        -
+            max-depth: 3
