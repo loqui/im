@@ -44,7 +44,7 @@ var Messenger = {
     $('section#chat article#main button#plus').show();
     $('section#chat article#main button#say').hide();
   },
-  
+
   csn: function (state) {
     var to = $('section#chat')[0].dataset.jid;
     var account = Accounts.current;
@@ -73,7 +73,7 @@ var Messenger = {
       }
     }
   },
-  
+
   avatarSet: function (blob) {
     var account = Accounts.current;
     if (account.supports('avatarChange')) {
@@ -82,7 +82,7 @@ var Messenger = {
       Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign', 3);
     }
   },
-  
+
   presenceUpdate: function () {
     var account = Accounts.current;
     if (App.online && account.connector.connected) {
@@ -93,7 +93,7 @@ var Messenger = {
       Lungo.Notification.error(_('Error'), _('NoWhenOffline'), 'exclamation-sign', 3);
     }
   },
-  
+
   contactProfile: function (jid) {
 	jid = jid || $('section#chat')[0].dataset.jid;
 
@@ -169,7 +169,7 @@ var Messenger = {
     }
     Lungo.Router.section('contact');
   },
-  
+
   mucProfile: function (jid) {
     var account = Accounts.current;
     jid = jid || $('section#chat')[0].dataset.jid;
@@ -245,7 +245,7 @@ var Messenger = {
     }
     Lungo.Router.section('muc');
   },
-  
+
   contactAdd: function () {
     var account = Accounts.current;
     if (App.online && account.connector.connection.connected) {
@@ -281,7 +281,7 @@ var Messenger = {
       Lungo.Notification.error(_('Error'), _('NoWhenOffline'), 'exclamation-sign', 3);
     }
   },
-  
+
   contactRemove: function (jid) {
     var account = Accounts.current;
     if (App.online && account.connector.connected) {
@@ -320,7 +320,7 @@ var Messenger = {
       Lungo.Notification.error(_('Error'), _('NoWhenOffline'), 'exclamation-sign', 3);
     }
   },
-  
+
   chatRemove: function (jid, account, force) {
     account = account || Accounts.current;
     var index = account.chatFind(jid);
@@ -348,7 +348,7 @@ var Messenger = {
       Lungo.Notification.error(_('Error'), _('NoChatsForContact'), 'exclamation-sign', 3);
     }
   },
-  
+
   mucClear: function (gid, force) {
     var account = Accounts.current;
     var chat = account.chatGet(gid);
@@ -377,7 +377,7 @@ var Messenger = {
       Lungo.Notification.error(_('Error'), _('NoChatsForContact'), 'exclamation-sign', 3);
     }
   },
-  
+
   mucExit: function (gid) {
     var account = Accounts.current;
     var chat = account.chatGet(gid).core;
@@ -388,7 +388,7 @@ var Messenger = {
       this.mucClear(gid, true);
     }
   },
-  
+
   accountRemove: function (jid) {
     var account = Accounts.current;
     var will = confirm(_('ConfirmAccountRemove', {account: account.core.user}));
@@ -410,5 +410,5 @@ var Messenger = {
       }, 3000);
     }
   }
-  
+
 };

@@ -24,7 +24,7 @@ var Message = {
     }
     return parts.join(' ');
   },
-  
+
   _replace : function() {
     var msg = this;
     var receipts = this.account.supports('receipts');
@@ -76,7 +76,7 @@ var Message = {
     if (ci < 0) {
       var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', chatJid);
       chat = Make(Chat)({
-        jid: chatJid, 
+        jid: chatJid,
         title: (contact ? contact.name : null) || this.core.pushName || chatJid,
         chunks: [],
         muc: this.options.muc
@@ -116,7 +116,7 @@ var Message = {
       });
     }
   },
-  
+
   // Try to send this message
   send : function (delay) {
     var message = this;
@@ -133,7 +133,7 @@ var Message = {
       this.postSend();
     }
   },
-  
+
   postSend : function () {
     if (this.account.connector.isConnected() && this.options.send) {
       this.core.id = this.account.connector.send(this.core.to, this.core.text, {delay: (this.options && 'delay' in this.options) ? this.core.stamp : this.options.delay, muc: this.options.muc});
@@ -149,7 +149,7 @@ var Message = {
       this.addToChat();
     }
   },
-  
+
   // Receive this message, process and store it properly
   receive : function (callback) {
     Tools.log('RECEIVE', this.core.text, this.options);
@@ -167,7 +167,7 @@ var Message = {
       this.postReceive(callback);
     }
   },
-  
+
   // Incoming
   postReceive : function(callback) {
     var message = this;
@@ -292,7 +292,7 @@ var Message = {
           li.append(message.preRender());
           ul.append(li);
         }
-        ul[0].scrollTop = ul[0].scrollHeight;   
+        ul[0].scrollTop = ul[0].scrollHeight;
         chat.core.lastRead = Tools.localize(Tools.stamp());
       }
     });

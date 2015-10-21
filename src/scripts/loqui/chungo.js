@@ -6,18 +6,18 @@ var Chungo = {
 
   VERSION: '0.0.1',
   DEVICE: null,
-  
+
   init: function (data) {
-    
+
     $$('document').ready(function() {
       var sections = $$('section');
       sections.first().addClass('show');
       sections.each(function () {
         $$(this).children('article').first().addClass('show');
       });
-      
+
       Chungo.Router._stack = [$$('section').first().attr('id')];
-      
+
       setTimeout(function() {
         var sections = $$('section');
         sections.each(function () {
@@ -25,13 +25,13 @@ var Chungo = {
         });
         $$('[data-view-section]').each(function () {
           $$(this).on('click', function (e) {
-            Chungo.Router.section(e.target.dataset.viewSection);      
+            Chungo.Router.section(e.target.dataset.viewSection);
           });
         });
         $$('[data-view-article]').each(function () {
           $$(this).on('click', function (e) {
             Chungo.Router.article($$(e.target).closest('section').attr('id'), e.target.dataset.viewArticle);
-          }); 
+          });
         });
         $$('[data-view-aside]').each(function () {
           $$(this).on('click', function (e) {
@@ -52,12 +52,12 @@ var Chungo = {
           links.each(function () {
             $$(this).on('click', function (e) {
               $$(this).addClass('selected').siblings().removeClass('selected');
-            });  
+            });
           });
         });
         $$('.chungo .notifier').swipeUp(Chungo.Notification.hide.bind(Chungo.Notification));
       });
-      
+
       setTimeout(function () {
         $$('header[data-title]').each(function () {
           var title = $$(this).data('l10n-title') && '_' in window ? _($$(this).data('l10n-title')) : $$(this).data('title');
@@ -66,7 +66,7 @@ var Chungo = {
           );
         });
       }, 1000);
-      
+
       $$('body').append(
         $$('<div>').addClass('chungo').append(
           $$('<div>').addClass('shader')
@@ -80,17 +80,17 @@ var Chungo = {
           )
         )
       );
-      
+
     });
-    
+
   },
-  
+
   Core: {
-  
+
     environment: function () {
       return $$.environment();
     },
-    
+
     findByProperty: function (list, key, value) {
       var ret = null;
       if (list instanceof Array && 'find' in Array.prototype) {
@@ -107,11 +107,11 @@ var Chungo = {
       }
       return ret;
     }
-    
+
   },
-  
+
   Element: {
-    
+
     count: function (query, value) {
       var result = $$(query);
       for (var i = 0; i < result.length; i++) {
@@ -124,17 +124,17 @@ var Chungo = {
         }
       }
     },
-    
+
     progress: function (value) {
       Tools.log(value);
     }
-    
+
   },
-  
+
   Router: {
-  
+
     _stack: [],
-    
+
     section: function (to) {
       var from = null;
       if (this._stack[this._stack.length - 1] != to) {
@@ -182,22 +182,22 @@ var Chungo = {
         Chungo.Aside.hide();
       }, to != from ? 300 : 0);
     },
-    
+
     article: function (section, article) {
       this.section(section);
       var to = $$('section#' + section).children('article#' + article);
       to.addClass('show').siblings('article').removeClass('show');
     }
-    
+
   },
-  
+
   Aside: {
-  
+
     _current: {
       id: undefined,
       open: false
     },
-    
+
     show: function (id) {
       $$('aside#' + id)[0].scrollTop = 0;
       $$('aside#' + id).addClass('show');
@@ -207,13 +207,13 @@ var Chungo = {
         open: true
       };
     },
-    
+
     hide: function () {
       $$('aside#' + this._current.id).removeClass('show');
       $$('section').removeClass('asided');
       this._current.open = false;
     },
-    
+
     toggle: function (id) {
       if (this._current.open) {
         this.hide();
@@ -221,16 +221,16 @@ var Chungo = {
         this.show(id);
       }
     }
-    
+
   },
-  
+
   Notification: {
-  
+
     get _sha() { return $$('.chungo .shader'); },
     get _not() { return $$('.chungo .notifier'); },
-    
+
     _timeout: [],
-    
+
     _unified: function (type, icon, title, description, seconds, cb) {
       this._not.data('type', type);
       this._not.children('.icon')[0].className = icon + ' icon';
@@ -250,19 +250,19 @@ var Chungo = {
         cb
       ];
     },
-    
+
     show: function (icon, title, seconds, cb) {
       this._unified('neutral', icon, title, null, seconds, cb);
     },
-    
+
     error: function (title, description, icon, seconds, cb) {
       this._unified('error', icon, title, description, seconds, cb);
     },
-    
+
     success: function (title, description, icon, seconds, cb) {
       this._unified('success', icon, title, description, seconds, cb);
     },
-    
+
     hide: function () {
       this._sha.addClass('out');
       this._not.addClass('out');
@@ -274,10 +274,10 @@ var Chungo = {
         this._timeout[1]();
       }
     }
-    
-    
+
+
   }
-  
+
 };
 
 var Lungo = Chungo;

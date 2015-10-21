@@ -10,7 +10,7 @@ $('document').ready(function(){
   document.addEventListener('localized', function(e) {
     $('section#welcome article#main h1').removeClass('hidden');
   });
-  
+
   setTimeout(function(){
     $('input[data-l10n-placeholder]').each(function () {
       var original = this.dataset.l10nPlaceholder;
@@ -231,7 +231,7 @@ $('section#me #card button.background.change').on('click', function (e) {
           Lungo.Notification.show('star', _('backChanged'), 3);
 
           free();
-        }.bind(this)); 
+        }.bind(this));
       });
     };
     e.onerror = function () {
@@ -248,7 +248,7 @@ $('section#me #card button.background.delete').on('click', function (e) {
     Store.blockDrop(account.core.background, function () {
       $('section#chat ul#messages').css('background-image', 'none');
       $('section.profile div#card').css('background-image', 'none');
-      Lungo.Notification.show('star', _('backChanged'), 3); 
+      Lungo.Notification.show('star', _('backChanged'), 3);
     });
   }
   account.core.background = null;
@@ -321,26 +321,38 @@ var bindings = function () {
   $('section#chat').on('swipeRight', function () {
     Lungo.Router.section('back');
   });
+
   $('section#main').on('click', function(e){
     if($(e.target).hasClass('asided')){
       Lungo.Aside.hide();
     }
-  }).on('swipeLeft', function(e){
+  })
+
+  .on('swipeLeft', function(e){
     if($(e.target).hasClass('asided')){
       Lungo.Aside.hide();
     } else if($('section#chat[data-jid]').length > 0) {
       Lungo.Router.section('chat');
     }
-  }).on('swipeRight', function () {
+  })
+
+  .on('swipeRight', function () {
     Lungo.Aside.show('accounts');
-  }).on('swipeUp', function () {
-    $('.floater').addClass('hidden');
-  }).on('swipeDown', function () {
-    $('.floater').removeClass('hidden');
   });
+
+  $('#main #chats').on('scroll', Tools.throttle(function (e) {
+
+    if (e.target.scrollTop > 0) {
+      $('.floater').addClass('hidden');
+    } else {
+      $('.floater').removeClass('hidden');
+    }
+  }, 100));
+
   $('aside').on('swipeLeft', function () {
     Lungo.Aside.hide();
   });
+
   $('#debugConsole #showConsole').on('click', function () {
     Plus.showConsole();
     $('#debugConsole #showConsole').hide();

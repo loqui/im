@@ -9,8 +9,8 @@ var Providers = {
       connector: {
         type: 'coseme'
       },
-      features: ['localContacts', 'receipts', 'imageSend', 'videoSend', 
-        'audioSend', 'locationSend', 'pay', 'muc', 'csn', 'avatarChange', 
+      features: ['localContacts', 'receipts', 'imageSend', 'videoSend',
+        'audioSend', 'locationSend', 'pay', 'muc', 'csn', 'avatarChange',
         'nickChange', 'statusChange', 'presence', 'mucCreate', 'readReceipts'],
       color: '#254242',
       terms: {
@@ -48,7 +48,7 @@ var Providers = {
         timeout: 300
       },
       autodomain: 'gmail.com',
-      features: ['multi', 'presence', 'vcard', 'easyAvatars', 'avatarChange', 
+      features: ['multi', 'presence', 'vcard', 'easyAvatars', 'avatarChange',
         'rosterMgmt', 'csn', 'delay', 'statusChange', 'attention', 'show'],
       color: '#4EA43B',
       terms: {
@@ -95,7 +95,7 @@ var Providers = {
       },
       emoji: 'XMPP'
     },
-    
+
     'lync': {
       longName: 'Microsoft Lync',
       altname: 'Lync',
@@ -123,9 +123,9 @@ var Providers = {
         timeout: 300
       },
       autodomain: false,
-      features: ['multi', 'vcard', 'presence', 'easyAvatars', 'rosterMgmt', 
-        'avatarChange', 'attention', 'csn', 'delay', 'time', 'statusChange', 
-        'show', 'muc', 'mucCreate', 'mucJoin', 'receipts', 'federation', 
+      features: ['multi', 'vcard', 'presence', 'easyAvatars', 'rosterMgmt',
+        'avatarChange', 'attention', 'csn', 'delay', 'time', 'statusChange',
+        'show', 'muc', 'mucCreate', 'mucJoin', 'receipts', 'federation',
         'time'],
       color: '#149ED2',
       terms: {
@@ -137,14 +137,14 @@ var Providers = {
       emoji: 'XMPP'
     }
   },
-  
+
   // Autocompletes adresses with default domain names
   autoComplete: function (user, provider) {
     var bits = user.split('@');
     var autodomain = Providers.data[provider].autodomain;
     if (autodomain) {
-      user = bits.length > 1 ? 
-        (bits[0] + '@' + autodomain) : 
+      user = bits.length > 1 ?
+        (bits[0] + '@' + autodomain) :
         (user + '@' + autodomain);
     }
     return user;

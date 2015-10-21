@@ -14,7 +14,7 @@ var Tools = {
   convenientDate: function (stamp) {
     var day = this.day(stamp);
     var today = this.day(this.localize(this.stamp()));
-    var dayString = 
+    var dayString =
       day.toString() == today.toString()
       ?
         _('Today')
@@ -32,13 +32,13 @@ var Tools = {
     hour = hour[1].split(':');
     return hour[0]+':'+hour[1];
   },
-  
+
   day: function (stamp) {
     var day = stamp.split('T');
     day = day[0].split('-');
     return day;
   },
-  
+
   stamp: function (date) {
     date = date ? new Date(parseInt(date)*1000) : new Date();
     return date.getUTCFullYear()+"-"
@@ -48,7 +48,7 @@ var Tools = {
   	  +("0"+(date.getUTCMinutes())).slice(-2)+":"
   	  +("0"+(date.getUTCSeconds())).slice(-2)+"Z";
   },
-  
+
   unstamp: function (stamp) {
     if (typeof stamp == 'string') {
       var ymdhms = stamp.split('T');
@@ -57,7 +57,7 @@ var Tools = {
       return new Date(ymd[0], ymd[1]-1, ymd[2], hms[0], hms[1], hms[2]);
     }
   },
-  
+
   localize: function (utc) {
     var offset = new Date().getTimezoneOffset();
     var ymdhms = utc.split('T');
@@ -72,7 +72,7 @@ var Tools = {
       +('0'+(date.getMinutes())).slice(-2)+':'
       +('0'+(date.getSeconds())).slice(-2)+'Z';
   },
-  
+
   unlocalize: function (local) {
     var offset = new Date().getTimezoneOffset();
     var ymdhms = local.split('T');
@@ -87,19 +87,19 @@ var Tools = {
       +('0'+(date.getMinutes())).slice(-2)+':'
       +('0'+(date.getSeconds())).slice(-2)+'Z';
   },
-  
+
   urlHL: function (text) {
     var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
     return text.replace(exp,'<a href=\'$1\' target=\'_blank\'>$1</a>');
   },
-  
+
   // By BMintern https://gist.github.com/BMintern/1795519
   HTMLescape: function (str) {
     var div = document.createElement('div');
     div.appendChild(document.createTextNode(str));
     return div.innerHTML.replace(/\n/g, '<br>\n');
   },
-  
+
   fileGet: function (url, cb) {
     var progress = function (event) {
       if (event.lengthComputable) {
@@ -133,7 +133,7 @@ var Tools = {
     var country = i18n.phonenumbers.metadata.countryCodeToRegionCodeMap[cc][0];
     return formatE164(country, num).replace(/[\s\-\+]/g, '');
   },
-  
+
   countries: function () {
     var xhr = new XMLHttpRequest();
     xhr.overrideMimeType('application/json');
@@ -142,11 +142,11 @@ var Tools = {
     var countries = JSON.parse(xhr.responseText) || {};
     return countries;
   },
-  
+
   textBlob: function (text) {
     return new Blob([text], {type: 'text/plain'});
   },
-  
+
   textUnblob: function (blob, cb) {
     var fr = new FileReader();
     fr.addEventListener('loadend', function () {
@@ -155,7 +155,7 @@ var Tools = {
     });
     fr.readAsText(blob);
   },
-  
+
   picThumb: function (blob, width, height, callback) {
     var reader = new FileReader();
     reader.onloadend = function (e) {
@@ -183,7 +183,7 @@ var Tools = {
   audThumb: function (blob, width, height, callback) {
     callback('img/audio.png');
   },
-  
+
   locThumb: function (blob, width, height, callback) {
     callback('img/location.png');
   },
@@ -249,7 +249,7 @@ var Tools = {
     var blob = new Blob(byteArrays, { type: contentType });
     return blob;
   },
-  
+
   blobToBase64: function (blob, cb) {
     var reader = new FileReader();
     reader.onloadend = function (e) {
@@ -271,7 +271,7 @@ var Tools = {
 
     return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + '-' + s4() + s4() + s4();
   },
-  
+
   nickToColor: function (nick) {
     var hash = MD5.hash(nick);
     var segSize = Math.floor(hash.length / 3);
@@ -280,12 +280,12 @@ var Tools = {
     var b = (hash.substr(segSize * 2).split('').reduce(function (prev, cur) {return prev + parseInt(cur.charCodeAt(0));}, 0) % 255).toString(16);
     return '#' + (r.length < 2 ? '0' + r : r) + (g.length < 2 ? '0' + g : g) + (b.length < 2 ? '0' + b : b);
   },
-  
+
   explode: function (str, len) {
     if (str.length < len) return str;
     return str.slice(0, len) + '<br />' + Tools.explode(str.slice(len), len);
   },
-  
+
   fingerprintToImage: function (fingerprint) {
     var canvas = document.createElement('canvas');
     canvas.width = 160;
@@ -299,7 +299,7 @@ var Tools = {
     }
     return canvas.toDataURL('image/png');
   },
-  
+
   toArray: function (o) {
     var a = [];
     for (var i in o) {
@@ -344,6 +344,50 @@ var Tools = {
 
       return stack;
     }
+  },
+
+  debounce: function(func, wait, immediate) {
+	var timeout;
+	return function() {
+	  var context = this, args = arguments;
+      var callNow = immediate && !timeout;
+
+      var later = function() {
+	    timeout = null;
+		if (!immediate) func.apply(context, args);
+	  };
+
+	  clearTimeout(timeout);
+	  timeout = setTimeout(later, wait);
+
+      if (callNow) func.apply(context, args);
+	};
+  },
+
+  throttle: function(callback, wait) {
+    var time,
+        go = true,
+        again = null;
+        
+    return function(e) {
+      if(go) {
+        go = false;
+        time = setTimeout(function(){
+          time = null;
+          go = true;
+
+          if(again) {
+            callback.apply(this, again);
+          }
+
+          again = null;
+        }.bind(this), wait);
+
+        callback.apply(this, arguments);
+      } else {
+        again = arguments;
+      }
+    };
   }
 
 };

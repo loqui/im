@@ -5,13 +5,13 @@
 var Store = {
 
   size: 0,
-  
+
   cache: [],
 
   locks : {},
 
   waiting : [],
-  
+
   init: function (){
     Store.recover(0, function (key, size, free) {
       Store.size = size || 0;
@@ -19,7 +19,7 @@ var Store = {
       free();
     });
   },
-  
+
   block: function (value) {
     this.value = value;
     this.save = function (callback) {
@@ -31,7 +31,7 @@ var Store = {
       });
     };
   },
-  
+
   save: function (value, callback) {
     var block = new Store.block(JSON.stringify(value));
     var key = Store.lock(0);
@@ -49,7 +49,7 @@ var Store = {
     Store.unlock(0, key);
     return block.index;
   },
-  
+
   recover: function (index, callback) {
     var stack = stack || Tools.currentStack();
 
@@ -85,7 +85,7 @@ var Store = {
     });
 
   },
-  
+
   update: function (key, index, value, callback) {
     if(this.locks[index] == key){
       var block = new Store.block(JSON.stringify(value));
@@ -102,11 +102,11 @@ var Store = {
       console.error('unable to write block '+ index +'! Free the current lock!');
     }
   },
-  
+
   drop: function (key, callback) {
     asyncStorage.removeItem(key, callback);
   },
-  
+
   lock : function(index, stack) {
     var key = {
       hash : (Date.now() * Math.random() * Date.now()).toString(16),
@@ -148,21 +148,21 @@ var Store = {
   blockDrop: function (index, callback) {
     this.drop('b' + index, callback);
   },
-  
+
   put: function (key, value, callback) {
   	asyncStorage.setItem(key, JSON.stringify(value), callback);
   },
-  
+
   get: function (key, callback) {
     asyncStorage.getItem(key, function (value) {
       callback(JSON.parse(value));
     });
   },
-  
+
   SD: {
-    
+
     card: 'getDeviceStorage' in navigator ? navigator.getDeviceStorage('sdcard') : null,
-    
+
     save: function (path, content, onsuccess, onerror) {
       var type = Tools.getFileType(path.split('.').pop());
       if (this.card) {
@@ -185,7 +185,7 @@ var Store = {
         Store.put('fakesdcard_' + path, {content: content, type: type}, onsuccess);
       }
     },
-    
+
     recover: function (path, onsuccess, onerror) {
       if (this.card) {
         var req = this.card.get(path);
@@ -211,7 +211,7 @@ var Store = {
         });
       }
     },
-      
+
     copy : function (from, to, onsuccess, onerror) {
       if (this.card) {
         var req = this.card.get(from);
@@ -261,7 +261,7 @@ var Store = {
 
       }
     }
-    
+
   }
-      
+
 };
