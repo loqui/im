@@ -9,7 +9,7 @@ App.connectors.coseme = function (account) {
   var MI = Yowsup.getMethodsInterface();
 
   var pulse= null;
-  
+
   this.account = account;
   this.provider = Providers.data[account.core.provider];
   this.presence = {
@@ -25,7 +25,7 @@ App.connectors.coseme = function (account) {
     membersCache: []
   };
   this.connected = false;
-  
+
   this.connect = function (callback) {
     var method = 'auth_login';
     var params = [this.account.core.data.login, this.account.core.data.pw];
@@ -66,7 +66,7 @@ App.connectors.coseme = function (account) {
     MI.call(method, params);
     callback.connecting();
   };
-  
+
   this.disconnect = function () {
     this.connected = false;
     var method = 'disconnect';
@@ -77,16 +77,16 @@ App.connectors.coseme = function (account) {
     }
     MI.call(method, params);
   };
-  
+
   this.isConnected = function () {
     return App.online && this.connected;
   };
-  
+
   this.start = function () {
     Tools.log('CONNECTOR START');
     this.handlers.init();
   };
-  
+
   this.sync = function (callback) {
     var getStatusesAndPics = function (contacts) {
       contacts = contacts || this.account.core.chats.map(function(e){ return e.jid; });
@@ -117,11 +117,11 @@ App.connectors.coseme = function (account) {
       callback(getStatusesAndPics);
     }
   }.bind(this);
-  
+
   this.contacts.getStatus = function (jids) {
     MI.call('contacts_getStatus', [jids]);
   }.bind(this);
-  
+
   this.contacts.sync = function (cb) {
     if (App.online) {
       Tools.log('SYNCING CONTACTS');
@@ -134,15 +134,15 @@ App.connectors.coseme = function (account) {
         if (this.result) {
           try {
             var result = this.result;
-            var fullname = (result.givenName[0] 
-              ? result.givenName[0] + ' ' + (result.familyName 
-                ? (result.familyName[0] || '') : 
+            var fullname = (result.givenName[0]
+              ? result.givenName[0] + ' ' + (result.familyName
+                ? (result.familyName[0] || '') :
                 ''
-              ) 
-              : (result.familyName ? 
-                  result.familyName[0] 
-                : (result.tel 
-                  ? result.tel[0] 
+              )
+              : (result.familyName ?
+                  result.familyName[0]
+                : (result.tel
+                  ? result.tel[0]
                   : ''
                 )
               )).trim();
@@ -170,7 +170,7 @@ App.connectors.coseme = function (account) {
       Lungo.Notification.error(_('ContactsGetError'), _('NoWhenOffline'), 'exclamation-sign', 5);
     }
   }.bind(this);
-  
+
   this.contacts.order = function (cb) {
     this.account.core.roster.sort(function (a,b) {
       var aname = a.name ? a.name : a.jid;
@@ -181,7 +181,7 @@ App.connectors.coseme = function (account) {
       cb();
     }
   }.bind(this);
-  
+
   this.contacts.remove = function () {
   };
 
@@ -205,7 +205,7 @@ App.connectors.coseme = function (account) {
     };
     this.account.save();
   }.bind(this);
-  
+
   this.presence.send = function (show, status, name) {
     if (App.online) {
       show = show || this.presence.show;
@@ -225,18 +225,18 @@ App.connectors.coseme = function (account) {
       }
     }
   }.bind(this);
-  
+
   this.send = function (to, text, options) {
     var method = options.isBroadcast ? 'message_broadcast' : 'message_send';
     var params = [to, text];
     return MI.call(method, params);
   }.bind(this);
-  
+
   this.ack = function (id, from, type) {
     type = type || 'delivery';
     MI.call('message_ack', [from, id, type]);
   };
-  
+
   this.avatar = function (callback, id) {
     var method = 'contact_getProfilePicture';
     MI.call(method, [id]);
@@ -244,7 +244,7 @@ App.connectors.coseme = function (account) {
       callback(new Avatar({url: 'img/foovatar.png'}));
     }
   };
-  
+
   this.muc.avatar = function (callback, id) {
     var method = 'group_getPicture';
     MI.call(method, [id]);
@@ -252,44 +252,44 @@ App.connectors.coseme = function (account) {
       callback(new Avatar({url: 'img/goovatar.png'}));
     }
   };
-  
+
   this.emojiRender = function (img, emoji) {
     App.emoji[Providers.data[this.account.core.provider].emoji].render(img, emoji);
   }.bind(this);
-  
+
   this.csnSend = function (to, state) {
     var method = state == 'composing' ? 'typing_send' : 'typing_paused';
     MI.call(method, [to]);
   };
-  
+
   this.groupsGet = function (type) {
     var method = 'group_getGroups';
     MI.call(method, [type]);
   };
-  
+
   this.muc.participantsGet = function (jid) {
     var method = 'group_getInfo';
     MI.call(method, [jid]);
   }.bind(this);
-  
+
   this.muc.create = function (subject, server, members) {
     var method = 'group_create';
     var idx = MI.call(method, [subject]);
     this.muc.membersCache[idx] = members;
   }.bind(this);
-  
+
   this.muc.expel = function (gid, jid) {
-    var [method, params] = jid ? 
+    var [method, params] = jid ?
       ['group_removeParticipants', [gid, jid]] :
       ['group_end', [gid]];
     MI.call(method, params);
   }.bind(this);
-  
+
   this.muc.invite = function (gid, members, title) {
     var method = 'group_addParticipants';
     MI.call(method, [gid, members]);
   }.bind(this);
-  
+
   this.fileSend = function (jid, blob) {
     var reader = new FileReader();
     reader.addEventListener("loadend", function () {
@@ -310,7 +310,7 @@ App.connectors.coseme = function (account) {
     });
     reader.readAsBinaryString(blob);
   };
-  
+
   this.locationSend = function (jid, loc) {
     var self = this;
     Tools.locThumb(loc, 120, 120, function (thumb) {
@@ -320,7 +320,7 @@ App.connectors.coseme = function (account) {
       App.audio('sent');
     });
   };
-  
+
   this.avatarSet = function (blob) {
     function UrlToBin (url, cb) {
       var reader = new FileReader();
@@ -342,7 +342,7 @@ App.connectors.coseme = function (account) {
       });
     });
   };
-  
+
   this.handlers.init = function () {
     Tools.log('HANDLERS INIT');
     var signals = {
@@ -423,14 +423,14 @@ App.connectors.coseme = function (account) {
     var method = 'cleardirty';
     MI.call(method, [categories]);
   };
-  
+
   this.events.onContactStatusUpdated = function (jid, msgId, status) {
     this.events.onPresenceUpdated(jid, undefined, status);
 
     var method = 'notification_ack';
     MI.call(method, [jid, msgId]);
   };
-  
+
   this.events.onMessage = function (msgId, from, msgData, timeStamp, wantsReceipt, pushName, isBroadcast) {
     Tools.log('MESSAGE', msgId, from, msgData, timeStamp, wantsReceipt, pushName, isBroadcast);
     var account = this.account;
@@ -484,7 +484,7 @@ App.connectors.coseme = function (account) {
     var to = this.account.core.fullJid;
     return this.mediaProcess('url', msgId, fromAttribute, to, [mlatitude, mlongitude, name], null, null, wantsReceipt, false);
   };
-  
+
   this.events.onVCardReceived = function (msgId, fromAttribute, vcardName, vcardData, wantsReceipt, isBroadcast) {
     var to = this.account.core.fullJid;
     return this.mediaProcess('vCard', msgId, fromAttribute, to, vcardName, vcardData, null, wantsReceipt, false);
@@ -573,7 +573,7 @@ App.connectors.coseme = function (account) {
       $("section#chat #typing").hide();
     }
   };
-  
+
   this.events.onMessageSent = function (from, msgId) {
     Tools.log('SENT', from, msgId);
     account.markMessage.push({from : from, msgId : msgId});
@@ -588,7 +588,7 @@ App.connectors.coseme = function (account) {
     Tools.log('DELIVERED', from, msgId, type);
     MI.call('delivered_ack', [from, msgId, type]);
   };
-  
+
   this.events.onMessageVisible = function (from, msgId) {
     Tools.log('VISIBLE', from, msgId);
     MI.call('visible_ack', [from, msgId]);
@@ -637,7 +637,7 @@ App.connectors.coseme = function (account) {
       chat.save(true);
     }
   };
-  
+
   this.events.onGroupGotPicture = function (jid, picId, blob) {
     var account = this.account;
     var avatars= App.avatars;
@@ -662,7 +662,7 @@ App.connectors.coseme = function (account) {
       });
     }
   };
-  
+
   this.events.onGroupGotParticipants = function (jid, participants) {
     var account = this.account;
     var ci = account.chatFind(jid);
@@ -677,7 +677,7 @@ App.connectors.coseme = function (account) {
       }
     }
   };
-  
+
   this.events.onGroupAddParticipantsSuccess = function (jid, participants) {
     var account = this.account;
     var ci = account.chatFind(jid);
@@ -690,15 +690,15 @@ App.connectors.coseme = function (account) {
       }
     }
   };
-  
+
   this.events.onGroupRemoveParticipantsSuccess = function (jid, participants) {
     Lungo.Notification.success(_('Removed'), null, 'trash', 3);
   };
-  
+
   this.events.onGroupEndSuccess = function (gid) {
     Lungo.Notification.success(_('Removed'), null, 'trash', 3);
   };
-  
+
   this.events.onGroupCreateSuccess = function (gid, idx) {
     Lungo.Notification.show('download', _('Synchronizing'), 5);
     Lungo.Router.section('back');
@@ -706,7 +706,7 @@ App.connectors.coseme = function (account) {
     MI.call('group_addParticipants', [gid, members]);
     delete this.muc.membersCache[idx];
   };
-  
+
   this.events.onGroupMessage = function (msgId, from, author, data, stamp, wantsReceipt, pushName) {
     Tools.log('GROUPMESSAGE', msgId, from, author, data, stamp, wantsReceipt, pushName);
     var account = this.account;
@@ -802,14 +802,14 @@ App.connectors.coseme = function (account) {
   this.events.onGroupLocationReceived = function (msgId, group, author, name, mediaPreview, mlatitude, mlongitude, wantsReceipt) {
     return this.mediaProcess('url', msgId, author, group, [mlatitude, mlongitude, name], null, null, wantsReceipt, true);
   };
-  
+
   this.events.onContactsGotStatus = function (id, statuses) {
     var i = Iterator(statuses);
     for (let [jid, status] in i) {
       this.events.onPresenceUpdated(jid, undefined, status);
     }
   };
-  
+
   this.events.onContactsSync = function (id, positive, negative) {
     this.account.core.roster = [];
     for (var i in positive) {
@@ -833,7 +833,7 @@ App.connectors.coseme = function (account) {
     this.account.save();
     this.account.allRender();
   };
-  
+
   this.events.onPresenceUpdated = function (jid, lastSeen, msg) {
     var account = this.account;
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
@@ -847,7 +847,7 @@ App.connectors.coseme = function (account) {
       }
     }
   }.bind(this);
-  
+
   this.events.onPresenceAvailable = function (jid) {
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
     if (contact) {
@@ -856,7 +856,7 @@ App.connectors.coseme = function (account) {
       account.presenceRender(jid);
     }
   };
-  
+
   this.events.onPresenceUnavailable = function (jid, last) {
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
     if (contact) {
@@ -866,16 +866,16 @@ App.connectors.coseme = function (account) {
       account.presenceRender(jid);
     }
   };
-  
+
   this.events.onProfileSetPictureSuccess = function (pictureId) {
     Tools.log('CHANGED AVATAR TO', pictureId);
     this.events.onAvatar(this.account.core.fullJid, pictureId);
   };
-  
+
   this.events.onProfileSetPictureError = function (err) {
     Lungo.Notification.error(_('NotUploaded'), _('ErrorUploading'), 'warning-sign', 5);
   };
-  
+
   this.events.onUploadRequestSuccess = function (hash, url, resumeFrom) {
     Tools.log('onUploadRequest!');
     var self = this;
@@ -1001,7 +1001,7 @@ App.connectors.coseme = function (account) {
         break;
     }
   };
-    
+
 };
 
 App.logForms.coseme = function (provider, article) {
@@ -1153,8 +1153,8 @@ App.logForms.coseme = function (provider, article) {
                       resource: App.defaults.Account.core.resource,
                       enabled: true,
                       chats: []
-                    }); 
-                    account.test();  
+                    });
+                    account.test();
                 } else {
                   Tools.log('Not valid', 'Reason:', data.reason, 'with DID', deviceId);
                   Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
@@ -1162,7 +1162,7 @@ App.logForms.coseme = function (provider, article) {
               } else {
                 Tools.log('Could not sent SMS', 'Reason:', data.reason, 'with DID', deviceId);
                 Lungo.Notification.error(_('SMSnotSent'), _('SMSreason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
-              }        
+              }
             };
             var onerror = function (data) {};
             deviceId = CoSeMe.registration.getCode(cc, user, onsent, onerror, deviceId, 0, 0, document.webL10n.getLanguage(), 'sms');
@@ -1205,8 +1205,8 @@ App.logForms.coseme = function (provider, article) {
                         resource: App.defaults.Account.core.resource,
                         enabled: true,
                         chats: []
-                      }); 
-                      account.test();  
+                      });
+                      account.test();
                   } else {
                     Tools.log('Not valid', 'Reason:', data.reason, 'with DID', deviceId);
                     Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
@@ -1214,7 +1214,7 @@ App.logForms.coseme = function (provider, article) {
                 } else {
                   Tools.log('Could not sent phone call', 'Reason:', data.reason, 'with DID', deviceId);
                   Lungo.Notification.error(_('VoicenotSent'), _('SMSreason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
-                }        
+                }
               };
               var onerror = function (data) {};
               deviceId = CoSeMe.registration.getCode(cc, user, onsent, onerror, deviceId, 0, 0, document.webL10n.getLanguage(), 'voice');
@@ -1253,12 +1253,12 @@ App.logForms.coseme = function (provider, article) {
                   enabled: true,
                   chats: []
                 });
-                account.test();  
+                account.test();
               }
             };
             var onerror = function (error) {
               Tools.log('Not valid', 'Reason:', data.reason);
-              Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);            
+              Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
             };
             Lungo.Notification.show('copy', _('CodeValidating'));
             CoSeMe.registration.register(cc, user, rCode, onready, onerror, deviceId);
@@ -1481,7 +1481,7 @@ App.emoji.coseme = {
 ["e132","1f3c1"],
 ["e143","1f38c"]
 ],
-  
+
   charToData: function (char) {
     var data = char;
     for (var i in this.map) {
@@ -1493,7 +1493,7 @@ App.emoji.coseme = {
     }
     return data;
   },
-   
+
   fy: function (text) {
     var mapped = text;
     if (mapped && mapped.match(/[\ue000-\ue999]|[\u1f000-\u1f999]|[\u00aa-\uffff]/g)) {
@@ -1507,11 +1507,11 @@ App.emoji.coseme = {
     }
     return mapped;
   },
-  
+
   render: function (img, emoji) {
     var code = typeof emoji[1] == 'string' ? emoji[1] : emoji[1].join('-');
     img.attr('src', '/img/emoji/coseme/' + code + '.png');
     img[0].dataset.emoji= String.fromCodePoint(parseInt(emoji[1], 16));
   }
-  
+
 };

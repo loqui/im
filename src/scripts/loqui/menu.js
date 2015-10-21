@@ -195,7 +195,7 @@ var Menu = {
       var emojiList = App.emoji[Providers.data[account.core.provider].emoji].map;
       if (ul.children('li').length != emojiList.length) {
         Lungo.Notification.show('heart', _('Loading...'));
-        setTimeout(function () {      
+        setTimeout(function () {
           ul.empty();
           for (var i in emojiList) {
             var emoji = emojiList[i];
@@ -291,12 +291,12 @@ var Menu = {
       }
     }
   },
-  
+
   // Opens a certain menu
   show: function (which, attr, delay) {
     console.log('SHOW', which, attr, delay);
     var map = this.map;
     setTimeout(function () { map[which](attr); }, delay );
   }
-  
+
 };

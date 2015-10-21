@@ -38,7 +38,7 @@ var Chat = {
         }
       }
     },
-  
+
 //  Render last chunk of messages
     lastChunkRender : function () {
       var ul = $('section#chat ul#messages');
@@ -48,7 +48,7 @@ var Chat = {
         this.chunkRender(index);
       }
     },
-  
+
 //  Render a chunk of messages
     chunkRender : function (index) {
       var chat = this;
@@ -121,7 +121,7 @@ var Chat = {
         });
       }
     },
-  
+
 //  Push messages to this queue to append them to this chat
     messageAppendProcessor : function (task, callback) {
       var msg = task.msg;
@@ -184,7 +184,7 @@ var Chat = {
         callback(blockIndex);
       }
     },
-  
+
   // This is runned when the message processing queue drains
     messageAppendDrain : function () {
       var chat = this;
@@ -228,7 +228,7 @@ var Chat = {
         this.wakeLock = null;
       }
     },
-  
+
   // Create a chat window for this contact
     show : function () {
       var section = $('section#chat');
@@ -389,7 +389,7 @@ var Chat = {
         }
       });
     },
-  
+
   // Save or update this chat in store
     save : function (up) {
       this.account.save();
@@ -418,7 +418,7 @@ var ChatCore = {
     this.info = this.info || {};
 
     this.settings = this.settings || {};
-    
+
     Object.keys(settings).forEach(function(key){
       if (!Array.isArray(this[key])) {
         this[key]= settings[key];
@@ -426,4 +426,3 @@ var ChatCore = {
     }.bind(this.settings));
   }
 };
-

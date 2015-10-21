@@ -18,11 +18,11 @@ var Plus = {
       }
     }
   },
-  
+
   emoji: function (emoji) {
     Messenger.add(emoji);
   },
-  
+
   fileSend: function () {
     var account = Accounts.current;
     var fileTypes = [];
@@ -53,7 +53,7 @@ var Plus = {
       account.connector.fileSend(to, blob);
     };
   },
-  
+
   locationSend: function () {
     var account = Accounts.current;
     if (account.supports('locationSend')) {
@@ -65,11 +65,11 @@ var Plus = {
       Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign');
     }
   },
-  
+
   rtc: function (constraints) {
-    
+
   },
-  
+
   switchOTR: function (jid, account) {
     account = account || Accounts.current;
     var ci = account.chatFind(jid);
@@ -77,7 +77,7 @@ var Plus = {
     if (ci < 0) {
       var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
       chat = Make(Chat)({
-        jid: jid, 
+        jid: jid,
         title: contact ? contact.name || jid : jid,
         chunks: [],
       }, account);
@@ -105,7 +105,7 @@ var Plus = {
       }
     }
   },
-  
+
   goOTR: function (chat) {
     console.log('GOING OTR IN', chat);
     var account = chat.account;
@@ -162,7 +162,7 @@ var Plus = {
     });
     chat.OTR.sendQueryMsg();
   },
-  
+
   killOTR: function (chat) {
     chat.OTR.endOtr();
     delete chat.OTR;
@@ -171,24 +171,24 @@ var Plus = {
   showConsole: function() {
     $('#console').show();
   },
-  
+
   hideConsole: function() {
     $('#console').hide();
   },
-  
+
   log: function(msg) {
     var node=document.createElement("DIV");
     var textnode=document.createTextNode(msg);
     node.appendChild(textnode);
     document.getElementById('logConsole').appendChild(node);
     while(document.getElementById('logConsole').childNodes.length>15)
-    { 
+    {
       document.getElementById('logConsole').removeChild(document.getElementById('logConsole').firstChild);
     }
   },
-  
+
   clearConsole: function() {
     document.getElementById('logConsole').innerHTML='';
   }
-  
+
 };
