@@ -396,7 +396,7 @@ var Message = {
     }
     var type = (this.core.from == this.account.core.user || this.core.from == this.account.core.realJid) ? 'out' : 'in';
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', Strophe.getBareJidFromJid(this.core.from));
-    var name = type == 'in' ? this._formatName((contact ? (contact.name || contact.jid) : (this.core.pushName || this.core.from))) : _('Me');
+    var name = type == 'in' ? this._formatName((contact ? (contact.name || contact.jid) : (this.core.name || this.core.pushName || this.core.from))) : _('Me');
     var day = Tools.day(this.core.stamp);
     var div = $('<div/>');
     var last = $('section#chat ul#messages li > div').last();

@@ -465,29 +465,29 @@ App.connectors.coseme = function (account) {
     Tools.log('MESSAGE NOT RECEIVED', id, from, body, stamp, e, nick, g);
   };
 
-  this.events.onImageReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast) {
+  this.events.onImageReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast, notifyName) {
     var to = this.account.core.fullJid;
-    return this.mediaProcess('image',  msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, wantsReceipt, false);
+    return this.mediaProcess('image',  msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, wantsReceipt, false, notifyName);
   };
 
-  this.events.onVideoReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast) {
+  this.events.onVideoReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast, notifyName) {
     var to = this.account.core.fullJid;
-    return this.mediaProcess('video', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, wantsReceipt, false);
+    return this.mediaProcess('video', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, wantsReceipt, false, notifyName);
   };
 
-  this.events.onAudioReceived = function (msgId, fromAttribute, mediaUrl, mediaSize, wantsReceipt, isBroadcast) {
+  this.events.onAudioReceived = function (msgId, fromAttribute, mediaUrl, mediaSize, wantsReceipt, isBroadcast, notifyName) {
     var to = this.account.core.fullJid;
-    return this.mediaProcess('audio', msgId, fromAttribute, to, null, mediaUrl, mediaSize, wantsReceipt, false);
+    return this.mediaProcess('audio', msgId, fromAttribute, to, null, mediaUrl, mediaSize, wantsReceipt, false, notifyName);
   };
 
-  this.events.onLocationReceived = function (msgId, fromAttribute, name, mediaPreview, mlatitude, mlongitude, wantsReceipt, isBroadcast) {
+  this.events.onLocationReceived = function (msgId, fromAttribute, name, mediaPreview, mlatitude, mlongitude, wantsReceipt, isBroadcast, notifyName) {
     var to = this.account.core.fullJid;
-    return this.mediaProcess('url', msgId, fromAttribute, to, [mlatitude, mlongitude, name], null, null, wantsReceipt, false);
+    return this.mediaProcess('url', msgId, fromAttribute, to, [mlatitude, mlongitude, name], null, null, wantsReceipt, false, notifyName);
   };
 
-  this.events.onVCardReceived = function (msgId, fromAttribute, vcardName, vcardData, wantsReceipt, isBroadcast) {
+  this.events.onVCardReceived = function (msgId, fromAttribute, vcardName, vcardData, wantsReceipt, isBroadcast, notifyName) {
     var to = this.account.core.fullJid;
-    return this.mediaProcess('vCard', msgId, fromAttribute, to, vcardName, vcardData, null, wantsReceipt, false);
+    return this.mediaProcess('vCard', msgId, fromAttribute, to, vcardName, vcardData, null, wantsReceipt, false, notifyName);
   };
 
   this.events.onAvatar = function (jid, picId, blob) {
@@ -787,20 +787,20 @@ App.connectors.coseme = function (account) {
     this.muc.participantsGet(from);
   };
 
-  this.events.onGroupImageReceived = function (msgId, group, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt) {
-    return this.mediaProcess('image', msgId, author, group, mediaPreview, mediaUrl, mediaSize, wantsReceipt, true);
+  this.events.onGroupImageReceived = function (msgId, group, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt, notifyName) {
+    return this.mediaProcess('image', msgId, author, group, mediaPreview, mediaUrl, mediaSize, wantsReceipt, true, notifyName);
   };
 
-  this.events.onGroupVideoReceived = function (msgId, group, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt) {
-    return this.mediaProcess('video', msgId, author, group, mediaPreview, mediaUrl, mediaSize, wantsReceipt, true);
+  this.events.onGroupVideoReceived = function (msgId, group, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt, notifyName) {
+    return this.mediaProcess('video', msgId, author, group, mediaPreview, mediaUrl, mediaSize, wantsReceipt, true, notifyName);
   };
 
-  this.events.onGroupAudioReceived = function (msgId, group, author, mediaUrl, mediaSize, wantsReceipt) {
-    return this.mediaProcess('audio', msgId, author, group, null, mediaUrl, mediaSize, wantsReceipt, true, author);
+  this.events.onGroupAudioReceived = function (msgId, group, author, mediaUrl, mediaSize, wantsReceipt, notifyName) {
+    return this.mediaProcess('audio', msgId, author, group, null, mediaUrl, mediaSize, wantsReceipt, true, notifyName);
   };
 
-  this.events.onGroupLocationReceived = function (msgId, group, author, name, mediaPreview, mlatitude, mlongitude, wantsReceipt) {
-    return this.mediaProcess('url', msgId, author, group, [mlatitude, mlongitude, name], null, null, wantsReceipt, true);
+  this.events.onGroupLocationReceived = function (msgId, group, author, name, mediaPreview, mlatitude, mlongitude, wantsReceipt, notifyName) {
+    return this.mediaProcess('url', msgId, author, group, [mlatitude, mlongitude, name], null, null, wantsReceipt, true, notifyName);
   };
 
   this.events.onContactsGotStatus = function (id, statuses) {
@@ -955,7 +955,7 @@ App.connectors.coseme = function (account) {
     msg.addToChat();
   };
 
-  this.mediaProcess = function (fileType, msgId, from, to, payload, mediaUrl, mediaSize, wantsReceipt, isGroup) {
+  this.mediaProcess = function (fileType, msgId, from, to, payload, mediaUrl, mediaSize, wantsReceipt, isGroup, notifyName) {
     Tools.log('Processing file of type', fileType);
     var process = function (thumb) {
       var media = {
@@ -965,15 +965,17 @@ App.connectors.coseme = function (account) {
         downloaded: false
       };
       var stamp = Tools.localize(Tools.stamp());
+      var name = notifyName ? from.split('@')[0] + ': ' + notifyName : null;
       var msg = {
         id: msgId,
         from: from,
         to: to,
         media: media,
-        stamp: stamp
+        stamp: stamp,
+        sender: name
       };
       if (isGroup) {
-        msg.pushName = from;
+        msg.pushName = name || from;
       }
       msg = Make(Message)(this.account, msg, {
         muc: isGroup
