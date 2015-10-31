@@ -491,6 +491,12 @@ var Account = function (core) {
 
   // Manage search through contacts
   this.searchRender = function (f, click) {
+    if(f) {
+      $('section#activity nav.on-right button').removeClass('hidden');
+    } else {
+      $('section#activity nav.on-right button').addClass('hidden');
+      return;
+    }
     if(!this.contacts)
       return false;
     var account = this;
