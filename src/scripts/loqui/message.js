@@ -64,7 +64,7 @@ var Message = {
       this.chat.findMessage(this.core.original, null).then(function(result){
         afterRecover(result.key, result.result.chunkIndex, result.result.message, result.result.chunk, result.free);
       }, function(result){
-        console.log('HOW SHOULD WE REPLACE A MESSAGE WE CAN\'T FIND?', result);
+        Tools.log('HOW SHOULD WE REPLACE A MESSAGE WE CAN\'T FIND?', result);
       });
     }
   },

@@ -107,7 +107,7 @@ var Plus = {
   },
 
   goOTR: function (chat) {
-    console.log('GOING OTR IN', chat);
+    Tools.log('GOING OTR IN', chat);
     var account = chat.account;
     chat.OTR = new OTR({
       priv: account.OTR.key

@@ -1,4 +1,4 @@
-/* global Tools, Lungo */
+/* global Tools, Lungo, App */
 
 'use strict';
 
@@ -163,10 +163,10 @@ var Store = {
 
     card: 'getDeviceStorage' in navigator ? navigator.getDeviceStorage('sdcard') : null,
 
-    save: function (path, content, onsuccess, onerror) {
+    save: function (path, content, onsuccess, onerror, quiet) {
       var type = Tools.getFileType(path.split('.').pop());
       if (this.card) {
-        Tools.log('SAVING', path);
+        if(!quiet) Tools.log('SAVING', path);
         var file = content instanceof Blob ? content : new Blob(content, {type: type});
         var req = this.card.addNamed(file, path);
         req.onsuccess = function () {
@@ -177,16 +177,16 @@ var Store = {
         req.onerror = function () {
           if (onerror) {
             onerror(this.error);
-            Lungo.Notification.error(_('Error'), _('NoSDAccess'), 'cloud-download', 5);
+            if(!quiet) Lungo.Notification.error(_('Error'), _('NoSDAccess'), 'cloud-download', 5);
           }
         };
       } else {
-        Tools.log('DS IS NOT SUPPORTED');
+        if(!quiet) Tools.log('DS IS NOT SUPPORTED');
         Store.put('fakesdcard_' + path, {content: content, type: type}, onsuccess);
       }
     },
 
-    recover: function (path, onsuccess, onerror) {
+    recover: function (path, onsuccess, onerror, quiet) {
       if (this.card) {
         var req = this.card.get(path);
         req.onsuccess = function () {
@@ -195,11 +195,11 @@ var Store = {
         req.onerror = function () {
           if (onerror) {
             onerror(this.error);
-            Lungo.Notification.error(_('Error'), _('NoSDAccess'), 'cloud-download', 5);
+            if(!quiet) Lungo.Notification.error(_('Error'), _('NoSDAccess'), 'cloud-download', 5);
           }
         };
       } else {
-        Tools.log('DS IS NOT SUPPORTED');
+        if(!quiet) Tools.log('DS IS NOT SUPPORTED');
         Store.get('fakesdcard_' + path, function (value) {
           if (value) {
             onsuccess(new Blob(value.content, {type: value.type}));
@@ -260,7 +260,121 @@ var Store = {
         };
 
       }
-    }
+    },
+
+    createFile : function(fileName, callback) {
+        if(this.card){
+            var card = this.card;
+
+            var request = card.get(fileName);
+
+            request.onerror = function(e){
+                if (request.error.name === 'NotFoundError') {
+                    request = card.addNamed(new Blob([''], {type: "text/plain"}), fileName);
+
+                    request.onsuccess = callback;
+                }
+
+                callback();
+            };
+
+            request.onsuccess = callback;
+        }
+    },
+
+    appendToFile: function(fileName, args, callback){
+        if(this.card){
+            var card = this.card;
+            var request = card.getEditable(fileName);
+
+            request.onsuccess = function(e){
+                var fileHandle = request.result.open('readwrite');
+
+                args.forEach(function(item){
+                    fileHandle.append(item.join(' ') + '\n');
+                });
+
+                fileHandle.flush();
+                fileHandle.abort();
+                callback();
+            };
+
+            request.onerror = function(e)　{
+                console.log('CAN\'T WRITE TO LOG FILE!!');
+                callback();
+            };
+        }
+    },
+
+    writeToLog : (function(){ 
+        var buffer = [];
+        var fileName = null;
+
+        var q = async.queue(function(args, callback) {
+            buffer.push(args.join(' '));
+
+            setTimeout(callback, 100);
+        });
+
+        q.drain = function(){
+            fileWriter.push([buffer]);
+        };
+
+        var fileWriter = async.queue(function(buffer, callback){
+            if (window.FileHandle) {
+                fileName = App.pathLogs + (new Date()).toISOString().split('T')[0] + '.log';
+
+                Store.SD.createFile(fileName, function(e){
+                    Store.SD.appendToFile(fileName, buffer, callback);
+                });
+            } else {
+                var lastDate = localStorage.getItem('logFileDate');
+                var currentDate = (new Date()).toISOString().split('T')[0];
+                var part = ((currentDate === lastDate) ? (parseInt(localStorage.getItem('logFilePart')) || 0) : 0);
+                fileName = App.pathLogs + currentDate + '_' + part + '.log';
+                var card = Store.SD.card;
+
+                Store.SD.createFile(fileName, function(e){
+                    Store.SD.recover(fileName, function(file){
+                        Tools.textUnblob(file, function(text){
+                            console.log('current log file', file.size);
+
+                            if (file.size > 1000000) {
+                                part += 1;
+                                fileName = App.pathLogs + currentDate + '_' + part + '.log';
+
+                                file = new Blob([buffer.join('\n')], { type : 'text/plain'});
+                            } else {
+                                file = new Blob([text, buffer.join('\n'), '\n'], { type : 'text/plain' });
+                            }
+
+                            var r = card.delete(fileName);
+
+                            r.onsuccess = function(){
+                                var r = card.addNamed(file, fileName);
+
+                                r.onsuccess = function(){
+                                    console.log('log saved!', 'new size is: ', file.size);
+                                    buffer = [];
+                                };
+
+                                r.onerror = callback;
+
+                                localStorage.setItem('logFilePart', part);
+                                localStorage.setItem('logFileDate', currentDate);
+                            };
+
+                            r.onerror = callback;
+                        }, callback, true);
+                    });
+                });
+            }
+        });
+
+        fileWriter.drain = function(){};
+
+        return q.push.bind(q);
+    })()
 
   }
 

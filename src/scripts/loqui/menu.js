@@ -294,7 +294,7 @@ var Menu = {
 
   // Opens a certain menu
   show: function (which, attr, delay) {
-    console.log('SHOW', which, attr, delay);
+    Tools.log('SHOW', which, attr, delay);
     var map = this.map;
     setTimeout(function () { map[which](attr); }, delay );
   }

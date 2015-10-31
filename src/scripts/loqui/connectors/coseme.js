@@ -10,6 +10,8 @@ App.connectors.coseme = function (account) {
 
   var pulse= null;
 
+  CoSeMe.config.customLogger = Tools;
+
   this.account = account;
   this.provider = Providers.data[account.core.provider];
   this.presence = {
@@ -37,7 +39,7 @@ App.connectors.coseme = function (account) {
       callback.connected();
       if(!pulse){
         pulse= setInterval(function(){
-          console.log('keep alive!');
+          Tools.log('keep alive!');
           MI.call('keepalive', []);
         }, 60000);
       }

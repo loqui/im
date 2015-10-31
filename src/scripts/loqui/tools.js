@@ -1,13 +1,24 @@
-/* global App, Plus */
+/* global App, Plus, Store */
 
 'use strict';
 
 var Tools = {
 
-  log: function () {
+  log: function (...args) {
     if (App.devsettings.debug) {
-      console.log.apply(console, [].slice.call(arguments));
-	    Plus.log([].slice.call(arguments));
+      console.log.apply(console, args);
+
+      if (App.devsettings.writeLogFiles) {
+        Store.SD.writeToLog([args]);
+      }
+
+      if (App.devsettings.stackTracke) {
+        console.groupCollapsed('StackTrace');
+        console.log(Tools.currentStack(1).join('\n'));
+        console.groupEnd();
+      }
+
+	  Plus.log(args);
     }
   },
 
@@ -337,6 +348,7 @@ var Tools = {
       var stack = e.stack.split('\n');
 
       stack.shift();
+      stack.pop();
 
       for (var i= 0; i < offset; i++) {
         stack.shift();
@@ -368,7 +380,7 @@ var Tools = {
     var time,
         go = true,
         again = null;
-        
+
     return function(e) {
       if(go) {
         go = false;

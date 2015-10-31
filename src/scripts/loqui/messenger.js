@@ -151,7 +151,7 @@ var Messenger = {
 
       if (value.length > 1 && value[1]) {
         li.on('click', function (e) {
-          console.log(value, value[1]);
+          Tools.log(value, value[1]);
           Menu.show(value[1], li[0]);
         });
       }
@@ -227,7 +227,7 @@ var Messenger = {
         li.bind('click', accountSwitch);
         if (value.length > 1 && value[1]) {
           li.on('click', function (e) {
-            console.log(value, value[1]);
+            Tools.log(value, value[1]);
             Menu.show(value[1], li[0]);
           });
         }
