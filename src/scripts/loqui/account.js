@@ -267,7 +267,8 @@ var Account = function (core) {
       };
       for (var i in this.core.chats) {
         var chat = this.core.chats[i];
-        var title = App.emoji[Providers.data[this.core.provider].emoji].fy(chat.title);
+        var name = chat.last && !chat.muc ? chat.last.pushName : null || chat.title;
+        var title = App.emoji[Providers.data[this.core.provider].emoji].fy(name);
         var lastMsg = chat.last ? (chat.last.text ? App.emoji[Providers.data[this.core.provider].emoji].fy(chat.last.text) : (chat.last.media ? _('SentYou', {type: _('MediaType_' + chat.last.media.type)}) : '')) : '';
         var lastStamp = chat.last.stamp ? Tools.convenientDate(chat.last.stamp).join('<br />') : '';
         var li = $('<li/>');
