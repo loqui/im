@@ -65,6 +65,7 @@ var Activity = function (action, account, content, options) {
         content(t[0].dataset.jid, t.find('.name').text());
       };
       account.contactsRender(f, click, options.selected);
+      account.searchRender(null);
     }
   };
   
