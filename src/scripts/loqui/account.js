@@ -10,8 +10,6 @@ var Account = function (core) {
   this.connector = new App.connectors[Providers.data[this.core.provider].connector.type](this);
   this.OTR = {};
   this.contacts = {};
-  this.names = [];
-  this.jidToNameMap = {};
   this._unread = new Blaze.Var(0);
   this._chats = new Blaze.Var([]);
   this._enabled = new Blaze.Var(false);
@@ -340,8 +338,6 @@ var Account = function (core) {
           account.contacts[part] += ' ' + contact.jid;
         else
           account.contacts[part] = contact.jid;
-        account.names.push(part);
-        account.jidToNameMap[contact.jid] = contact.name;
       }
       var li = document.createElement('li');
       li.dataset.jid = contact.jid;
@@ -531,31 +527,39 @@ var Account = function (core) {
       article.append($('<h1/>').text('Type some characters to start searching'));
       return false;
     }
-    text = text.toLowerCase();
-    var str = {};
+    text = text.toLowerCase().split(' ');
+    var roster = account.core.roster;
     // forEach is slow, and evil
-    for(var _i = 0, _len = account.names.length; _i < _len; _i++) {
-      if(account.names[_i].startsWith(text)) {
-        str[account.names[_i]] = 1; // Just a placeholder
-      }
-    }
-    var matches = [];
-    for(var match in str) {
-      if(str.hasOwnProperty(match))
-        matches.push(match);
-    }
+    // for(var _i = 0, _len = account.names.length; _i < _len; _i++) {
+    //   if(account.names[_i].startsWith(text)) {
+    //     str[account.names[_i]] = 1; // Just a placeholder
+    //   }
+    // }
+    // var matches = [];
+    // for(var match in str) {
+    //   if(str.hasOwnProperty(match))
+    //     matches.push(match);
+    // }
+
+    // Search now for the `text` match
+    var matches = roster.filter( function ( contactMap ) {
+      return ( text.filter( function ( token ) {
+        var regex = new RegExp( token, 'gi' );
+        return contactMap.jid.match( regex ) || contactMap.name.match( regex );
+      } ) || [ ] ).length;
+    } );
+
     var ul = $('<ul/>').addClass('list').addClass('scroll');
+    var _i, _len;
     for(_i = 0, _len = matches.length; _i < _len; _i++) {
-      var jids = account.contacts[matches[_i]].split(' ');
-      for(var _j = 0, _l = jids.length; _j < _l; _j++) {
-        var name = account.jidToNameMap[jids[_j]];
-        var li = document.createElement('li');
-        li.dataset.jid = jids[_j];
-        li.innerHTML = '<span class=\'name\'>' + name + '</span>'
-                       + '<span class=\'status\'>' + jids[_j] + '</span>';
-        li.addEventListener('click', click.bind(li, li));
-        ul[0].appendChild(li);
-      }
+      var name = matches[_i].name;
+      var jID = matches[_i].jid;
+      var li = document.createElement('li');
+      li.dataset.jid = jID;
+      li.innerHTML = '<span class=\'name\'>' + name + '</span>'
+                     + '<span class=\'status\'>' + jID + '</span>';
+      li.addEventListener('click', click.bind(li, li));
+      ul[0].appendChild(li);
     }
     article.append(ul[0]);
   };
