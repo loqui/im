@@ -11,3 +11,10 @@ rules:
         - 1
         -
             max-depth: 3
+    force-element-nesting: 0
+    force-attribute-nesting: 0
+    force-pseudo-nesting: 0
+    no-vendor-prefixes: 0
+    no-qualifying-elements: 0
+    url-format: 0
+    no-transition-all: 0

@@ -1,12 +1,36 @@
+// Varibales
+
+// MEDIA QUERIES
+// this query improves the text input in landscape mode
+// when the keyboard is open
+$landscape: 'only screen and (orientation: landscape) and (max-height: 18vw)';
+
+// COLORS
+$app-background: #312f34;
+$text-box-border: #DFDFDF;
+$primary-text-color: #666;
+$h1-border: #AAA;
+$list-box-border: #AAA;
+$message-user-name-color: #AAA;
+$avatar-active-border: #DDD;
+$form-add-color: #fff;
+$form-add-background: #2CC269;
+
+// Rules
 body {
     -moz-user-select: none;
     -webkit-user-select: none;
-    background-color: #312f34;
+    background-color: $app-background;
 }
 
 button {
     border-radius: .2rem;
     cursor: pointer;
+
+    // display buttons on top of the text field
+    @media #{$landscape} {
+        z-index: 3;
+    }
 
     &::-moz-focus-inner {
         border: 0;
@@ -15,18 +39,7 @@ button {
 
 input {
     pointer-events: auto;
-}
 
-small {
-    font-size: .9em;
-    font-weight: 100;
-}
-
-a {
-    cursor: pointer;
-}
-
-input {
     &[type='search'] {
         width: 100%;
         border-radius: 0;
@@ -37,10 +50,19 @@ input {
         width: calc(100% - 2rem);
         height: 4.2rem;
         font-size: 1.5rem;
-        border: .1rem solid #DFDFDF;
+        border: .1rem solid $text-box-border;
         border-radius: .2rem;
         padding: 0 1rem;
     }
+}
+
+small {
+    font-size: .9em;
+    font-weight: 100;
+}
+
+a {
+    cursor: pointer;
 }
 
 .spaced {
@@ -66,7 +88,7 @@ input {
         &.back {
             width: 100%;
             background-color: #DDD;
-            color: #666;
+            color: $primary-text-color;
         }
 
         &[data-role='submit'] {
@@ -85,7 +107,7 @@ input {
     }
 
     .listBox {
-        border: .1rem solid #AAA;
+        border: .1rem solid $list-box-border;
         border-radius: .2rem;
 
         li {
@@ -94,8 +116,8 @@ input {
         }
 
         .add {
-            color: #fff;
-            background-color: #2CC269;
+            color: $form-add-color;
+            background-color: $form-add-background;
             font-style: italic;
 
             &:before {
@@ -115,7 +137,7 @@ section {
             width: calc(100vw - 6.4rem);
             font-size: 2.6rem;
             line-height: 2.6rem;
-            margin: 0 0 1rem 0;
+            margin: 0 0 1rem;
             font-weight: 100;
             color: #E95644;
         }
@@ -171,6 +193,7 @@ section {
                 background: none;
                 color: #fff;
                 font-size: 1.2em;
+                width: 5rem;
             }
 
             &.discreet button {
@@ -214,7 +237,7 @@ section nav {
         a {
             float: left;
             margin: 1rem -1rem 0 1rem;
-            padding: .8rem 1.5rem .6rem 1.5rem;
+            padding: .8rem 1.5rem .6rem;
             font-size: 1.6rem;
             font-weight: 100;
             font-style: italic;
@@ -267,7 +290,7 @@ section nav {
 #welcome {
     color: #E95644;
     text-align: center;
-    background: url('https://loqui.im/img/background.jpg') no-repeat center center fixed;
+    background: url('http://loqui.im/img/background.jpg') no-repeat center center fixed;
     background-size: cover;
 
     h1 {
@@ -292,9 +315,9 @@ section nav {
     width: 14rem;
     left: calc(50% - 7rem);
     padding: .2rem;
-    border: .1rem solid #DDD;
+    border: .1rem solid $avatar-active-border;
     background-color: #FFF;
-    margin: 1rem 0 0 0;
+    margin: 1rem 0 0;
     border-radius: 50%;
     box-sizing: content-box;
 }
@@ -319,63 +342,71 @@ section nav {
 }
 
 .aside {
-    transform: translateX(5rem);
+    transform: translate-x(5rem);
 }
 
 #activity {
     z-index: 52;
 
-    article li {
-        position: relative;
-        border-bottom: .05rem solid #E6E6E6;
-        height: 5.6rem;
-        cursor: pointer;
-        box-sizing: content-box;
-
-        .lastStamp,
-        .unread {
-            display: none;
+    li {
+        :active {
+            background-color: #DDD;
         }
+    }
 
-        &.selected:after {
-            content: '✔';
-            position: absolute;
-            right: 1rem;
-            top: 1rem;
-            background-color: #2CC269;
-            color: #fff;
-            border-radius: 100%;
-            width: 2rem;
-            padding: .5rem 0;
-            font-size: 1.5rem;
-            line-height: 1rem;
-            text-align: center;
-        }
+    article {
+        li {
+            position: relative;
+            border-bottom: .05rem solid #E6E6E6;
+            height: 5.6rem;
+            cursor: pointer;
+            box-sizing: content-box;
 
-        .name {
-            position: absolute;
-            left: 1.6rem;
-            top: .6rem;
-            color: #222;
-            max-width: calc(100% - 4.5rem);
-            overflow: hidden;
-            font-size: 1.6rem;
-            padding-top: .3rem;
-        }
+            .lastStamp,
+            .unread {
+                display: none;
+            }
 
-        .status,
-        .lastMessage {
-            position: absolute;
-            left: 1.6rem;
-            top: 2rem;
-            color: #444;
-            font-weight: 100;
-            font-size: 1.4rem;
-            max-width: calc(100% - 4.5rem);
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            padding-top: .9rem;
+            &.selected::after {
+                content: '✔';
+                position: absolute;
+                right: 1rem;
+                top: 1rem;
+                background-color: #2CC269;
+                color: #fff;
+                border-radius: 100%;
+                width: 2rem;
+                padding: .5rem 0;
+                font-size: 1.5rem;
+                line-height: 1rem;
+                text-align: center;
+            }
+
+            .name {
+                position: absolute;
+                left: 1.6rem;
+                top: .6rem;
+                color: #222;
+                max-width: calc(100% - 4.5rem);
+                overflow: hidden;
+                font-size: 1.6rem;
+                padding-top: .3rem;
+            }
+
+            .status,
+            .lastMessage {
+                position: absolute;
+                left: 1.6rem;
+                top: 2rem;
+                color: #444;
+                font-weight: 100;
+                font-size: 1.4rem;
+                max-width: calc(100% - 4.5rem);
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                padding-top: .9rem;
+            }
         }
     }
 
@@ -391,7 +422,7 @@ section nav {
             background: none;
             font-size: 1.4rem;
             width: 50%;
-            padding: 1.3rem 0 1.2rem 0;
+            padding: 1.3rem 0 1.2rem;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
@@ -437,7 +468,7 @@ section nav {
             top: .7rem;
             left: 6rem;
             font-size: 1.3rem;
-            color: #666;
+            color: $primary-text-color;
         }
 
         .jid {
@@ -575,7 +606,7 @@ section nav {
             position: absolute;
             left: 7.2rem;
             bottom: 1.6rem;
-            color: #666;
+            color: $primary-text-color;
             font-weight: 100;
             font-size: 1.4rem;
             max-width: calc(100% - 12rem);
@@ -695,7 +726,17 @@ section nav {
 }
 
 #chat {
+
+    @media #{$landscape} {
+        height: 100%;
+    }
+
     header {
+
+        @media #{$landscape} {
+            display: none;
+        }
+
         span {
             color: #fff;
             text-align: right;
@@ -802,13 +843,6 @@ section nav {
     }
 }
 
-#main,
-#activity {
-    li:active {
-        background-color: #DDD;
-    }
-}
-
 
 #main li .name,
 #main li .status,
@@ -849,7 +883,7 @@ section nav {
         position: absolute;
         top: 0;
         right: 0;
-        padding: .5rem .4rem .5rem .4rem;
+        padding: .5rem .4rem;
     }
 
     .clear {
@@ -904,6 +938,12 @@ section nav {
     background-color: #F9F9F9;
     border-top: .1rem solid #E6E6E6;
 
+    // display footbox and text across the whole rest of the screen
+    @media #{$landscape} {
+        position: fixed;
+        top: 0;
+    }
+
     button {
         position: relative;
         top: .05rem;
@@ -940,7 +980,7 @@ section nav {
     top: -2.4rem;
     left: 0;
     height: 1.05rem;
-    padding: .4rem 1rem .9rem 1rem;
+    padding: .4rem 1rem .9rem;
     border: .1rem solid #E6E6E6;
     border-bottom: 0;
     border-left: 0;
@@ -951,6 +991,15 @@ section nav {
     z-index: 1;
     border-top-right-radius: .5rem;
     box-sizing: content-box;
+
+    @media #{$landscape} {
+        // adjust the typing notification
+        // to be on the bottom of the text area
+        position: fixed;
+        z-index: 3;
+        bottom: .1rem;
+        top: auto;
+    }
 }
 
 #say {
@@ -959,7 +1008,7 @@ section nav {
 
 #text {
     position: relative;
-    padding: .6rem .5rem .7rem .5rem;
+    padding: .6rem .5rem .7rem;
     min-height: 1.8rem;
     max-height: 6.2rem;
     background: none;
@@ -969,7 +1018,7 @@ section nav {
     font-size: 1.4rem;
     line-height: 1.6rem;
     font-weight: 300;
-    color: #666;
+    color: $primary-text-color;
     outline: none;
     overflow: auto;
     transition: all .2s;
@@ -977,6 +1026,18 @@ section nav {
     -moz-user-select: text;
     -webkit-user-select: text;
     user-select: text;
+
+    @media #{$landscape} {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        max-height: 100%;
+        bottom: 0;
+        border: 0;
+        border-radius: 0;
+        z-index: 2;
+    }
 
     :focus {
         border-bottom: .1rem solid #E95644;
@@ -997,6 +1058,10 @@ section nav {
     background-size: cover;
     background-position: center;
 
+    @media #{$landscape} {
+        display: none;
+    }
+
     .more {
         width: calc(100vw - 1rem);
         background: #E95644;
@@ -1004,7 +1069,7 @@ section nav {
         padding: .5rem;
         color: #fff;
         font-weight: 300;
-        margin: -1rem .5rem 1rem .5rem;
+        margin: -1rem .5rem 1rem;
     }
 
     li {
@@ -1039,7 +1104,7 @@ section nav {
             margin-left: -.1rem;
             font-size: .8em;
             font-weight: 100;
-            color: #AAA;
+            color: $message-user-name-color;
             text-shadow: 0 .05rem 0 #fff;
         }
 
@@ -1071,8 +1136,8 @@ section nav {
             font-size: 1.2rem;
             font-weight: 100;
             font-style: italic;
-            padding: 1rem 0 .5rem 0;
-            color: #666;
+            padding: 1rem 0 .5rem;
+            color: $primary-text-color;
             text-shadow: 0 .05rem 0 #fff;
         }
     }
@@ -1111,19 +1176,21 @@ section nav {
         background: rgba(0, 0, 0, .01);
     }
 
-    div[data-ack='delivered'],
-    div[data-ack='viewed'] {
-        &:after {
-            content: '✔✔';
-            position: absolute;
-            top: 1.6rem;
-            left: -1rem;
-            text-align: right;
-            font-size: .79em;
-            color: #71C837;
-            letter-spacing: -.5em;
-            background: rgba(0, 0, 0, .01);
-            padding-right: .4em;
+    div {
+        [data-ack='delivered'],
+        [data-ack='viewed'] {
+            &:after {
+                content: '✔✔';
+                position: absolute;
+                top: 1.6rem;
+                left: -1rem;
+                text-align: right;
+                font-size: .79em;
+                color: #71C837;
+                letter-spacing: -.5em;
+                background: rgba(0, 0, 0, .01);
+                padding-right: .4em;
+            }
         }
     }
 
@@ -1196,7 +1263,7 @@ section nav {
         width: calc(100% - 3.5rem);
 
         :after {
-            content: url(../../img/play.png);
+            content: url('../../img/play.png');
             position: absolute;
             width: 4rem;
             left: calc(50% - 2rem);
@@ -1283,7 +1350,7 @@ section nav {
 
     h1 {
         font-size: 1.2rem;
-        border-bottom: .1rem solid #AAA;
+        border-bottom: .1rem solid $h1-border;
         color: #444;
     }
 
@@ -1315,7 +1382,7 @@ section nav {
 
     h1 {
         font-size: 1.2rem;
-        border-bottom: .1rem solid #AAA;
+        border-bottom: .1rem solid $h1-border;
         color: #444;
     }
 
@@ -1385,7 +1452,7 @@ section:not([data-features~=presence]) .show {
 
     .name {
         display: block;
-        margin: 11rem 1rem 0 1rem;
+        margin: 11rem 1rem 0;
         max-width: calc(100% - 2rem);
         text-align: center;
         font-size: 1.6rem;
@@ -1397,7 +1464,7 @@ section:not([data-features~=presence]) .show {
 
     .user {
         display: block;
-        margin: 1rem 1rem 1rem 1rem;
+        margin: 1rem;
         max-width: calc(100% - 2rem);
         text-align: center;
         margin-bottom: 0;
@@ -1511,11 +1578,11 @@ section:not([data-features~=presence]) .show {
 #status input,
 #nick input,
 input[type='password'] {
-    margin: .5rem 0 1.5rem 0;
+    margin: .5rem 0 1.5rem;
 }
 
 .profile article > div:not(#card) {
-    padding: 0 1.6rem 0 1.6rem;
+    padding: 0 1.6rem;
 
     h2 {
         font-size: 1.6rem;
@@ -1526,12 +1593,12 @@ input[type='password'] {
     p {
         font-weight: 100;
         font-size: 1.4rem;
-        margin: .5rem 0 2rem 0;
-        color: #666;
+        margin: .5rem 0 2rem;
+        color: $primary-text-color;
     }
 
     .buttongroup {
-        margin: .5rem 0 1.6rem 0;
+        margin: .5rem 0 1.6rem;
     }
 
     li {
@@ -1540,7 +1607,7 @@ input[type='password'] {
         border-bottom: .05rem solid #CCC;
         font-weight: 300;
         font-size: .9em;
-        color: #666;
+        color: $primary-text-color;
 
         :last-child {
             border: 0;
@@ -1723,7 +1790,7 @@ li[data-show] {
     }
 
     &:active .avatar:after {
-        border-color: #DDD;
+        border-color: $avatar-active-border;
     }
 }
 
@@ -1768,7 +1835,7 @@ ul:not([data-enabled='true']) .avatar:after {
     display: none;
 }
 
-.devMode #developer {
+.devMode #settings #developer {
     display: block;
 }
 
@@ -1899,55 +1966,6 @@ ul:not([data-enabled='true']) .avatar:after {
     }
 }
 
-// MEDIA QUERIES
-// this query improves the text input in landscape mode
-// when the keyboard is open
-@media only screen and (orientation: landscape) and (max-height: 18vw) {
-    #chat {
-        height: 100%;
-
-        header {
-            display: none;
-        }
-    }
-
-    #messages {
-        display: none;
-    }
-
-    // display footbox and text across the whole rest of the screen
-    #footbox {
-        position: fixed;
-        top: 0;
-    }
-
-    #text {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        max-height: 100%;
-        bottom: 0;
-        border: 0;
-        border-radius: 0;
-        z-index: 2;
-    }
-
-    // adjust the typing notification
-    // to be on the bottom of the text area
-    #chat #typing {
-        position: fixed;
-        z-index: 3;
-        bottom: .1rem;
-        top: auto;
-    }
-
-    // display buttons on top of the text field
-    button {
-        z-index: 3;
-    }
-}
-
 // PROGRESS BAR
 
 #footbox progress {
@@ -1983,7 +2001,7 @@ ul:not([data-enabled='true']) .avatar:after {
     left: 50%;
     position: absolute;
     z-index: 1001;
-    opacity: .50;
+    opacity: .5;
     width: 20px;
     height: 60px;
 }
@@ -1993,7 +2011,7 @@ ul:not([data-enabled='true']) .avatar:after {
     left: 50%;
     position: absolute;
     z-index: 1001;
-    opacity: .50;
+    opacity: .5;
     width: 20px;
     height: 60px;
     display: none;
@@ -2004,7 +2022,7 @@ ul:not([data-enabled='true']) .avatar:after {
     top: 3rem;
     position: absolute;
     z-index: 1001;
-    opacity: .70;
+    opacity: .7;
     background-color: #fff;
     width: 100%;
     height: 100%;
@@ -2035,17 +2053,17 @@ ul:not([data-enabled='true']) .avatar:after {
 #logConsole {
     width: 100%;
     margin-left: 1rem;
-    padding: 0 1rem 1rem 1rem;
+    padding: 0 1rem 1rem;
     overflow-y: scroll;
     overflow-x: hidden;
     word-wrap: break-word;
     font-size: .9rem;
     box-sizing: border-box;
-}
 
-#logConsole div {
-    word-wrap: break-word;
-    font-size: .9rem;
+    div {
+        word-wrap: break-word;
+        font-size: .9rem;
+    }
 }
 
 .floater {
@@ -2067,8 +2085,8 @@ ul:not([data-enabled='true']) .avatar:after {
         top: 1.5rem;
         left: 1.7rem;
     }
-}
 
-.hidden.floater {
-    bottom: -10rem;
+    &.hidden {
+        bottom: -10rem;
+    }
 }
