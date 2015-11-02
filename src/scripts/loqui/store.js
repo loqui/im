@@ -1,5 +1,13 @@
 /* global Tools, Lungo, App */
 
+/**
+* @file Holds {@link Store}
+* @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
+* @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
+* @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
+* @license AGPLv3
+*/
+
 'use strict';
 
 var Store = {

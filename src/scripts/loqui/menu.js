@@ -1,39 +1,97 @@
 /* global Lungo, Accounts, Messenger, Tools, Activity, App, Providers, Plus */
 
+/**
+* @file Holds {@link Menu}
+* @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
+* @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
+* @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
+* @author [Sukant Garg]{@link https://github.com/gargsms}
+* @license AGPLv3
+*/
+
 'use strict';
 
+/**
+ * @namespace
+ */
 var Menu = {
 
-  // Tells what menu to open
+  /**
+   * Tells what menu to open.
+   *
+   * @namespace
+   */
   map: {
+
+    /**
+     * Opens the providers section.
+     */
     providers: function () {
       Lungo.Router.section('providers');
     },
+
+    /**
+     * Opens the main section.
+     */
     main: function () {
       Accounts.current = 0;
       Lungo.Router.section('main');
       Lungo.Router._stack[0] = 'main';
     },
+
+    /**
+     * Opens the settings section.
+     */
     settings: function () {
       Lungo.Router.section('settings');
     },
+
+    /**
+     * Opens the me section.
+     */
     me: function () {
       Lungo.Router.section('me');
     },
+
+    /**
+     * Opens the contact section.
+     */
     contact: function () {
       Messenger.contactProfile();
     },
+
+    /**
+     * Opens the muc section.
+     */
     muc: function () {
       Messenger.mucProfile();
     },
+
+    /**
+     * Removes all participants from the active group
+     *
+     * @param {Object} obj
+     */
     mucClear: function (obj) {
       var gid = $(obj).closest('section')[0].dataset.jid;
       Messenger.mucClear(gid);
     },
+
+    /**
+     * Removes the active accout form the active group.
+     *
+     * @param {Object} obj
+     */
     mucExit: function (obj) {
       var gid = $(obj).closest('section')[0].dataset.jid;
       Messenger.mucExit(gid);
     },
+
+    /**
+     * Opens the group creation from.
+     *
+     * @param {Object} obj
+     */
     mucCreateForm: function (obj) {
       Lungo.Router.section('back');
       Lungo.Router.section('mucCreateForm');
@@ -292,7 +350,13 @@ var Menu = {
     }
   },
 
-  // Opens a certain menu
+  /**
+   * Opens a certain menu.
+   *
+   * @param {string} which
+   * @param {*} attr
+   * @param {number} delay
+   */
   show: function (which, attr, delay) {
     Tools.log('SHOW', which, attr, delay);
     var map = this.map;

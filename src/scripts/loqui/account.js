@@ -1,9 +1,19 @@
 /* global App, Providers, Store, Tools, Messenger, Activity, Menu, Avatar, Message, Chat, Lungo, Make */
 
+/**
+* @file Holds {@link Account}
+* @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
+* @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
+* @author [Christof Meerwald]{@link https://github.com/cmeerw}
+* @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
+* @author [Sukant Garg]{@link https://github.com/gargsms}
+* @license AGPLv3
+*/
+
 'use strict';
 
 var Account = function (core) {
-  
+
   // Holds only account data and no functions
   this.core = core;
   this.core.sendQ = this.core.sendQ || [];
@@ -45,7 +55,7 @@ var Account = function (core) {
       this.save();
     }
   });
-  
+
   this.__defineGetter__('chats', function () {
     return this._chats.get();
   });
@@ -90,7 +100,7 @@ var Account = function (core) {
             $('section#success span#imported').text(_('Imported', {number: (this.core.roster && this.core.roster.length) ? this.core.roster.length : 0}));
             this.connector.avatar(function (avatar) {
               avatar.url.then(function (src) {
-                $('section#success img#avatar').attr('src', src);              
+                $('section#success img#avatar').attr('src', src);
               });
             });
             Lungo.Router.section('success');
@@ -108,7 +118,7 @@ var Account = function (core) {
       }
     });
   };
-  
+
   // Connect
   this.connect = function () {
     if (this._pendingReconnect) {
@@ -164,17 +174,17 @@ var Account = function (core) {
       }
     }
   };
-  
+
   // Download roster and register callbacks for roster updates handling
   this.sync = function (callback) {
     this.connector.sync(callback);
   };
-  
+
   // Bring account to foreground
   this.show = function () {
     Accounts.current = Accounts.find(this.core.fullJid);
   };
-  
+
   // Render everything for this account
   this.allRender = function () {
     this.accountRender();
@@ -182,7 +192,7 @@ var Account = function (core) {
     this.avatarsRender();
     this.presenceRender();
   };
-  
+
   // Changes some styles based on presence and connection status
   this.accountRender = function (front) {
     $('section#main header').css('border-color', this.connector.provider.color);
@@ -215,7 +225,7 @@ var Account = function (core) {
         $('section.profile div#card').css('background-image', '');
     }
   }.bind(this);
-  
+
   this.singleRender = function (chat, up) {
     var ul = $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"]');
     var li = ul.children('li[data-jid="' + chat.core.jid + '"]');
@@ -234,7 +244,7 @@ var Account = function (core) {
       this.presenceRender(chat.core.jid);
     }
   }.bind(this);
-  
+
   // List all chats for this account
   this.chatsRender = function (f, click, hold) {
     var account = this;
@@ -305,7 +315,7 @@ var Account = function (core) {
     if (f) {
       f.appendChild($('<article/>').attr('id', 'chats').addClass('scroll').append(ul)[0]);
     } else {
-      oldUl.replaceWith(ul);    
+      oldUl.replaceWith(ul);
     }
   }.bind(this);
 
@@ -344,7 +354,7 @@ var Account = function (core) {
       if (selected && selected.indexOf(contact.jid) > -1) {
         li.classList.add('selected');
       }
-      li.innerHTML = 
+      li.innerHTML =
           '<span class=\'name\'>' + name + '</span>'
         + '<span class=\'status\'>' + contact.jid + '</span>';
       li.addEventListener('click', function (e) {
@@ -355,7 +365,7 @@ var Account = function (core) {
     article.append(header).append(ul);
     frag.appendChild(article[0]);
   }.bind(this);
-  
+
   // List all group chats for this account
   this.groupsRender = function (f, click) {
     var account = this;
@@ -381,7 +391,7 @@ var Account = function (core) {
         var title = chat.title;
         var li = document.createElement('li');
         li.dataset.jid = chat.jid;
-        li.innerHTML = 
+        li.innerHTML =
             '<span class=\'name\'>'
           +  App.emoji[Providers.data[account.core.provider].emoji].fy(title)
           + '</span>'
@@ -399,7 +409,7 @@ var Account = function (core) {
     article.append(header).append(ul);
     frag.appendChild(article[0]);
   }.bind(this);
-  
+
   // Render presence for every contact
   this.presenceRender = function (jid) {
     var contactPresenceRender = function (jid) {
@@ -449,7 +459,7 @@ var Account = function (core) {
       }
     }
   }.bind(this);
-  
+
   // Render all the avatars
   this.avatarsRender = function () {
     var account = this;
@@ -569,7 +579,7 @@ var Account = function (core) {
     }
     article.append(ul[0]);
   };
-  
+
   this.OTRMenu = function () {
     var account = this;
     function OTRSetup() {
@@ -612,7 +622,7 @@ var Account = function (core) {
     }
     Lungo.Router.section('otrMenu');
   };
-  
+
   // Push message to sendQ
   this.toSendQ = function (storageIndex) {
     Tools.log('[sendQ] Queued', storageIndex);
@@ -622,7 +632,7 @@ var Account = function (core) {
     this.core.sendQ.push(storageIndex);
     this.save();
   };
-  
+
   // Send every message in SendQ
   this.sendQFlush = function () {
     var account = this;
@@ -652,7 +662,7 @@ var Account = function (core) {
       this.save();
     }
   };
-  
+
   // Find chat in chat array
   this.chatFind = function (jid) {
     var index = -1;
@@ -664,14 +674,14 @@ var Account = function (core) {
     }
     return index;
   };
-  
+
   // Get a chat for a jid (create if none)
   this.chatGet = function (jid, title) {
     var ci = this.chatFind(jid);
     var chat= null;
     if (ci >= 0) {
       chat = this.chats[ci];
-    } else { 
+    } else {
       chat = Make(Chat)({
         jid: jid,
         title: title || jid,
@@ -734,12 +744,12 @@ var Account = function (core) {
 
     account.save();
   }.bind(this);
-    
+
   // Check for feature support
   this.supports = function (feature) {
     return this.connector.provider.features.indexOf(feature) >= 0;
   };
-  
+
   // Save to store
   this.save = function () {
     var index = Accounts.find(this.core.fullJid || this.core.user);
@@ -789,5 +799,5 @@ var Accounts = {
     }
     return index;
   }
-  
+
 };

@@ -1,17 +1,55 @@
 'use strict';
 
+/**
+* @file Holds {@link Providers}
+* @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
+* @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
+* @author [Christof Meerwald]{@link https://github.com/cmeerw}
+* @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
+* @license AGPLv3
+*/
+
+/**
+ * @namespace
+ */
 var Providers = {
 
-  // Providers data
+  /**
+   * @lends Providers
+   */
   data: {
+
+    /**
+     * @class
+     */
     'whatsapp': {
+
+      /**
+       * @type {string}
+       * @const
+       */
       longName: 'WhatsApp',
+
+      /**
+       * @type {object}
+       * @property {string} type
+       * @const
+       */
       connector: {
         type: 'coseme'
       },
+
+      /**
+       * @type {string[]}
+       * @const
+       */
       features: ['localContacts', 'receipts', 'imageSend', 'videoSend',
         'audioSend', 'locationSend', 'pay', 'muc', 'csn', 'avatarChange',
         'nickChange', 'statusChange', 'presence', 'mucCreate', 'readReceipts'],
+
+      /**
+       * @type {string}
+       */
       color: '#254242',
       terms: {
         user: 'YourNumber',

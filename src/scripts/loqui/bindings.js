@@ -1,5 +1,16 @@
 /* global App, Menu, Tools, Messenger, Accounts, Store, Plus, UI, Lungo */
 
+/**
+* @file Contains all the bindings
+* @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
+* @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
+* @author [Christof Meerwald]{@link https://github.com/cmeerw}
+* @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
+* @author [Sukant Garg]{@link https://github.com/gargsms}
+* @author [Carsten]{@link https://github.com/acidicX}
+* @license AGPLv3
+*/
+
 'use strict';
 
 Lungo.init({
