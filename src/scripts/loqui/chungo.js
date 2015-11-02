@@ -1,5 +1,14 @@
 /* global Tools */
 
+/**
+* @file Holds {@link Chungo}
+* @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
+* @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
+* @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
+* @author [Sukant Garg]{@link https://github.com/gargsms}
+* @license AGPLv3
+*/
+
 'use strict';
 
 var Chungo = {

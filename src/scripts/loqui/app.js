@@ -1,28 +1,170 @@
 /* global Store, Account, Chat, Messenger, Accounts, Menu, Tools, Lungo, Make, ChatCore */
 
+/**
+ * @file Holds {@link App}
+ * @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
+ * @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
+ * @author [Christof Meerwald]{@link https://github.com/cmeerw}
+ * @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
+ * @license AGPLv3
+*/
+
 'use strict';
 
+/**
+ * @namespace App
+ */
 var App = {
 
+  /**
+  * @type {string}
+  * @const
+  */
   name: 'Loqui IM',
+
+  /**
+  * @type {string}
+  * @const
+  */
   shortName: 'Loqui',
+
+  /**
+  * @type {string}
+  * @const
+  */
   version: 'v0.4.8',
+
+  /**
+  * @type {String}
+  * @const
+  */
   minorVersion: 'a',
+
+  /**
+  * @type {Connector[]}
+  */
   connectors: [],
+
+  /**
+  * @type {object[]}
+  */
   logForms: [],
+
+  /**
+  * @type {object[]}
+  */
   emoji: [],
+
+  /**
+  * @type {object[]}
+  */
   toSave: [],
+
+  /**
+  * @type {Blaze.Var}
+  * @private
+  */
   _accounts: new Blaze.Var([]),
+
+  /**
+  * @type {Blaze.Var}
+  * @private
+  */
   _settings: new Blaze.Var({}),
+
+  /**
+  * @type {Blaze.Var}
+  * @private
+  */
   _devsettings: new Blaze.Var({}),
+
+  /**
+  * @type {Blaze.Var}
+  * @private
+  */
   _avatars: new Blaze.Var({}),
+
+  /**
+  * @type {Blaze.Var}
+  * @private
+  */
   _online: new Blaze.Var(navigator.onLine),
+
+  /**
+  * @type {Notification[]}
+  */
   notifications: [],
+
+  /**
+  * @type {string}
+  * @const
+  */
   pathFiles: 'loqui/files/',
+
+  /**
+  * @type {string}
+  * @const
+  */
   pathBackup: 'loqui/backup/',
+
+  /**
+  * @type {string}
+  * @const
+  */
+  pathLogs: 'loqui/logs/',
+
+  /**
+  * @type {Object}
+  */
   caps: {},
 
-  // Default values
+  /**
+  * @typedef Language
+  * @type {Object}
+  * @property {string} caption
+  * @property {string} value
+  * @memberof App
+  * @inner
+  */
+
+  /**
+  * Default values
+  *
+  * @type {Object}
+  * @property {Object} App
+  * @property {Object} App.settings
+  * @property {boolean} App.settings.reconnect
+  * @property {boolean} App.settings.sound
+  * @property {boolean} App.settings.csn
+  * @property {boolean} App.settings.boltGet
+  * @property {boolean} App.settings.readReceipts
+  * @property {boolean} App.settings.lockOrientation
+  * @property {boolean} App.settings.devMode
+  * @property {Object} App.settings.language
+  * @property {string} App.settings.language.type
+  * @property {string} App.settings.language.type
+  *
+  * @property {Object} App.devsettings
+  * @property {boolean} App.devsettings.devConsole
+  * @property {boolean} App.devsettings.debug
+  * @property {boolean} App.devsettings.stackTrace
+  * @property {boolean} App.devsettings.writeLogFiles
+  * @property {boolean} App.online
+  *
+  * @property {Object} Selects
+  * @property {App~Language[]} Selects.language
+  *
+  * @property {Object} Chat
+  * @property {number} Chat.chunkSize
+  *
+  * @property {Object} Connector
+  * @property {Object} Connector.presence
+  * @property {string} Connector.presence.show
+  *
+  * @property {Object} Provider
+  * @property {Object} Provider.BOSH
+  * @property {string} Provider.BOSH.show
+  */
   defaults: {
     App: {
       settings: {
@@ -40,7 +182,9 @@ var App = {
       },
       devsettings: {
         devConsole: false,
-        debug: false
+        debug: false,
+        stackTrace: false,
+        writeLogFiles: false,
       },
       online: true
     },
@@ -103,26 +247,58 @@ var App = {
     }
   },
 
+  /**
+  * @property {App~events/language} language
+  */
   events : {
+
+    /**
+    * @function events/language
+    * @param {string} value
+    * @inner
+    * @memberof App
+    */
     language : function(value) {
       localStorage.setItem('language', value);
       window.location.reload();
     }
   },
 
+  /**
+  * @function accounts/get
+  * @return {Account[]}
+  * @memberof App
+  */
   get accounts () {
     return this._accounts.get();
   },
+
+  /**
+  * @function accounts/set
+  * @param {Account[]} val
+  * @memberof App
+  */
   set accounts (val) {
     this._accounts.set([].concat(val));
     this.accountsCores = [].concat(this.accountsCores);
   },
 
+  /**
+  * @function accountsCores/get
+  * @return {AccountCore[]}
+  * @memberof App
+  */
   get accountsCores () {
     return this.accounts.map(function (e, i, a) {
       return e.core;
     });
   },
+
+  /**
+  * @function accountsCores/set
+  * @param {AccountCore[]} val
+  * @memberof App
+  */
   set accountsCores (val) {
     Store.put('accountsCores', val);
   },
@@ -140,9 +316,20 @@ var App = {
     this._settings.set($.extend({}, val));
   },
 
+  /**
+  * @function devsettings/get
+  * @return {Object}
+  * @memberof App
+  */
   get devsettings () {
     return this._devsettings.get();
   },
+
+  /**
+  * @function devsettings/set
+  * @param {Object} val
+  * @memberof App
+  */
   set devsettings (val) {
     for (var [key, value] in Iterator(val)) {
       $('body')[value ? 'addClass' : 'removeClass'](key);
@@ -151,27 +338,56 @@ var App = {
     this._devsettings.set($.extend({}, val));
   },
 
+  /**
+  * @function online/get
+  * @return {boolean}
+  * @memberof App
+  */
   get online () {
     return this._online.get();
   },
+
+  /**
+  * @function online/set
+  * @param {boolean} val
+  * @memberof App
+  */
   set online (val) {
     this._online.set(val);
     $('body')[0].dataset.online = val;
   },
 
+  /**
+  * @function avatars/get
+  * @return {Avatar[]}
+  * @memberof App
+  */
   get avatars () {
     return this._avatars.get();
   },
+
+  /**
+  * @function avatars/get
+  * @param {Avatar[]} val
+  * @memberof App
+  */
   set avatars (val) {
     Store.put('avatars', val);
     this._avatars.set($.extend({}, val));
   },
 
+  /**
+  * @function unread/get
+  * @return {number}
+  * @memberof App
+  */
   get unread () {
     return this.accounts.reduce(function (prev, cur) {return prev + cur.unread;}, 0);
   },
 
-  // This is the main procedure
+  /**
+  * This is the main procedure.
+  */
   run: function () {
     // Initialize Store class
     Store.init();
@@ -183,7 +399,9 @@ var App = {
     });
   },
 
-  // Load settings and data from storage
+  /**
+  * Load settings and data from storage
+  */
   load: function () {
     return Promise.all([
       new Promise(function (callback) {
@@ -207,13 +425,13 @@ var App = {
       }),
       new Promise(function (callback) {
         Store.get('settings', function (val) {
-          App.settings = $.extend(App.defaults.App.settings, val);
+          App.settings = $.extend({}, App.defaults.App.settings, val);
           callback(null);
         });
       }),
       new Promise(function (callback) {
         Store.get('devsettings', function (val) {
-          App.devsettings = (val && Object.keys(val).length) ? val : App.defaults.App.devsettings;
+          App.devsettings = $.extend({}, App.defaults.App.devsettings, val);
           callback(null);
         });
       }),
@@ -232,7 +450,9 @@ var App = {
     ]);
   },
 
-  // Perform special processes if upgrading from older version
+  /**
+  * Perform special processes if upgrading from older version
+  */
   upgrade: function () {
     var last = localStorage.getItem('version');
     var from = {
@@ -316,7 +536,10 @@ var App = {
     localStorage.setItem('version', App.version);
   },
 
-  // Bootstrap logins and so on
+  /**
+  * Bootstrap logins and so on
+  * @param {string} last
+  */
   start: function (last) {
     App.online = App.online;
 
@@ -349,7 +572,9 @@ var App = {
     }
   },
 
-  // Connect with every enabled account
+  /**
+  * Connect with every enabled account
+  */
   connect: function () {
     for (var i in this.accounts) {
       var account = this.accounts[i];
@@ -359,7 +584,9 @@ var App = {
     }
   },
 
-  // Disconnect from every account
+  /**
+  * Disconnect from every account
+  */
   disconnect: function () {
     for (var i in this.accounts) {
       var account = this.accounts[i];
@@ -372,20 +599,26 @@ var App = {
     $('section#main').attr('data-show', 'na');
   },
 
-  // Update an array and put it in storage
+  /**
+  * Update an array and put it in storage
+  */
   smartpush: function (key, value, callback) {
     this[key].push(value);
     Tools.log('PUSHING', value, 'TO', key, this[key]);
     Store.put(key, this[key], callback);
   },
 
-  // Update an object and put it in storage
+  /**
+  * Update an object and put it in storage
+  */
   smartupdate: function (key, callback) {
     /*Tools.log('SAVING', key, this[key]);
     Store.put(key, this[key], callback);*/
   },
 
-  // Disconnect from every account
+  /**
+  * Disconnect from every account
+  */
   killAll: function () {
     this.settings.reconnect = false;
     for (var i in this.accounts) {
@@ -393,7 +626,9 @@ var App = {
     }
   },
 
-  // Display a system notification or play a sound accordingly
+  /**
+  * Display a system notification or play a sound accordingly
+  */
   notify: function (core, altSound, force) {
     var alt = function () {
       App.audio(altSound);
@@ -423,14 +658,18 @@ var App = {
     }
   },
 
-  // Play a sound
+  /**
+  * Play a sound
+  */
   audio: function (file) {
     if (App.settings.sound && !document.hidden) {
       $('audio[src="audio/' + file + '.ogg"]')[0].play();
     }
   },
 
-  // Set an alarm for 90 seconds later so that app automatically reopens
+  /**
+  * Set an alarm for 90 seconds later so that app automatically reopens
+  */
   alarmSet: function (data) {
     if (navigator.mozAlarms) {
       var req = navigator.mozAlarms.add(new Date(Date.now()+90000), 'ignoreTimezone', data);
@@ -439,7 +678,9 @@ var App = {
     }
   },
 
-  // Bring app to foreground
+  /**
+  * Bring app to foreground
+  */
   toForeground: function () {
     navigator.mozApps.getSelf().onsuccess = function (e) {
       var app = e.target.result;
@@ -449,7 +690,9 @@ var App = {
     };
   },
 
-
+  /**
+  * Export user data to an encripted backup file.
+  */
   exportData : function(){
     var accounts= null;
     var chatChunks= {};
@@ -501,7 +744,6 @@ var App = {
             });
           }));
         }
-
       });
 
       Promise.all(jobs).then(function(){
@@ -532,7 +774,7 @@ var App = {
               Lungo.Notification.success(_('Backup'), _('BackupStored'), 'save', 3);
             }, function(e){
               Lungo.Notification.error(_('Backup'), _('BackupFailed'), 'info-sign', 5);
-              console.log('FAILED TO SAVE THE BACKUP', e, blob);
+              Tools.log('FAILED TO SAVE THE BACKUP', e, blob);
             });
 
           }, 100);
@@ -542,6 +784,9 @@ var App = {
     });
   },
 
+  /**
+  * Import userdata form an encripted backup file
+  */
   importData : function(){
     var restore= function(backupPack){
       App.requestPassword('Restore', function(password){
@@ -571,10 +816,10 @@ var App = {
               backup.avatarChunks[key]= JSON.parse(CryptoJS.AES.decrypt(avatar, password).toString(CryptoJS.enc.Utf8));
             });
 
-            console.log('BACKUP DECRYPTED', backup);
+            Tools.log('BACKUP DECRYPTED', backup);
 
             if(confirm(_('BackupApplyRequest'))){
-              console.log('REMOVING CURRENT DATA');
+              Tools.log('REMOVING CURRENT DATA');
               Lungo.Notification.show('trash', _('RemovingCurrentData'));
 
               var jobs= [];
@@ -699,6 +944,12 @@ var App = {
     });
   },
 
+  /**
+  * ask the user to enter a passphrase
+  *
+  * @param {string} type
+  * @param {function} callback
+  */
   requestPassword : function(type, callback){
     $('#backupPassword p')[0].dataset.l10nId= "PasswordExplanation" + type;
 

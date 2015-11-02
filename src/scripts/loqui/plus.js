@@ -1,9 +1,24 @@
 /* global Accounts, App, Tools, Lungo, Messenger, Geo, Chat, OTR, Message, Make */
 
+/**
+* @file Holds {@link Plus}
+* @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
+* @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
+* @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
+* @author [Sukant Garg]{@link https://github.com/gargsms}
+* @license AGPLv3
+*/
+
 'use strict';
 
+/**
+ * @namespace
+ */
 var Plus = {
 
+  /**
+   * Triggers a bolt on the users device
+   */
   bolt: function () {
     var account = Accounts.current;
     var to = $('section#chat')[0].dataset.jid;
@@ -19,10 +34,18 @@ var Plus = {
     }
   },
 
+  /**
+   * Adds an emoji to the messenges text box.
+   *
+   * @param {string} emoji
+   */
   emoji: function (emoji) {
     Messenger.add(emoji);
   },
 
+  /**
+   * Triggers a file pick [{MozActivity}]{@link external:System.MozActivity}
+   */
   fileSend: function () {
     var account = Accounts.current;
     var fileTypes = [];
@@ -54,6 +77,9 @@ var Plus = {
     };
   },
 
+  /**
+   * Sends the current location to the active chat.
+   */
   locationSend: function () {
     var account = Accounts.current;
     if (account.supports('locationSend')) {
@@ -66,10 +92,19 @@ var Plus = {
     }
   },
 
+  /**
+   * @param {*} constraints
+   */
   rtc: function (constraints) {
 
   },
 
+  /**
+   * switches the user matching the given jid to an OTR encrypted conversation.
+   *
+   * @param {string} jid
+   * @param {Account} account
+   */
   switchOTR: function (jid, account) {
     account = account || Accounts.current;
     var ci = account.chatFind(jid);
@@ -106,8 +141,13 @@ var Plus = {
     }
   },
 
+  /**
+   * Switches a [{Chat}]{@link Chat} to OTR??
+   *
+   * @param {Chat} chat
+   */
   goOTR: function (chat) {
-    console.log('GOING OTR IN', chat);
+    Tools.log('GOING OTR IN', chat);
     var account = chat.account;
     chat.OTR = new OTR({
       priv: account.OTR.key
@@ -163,19 +203,35 @@ var Plus = {
     chat.OTR.sendQueryMsg();
   },
 
+  /**
+   * Swichtes a [{Chat}]{@link Chat} back to non-OTR
+   *
+   * @param {Chat} chat
+   */
   killOTR: function (chat) {
     chat.OTR.endOtr();
     delete chat.OTR;
   },
 
+  /**
+   * Shows the in-app console
+   */
   showConsole: function() {
     $('#console').show();
   },
 
+  /**
+   * Hides the in-app console
+   */
   hideConsole: function() {
     $('#console').hide();
   },
 
+  /**
+   * Writes to the in-app console
+   *
+   * @param {string} msg
+   */
   log: function(msg) {
     var node=document.createElement("DIV");
     var textnode=document.createTextNode(msg);
@@ -187,6 +243,9 @@ var Plus = {
     }
   },
 
+  /**
+   * Clears the in-app console.
+   */
   clearConsole: function() {
     document.getElementById('logConsole').innerHTML='';
   }

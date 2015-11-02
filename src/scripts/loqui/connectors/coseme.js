@@ -1,7 +1,22 @@
 /* global App, CoSeMe, Providers, Tools, Avatar, Store, Message, Chat, Account, Accounts, Lungo, Make */
 
+/**
+* @file Holds {@link Connector/Coseme}
+* @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
+* @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
+* @author [Christof Meerwald]{@link https://github.com/cmeerw}
+* @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
+* @author [Sukant Garg]{@link https://github.com/gargsms}
+* @license AGPLv3
+*/
+
 'use strict';
 
+/**
+ * @class Connector/CoSeMe
+ * @implements Connector
+ * @param {Account} account
+ */
 App.connectors.coseme = function (account) {
 
   var Yowsup = CoSeMe.yowsup;
@@ -9,6 +24,8 @@ App.connectors.coseme = function (account) {
   var MI = Yowsup.getMethodsInterface();
 
   var pulse= null;
+
+  CoSeMe.config.customLogger = Tools;
 
   this.account = account;
   this.provider = Providers.data[account.core.provider];
@@ -37,7 +54,7 @@ App.connectors.coseme = function (account) {
       callback.connected();
       if(!pulse){
         pulse= setInterval(function(){
-          console.log('keep alive!');
+          Tools.log('keep alive!');
           MI.call('keepalive', []);
         }, 60000);
       }

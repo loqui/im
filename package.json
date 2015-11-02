@@ -14,7 +14,10 @@
     "type": "AGPL"
   },
   "scripts": {
-    "jshint": "node_modules/jshint/bin/jshint -c .jshintrc --exclude-path .gitignore src/scripts/loqui"
+    "jshint": "node_modules/jshint/bin/jshint -c .jshintrc --exclude-path .gitignore src/scripts/loqui",
+    "jsdoc-init": "git clone -b gh-pages --single-branch https://github.com/loqui/im.git gh-pages",
+    "jsdoc-build" : "sh jsdoc/build.sh",
+    "jsdoc-publish": "sh jsdoc/publish.sh"
   },
   "pre-commit": [
     "jshint"
@@ -29,6 +32,7 @@
     "grunt-execute": "~0.2.2",
     "grunt-node-webkit-builder": "~1.0.2",
     "grunt-sass": "^1.0.0",
+    "ink-docstrap": "git://github.com/TitanNano/docstrap.git",
     "jsdom": "~6.5.1",
     "jshint": "^2.6.0",
     "pre-commit": "^1.0.1"

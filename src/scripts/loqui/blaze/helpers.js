@@ -35,8 +35,6 @@ Template.settings_selects.helpers({
   },
 
   Selected : function(value, index){
-    console.log(value, index);
-
     return value == index ? 'selected' : '';
   }
 });
@@ -44,13 +42,17 @@ Template.settings_selects.helpers({
 Template.settings_devmode.helpers({
   settings: function () {
     var settings = [];
-    for (var [key, value] in Iterator(App.devsettings)) {
+
+    Object.keys(App.defaults.App.devsettings).forEach(function(key){
+      var value = this[key];
+
       settings.push({
-        key: key, 
+        key: key,
         value: value,
         caption: _('Set' + key)
       });
-    }
+    }.bind(App.devsettings));
+
     return settings;
   }
 });
@@ -98,7 +100,7 @@ UI.registerHelper('providers', function () {
   var providers = [];
   for (var [key, value] in Iterator(Providers.data)) {
     providers.push({
-      key: key, 
+      key: key,
       value: value
     });
   }
@@ -160,4 +162,3 @@ UI.registerHelper('time', function (ts) {
 UI.registerHelper('json', function(context) {
   return JSON.stringify(context);
 });
-

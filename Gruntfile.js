@@ -6,6 +6,18 @@ module.exports = function(grunt) {
       compress: "package"
     },
     copy: {
+      importDocstrapTemplate: {
+        src: 'docstrap/template.less',
+        dest: 'node_modules/ink-docstrap/styles/variables.less'
+      },
+      importJsdocConfig: {
+        src: 'jsdoc/config.json',
+        dest: 'node_modules/ink-docstrap/template/jsdoc.conf.json'
+      },
+      logoToDocstrap: {
+        src: 'src/img/icon-128.png',
+        dest: 'node_modules/ink-docstrap/template/static/img/logo.png'
+      },
       srcToFirefoxos: {
         expand: true,
         cwd: 'src/',
@@ -143,4 +155,5 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['clean:build', 'execute', 'sass', 'copy', 'clean:css', 'compress']);
   grunt.registerTask('with-desktop', ['clean', 'execute', 'sass', 'copy', 'clean:css', 'compress', 'nodewebkit']);
   grunt.registerTask('devel', ['connect', 'watch']);
+  grunt.registerTask('docstrap', ['copy:importDocstrapTemplate', 'copy:importJsdocConfig', 'copy:logoToDocstrap']);
 };

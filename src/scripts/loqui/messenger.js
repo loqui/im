@@ -1,5 +1,15 @@
 /* global Accounts, App, Message, Tools, Lungo, Providers, Menu, Store, Make */
 
+/**
+* @file Holds {@link Connector/XMPP}
+* @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
+* @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
+* @author [Christof Meerwald]{@link https://github.com/cmeerw}
+* @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
+* @author [Sukant Garg]{@link https://github.com/gargsms}
+* @license AGPLv3
+*/
+
 'use strict';
 
 var Messenger = {
@@ -151,7 +161,7 @@ var Messenger = {
 
       if (value.length > 1 && value[1]) {
         li.on('click', function (e) {
-          console.log(value, value[1]);
+          Tools.log(value, value[1]);
           Menu.show(value[1], li[0]);
         });
       }
@@ -227,7 +237,7 @@ var Messenger = {
         li.bind('click', accountSwitch);
         if (value.length > 1 && value[1]) {
           li.on('click', function (e) {
-            console.log(value, value[1]);
+            Tools.log(value, value[1]);
             Menu.show(value[1], li[0]);
           });
         }

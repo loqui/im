@@ -1,8 +1,25 @@
 /* global Chat, Tools, Plus, App, Providers, Store, Activity, Lungo, Make */
 
+/**
+* @file Holds {@link Message}
+* @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
+* @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
+* @author [Christof Meerwald]{@link https://github.com/cmeerw}
+* @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
+* @author [Sukant Garg]{@link https://github.com/gargsms}
+* @license AGPLv3
+*/
+
 'use strict';
 
 var Message = {
+
+  /**
+   * @constructs
+   * @param {Account} account
+   * @param {ChatCore} core
+   * @param {object} options
+   */
   _make : function (account, core, options) {
     options = options || {};
 
@@ -11,6 +28,10 @@ var Message = {
     this.options = Make(options, MessageOptions)();
   },
 
+  /**
+   * @param {string} name
+   * @private
+   */
   _formatName : function (name) {
     var re = /[A-Za-z-]+/;
     var parts = name.split(' ');
@@ -25,6 +46,9 @@ var Message = {
     return parts.join(' ');
   },
 
+  /**
+   * @private
+   */
   _replace : function() {
     var msg = this;
     var receipts = this.account.supports('receipts');
@@ -64,11 +88,15 @@ var Message = {
       this.chat.findMessage(this.core.original, null).then(function(result){
         afterRecover(result.key, result.result.chunkIndex, result.result.message, result.result.chunk, result.free);
       }, function(result){
-        console.log('HOW SHOULD WE REPLACE A MESSAGE WE CAN\'T FIND?', result);
+        Tools.log('HOW SHOULD WE REPLACE A MESSAGE WE CAN\'T FIND?', result);
       });
     }
   },
 
+  /**
+   * @alias chat/get
+   * @return {Chat}
+   */
   get chat() {
     var chatJid = Strophe.getBareJidFromJid(this.options.muc ? this.core.to : (this.core.from == (this.account.core.user || this.account.core.fullJid) ? this.core.to : this.core.from));
     var ci = this.account.chatFind(chatJid);
@@ -89,6 +117,9 @@ var Message = {
     return chat;
   },
 
+  /**
+   * @param {Chat} chat
+   */
   read : function(chat){
     var isIncoming = (this.core.from != this.account.core.user && this.core.from != this.account.core.realJid);
     var isUnread = !this.core.viewed;
@@ -117,7 +148,11 @@ var Message = {
     }
   },
 
-  // Try to send this message
+  /**
+   * Try to send this message.
+   *
+   * @param {number} delay
+   */
   send : function (delay) {
     var message = this;
     var chat = this.chat;
@@ -134,6 +169,9 @@ var Message = {
     }
   },
 
+  /**
+   *
+   */
   postSend : function () {
     if (this.account.connector.isConnected() && this.options.send) {
       this.core.id = this.account.connector.send(this.core.to, this.core.text, {delay: (this.options && 'delay' in this.options) ? this.core.stamp : this.options.delay, muc: this.options.muc});
@@ -150,7 +188,11 @@ var Message = {
     }
   },
 
-  // Receive this message, process and store it properly
+  /**
+   * Receive this message, process and store it properly
+   *
+   * @param {function} callback
+   */
   receive : function (callback) {
     Tools.log('RECEIVE', this.core.text, this.options);
     var message = this;
@@ -168,7 +210,11 @@ var Message = {
     }
   },
 
-  // Incoming
+  /**
+   * Incoming
+   *
+   * @param {function} callback
+   */
   postReceive : function(callback) {
     var message = this;
     var chat = this.chat;
@@ -222,6 +268,10 @@ var Message = {
     });
   },
 
+  /**
+   * @param {number} block
+   * @param {number} index
+   */
   setSendTimeout : function(block, index){
 	  var message= this.core;
 	  var account= this.account;
@@ -253,7 +303,9 @@ var Message = {
 	  }, 30000);
   },
 
-  //Outcoming
+  /**
+   * Outcoming
+   */
   addToChat : function () {
     var message = this;
     var chat = this.chat;
@@ -298,6 +350,10 @@ var Message = {
     });
   },
 
+  /**
+   * @param {number} blockIndex
+   * @param {string} old_id
+   */
   reRender : function(blockIndex, old_id){
     if($('section#chat')[0].dataset.jid == this.core.to){
       var element= $('section#chat ul#messages li[data-chunk="' + blockIndex + '"] div[data-id="' + (old_id || this.core.id) + '"]');
@@ -305,7 +361,11 @@ var Message = {
     }
   },
 
-  // Represent this message in HTML
+  /**
+   * Represent this message in HTML
+   * @param {number} index
+   * @param {boolean} avatarize
+   */
   preRender : function (index, avatarize) {
     var message = this;
     var account = this.account;
@@ -447,6 +507,16 @@ var Message = {
   }
 };
 
+
+/**
+ * @typedef MessageOptions
+ * @type {object}
+ * @property {boolean} send
+ * @property {boolean} render
+ * @property {boolean} otr
+ * @property {boolean} logging
+ * @property {boolean} muc
+ */
 var MessageOptions = {
   send: true,
   render: true,
