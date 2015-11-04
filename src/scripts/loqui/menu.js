@@ -184,6 +184,11 @@ var Menu = {
         groups: false,
         selected: listBox && listBox.children().map(function (i,e,a) {return e.dataset.jid;})
       };
+      $('#mucCreateForm').removeClass('show');
+      $('#activity').find('button.remove').click(function () {
+        $('#mucCreateForm').addClass('show');
+        $('#activity').find('button.remove').off("click");
+      });
       Activity('invite', account, cb, options);
     },
     mucDirectInvite: function (obj) {
