@@ -32,7 +32,7 @@ var App = {
   * @type {string}
   * @const
   */
-  version: 'v0.4.8',
+  version: 'v0.4.9',
 
   /**
   * @type {String}
