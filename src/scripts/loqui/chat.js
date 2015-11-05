@@ -493,6 +493,11 @@ var Chat = {
 var ChatCore = {
 
   /**
+   * @type {string}
+   */
+  title : null,
+
+  /**
   * @type {?number}
   */
   lastAck : null,
@@ -539,6 +544,7 @@ var ChatCore = {
 
     this.last = this.last || {};
     this.info = this.info || {};
+    this.title = ((!this.title || this.title === this.jid) && this.last && this.last.pushName) ? this.last.pushName : this.title;
 
     this.settings = this.settings || {};
 
