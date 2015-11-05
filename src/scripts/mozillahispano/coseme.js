@@ -3366,11 +3366,11 @@ CoSeMe.namespace('config', (function(){
     groupDomain: 'g.us',
 
     tokenData: {
-      "v": "2.12.11",
+      "v": "2.13.9",
       // XXX: it is tokenData[d] + - + tokenData[v] + - + port
-      "r": "S 40-2.12.11-443",
-      "u": "WhatsApp/2.12.11 S40Version/14.26 Device/Nokia302",
-      "d": "S 40"
+      "r": "S40-2.13.9",
+      "u": "WhatsApp/2.13.9 S40Version/14.26 Device/Nokia302",
+      "d": "S40"
     },
 
     auth: {
@@ -4213,6 +4213,7 @@ CoSeMe.namespace('protocol.dictionary', (function(){
     'google',
     'group',
     'groups',
+    'groups_v2',
     'http://etherx.jabber.org/streams',
     'http://jabber.org/protocol/chatstates',
     'ib',
@@ -4276,9 +4277,9 @@ CoSeMe.namespace('protocol.dictionary', (function(){
     'query',
     'raw',
     'read',
+    'readreceipts',
     'reason',
     'receipt',
-    'received',
     'relay',
     'remote-server-timeout',
     'remove',
@@ -4324,7 +4325,6 @@ CoSeMe.namespace('protocol.dictionary', (function(){
     'urn:ietf:params:xml:ns:xmpp-stanzas',
     'urn:ietf:params:xml:ns:xmpp-streams',
     'urn:xmpp:ping',
-    'urn:xmpp:receipts',
     'urn:xmpp:whatsapp:account',
     'urn:xmpp:whatsapp:dirty',
     'urn:xmpp:whatsapp:mms',
@@ -4341,54 +4341,54 @@ CoSeMe.namespace('protocol.dictionary', (function(){
     'w',
     'wait',
     'WAUTH-2',
-    'x',
     'xmlns:stream',
     'xmlns',
     '1',
     'chatstate',
     'crypto',
+    'phash',
     'enc',
     'class',
     'off_cnt',
     'w:g2',
     'promote',
     'demote',
-    'creator'
+    'creator',
+    'Bell.caf',
+    'Boing.caf',
+    'Glass.caf',
+    'Harp.caf',
+    'TimePassing.caf',
+    'Tri-tone.caf',
+    'Xylophone.caf',
+    'background',
+    'backoff',
+    'chunked',
+    'context',
+    'full',
+    'in',
+    'interactive',
+    'out',
+    'registration',
+    'sid',
+    'urn:xmpp:whatsapp:sync',
+    'flt',
+    's16',
+    'u8',
+    'adpcm',
+    'amrnb',
+    'amrwb',
+    'mp3',
+    'pcm',
+    'qcelp',
+    'wma',
+    'h263',
+    'h264',
+    'jpeg'
   ];
 
   var secondaryStrings = [
     [
-      'Bell.caf',
-      'Boing.caf',
-      'Glass.caf',
-      'Harp.caf',
-      'TimePassing.caf',
-      'Tri-tone.caf',
-      'Xylophone.caf',
-      'background',
-      'backoff',
-      'chunked',
-      'context',
-      'full',
-      'in',
-      'interactive',
-      'out',
-      'registration',
-      'sid',
-      'urn:xmpp:whatsapp:sync',
-      'flt',
-      's16',
-      'u8',
-      'adpcm',
-      'amrnb',
-      'amrwb',
-      'mp3',
-      'pcm',
-      'qcelp',
-      'wma',
-      'h263',
-      'h264',
-      'jpeg',
       'mpeg4',
       'wmv',
       'audio/3gpp',
@@ -4422,6 +4422,7 @@ CoSeMe.namespace('protocol.dictionary', (function(){
       '406',
       '407',
       '409',
+      '410',
       '500',
       '501',
       '503',
@@ -4432,7 +4433,6 @@ CoSeMe.namespace('protocol.dictionary', (function(){
       'asampfmt',
       'asampfreq',
       'audio',
-      'bb_db',
       'clear',
       'conflict',
       'conn_no_nna',
@@ -4445,6 +4445,7 @@ CoSeMe.namespace('protocol.dictionary', (function(){
       'g_notify',
       'g_sound',
       'gcm',
+      'gone',
       'google_play',
       'hash',
       'height',
@@ -4540,7 +4541,78 @@ CoSeMe.namespace('protocol.dictionary', (function(){
       'popcorn.m4r',
       'pulse.m4r',
       'synth.m4r',
-      'filehash'
+      'filehash',
+      'max_list_recipients',
+      'en-AU',
+      'en-GB',
+      'es-MX',
+      'pt-PT',
+      'zh-Hans',
+      'zh-Hant',
+      'relayelection',
+      'relaylatency',
+      'interruption',
+      'Apex.m4r',
+      'Beacon.m4r',
+      'Bulletin.m4r',
+      'By The Seaside.m4r',
+      'Chimes.m4r',
+      'Circuit.m4r',
+      'Constellation.m4r',
+      'Cosmic.m4r',
+      'Crystals.m4r',
+      'Hillside.m4r',
+      'Illuminate.m4r',
+      'Night Owl.m4r',
+      'Opening.m4r',
+      'Playtime.m4r',
+      'Presto.m4r',
+      'Radar.m4r',
+      'Radiate.m4r',
+      'Ripples.m4r',
+      'Sencha.m4r',
+      'Signal.m4r',
+      'Silk.m4r',
+      'Slow Rise.m4r',
+      'Stargaze.m4r',
+      'Summit.m4r',
+      'Twinkle.m4r',
+      'Uplift.m4r',
+      'Waves.m4r',
+      'voip',
+      'eligible',
+      'upgrade',
+      'planned',
+      'current',
+      'future',
+      'disable',
+      'expire',
+      'start',
+      'stop',
+      'accuracy',
+      'speed',
+      'bearing',
+      'recording',
+      'encrypt',
+      'key',
+      'identity',
+      'w:gp2',
+      'admin',
+      'locked',
+      'unlocked',
+      'new',
+      'battery',
+      'archive',
+      'adm',
+      'plaintext_size',
+      'compressed_size',
+      'delivered',
+      'msg',
+      'pkmsg',
+      'everyone',
+      'v',
+      'transport',
+      'call-id'
     ]
   ];
 
@@ -4627,6 +4699,7 @@ CoSeMe.namespace('protocol.dictionary', (function(){
   var LONG_STRING_MARK  = 253;
 
   var JID_MARK = 250;
+  var NIBBLE_MARK = 255;
 
   var MAC_LENGTH = 4;
 
@@ -4648,6 +4721,7 @@ CoSeMe.namespace('protocol.dictionary', (function(){
     get LONG_STRING_MARK() { return LONG_STRING_MARK; },
 
     get JID_MARK() { return JID_MARK; },
+    get NIBBLE_MARK() { return NIBBLE_MARK; },
 
     get MAC_LENGTH() { return MAC_LENGTH; },
 
@@ -4693,7 +4767,7 @@ CoSeMe.namespace('protocol', (function(){
   };
 
   BinaryWriter.prototype._sendProtocol = function(counting) {
-    var dictionaryVersion = 4; // my guess: the dictionary version
+    var dictionaryVersion = 5; // my guess: the dictionary version
 
     this.resetBuffer(counting, IS_RAW);
     this.writeASCII('WA', counting);
@@ -5584,6 +5658,38 @@ CoSeMe.namespace('protocol', (function(){
            undefined;
   };
 
+  BinaryReader.prototype.readNibble = function() {
+    var nibbles = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '.' ];
+    var b = this.message.read();
+    var ignoreLastNibble = (b & 0x80) != 0;
+    var size = (b & 0x7f);
+    var nrOfNibbles = size * 2 - ignoreLastNibble;
+    var buffer = new Uint8Array(size)
+    this.fillArray(buffer, size);
+    var charArray = [];
+    var c;
+    for (var i = 0, l = buffer.length; i < l; i++) {
+      b = buffer[i];
+      var dec = Number(buffer[i]) >> 4;
+      if (dec <= 11) {
+        charArray.push(nibbles[dec]);
+      } else {
+        throw new SyntaxError('Bad nibble ' + dec);
+      }
+
+      if (i != l - 1 || !ignoreLastNibble) {
+        var dec = Number(buffer[i]) & 0xf;
+        if (dec <= 11) {
+          charArray.push(nibbles[dec]);
+        } else {
+          throw new SyntaxError('Bad nibble ' + dec);
+        }
+      }
+    }
+
+    return charArray.join('');
+  };
+
   var SHORT_LIST_MARK = k.SHORT_LIST_MARK;
   var LONG_LIST_MARK  = k.LONG_LIST_MARK;
   var EMPTY_LIST_MARK = k.EMPTY_LIST_MARK;
@@ -5635,6 +5741,7 @@ CoSeMe.namespace('protocol', (function(){
   var SURROGATE_MARK = k.SURROGATE_MARK;
 
   var JID_MARK = k.JID_MARK;
+  var NIBBLE_MARK = k.NIBBLE_MARK;
 
   /**
    * Parses a string from the message buffer.
@@ -5682,6 +5789,11 @@ CoSeMe.namespace('protocol', (function(){
       else {
         throw new SyntaxError('could not reconstruct JID.');
       }
+
+    // Nibble
+    } else if (stringMark === NIBBLE_MARK) {
+      string = this.readNibble();
+
     } else {
       throw new SyntaxError('could not find a string.');
     }
