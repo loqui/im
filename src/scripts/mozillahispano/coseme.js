@@ -3366,11 +3366,11 @@ CoSeMe.namespace('config', (function(){
     groupDomain: 'g.us',
 
     tokenData: {
-      "v": "2.13.9",
+      "v": "2.12.11",
       // XXX: it is tokenData[d] + - + tokenData[v] + - + port
-      "r": "S40-2.13.9-443",
-      "u": "WhatsApp/2.13.9 S40Version/14.26 Device/Nokia302",
-      "d": "S40"
+      "r": "S 40-2.12.11-443",
+      "u": "WhatsApp/2.12.11 S40Version/14.26 Device/Nokia302",
+      "d": "S 40"
     },
 
     auth: {
@@ -8497,4 +8497,3 @@ CoSeMe.namespace('contacts', (function(){
     }
   };
 }()));
-
