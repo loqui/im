@@ -351,7 +351,9 @@ var Account = function (core) {
       }
       var li = document.createElement('li');
       li.dataset.jid = contact.jid;
-      if (selected && selected.indexOf(contact.jid) > -1) {
+      if (selected && Object.keys(selected).map(function (key) {
+        return selected[key];
+      }).indexOf(contact.jid) > -1) {
         li.classList.add('selected');
       }
       li.innerHTML =
