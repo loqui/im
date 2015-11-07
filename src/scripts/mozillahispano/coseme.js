@@ -3537,7 +3537,7 @@ CoSeMe.namespace('common', (function(){
   }
 
   function putMessage(kind, message) {
-    var console = console;
+    var console = window.console;
 
     if (CoSeMe.config.customLogger) {
       console = CoSeMe.config.customLogger;
