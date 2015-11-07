@@ -1177,8 +1177,8 @@ section nav {
     }
 
     div {
-        [data-ack='delivered'],
-        [data-ack='viewed'] {
+        &[data-ack='delivered'],
+        &[data-ack='viewed'] {
             &:after {
                 content: '✔✔';
                 position: absolute;
@@ -1421,10 +1421,6 @@ section nav {
     transform: rotate(-20deg);
     opacity: .2;
     pointer-events: none;
-}
-
-section:not([data-features~=presence]) .show {
-    display: none;
 }
 
 .profile #card {
