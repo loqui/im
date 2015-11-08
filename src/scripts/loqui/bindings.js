@@ -136,36 +136,43 @@ document.addEventListener("visibilitychange", function() {
 
 // Type in chat text box
 $('section#chat article#main div#text').on('keydown', function (e) {
+
   if (e.which == 13) {
     e.preventDefault();
     Messenger.say();
-    Messenger.csn('active');
+
   } else if (e.which == 8 || e.which == 46) {
-    if (this.textContent.length < 2) {
-      $('section#chat article#main button#plus').show();
-      $('section#chat article#main button#say').hide();
-      Messenger.csn('paused');
-    }
     // if user wants to hide keyboard in landscape
     // user can clear the box and press backspace to hide it
     if (this.textContent.length === 0 && e.which == 8 && window.matchMedia('(orientation:landscape)').matches) {
       $('section#chat article#main div#text').blur();
     }
-  } else {
-    $('section#chat article#main button#plus').hide();
-    $('section#chat article#main button#say').show();
+  }
 
-    var ul = $('section#chat ul#messages');
-    ul[0].scrollTop = ul[0].scrollHeight;
+}).on('keydown', Tools.throttle(function(e){
+  var dirtyState = $('#footbox')[0].dataset.dirty;
+  var newDirtyState = ((e.which === 8 && this.textContent.length > 1) || (e.which !== 8 && this.textContent.length >= 0));
+
+  if (dirtyState !== newDirtyState.toString()) {
+    $('#footbox')[0].dataset.dirty = newDirtyState;
+  }
+
+  if (newDirtyState) {
     Messenger.csn('composing');
   }
-}).on('tap', function (e) {
-  Lungo.Router.article('chat', 'main');
 
+}, 1500)).on('keyup', Tools.debounce(function(){
+  Messenger.csn('paused');
+
+}, 5000)).on('tap', function (e) {
   var ul = $('section#chat ul#messages');
-  ul[0].scrollTop = ul[0].scrollHeight + 500;
+  ul[0].scrollTop = ul[0].scrollHeight;
+
 }).on('blur', function (e) {
   Messenger.csn('paused');
+
+  var ul = $('section#chat ul#messages');
+  ul[0].scrollTop = ul[0].scrollHeight;
 });
 
 // Tap my avatar
