@@ -1,4 +1,4 @@
-/* global Accounts, App, Tools, Lungo, Messenger, Geo, Chat, OTR, Message, Make */
+/* global Accounts, App, Tools, Lungo, Messenger, Geo, Chat, OTR, Message, Make, ContactToVcard */
 
 /**
 * @file Holds {@link Plus}
@@ -77,9 +77,29 @@ var Plus = {
     };
   },
 
-  /**
-   * Sends the current location to the active chat.
-   */
+  vcardSend: function () {
+    var account = Accounts.current;
+    var to = $('section#chat')[0].dataset.jid;
+
+    var e = new MozActivity({
+      name: 'pick',
+      data: {
+        type: 'webcontacts/tel'
+      }
+    });
+
+    e.onsuccess = function () {
+      var contact = this.result;
+      var name = Array.isArray(contact.name) ? contact.name[0] : contact.name;
+      var str = '';
+      ContactToVcard([contact], function (vcards, nCards) {
+        str += vcards;
+      }, function () {
+        account.connector.vcardSend(to, name, str);
+      }, 0, true);
+    };
+  },
+  
   locationSend: function () {
     var account = Accounts.current;
     if (account.supports('locationSend')) {

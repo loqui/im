@@ -292,6 +292,10 @@ var Menu = {
       Lungo.Router.section('back');
       Plus.locationSend();
     },
+    vcardSend: function () {
+      Lungo.Router.section('back');
+      Plus.vcardSend();
+    },
     bolt: function () {
       Lungo.Router.section('back');
       Plus.bolt();

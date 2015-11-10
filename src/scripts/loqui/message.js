@@ -394,7 +394,14 @@ var Message = {
         case 'vCard':
           onClick = function(e){
             e.preventDefault();
-            return alert('vCard');
+            return new MozActivity({
+              name: 'open',
+              data: {
+                type: 'text/vcard',
+                blob: new Blob([ message.core.media.payload[1] ],
+                               { type : 'text/vcard' })
+              }
+            });
           };
           break;
 

@@ -207,6 +207,10 @@ var Tools = {
     callback('img/location.png');
   },
 
+  vcardThumb: function (blob, width, height, callback) {
+    callback('img/contact.png');
+  },
+
   getFileType: function(type) {
     var fileType = null;
     switch (type) {

@@ -1273,6 +1273,7 @@ section nav {
 
     div[data-media-type='video']
     div[data-media-type='audio'],
+    div[data-media-type='vCard'],
     div[data-media-type='url'] {
         width: calc(100% - 3.5rem);
     }
@@ -1563,6 +1564,10 @@ section nav {
     }
 
     &:not([data-features~=locationSend]) .location {
+        display: none;
+    }
+
+    &:not([data-features~=vcardSend]) .vcard {
         display: none;
     }
 
