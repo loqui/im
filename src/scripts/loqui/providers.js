@@ -44,8 +44,9 @@ var Providers = {
        * @const
        */
       features: ['localContacts', 'receipts', 'imageSend', 'videoSend',
-        'audioSend', 'locationSend', 'pay', 'muc', 'csn', 'avatarChange',
-        'nickChange', 'statusChange', 'presence', 'mucCreate', 'readReceipts'],
+                 'audioSend', 'locationSend', 'vcardSend', 'pay', 'muc', 'csn',
+                 'avatarChange', 'nickChange', 'statusChange', 'presence',
+                 'mucCreate', 'readReceipts'],
 
       /**
        * @type {string}

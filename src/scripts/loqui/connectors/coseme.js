@@ -333,11 +333,20 @@ App.connectors.coseme = function (account) {
     Tools.locThumb(loc, 120, 120, function (thumb) {
       var method = 'message_locationSend';
       MI.call(method, [jid, loc.lat, loc.long, thumb]);
-      self.addMediaMessageToChat('url', thumb, 'https://maps.google.com/maps?q=' + loc.lat + ',' + loc.long, account.core.user, jid, Math.floor((new Date()).getTime() / 1000) + '-1');
+      self.addMediaMessageToChat('url', thumb, 'https://maps.google.com/maps?q=' + loc.lat + ',' + loc.long, [ loc.lat, loc.long ], account.core.user, jid, Math.floor((new Date()).getTime() / 1000) + '-1');
       App.audio('sent');
     });
   };
 
+  this.vcardSend = function (jid, name, vcard) {
+    var self = this;
+    Tools.vcardThumb(null, 120, 120, function (thumb) {
+      var method = 'message_vcardSend';
+      MI.call(method, [jid, vcard, name]);
+      self.addMediaMessageToChat('vCard', thumb, null, [ name, vcard ], account.core.user, jid, Math.floor((new Date()).getTime() / 1000) + '-1');
+    });
+  };
+  
   this.avatarSet = function (blob) {
     function UrlToBin (url, cb) {
       var reader = new FileReader();
@@ -392,7 +401,7 @@ App.connectors.coseme = function (account) {
       group_setSubjectSuccess: null,
       group_messageReceived: this.events.onGroupMessage,
       group_imageReceived: this.events.onGroupImageReceived,
-      group_vcardReceived: null,
+      group_vcardReceived: this.events.onGroupVCardReceived,
       group_videoReceived: this.events.onGroupVideoReceived,
       group_audioReceived: this.events.onGroupAudioReceived,
       group_locationReceived: this.events.onGroupLocationReceived,
@@ -504,7 +513,7 @@ App.connectors.coseme = function (account) {
 
   this.events.onVCardReceived = function (msgId, fromAttribute, vcardName, vcardData, wantsReceipt, isBroadcast, notifyName) {
     var to = this.account.core.fullJid;
-    return this.mediaProcess('vCard', msgId, fromAttribute, to, vcardName, vcardData, null, wantsReceipt, false, notifyName);
+    return this.mediaProcess('vCard', msgId, fromAttribute, to, [vcardName, vcardData], null, null, wantsReceipt, false, notifyName);
   };
 
   this.events.onAvatar = function (jid, picId, blob) {
@@ -820,6 +829,10 @@ App.connectors.coseme = function (account) {
     return this.mediaProcess('url', msgId, author, group, [mlatitude, mlongitude, name], null, null, wantsReceipt, true, notifyName);
   };
 
+  this.events.onGroupVCardReceived = function (msgId, group, author, vcardName, vcardData, wantsReceipt, notifyName) {
+    return this.mediaProcess('vCard', msgId, author, group, [vcardName, vcardData], null, null, wantsReceipt, true, notifyName);
+  };
+  
   this.events.onContactsGotStatus = function (id, statuses) {
     var i = Iterator(statuses);
     for (let [jid, status] in i) {
@@ -923,7 +936,7 @@ App.connectors.coseme = function (account) {
           method,
           [toJID, url, hash, '0', thumb.split(',').pop()]
         );
-        self.addMediaMessageToChat(type, thumb, url, account.core.user, toJID, Math.floor((new Date()).getTime() / 1000) + '-1');
+        self.addMediaMessageToChat(type, thumb, url, null, account.core.user, toJID, Math.floor((new Date()).getTime() / 1000) + '-1');
         App.audio('sent');
         var ext = url.split('.').pop();
         var localUrl = App.pathFiles + Tools.localize(Tools.stamp(id)).replace(/[-:]/g, '') + url.split('/').pop().substring(0, 5).toUpperCase() + '.' + ext;
@@ -953,11 +966,12 @@ App.connectors.coseme = function (account) {
   this.events.onUploadRequestDuplicate = function (hash) {
     Lungo.Notification.error(_('NotUploaded'), _('DuplicatedUpload'), 'warning-sign', 5);
   };
-  this.addMediaMessageToChat = function(type, data, url, from, to, id) {
+  this.addMediaMessageToChat = function(type, data, url, payload, from, to, id) {
     var account = this.account;
     var msgMedia = {
       type: type,
       thumb: data,
+      payload: payload,
       url: url,
       downloaded: true
     };
@@ -978,6 +992,7 @@ App.connectors.coseme = function (account) {
       var media = {
         type: fileType,
         thumb: thumb,
+        payload: mediaUrl ? null : payload,
         url: mediaUrl,
         downloaded: false
       };
@@ -1013,10 +1028,10 @@ App.connectors.coseme = function (account) {
         break;
       case 'url':
         mediaUrl = 'https://maps.google.com/maps?q=' + payload[0] + ',' + payload[1];
-        process('img/location.jpg');
+        process('img/location.png');
         break;
       case 'vCard':
-        process(null);
+        process('img/contact.png');
         break;
     }
   };
