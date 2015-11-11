@@ -1006,6 +1006,16 @@ section nav {
     display: none;
 }
 
+#footbox[data-dirty='true'] {
+    #say {
+        display: block;
+    }
+
+    #plus {
+        display: none;
+    }
+}
+
 #text {
     position: relative;
     padding: .6rem .5rem .7rem;
