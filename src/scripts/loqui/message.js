@@ -12,6 +12,9 @@
 
 'use strict';
 
+/**
+ * @lends Message.prototype
+ */
 var Message = {
 
   /**
@@ -96,6 +99,7 @@ var Message = {
   /**
    * @alias chat/get
    * @return {Chat}
+   * @memberof Message.prototype
    */
   get chat() {
     var chatJid = Strophe.getBareJidFromJid(this.options.muc ? this.core.to : (this.core.from == (this.account.core.user || this.account.core.fullJid) ? this.core.to : this.core.from));
@@ -170,7 +174,7 @@ var Message = {
   },
 
   /**
-   *
+   * Pushes the message to the network interface to actually send it.
    */
   postSend : function () {
     if (this.account.connector.isConnected() && this.options.send) {
@@ -189,7 +193,7 @@ var Message = {
   },
 
   /**
-   * Receive this message, process and store it properly
+   * Receive this message, process and store it properly.
    *
    * @param {function} callback
    */
