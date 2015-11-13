@@ -46,17 +46,17 @@ var App = {
   connectors: [],
 
   /**
-  * @type {object[]}
+  * @type {Object[]}
   */
   logForms: [],
 
   /**
-  * @type {object[]}
+  * @type {Object[]}
   */
   emoji: [],
 
   /**
-  * @type {object[]}
+  * @type {Object[]}
   */
   toSave: [],
 
@@ -672,9 +672,18 @@ var App = {
   */
   alarmSet: function (data) {
     if (navigator.mozAlarms) {
-      var req = navigator.mozAlarms.add(new Date(Date.now()+90000), 'ignoreTimezone', data);
-      req.onsuccess = function () { };
-      req.onerror = function () { };
+      navigator.mozAlarms.getAll().onsuccess = function(e){
+        e.target.result.forEach(function(item) {
+          Tools.log('REMOVE ALARM', item);
+          navigator.mozAlarms.remove(item.id);
+        });
+
+        var req = navigator.mozAlarms.add(new Date(Date.now()+90000), 'ignoreTimezone', data);
+        req.onsuccess = function () {
+          Tools.log('SET NEW ALARM', req.result);
+        };
+        req.onerror = function () { };
+      };
     }
   },
 
