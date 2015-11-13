@@ -419,14 +419,17 @@ var Store = {
         }
     },
 
+    /**
+     * @param {Array} args
+     */
     writeToLog : (function(){ 
         var buffer = [];
         var fileName = null;
 
         var q = async.queue(function(args, callback) {
-            buffer.push(args.join(' '));
+            buffer.push((new Date()).toTimeString() + '|  ' + args.join(' '));
 
-            setTimeout(callback, 100);
+            setTimeout(callback, 10);
         });
 
         q.drain = function(){
@@ -469,6 +472,7 @@ var Store = {
                                 r.onsuccess = function(){
                                     console.log('log saved!', 'new size is: ', file.size);
                                     buffer = [];
+                                    callback();
                                 };
 
                                 r.onerror = callback;
