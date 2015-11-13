@@ -105,7 +105,7 @@ var App = {
   * @type {string}
   * @const
   */
-  pathBackup: 'loqui/backup/',
+  pathBackup: 'loqui/backup',
 
   /**
   * @type {string}
@@ -411,6 +411,7 @@ var App = {
             // Inflate accounts
             for (let [i, core] in Iterator(cores)) {
               var account = new Account(core);
+
               for (let [i, chcore] in Iterator(core.chats)) {
                 core.chats[i] = chcore = Make(chcore, ChatCore)();
                 let chat = Make(Chat)(chcore, account);
@@ -779,7 +780,7 @@ var App = {
             Lungo.Notification.show('save', _('SavingBackup'));
             var blob= new Blob([JSON.stringify({accounts : accounts, avatars : avatars, chatChunks : chatChunks, avatarChunks : avatarChunks})], { type : 'application/json' });
 
-            Store.SD.save('loqui/backups/'+ (new Date()).getTime() +'.backup', blob, function(){
+            Store.SD.save(App.pathBackup+'/'+ (new Date()).getTime() +'.backup', blob, function(){
               Lungo.Notification.success(_('Backup'), _('BackupStored'), 'save', 3);
             }, function(e){
               Lungo.Notification.error(_('Backup'), _('BackupFailed'), 'info-sign', 5);
@@ -905,7 +906,7 @@ var App = {
       });
     };
 
-    Store.SD.dir('loqui/backups', function(list){
+    Store.SD.dir(App.pathBackup, function(list){
       var files= [];
 
       list.forEach(function(item){
