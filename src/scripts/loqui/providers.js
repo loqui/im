@@ -1,7 +1,7 @@
 'use strict';
 
 /**
-* @file Holds {@link Providers}
+* @file Holds {@link Providers} and [{Provider}]{@link Provider}
 * @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
 * @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
 * @author [Christof Meerwald]{@link https://github.com/cmeerw}
@@ -14,51 +14,41 @@
  */
 var Providers = {
 
-  /**
-   * @lends Providers
-   */
   data: {
 
     /**
-     * @class
+     * @type {Provider}
+     * @memberof Providers
+     * @readonly
      */
     'whatsapp': {
-
-      /**
-       * @type {string}
-       * @const
-       */
       longName: 'WhatsApp',
 
-      /**
-       * @type {object}
-       * @property {string} type
-       * @const
-       */
       connector: {
         type: 'coseme'
       },
 
-      /**
-       * @type {string[]}
-       * @const
-       */
       features: ['localContacts', 'receipts', 'imageSend', 'videoSend',
                  'audioSend', 'locationSend', 'vcardSend', 'pay', 'muc', 'csn',
                  'avatarChange', 'nickChange', 'statusChange', 'presence',
                  'mucCreate', 'readReceipts'],
 
-      /**
-       * @type {string}
-       */
       color: '#254242',
+
       terms: {
         user: 'YourNumber',
         country: 'YourCountry'
       },
+
       logForm: 'coseme',
       emoji: 'coseme'
     },
+
+    /**
+     * @type {Provider}
+     * @memberof Providers
+     * @readonly
+     */
     'facebook': {
       longName: 'Facebook Chat',
       altname: 'Facebook',
@@ -78,6 +68,12 @@ var Providers = {
       notice: true,
       emoji: 'FB'
     },
+
+    /**
+     * @type {Provider}
+     * @memberof Providers
+     * @readonly
+     */
     'hangouts': {
       longName: 'Google Hangouts',
       altname: 'Gmail',
@@ -99,6 +95,12 @@ var Providers = {
       notice: true,
       emoji: 'GTALK'
     },
+
+    /**
+     * @type {Provider}
+     * @memberof Providers
+     * @readonly
+     */
     'nimbuzz': {
       longName: 'Nimbuzz',
       connector: {
@@ -116,6 +118,12 @@ var Providers = {
       },
       emoji: 'XMPP'
     },
+
+    /**
+     * @type {Provider}
+     * @memberof Providers
+     * @readonly
+     */
     'ovi': {
       longName: 'Nokia ovi',
       altname: 'ovi',
@@ -135,6 +143,10 @@ var Providers = {
       emoji: 'XMPP'
     },
 
+    /**
+     * @type {Provider}
+     * @memberof Providers
+     */
     'lync': {
       longName: 'Microsoft Lync',
       altname: 'Lync',
@@ -154,6 +166,11 @@ var Providers = {
       },
       emoji: 'XMPP'
     },
+
+    /**
+     * @type {provider}
+     * @memberof Provider
+     */
     'xmpp': {
       longName: 'XMPP/Jabber',
       connector: {
@@ -177,7 +194,13 @@ var Providers = {
     }
   },
 
-  // Autocompletes adresses with default domain names
+  /**
+   * Autocompletes adresses with default domain names
+   *
+   * @param {string} user
+   * @param {string} provider
+   * @return {string}
+   */
   autoComplete: function (user, provider) {
     var bits = user.split('@');
     var autodomain = Providers.data[provider].autodomain;
@@ -190,3 +213,17 @@ var Providers = {
   }
 
 };
+
+/**
+ * @typedef Provider
+ * @property {string} longName
+ * @property {Object} connector
+ * @property {string} connector.type
+ * @property {string[]} features
+ * @property {string} color
+ * @property {Object} terms
+ * @property {string} terms.user
+ * @property {string} terms.country
+ * @property {string} logForm
+ * @property {string} emoji
+ */

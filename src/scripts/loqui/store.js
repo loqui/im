@@ -10,16 +10,34 @@
 
 'use strict';
 
+/**
+ * @namespace
+ */
 var Store = {
 
+  /**
+   * @type {number}
+   */
   size: 0,
 
+  /**
+   * @type {Chunk[]}
+   */
   cache: [],
 
+  /**
+   * @type {Object}
+   */
   locks : {},
 
+  /**
+   * @type {Promise[]}
+   */
   waiting : [],
 
+  /**
+   * Initializes the IndexedDB
+   */
   init: function (){
     Store.recover(0, function (key, size, free) {
       Store.size = size || 0;
@@ -28,6 +46,9 @@ var Store = {
     });
   },
 
+  /**
+   * @param {*} value
+   */
   block: function (value) {
     this.value = value;
     this.save = function (callback) {
@@ -40,6 +61,11 @@ var Store = {
     };
   },
 
+  /**
+   * @param {*} value
+   * @param {function} callback
+   * @return {number}
+   */
   save: function (value, callback) {
     var block = new Store.block(JSON.stringify(value));
     var key = Store.lock(0);
@@ -58,6 +84,10 @@ var Store = {
     return block.index;
   },
 
+  /**
+   * @param {number} index
+   * @param {function} callback
+   */
   recover: function (index, callback) {
     var stack = stack || Tools.currentStack();
 
@@ -94,6 +124,12 @@ var Store = {
 
   },
 
+  /**
+   * @param {object} key
+   * @param {number} index
+   * @param {*} value
+   * @param {function} callback
+   */
   update: function (key, index, value, callback) {
     if(this.locks[index] == key){
       var block = new Store.block(JSON.stringify(value));
@@ -111,10 +147,18 @@ var Store = {
     }
   },
 
+  /**
+   * @param {string} key
+   * @param {function} callback
+   */
   drop: function (key, callback) {
     asyncStorage.removeItem(key, callback);
   },
 
+  /**
+   * @param {number} index
+   * @param {string[]} [stack]
+   */
   lock : function(index, stack) {
     var key = {
       hash : (Date.now() * Math.random() * Date.now()).toString(16),
@@ -130,6 +174,10 @@ var Store = {
     }
   },
 
+  /**
+   * @param {number} index
+   * @param {object} key
+   */
   unlock : function(index, key) {
     if (this.locks[index] == key) {
       delete this.locks[index];
@@ -149,28 +197,59 @@ var Store = {
     }
   },
 
+  /**
+   * @param {number} index
+   * @param {function} callback
+   */
   onUnlock : function(index, callback) {
     this.waiting.push({ index : index, callback : callback });
   },
 
+  /**
+   * @param {number} index
+   * @param {function} callback
+   */
   blockDrop: function (index, callback) {
     this.drop('b' + index, callback);
   },
 
+  /**
+   * @param {string} key
+   * @param {*} value
+   * @param {function} callback
+   */
   put: function (key, value, callback) {
   	asyncStorage.setItem(key, JSON.stringify(value), callback);
   },
 
+  /**
+   * @param {string} key
+   * @param {function} callback
+   */
   get: function (key, callback) {
     asyncStorage.getItem(key, function (value) {
       callback(JSON.parse(value));
     });
   },
 
+  /**
+   * @namespace
+   */
   SD: {
 
+    /**
+     * @instanceof {DeviceStorage}
+     * @borrows navigator.getDeviceStorage()
+     */
     card: 'getDeviceStorage' in navigator ? navigator.getDeviceStorage('sdcard') : null,
 
+    /**
+     * @param {string} path
+     * @param {*} content
+     * @param {function} onsuccess
+     * @param {function} onerror
+     * @param {boolean} quiet
+     */
     save: function (path, content, onsuccess, onerror, quiet) {
       var type = Tools.getFileType(path.split('.').pop());
       if (this.card) {
@@ -194,6 +273,12 @@ var Store = {
       }
     },
 
+    /**
+     * @param {string} path
+     * @param {function} onsuccess
+     * @param {function} onerror
+     * @param {boolean} quiet
+     */
     recover: function (path, onsuccess, onerror, quiet) {
       if (this.card) {
         var req = this.card.get(path);
@@ -220,6 +305,12 @@ var Store = {
       }
     },
 
+    /**
+     * @param {string} from
+     * @param {string} to
+     * @param {function} onsuccess
+     * @param {function} onerror
+     */
     copy : function (from, to, onsuccess, onerror) {
       if (this.card) {
         var req = this.card.get(from);
@@ -246,6 +337,11 @@ var Store = {
       }
     },
 
+    /**
+     * @param {string} path
+     * @param {function} onsuccess
+     * @param {function} onerror
+     */
     dir : function(path, onsuccess, onerror){
       if(this.card){
         var list= [];
@@ -270,6 +366,10 @@ var Store = {
       }
     },
 
+    /**
+     * @param {string} fileName
+     * @param {function} callback
+     */
     createFile : function(fileName, callback) {
         if(this.card){
             var card = this.card;
@@ -290,6 +390,11 @@ var Store = {
         }
     },
 
+    /**
+     * @param {string} fileName
+     * @param {Array} args
+     * @param {function} callback
+     */
     appendToFile: function(fileName, args, callback){
         if(this.card){
             var card = this.card;

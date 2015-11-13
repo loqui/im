@@ -346,7 +346,7 @@ App.connectors.coseme = function (account) {
       self.addMediaMessageToChat('vCard', thumb, null, [ name, vcard ], account.core.user, jid, Math.floor((new Date()).getTime() / 1000) + '-1');
     });
   };
-  
+
   this.avatarSet = function (blob) {
     function UrlToBin (url, cb) {
       var reader = new FileReader();
@@ -832,7 +832,7 @@ App.connectors.coseme = function (account) {
   this.events.onGroupVCardReceived = function (msgId, group, author, vcardName, vcardData, wantsReceipt, notifyName) {
     return this.mediaProcess('vCard', msgId, author, group, [vcardName, vcardData], null, null, wantsReceipt, true, notifyName);
   };
-  
+
   this.events.onContactsGotStatus = function (id, statuses) {
     var i = Iterator(statuses);
     for (let [jid, status] in i) {
