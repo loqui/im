@@ -20,7 +20,7 @@ var Tools = {
         Store.SD.writeToLog([args]);
       }
 
-      if (App.devsettings.stackTracke) {
+      if (App.devsettings.stackTrace) {
         console.groupCollapsed('StackTrace');
         console.log(Tools.currentStack(1).join('\n'));
         console.groupEnd();
