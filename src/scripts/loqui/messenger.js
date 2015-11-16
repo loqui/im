@@ -409,7 +409,7 @@ var Messenger = {
    */
   cleanTextBox : function() {
     $('section#chat div#text').empty();
-    $('footbox')[0].datset.dirty = false;
+    $('#footbox')[0].dataset.dirty = false;
   }
 
 };
