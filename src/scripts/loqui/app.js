@@ -32,13 +32,13 @@ var App = {
   * @type {string}
   * @const
   */
-  version: 'v0.4.9',
+  version: 'v0.4.10',
 
   /**
   * @type {String}
   * @const
   */
-  minorVersion: 'b',
+  minorVersion: 'a',
 
   /**
   * @type {Connector[]}
