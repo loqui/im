@@ -502,7 +502,7 @@ var Message = {
     }
 
     if (html) {
-      var textSpan = $('<span/>').addClass('text').html(html);
+      var textSpan = $('<span/>').addClass('text').html(html.replace(/<br>/gi,""));
       div.append(textSpan);
     }
 

@@ -174,6 +174,7 @@ var App = {
         boltGet: true,
         readReceipts: true,
         lockOrientation : true,
+        sendOnEnter: true,
         devMode: false,
         language : {
           type : 'select',
