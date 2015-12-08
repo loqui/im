@@ -137,7 +137,7 @@ document.addEventListener("visibilitychange", function() {
 // Type in chat text box
 $('section#chat article#main div#text').on('keydown', function (e) {
 
-  if (e.which == 13) {
+  if (e.which == 13 && App.settings.sendOnEnter) {
     e.preventDefault();
     Messenger.say();
 
