@@ -5533,21 +5533,6 @@ Strophe.Tcpsocket = function(connection) {
     this.strip = "wrapper";
 
     var service = connection.service;
-    if (service.indexOf("tcp:") !== 0) {
-        // If the service is not an absolute URL, assume it is a path and put the absolute
-        // URL together from options, current URL and the path.
-        var new_service = "tcp";
-
-        new_service += ":" + window.location.host;
-
-        if (service.indexOf("/") !== 0) {
-            new_service += window.location.pathname + service;
-        } else {
-            new_service += service;
-        }
-
-        connection.service = new_service;
-    }
 };
 
 Strophe.Tcpsocket.prototype = {
@@ -5649,7 +5634,8 @@ Strophe.Tcpsocket.prototype = {
         this._started_starttls = false;
 
         // Create the new TCP socket
-        this.socket = navigator.mozTCPSocket.open(this._conn.service.substr(4), 5222);
+        var host = this._conn.service.substr(4).split(':');
+        this.socket = navigator.mozTCPSocket.open(host[0], host[1] || 5222);
         this._receiveFunction = this._connect_cb_wrapper;
         this.socket.onopen = this._onOpen.bind(this);
         this.socket.onerror = this._onError.bind(this);

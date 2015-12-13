@@ -182,7 +182,7 @@ var Providers = {
       features: ['multi', 'vcard', 'presence', 'easyAvatars', 'rosterMgmt',
         'avatarChange', 'attention', 'csn', 'delay', 'time', 'statusChange',
         'show', 'muc', 'mucCreate', 'mucJoin', 'receipts', 'federation',
-        'time'],
+        'time', 'connectorHost'],
       color: '#149ED2',
       terms: {
         user: 'FullJID',

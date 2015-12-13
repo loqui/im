@@ -47,7 +47,7 @@ Template.settings_devmode.events({
 });
 
 Template.providers_setup.events({
-  'click button, change select': function (e, t) {
+  'click button, change select, blur input[name="user"]': function (e, t) {
     var target = $(e.target);
     if (target.hasClass('back')) {
       Lungo.Router.article('back');
