@@ -672,7 +672,8 @@ App.logForms.XMPP = function (provider, article) {
           account.test();
         }
       } else if (target.context.tagName == 'INPUT' &&
-                 target.context.getAttribute('name') == 'user') {
+                 target.context.getAttribute('name') == 'user' &&
+                 data.features.indexOf('connectorHost') !== -1) {
         var idx = user.indexOf('@');
         if (idx !== -1) {
           var domain = user.substr(idx + 1);
