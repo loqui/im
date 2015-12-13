@@ -27,7 +27,7 @@ App.connectors.XMPP = function (account) {
   this.contacts = {};
   this.connected = false;
 
-  this.connection = new Strophe.Connection(this.provider.connector.host);
+  this.connection = new Strophe.Connection(this.account.core.host || this.provider.connector.host);
   this.connection.rawInput = function (data) {Tools.log('RECV', this.account.core.fullJid, data);}.bind(this);
   this.connection.rawOutput = function (data) {Tools.log('SENT', this.account.core.fullJid, data);}.bind(this);
 
@@ -625,6 +625,7 @@ App.connectors.XMPP = function (account) {
 
 App.logForms.XMPP = function (provider, article) {
   var data = Providers.data[provider];
+
   return {
     get html () {
       if (article) {
@@ -635,6 +636,11 @@ App.logForms.XMPP = function (provider, article) {
           .append($('<input/>').attr('type', data.terms.userInputType).attr('x-inputmode', 'verbatim').attr('name', 'user').attr('placeholder', (data.terms.placeholder || _(data.terms.user, { provider: data.altname }) )))
           .append($('<label/>').attr('for', 'pass').text(_(data.terms.pass)))
           .append($('<input/>').attr('type', 'password').attr('name', 'pass').attr('placeholder', '******'));
+        if (data.features.indexOf('connectorHost') !== -1) {
+          article
+            .append($('<label/>').attr('for', 'host').text(_('ConnectVia')))
+            .append($('<input/>').attr('type', 'text').attr('x-inputmode', 'verbatim').attr('name', 'host').attr('value', data.connector.host));
+        }
         if (data.notice) {
           article.append($('<small/>').html(_(provider + 'Notice')));
         }
@@ -645,22 +651,51 @@ App.logForms.XMPP = function (provider, article) {
       }
     },
     events: function (target) {
+      var article = target[0].closest('article');
+      var provider = article.parentNode.id;
+      var user = Providers.autoComplete($(article).children('[name="user"]').val(), provider);
+
       if (target.hasClass('submit')) {
-        var article = target[0].parentNode.parentNode;
-        var provider = article.parentNode.id;
-        var user = Providers.autoComplete($(article).children('[name="user"]').val(), provider);
         var pass = $(article).children('[name="pass"]').val();
+        var host = $(article).children('[name="host"]').val();
         var cc = $(article).children('[name="cc"]').val();
         if (user && pass) {
           var account = new Account({
             user: user,
             pass: pass,
+            host: host,
             provider: provider,
             resource: App.defaults.Account.core.resource,
             enabled: true,
             chats: []
           });
           account.test();
+        }
+      } else if (target.context.tagName == 'INPUT' &&
+                 target.context.getAttribute('name') == 'user') {
+        var idx = user.indexOf('@');
+        if (idx !== -1) {
+          var domain = user.substr(idx + 1);
+          var xhr = new XMLHttpRequest({mozSystem: true});
+          xhr.onload = function() {
+            var links = this.response.links.filter(function (e) {
+              // we can only use direct TCP connections where the host
+              // name matches the domain due to SSL certificate name
+              // issues that would arise otherwise
+              var result = ((e.rel != 'urn:xmpp:alt-connections:tcp') ||
+                            (e.href.split(':')[1] == domain));
+              Tools.log(result ? '' : 'ignoring', e.rel, e.href);
+              return result;
+            });
+            if (links.length) {
+              $(article).children('[name="host"]').val(links[0].href);
+            }
+          };
+          xhr.open('GET', 'http://xmppconnect.cmeerw.net/' + domain + '.json');
+          xhr.overrideMimeType('json');
+          xhr.responseType = 'json';
+          xhr.setRequestHeader('Accept', 'text/json');
+          xhr.send();
         }
       }
     }
