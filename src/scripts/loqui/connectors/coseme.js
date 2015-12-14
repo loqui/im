@@ -44,12 +44,22 @@ App.connectors.coseme = function (account) {
   this.connected = false;
 
   this.connect = function (callback) {
+    var self = this;
     var method = 'auth_login';
     var params = [this.account.core.data.login, this.account.core.data.pw];
+    var connTimeoutId = setTimeout(function () {
+      Tools.log("AUTH TIMED OUT");
+      connTimeoutId = null;
+      self.disconnect();
+      callback.connfail();
+    }, 60000);
+
     Yowsup.connectionmanager.signals.auth_success.length = 0;
     SI.registerListener('auth_success', function() {
       Tools.log("CONNECTED");
       this.connected = true;
+      clearTimeout(connTimeoutId);
+      connTimeoutId = null;
       this.account.core.fullJid = CoSeMe.yowsup.connectionmanager.jid;
       callback.connected();
       if(!pulse){
@@ -63,7 +73,9 @@ App.connectors.coseme = function (account) {
     SI.registerListener('auth_fail', function(username, _, reason) {
       Tools.log("AUTH FAIL");
       this.connected = false;
-      if ((reason == 'connection-refused') && callback.connfail) {
+      clearTimeout(connTimeoutId);
+      connTimeoutId = null;
+      if (reason == 'connection-refused') {
         callback.connfail();
       } else {
         callback.authfail(reason);
@@ -72,6 +84,10 @@ App.connectors.coseme = function (account) {
     Yowsup.connectionmanager.signals.disconnected.length = 0;
     SI.registerListener('disconnected', function () {
       this.connected = false;
+      if (connTimeoutId) {
+        clearTimeout(connTimeoutId);
+        connTimeoutId = null;
+      }
       if (pulse) {
         clearInterval(pulse);
         pulse = null;
