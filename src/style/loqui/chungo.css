@@ -38,7 +38,7 @@
   font-family:'FiraSans';
   src: url('../fonts/FiraSans-LightItalic.ttf');
   font-weight: 100;
-  font-style: italic; 
+  font-style: italic;
 }
 
 * {
@@ -66,15 +66,15 @@ section.prev {
 [data-transition="horizontal"] {
   transform: translateX(100%);
   -webkit-transform: translateX(100%);
-  transition: all .3s;
-  -webkit-transition: all .3s;
+  transition: all .4s;
+  -webkit-transition: all .4s;
 }
 [data-transition="vertical"] {
   transform: translateY(-100%);
   -webkit-transform: translateY(-100%);
   opacity: 0;
-  transition: all .3s;
-  -webkit-transition: all .3s;
+  transition: all .4s;
+  -webkit-transition: all .4s;
   z-index: 51!important;
 }
 section.show[data-transition="horizontal"] {
@@ -136,7 +136,7 @@ section > article {
 section > .headless {
   top: 0;
 }
-section.show > article.show {
+section > article.show {
   display: block;
 }
 
@@ -365,4 +365,3 @@ section .hideable {
     transform: translateY(-100%);
   }
 }
-

@@ -2087,7 +2087,7 @@ ul:not([data-enabled='true']) .avatar:after {
     bottom: 2.3rem;
     width: 5.6rem;
     height: 5.6rem;
-    box-shadow: 0 .2rem .2rem rgba(0, 0, 0, .3);
+    box-shadow: 0 0 3px rgba(0, 0, 0, .3), 0 5px 5px rgba(0, 0, 0, .4);
     transition: all .2s ease;
 
     &:before {
@@ -2100,5 +2100,41 @@ ul:not([data-enabled='true']) .avatar:after {
 
     &.hidden {
         bottom: -10rem;
+    }
+
+    &:active {
+        box-shadow: 0 0 6px rgba(0, 0, 0, .3), 0 12px 12px rgba(0, 0, 0, .4);
+    }
+}
+
+// Gecko 34.0+ features
+.gecko-34 {
+    #chat {
+        flex-flow: column;
+
+        &.show {
+            display: flex;
+        }
+
+        #main {
+            flex-flow: column;
+            flex: 1 1 auto;
+            position: relative;
+            top: auto;
+            overflow: auto;
+
+            &.show {
+                display: flex;
+            }
+        }
+
+        ul {
+            flex: 1 1 auto;
+            position: relative;
+        }
+
+        #footbox {
+            position: relative;
+        }
     }
 }
