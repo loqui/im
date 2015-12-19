@@ -63,6 +63,7 @@ var VoiceRecorder = {
 
     this._audioPromise = null;
     this._active = true;
+    this.duration.set('00:00');
 
     navigator.getUserMedia({audio : true}, (stream) => {
       if (this._active) {
@@ -79,9 +80,7 @@ var VoiceRecorder = {
           this.duration.set((time.getMinutes() < 10 ? '0' : '') + time.getMinutes() + ':' + (time.getSeconds() < 10 ? '0' : '') + time.getSeconds());
         }, 1000);
 
-        this.duration.set('00:00');
         this.recording.set(interval);
-
         this._audioRecorder.start();
 
         Tools.log('recording now!');
