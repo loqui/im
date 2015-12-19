@@ -8,11 +8,14 @@ Providers support
 At the moment it supports accounts from:
  * WhatsApp
  * Google Hangouts
- * Facebook Chat
  * Nimbuzz
  * Nokia ovi
  * Microsoft Lync
  * Any other XMPP/Jabber provider in the world
+
+Build The Source
+===
+See the [How To Build](https://github.com/loqui/im/wiki/Build-Loqui) page on the wiki.
 
 Contribute
 ===
@@ -58,7 +61,6 @@ In the same manner, any third party's trademark or intellectual property that ma
 
 * WhatsApp and the WhatsApp logo are registered trademarks of WhatsApp Inc.
 * Hangouts, Gmail, Android, Google and the Google logo are registered trademarks of Google Inc., used with permission.
-* Facebook and Facebook Chat are registered trademarks of Facebook, Inc.
 * Nimbuzz is a registered trademark of Nimbuzz BV.
 * Microsoft Lync are either registered trademarks or trademarks of Microsoft Corporation in the United States and/or other countries.
 * Nokia Ovi is a trademark or registered trademark of Nokia Corporation.

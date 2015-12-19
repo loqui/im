@@ -2,5 +2,8 @@ node_modules/*
 dist/*
 package/*
 cache/*
+out/
+gh-pages/
 *.log
 .DS_Store
+src/scripts/loqui/blaze/renderers.js

@@ -1,0 +1,20 @@
+rules:
+    indentation:
+        - 1
+        -
+            size: 4
+    hex-notation: 0
+    no-color-literals: 0
+    property-sort-order: 0
+    no-ids: 0
+    nesting-depth:
+        - 1
+        -
+            max-depth: 3
+    force-element-nesting: 0
+    force-attribute-nesting: 0
+    force-pseudo-nesting: 0
+    no-vendor-prefixes: 0
+    no-qualifying-elements: 0
+    url-format: 0
+    no-transition-all: 0

@@ -1,4 +1,14 @@
-/* global Accounts, App, Message, Tools, Lungo, Providers, Menu, Store */
+/* global Accounts, App, Message, Tools, Lungo, Providers, Menu, Store, Make */
+
+/**
+* @file Holds {@link Connector/XMPP}
+* @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
+* @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
+* @author [Christof Meerwald]{@link https://github.com/cmeerw}
+* @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
+* @author [Sukant Garg]{@link https://github.com/gargsms}
+* @license AGPLv3
+*/
 
 'use strict';
 
@@ -19,10 +29,12 @@ var Messenger = {
     var to = $('section#chat')[0].dataset.jid;
     var muc = $('section#chat')[0].dataset.muc == "true";
     var account = Accounts.current;
-    text = text || $('section#chat div#text').text();
+
+    text = text || $('section#chat div#text').html().replace(/(<br>)$/gi,"").replace(/<br>/gi,"\n").replace(/&nbsp;/gi, " ").replace(/(<([^>]+)>)/gi, "");
     text = text.trim();
+
     if (text.length) {
-      var msg = new Message(account, 
+      var msg = Make(Message)(account,
       {
         from: account.core.user,
         to: to,
@@ -40,40 +52,21 @@ var Messenger = {
       $('#chat #messages span.lastRead').remove();
       App.audio('sent');
     }
-    $('section#chat div#text').empty();
-    $('section#chat article#main button#plus').show();
-    $('section#chat article#main button#say').hide();
+
+    this.cleanTextBox();
+    this.csn('active');
   },
-  
+
   csn: function (state) {
     var to = $('section#chat')[0].dataset.jid;
     var account = Accounts.current;
     var muc = account.chatGet(to).core.muc;
+
     if (account.connector.isConnected() && account.supports('csn') && App.settings.csn && !muc) {
-      if(this.typingTimeout){
-        clearTimeout(this.typingTimeout);
-        this.typingTimeout= null;
-      }
-      if(state == 'composing'){
-        if(!this.composingInterval){
-          this.composingInterval= setInterval(function(){
-            account.connector.csnSend(to, 'composing');
-          }, 15000);
-          account.connector.csnSend(to, state);
-        }
-        this.typingTimeout= setTimeout(function(){
-          account.connector.csnSend(to, 'paused');
-          clearInterval(this.composingInterval);
-          this.composingInterval= null;
-        }.bind(this), 5000);
-      }else{
-        account.connector.csnSend(to, state);
-        clearInterval(this.composingInterval);
-        this.composingInterval= null;
-      }
+      account.connector.csnSend(to, state);
     }
   },
-  
+
   avatarSet: function (blob) {
     var account = Accounts.current;
     if (account.supports('avatarChange')) {
@@ -82,7 +75,7 @@ var Messenger = {
       Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign', 3);
     }
   },
-  
+
   presenceUpdate: function () {
     var account = Accounts.current;
     if (App.online && account.connector.connected) {
@@ -93,71 +86,83 @@ var Messenger = {
       Lungo.Notification.error(_('Error'), _('NoWhenOffline'), 'exclamation-sign', 3);
     }
   },
-  
+
   contactProfile: function (jid) {
+	  jid = jid || $('section#chat')[0].dataset.jid;
+
     var account = Accounts.current;
-    jid = jid || $('section#chat')[0].dataset.jid;
     var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
     var chat = account.chatGet(jid);
-    if (contact) {
-      var name = contact.name || jid;
-      var section = $('section#contact');
-      section[0].dataset.jid= jid;
-      section.find('#card .name').text(name == jid ? ' ' : name);
-      section.find('#card .user').text(jid);
-      section.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + account.core.provider + '.svg'));
-      section.find('#status p').html(App.emoji[Providers.data[account.core.provider].emoji].fy(contact.presence.status) || _('showna'));
-      var setUl = section.find('#settings ul').empty();
-      var accountSwitch = function (e) {
-        var sw = $(this);
-        var li = sw.closest('li');
-        var key = li[0].dataset.key;
-        var chat = account.chatGet(jid);
-        if(!Array.isArray(chat.core.settings[key])){
-            chat.core.settings[key]= App.defaults.Chat.core.settings[key];
-        }
-        if (li[0].dataset.value == 'true') {
-          chat.core.settings[key][0] = false;
-        } else {
-          chat.core.settings[key][0] = true;
-        }
-        li[0].dataset.value= chat.core.settings[key][0];
-        account.save();
-        account.singleRender(chat, false);
-      };
-      Object.keys(App.defaults.Chat.core.settings).forEach(function(key){
-        var value= chat.core.settings[key] || App.defaults.Chat.core.settings[key];
-        var li = $('<li/>');
-        li[0].dataset.key= key;
-        li[0].dataset.value= (value.length > 1 ? value[0] : value);
-        li.bind('click', accountSwitch);
-        li.append(
-          $('<span/>').addClass('caption').text(_('AccountSet' + key))
-        ).append(
-          $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>')
-        );
+    var name = contact ? contact.name : jid;
+    var status = contact ? contact.presence.status : _('showna');
+    var section = $('section#contact');
+    var setUl = section.find('#settings ul').empty();
 
-        if (value.length > 1 && value[1]) {
-          li.on('click', function (e) {
-            console.log(value, value[1]);
-            Menu.show(value[1], li[0]);
-          });
-        }
-        setUl.append(li);
-      });
-      if (App.avatars[jid]) {
-        Store.recover(App.avatars[jid].chunk, function (val) {
-          section.find('#card .avatar').children('img').attr('src', val);
-        });
+    section[0].dataset.jid= jid;
+    section.find('#card .name').text(name == jid ? jid.split('@')[0] : name);
+    section.find('#card .user').text(jid);
+    section.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + account.core.provider + '.svg'));
+    section.find('#status p').html(App.emoji[Providers.data[account.core.provider].emoji].fy(status));
+
+    var accountSwitch = function (e) {
+      var sw = $(this);
+      var li = sw.closest('li');
+      var key = li[0].dataset.key;
+      var chat = account.chatGet(jid);
+
+      if (li[0].dataset.value == 'true') {
+        chat.core.settings[key][0] = false;
       } else {
-        section.find('#card .avatar').children('img').attr('src', 'img/foovatar.png');
+        chat.core.settings[key][0] = true;
       }
-      Lungo.Router.section('contact');
+
+      li[0].dataset.value= chat.core.settings[key][0];
+
+      account.save();
+      account.singleRender(chat, false);
+    };
+
+    if (contact) {
+      $('section#contact button[data-menu-onclick="contactRemove"]').removeClass('hidden');
+      $('section#contact button[data-menu-onclick="contactAdd"]').addClass('hidden');
     } else {
-      Messenger.chatRemove(jid);
+      $('section#contact button[data-menu-onclick="contactAdd"]').removeClass('hidden');
+      $('section#contact button[data-menu-onclick="contactRemove"]').addClass('hidden');
     }
+
+    Object.keys(chat.core.settings).forEach(function(key){
+      var value= chat.core.settings[key];
+      var li = $('<li/>');
+      li[0].dataset.key= key;
+      li[0].dataset.value= (value.length > 1 ? value[0] : value);
+      li.bind('click', accountSwitch);
+      li.append(
+        $('<span/>').addClass('caption').text(_('AccountSet' + key))
+      ).append(
+        $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>')
+      );
+
+      if (value.length > 1 && value[1]) {
+        li.on('click', function (e) {
+          Tools.log(value, value[1]);
+          Menu.show(value[1], li[0]);
+        });
+      }
+      setUl.append(li);
+    });
+
+    if (App.avatars[jid]) {
+      Store.recover(App.avatars[jid].chunk, function (key, val, free) {
+        section.find('#card .avatar').children('img').attr('src', val);
+
+        free();
+      });
+    } else {
+      section.find('#card .avatar').children('img').attr('src', 'img/foovatar.png');
+    }
+    Lungo.Router.section('contact');
   },
-  
+
   mucProfile: function (jid) {
     var account = Accounts.current;
     jid = jid || $('section#chat')[0].dataset.jid;
@@ -174,7 +179,17 @@ var Messenger = {
       for (var i in chat.core.participants) {
         var participantJid = chat.core.participants[i];
         var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', participantJid);
-        partUl.append($('<li/>').text(contact ? contact.name : participantJid.split('@')[0]));
+        var label = "";
+
+        if(contact) {
+          label = contact.name;
+        } else if (participantJid == account.core.fullJid) {
+          label = _('Me');
+        } else {
+          label = participantJid.split('@')[0];
+        }
+
+        partUl.append($('<li/>').text(label));
       }
       var setUl = section.find('#settings ul').empty();
       var accountSwitch = function (e) {
@@ -182,9 +197,7 @@ var Messenger = {
         var li = sw.closest('li');
         var key = li[0].dataset.key;
         var chat = account.chatGet(jid);
-        if(!Array.isArray(chat.core.settings[key])){
-            chat.core.settings[key]= App.defaults.Chat.core.settings[key];
-        }
+
         if (li[0].dataset.value == 'true') {
           chat.core.settings[key][0] = false;
         } else {
@@ -194,8 +207,8 @@ var Messenger = {
         account.save();
         account.singleRender(chat, false);
       };
-      Object.keys(App.defaults.Chat.core.settings).forEach(function(key){
-        var value= chat.core.settings[key] || App.defaults.Chat.core.settings[key];
+      Object.keys(chat.core.settings).forEach(function(key){
+        var value= chat.core.settings[key];
         var li = $('<li/>');
         li[0].dataset.key= key;
         li.append(
@@ -207,7 +220,7 @@ var Messenger = {
         li.bind('click', accountSwitch);
         if (value.length > 1 && value[1]) {
           li.on('click', function (e) {
-            console.log(value, value[1]);
+            Tools.log(value, value[1]);
             Menu.show(value[1], li[0]);
           });
         }
@@ -215,15 +228,17 @@ var Messenger = {
       });
     }
     if (App.avatars[jid]) {
-      Store.recover(App.avatars[jid].chunk, function (val) {
+      Store.recover(App.avatars[jid].chunk, function (key, val, free) {
         section.find('#card .avatar').children('img').attr('src', val);
+
+        free();
       });
     } else {
       section.find('#card .avatar').children('img').attr('src', 'img/goovatar.png');
     }
     Lungo.Router.section('muc');
   },
-  
+
   contactAdd: function () {
     var account = Accounts.current;
     if (App.online && account.connector.connection.connected) {
@@ -259,7 +274,7 @@ var Messenger = {
       Lungo.Notification.error(_('Error'), _('NoWhenOffline'), 'exclamation-sign', 3);
     }
   },
-  
+
   contactRemove: function (jid) {
     var account = Accounts.current;
     if (App.online && account.connector.connected) {
@@ -298,7 +313,7 @@ var Messenger = {
       Lungo.Notification.error(_('Error'), _('NoWhenOffline'), 'exclamation-sign', 3);
     }
   },
-  
+
   chatRemove: function (jid, account, force) {
     account = account || Accounts.current;
     var index = account.chatFind(jid);
@@ -326,7 +341,7 @@ var Messenger = {
       Lungo.Notification.error(_('Error'), _('NoChatsForContact'), 'exclamation-sign', 3);
     }
   },
-  
+
   mucClear: function (gid, force) {
     var account = Accounts.current;
     var chat = account.chatGet(gid);
@@ -355,7 +370,7 @@ var Messenger = {
       Lungo.Notification.error(_('Error'), _('NoChatsForContact'), 'exclamation-sign', 3);
     }
   },
-  
+
   mucExit: function (gid) {
     var account = Accounts.current;
     var chat = account.chatGet(gid).core;
@@ -366,7 +381,7 @@ var Messenger = {
       this.mucClear(gid, true);
     }
   },
-  
+
   accountRemove: function (jid) {
     var account = Accounts.current;
     var will = confirm(_('ConfirmAccountRemove', {account: account.core.user}));
@@ -387,6 +402,14 @@ var Messenger = {
         window.location.reload();
       }, 3000);
     }
+  },
+
+  /**
+   * Cleans textBox
+   */
+  cleanTextBox : function() {
+    $('section#chat div#text').empty();
+    $('#footbox')[0].dataset.dirty = false;
   }
-  
+
 };

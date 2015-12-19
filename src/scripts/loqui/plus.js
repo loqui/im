@@ -1,13 +1,27 @@
-/* global Accounts, App, Tools, Lungo, Messenger, Geo, Chat, OTR, Message */
+/* global Accounts, App, Tools, Lungo, Messenger, Geo, Chat, OTR, Message, Make, ContactToVcard */
+
+/**
+* @file Holds {@link Plus}
+* @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
+* @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
+* @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
+* @author [Sukant Garg]{@link https://github.com/gargsms}
+* @license AGPLv3
+*/
 
 'use strict';
 
+/**
+ * @namespace
+ */
 var Plus = {
 
+  /**
+   * Triggers a bolt on the users device
+   */
   bolt: function () {
     var account = Accounts.current;
     var to = $('section#chat')[0].dataset.jid;
-    $('section#chat nav#plus').removeClass('show');
     if (to && App.online && account.connector.connection.connected){
       if (account.supports('attention')) {
         account.connector.attentionSend(to);
@@ -19,66 +33,71 @@ var Plus = {
       }
     }
   },
-  
+
+  /**
+   * Adds an emoji to the messenges text box.
+   *
+   * @param {string} emoji
+   */
   emoji: function (emoji) {
     Messenger.add(emoji);
   },
-  
-  imageSend: function () {
+
+  /**
+   * Triggers a file pick [{MozActivity}]{@link external:System.MozActivity}
+   */
+  fileSend: function () {
     var account = Accounts.current;
+    var fileTypes = [];
+    var to = $('section#chat')[0].dataset.jid;
+
+
     if (account.supports('imageSend')) {
-    var to = $('section#chat')[0].dataset.jid;
-      var e = new MozActivity({
-        name: 'pick',
-        data: {
-          type: ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/bmp']
-        }
-      });
-      e.onsuccess = function () {
-        var blob = this.result.blob;
-        account.connector.fileSend(to, blob);      
-      };
-    } else {
-      Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign');
+      fileTypes = fileTypes.concat(['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/bmp']);
     }
-  },
 
-  videoSend: function () {
-    var account = Accounts.current;
     if (account.supports('videoSend')) {
-    var to = $('section#chat')[0].dataset.jid;
-      var e = new MozActivity({
-        name: 'pick',
-        data: {
-          type: ['video/webm', 'video/mp4', 'video/3gpp']
-        }
-      });
-      e.onsuccess = function () {
-        var blob = this.result.blob;
-        account.connector.fileSend(to, blob);      
-      };
-    } else {
-      Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign');
+      fileTypes = fileTypes.concat(['video/webm', 'video/mp4', 'video/3gpp']);
     }
+
+    if (account.supports('audioSend')) {
+      fileTypes = fileTypes.concat(['audio/mpeg', 'audio/ogg', 'audio/mp4']);
+    }
+
+    var e = new MozActivity({
+      name: 'pick',
+      data: {
+        type: fileTypes
+      }
+    });
+
+    e.onsuccess = function () {
+      var blob = this.result.blob;
+      account.connector.fileSend(to, blob);
+    };
   },
 
-  audioSend: function () {
+  vcardSend: function () {
     var account = Accounts.current;
-    if (account.supports('audioSend')) {
     var to = $('section#chat')[0].dataset.jid;
-      var e = new MozActivity({
-        name: 'pick',
-        data: {
-          type: ['audio/mpeg', 'audio/ogg', 'audio/mp4']
-        }
-      });
-      e.onsuccess = function () {
-        var blob = this.result.blob;
-        account.connector.fileSend(to, blob);      
-      };
-    } else {
-      Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign');
-    }
+
+    var e = new MozActivity({
+      name: 'pick',
+      data: {
+        type: 'webcontacts/tel'
+      }
+    });
+
+    e.onsuccess = function () {
+      var contact = this.result;
+      var name = Array.isArray(contact.name) ? contact.name[0] : contact.name;
+      var str = '';
+      ContactToVcard([contact], function (vcards, nCards) {
+        str += vcards;
+      }, function () {
+        account.connector.vcardSend(to, name, str);
+      }, 0, true);
+    };
   },
   
   locationSend: function () {
@@ -92,20 +111,28 @@ var Plus = {
       Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign');
     }
   },
-  
+
+  /**
+   * @param {*} constraints
+   */
   rtc: function (constraints) {
-    
+
   },
-  
+
+  /**
+   * switches the user matching the given jid to an OTR encrypted conversation.
+   *
+   * @param {string} jid
+   * @param {Account} account
+   */
   switchOTR: function (jid, account) {
-    $('section#chat nav#plus').removeClass('show');
     account = account || Accounts.current;
     var ci = account.chatFind(jid);
     var chat= null;
     if (ci < 0) {
       var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', jid);
-      chat = new Chat({
-        jid: jid, 
+      chat = Make(Chat)({
+        jid: jid,
         title: contact ? contact.name || jid : jid,
         chunks: [],
       }, account);
@@ -113,8 +140,6 @@ var Plus = {
       account.core.chats.push(chat.core);
     } else {
       chat = account.chats[ci];
-      account.chats.push(chat);
-      account.chats.splice(ci, 1);
     }
     if (chat.core.settings.otr[0]) {
       // This chat should be private
@@ -135,15 +160,20 @@ var Plus = {
       }
     }
   },
-  
+
+  /**
+   * Switches a [{Chat}]{@link Chat} to OTR??
+   *
+   * @param {Chat} chat
+   */
   goOTR: function (chat) {
-    console.log('GOING OTR IN', chat);
+    Tools.log('GOING OTR IN', chat);
     var account = chat.account;
     chat.OTR = new OTR({
       priv: account.OTR.key
     });
     chat.OTR.on('ui', function (text) {
-      var msg = new Message(account, {
+      var msg = Make(Message)(account, {
         to: account.core.user,
         from: chat.core.jid,
         text: text,
@@ -154,12 +184,13 @@ var Plus = {
       });
       msg.postReceive();
     });
-    chat.OTR.on('io', function (text) {
-      var msg = new Message(account, {
+    chat.OTR.on('io', function (id, text) {
+      var msg = Make(Message)(account, {
         from: account.core.user,
         to: chat.core.jid,
         text: text,
-        stamp: Tools.localize(Tools.stamp())
+        stamp: Tools.localize(Tools.stamp()),
+        original: id
       }, {
         otr: true,
         logging: account.OTR.logging,
@@ -191,33 +222,52 @@ var Plus = {
     });
     chat.OTR.sendQueryMsg();
   },
-  
+
+  /**
+   * Swichtes a [{Chat}]{@link Chat} back to non-OTR
+   *
+   * @param {Chat} chat
+   */
   killOTR: function (chat) {
     chat.OTR.endOtr();
     delete chat.OTR;
   },
 
+  /**
+   * Shows the in-app console
+   */
   showConsole: function() {
     $('#console').show();
   },
-  
+
+  /**
+   * Hides the in-app console
+   */
   hideConsole: function() {
     $('#console').hide();
   },
-  
+
+  /**
+   * Writes to the in-app console
+   *
+   * @param {string} msg
+   */
   log: function(msg) {
     var node=document.createElement("DIV");
     var textnode=document.createTextNode(msg);
     node.appendChild(textnode);
     document.getElementById('logConsole').appendChild(node);
     while(document.getElementById('logConsole').childNodes.length>15)
-    { 
+    {
       document.getElementById('logConsole').removeChild(document.getElementById('logConsole').firstChild);
     }
   },
-  
+
+  /**
+   * Clears the in-app console.
+   */
   clearConsole: function() {
     document.getElementById('logConsole').innerHTML='';
   }
-  
+
 };

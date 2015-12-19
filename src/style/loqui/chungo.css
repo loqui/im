@@ -16,29 +16,29 @@
 }
 @font-face {
   font-family:'FiraSans';
-  src: url('/style/fonts/FiraSans-Bold.ttf');
+  src: url('../fonts/FiraSans-Bold.ttf');
   font-weight: 700;
 }
 @font-face {
   font-family:'FiraSans';
-  src: url('/style/fonts/FiraSans-Medium.ttf');
+  src: url('../fonts/FiraSans-Medium.ttf');
   font-weight: 500;
 }
 @font-face {
   font-family:'FiraSans';
-  src: url('/style/fonts/FiraSans-Regular.ttf');
+  src: url('../fonts/FiraSans-Regular.ttf');
   font-weight: 300;
 }
 @font-face {
   font-family:'FiraSans';
-  src: url('/style/fonts/FiraSans-Light.ttf');
+  src: url('../fonts/FiraSans-Light.ttf');
   font-weight: 100;
 }
 @font-face {
   font-family:'FiraSans';
-  src: url('/style/fonts/FiraSans-LightItalic.ttf');
+  src: url('../fonts/FiraSans-LightItalic.ttf');
   font-weight: 100;
-  font-style: italic; 
+  font-style: italic;
 }
 
 * {
@@ -66,15 +66,15 @@ section.prev {
 [data-transition="horizontal"] {
   transform: translateX(100%);
   -webkit-transform: translateX(100%);
-  transition: all .3s;
-  -webkit-transition: all .3s;
+  transition: all .4s;
+  -webkit-transition: all .4s;
 }
 [data-transition="vertical"] {
   transform: translateY(-100%);
   -webkit-transform: translateY(-100%);
   opacity: 0;
-  transition: all .3s;
-  -webkit-transition: all .3s;
+  transition: all .4s;
+  -webkit-transition: all .4s;
   z-index: 51!important;
 }
 section.show[data-transition="horizontal"] {
@@ -136,7 +136,7 @@ section > article {
 section > .headless {
   top: 0;
 }
-section.show > article.show {
+section > article.show {
   display: block;
 }
 
@@ -206,9 +206,11 @@ nav[data-control=menu] {
 .hidden {
   display: none;
 }
-.show {
+
+show {
   display: block!important;
 }
+
 .scroll {
   overflow: auto;
   will-animate: scroll;
@@ -267,10 +269,12 @@ nav[data-control=menu] {
   border-bottom: .4rem solid #2ECC71;
 }
 .chungo .notifier.show {
+  display: block;
   animation: popUp .5s;
   -webkit-animation: popUp .5s;
 }
 .chungo .notifier.out {
+  display: block;
   animation: popDown .2s;
   -webkit-animation: popDown .2s;
 }
@@ -361,4 +365,3 @@ section .hideable {
     transform: translateY(-100%);
   }
 }
-

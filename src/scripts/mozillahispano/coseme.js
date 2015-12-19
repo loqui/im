@@ -3359,21 +3359,23 @@ CoSeMe.namespace('config', (function(){
   return {
     logger: true,
 
+    customLogger: null,
+
     domain: 's.whatsapp.net',
 
     groupDomain: 'g.us',
 
     tokenData: {
-      "v": "2.12.60",
+      "v": "2.13.26",
       // XXX: it is tokenData[d] + - + tokenData[v] + - + port
-      "r": "S40-2.12.60-5222",
-      "u": "WhatsApp/2.12.60 S40Version/14.26 Device/Nokia302",
+      "r": "S40-2.13.9",
+      "u": "WhatsApp/2.13.26 S40Version/14.26 Device/Nokia302",
       "d": "S40"
     },
 
     auth: {
       host: 'c2.whatsapp.net',
-      port: 5222,
+      port: 443,
 //      host: 'localhost',
 //      port: 8080,
       connectionOptions: {
@@ -3535,6 +3537,12 @@ CoSeMe.namespace('common', (function(){
   }
 
   function putMessage(kind, message) {
+    var console = window.console;
+
+    if (CoSeMe.config.customLogger) {
+      console = CoSeMe.config.customLogger;
+    }
+
     if (typeof console[kind] !== 'function') {
       kind = 'log';
     }
@@ -4205,6 +4213,7 @@ CoSeMe.namespace('protocol.dictionary', (function(){
     'google',
     'group',
     'groups',
+    'groups_v2',
     'http://etherx.jabber.org/streams',
     'http://jabber.org/protocol/chatstates',
     'ib',
@@ -4268,9 +4277,9 @@ CoSeMe.namespace('protocol.dictionary', (function(){
     'query',
     'raw',
     'read',
+    'readreceipts',
     'reason',
     'receipt',
-    'received',
     'relay',
     'remote-server-timeout',
     'remove',
@@ -4316,7 +4325,6 @@ CoSeMe.namespace('protocol.dictionary', (function(){
     'urn:ietf:params:xml:ns:xmpp-stanzas',
     'urn:ietf:params:xml:ns:xmpp-streams',
     'urn:xmpp:ping',
-    'urn:xmpp:receipts',
     'urn:xmpp:whatsapp:account',
     'urn:xmpp:whatsapp:dirty',
     'urn:xmpp:whatsapp:mms',
@@ -4333,54 +4341,54 @@ CoSeMe.namespace('protocol.dictionary', (function(){
     'w',
     'wait',
     'WAUTH-2',
-    'x',
     'xmlns:stream',
     'xmlns',
     '1',
     'chatstate',
     'crypto',
+    'phash',
     'enc',
     'class',
     'off_cnt',
     'w:g2',
     'promote',
     'demote',
-    'creator'
+    'creator',
+    'Bell.caf',
+    'Boing.caf',
+    'Glass.caf',
+    'Harp.caf',
+    'TimePassing.caf',
+    'Tri-tone.caf',
+    'Xylophone.caf',
+    'background',
+    'backoff',
+    'chunked',
+    'context',
+    'full',
+    'in',
+    'interactive',
+    'out',
+    'registration',
+    'sid',
+    'urn:xmpp:whatsapp:sync',
+    'flt',
+    's16',
+    'u8',
+    'adpcm',
+    'amrnb',
+    'amrwb',
+    'mp3',
+    'pcm',
+    'qcelp',
+    'wma',
+    'h263',
+    'h264',
+    'jpeg'
   ];
 
   var secondaryStrings = [
     [
-      'Bell.caf',
-      'Boing.caf',
-      'Glass.caf',
-      'Harp.caf',
-      'TimePassing.caf',
-      'Tri-tone.caf',
-      'Xylophone.caf',
-      'background',
-      'backoff',
-      'chunked',
-      'context',
-      'full',
-      'in',
-      'interactive',
-      'out',
-      'registration',
-      'sid',
-      'urn:xmpp:whatsapp:sync',
-      'flt',
-      's16',
-      'u8',
-      'adpcm',
-      'amrnb',
-      'amrwb',
-      'mp3',
-      'pcm',
-      'qcelp',
-      'wma',
-      'h263',
-      'h264',
-      'jpeg',
       'mpeg4',
       'wmv',
       'audio/3gpp',
@@ -4414,6 +4422,7 @@ CoSeMe.namespace('protocol.dictionary', (function(){
       '406',
       '407',
       '409',
+      '410',
       '500',
       '501',
       '503',
@@ -4424,7 +4433,6 @@ CoSeMe.namespace('protocol.dictionary', (function(){
       'asampfmt',
       'asampfreq',
       'audio',
-      'bb_db',
       'clear',
       'conflict',
       'conn_no_nna',
@@ -4437,6 +4445,7 @@ CoSeMe.namespace('protocol.dictionary', (function(){
       'g_notify',
       'g_sound',
       'gcm',
+      'gone',
       'google_play',
       'hash',
       'height',
@@ -4532,7 +4541,78 @@ CoSeMe.namespace('protocol.dictionary', (function(){
       'popcorn.m4r',
       'pulse.m4r',
       'synth.m4r',
-      'filehash'
+      'filehash',
+      'max_list_recipients',
+      'en-AU',
+      'en-GB',
+      'es-MX',
+      'pt-PT',
+      'zh-Hans',
+      'zh-Hant',
+      'relayelection',
+      'relaylatency',
+      'interruption',
+      'Apex.m4r',
+      'Beacon.m4r',
+      'Bulletin.m4r',
+      'By The Seaside.m4r',
+      'Chimes.m4r',
+      'Circuit.m4r',
+      'Constellation.m4r',
+      'Cosmic.m4r',
+      'Crystals.m4r',
+      'Hillside.m4r',
+      'Illuminate.m4r',
+      'Night Owl.m4r',
+      'Opening.m4r',
+      'Playtime.m4r',
+      'Presto.m4r',
+      'Radar.m4r',
+      'Radiate.m4r',
+      'Ripples.m4r',
+      'Sencha.m4r',
+      'Signal.m4r',
+      'Silk.m4r',
+      'Slow Rise.m4r',
+      'Stargaze.m4r',
+      'Summit.m4r',
+      'Twinkle.m4r',
+      'Uplift.m4r',
+      'Waves.m4r',
+      'voip',
+      'eligible',
+      'upgrade',
+      'planned',
+      'current',
+      'future',
+      'disable',
+      'expire',
+      'start',
+      'stop',
+      'accuracy',
+      'speed',
+      'bearing',
+      'recording',
+      'encrypt',
+      'key',
+      'identity',
+      'w:gp2',
+      'admin',
+      'locked',
+      'unlocked',
+      'new',
+      'battery',
+      'archive',
+      'adm',
+      'plaintext_size',
+      'compressed_size',
+      'delivered',
+      'msg',
+      'pkmsg',
+      'everyone',
+      'v',
+      'transport',
+      'call-id'
     ]
   ];
 
@@ -4619,6 +4699,7 @@ CoSeMe.namespace('protocol.dictionary', (function(){
   var LONG_STRING_MARK  = 253;
 
   var JID_MARK = 250;
+  var NIBBLE_MARK = 255;
 
   var MAC_LENGTH = 4;
 
@@ -4640,6 +4721,7 @@ CoSeMe.namespace('protocol.dictionary', (function(){
     get LONG_STRING_MARK() { return LONG_STRING_MARK; },
 
     get JID_MARK() { return JID_MARK; },
+    get NIBBLE_MARK() { return NIBBLE_MARK; },
 
     get MAC_LENGTH() { return MAC_LENGTH; },
 
@@ -4677,17 +4759,15 @@ CoSeMe.namespace('protocol', (function(){
    */
   BinaryWriter.prototype.streamStart = function(domain, resource, callback) {
     var writerTask = this.newWriteTask(callback);
-    setTimeout(function() {
-      writerTask._sendProtocol(IS_COUNTING);
-      writerTask._sendProtocol();
+    writerTask._sendProtocol(IS_COUNTING);
+    writerTask._sendProtocol();
 
-      writerTask._streamStart(domain, resource, IS_COUNTING);
-      writerTask._streamStart(domain, resource);
-    });
+    writerTask._streamStart(domain, resource, IS_COUNTING);
+    writerTask._streamStart(domain, resource);
   };
 
   BinaryWriter.prototype._sendProtocol = function(counting) {
-    var dictionaryVersion = 4; // my guess: the dictionary version
+    var dictionaryVersion = 5; // my guess: the dictionary version
 
     this.resetBuffer(counting, IS_RAW);
     this.writeASCII('WA', counting);
@@ -4711,10 +4791,8 @@ CoSeMe.namespace('protocol', (function(){
    */
   BinaryWriter.prototype.write = function(tree, callback) {
     var writerTask = this.newWriteTask(callback);
-    setTimeout(function() {
-      writerTask._write(tree, IS_COUNTING);
-      writerTask._write(tree);
-    });
+    writerTask._write(tree, IS_COUNTING);
+    writerTask._write(tree);
   };
 
   /*
@@ -5145,7 +5223,9 @@ CoSeMe.namespace('protocol', (function(){
 
     var self = this;
     this.socket.ondata = function(evt) {
-     self.onSocketData(evt.data);
+      var lock = navigator.requestWakeLock('cpu');
+      self.onSocketData(evt.data);
+      lock.unlock();
     };
   };
 
@@ -5178,7 +5258,7 @@ CoSeMe.namespace('protocol', (function(){
   BinaryReader.prototype.onSocketData = function(rawData) {
     logger.log('Received socket data:', rawData.byteLength, 'bytes!')
     rawData && this.addDataChunk(rawData);
-    setTimeout(this.checkForAnotherTree.bind(this));
+    this.checkForAnotherTree();
   };
 
   /**
@@ -5187,16 +5267,15 @@ CoSeMe.namespace('protocol', (function(){
    * are more trees.
    */
   BinaryReader.prototype.checkForAnotherTree = function() {
-    if (this.waitingForMessage()) return;
+    while (!this.waitingForMessage()) {
 
-    if (!this.isStreamStartRead) {
-      this.readStreamStart();
-      this.isStreamStartRead = true;
-    } else {
-      this.readNextTree();
+       if (!this.isStreamStartRead) {
+        this.readStreamStart();
+        this.isStreamStartRead = true;
+      } else {
+        this.readNextTree();
+      }
     }
-
-    setTimeout(this.checkForAnotherTree.bind(this));
   }
 
   /**
@@ -5205,9 +5284,7 @@ CoSeMe.namespace('protocol', (function(){
    */
   BinaryReader.prototype.readStreamStart = function() {
     var readerTask = this.newReaderTask();
-    setTimeout(function() {
-      readerTask._readStreamStart();
-    });
+    readerTask._readStreamStart();
   };
 
   /**
@@ -5215,9 +5292,7 @@ CoSeMe.namespace('protocol', (function(){
    */
   BinaryReader.prototype.readNextTree = function() {
     var readerTask = this.newReaderTask();
-    setTimeout(function() {
-      readerTask._readNextTree();
-    });
+    readerTask._readNextTree();
   };
 
   /**
@@ -5305,22 +5380,24 @@ CoSeMe.namespace('protocol', (function(){
    * Tree dispatching occurs in the same order than they were received.
    */
   BinaryReader.prototype.attendPendingTrees = function() {
-    var args, err, tree, callbackName;
+    var args, err, tree, callbackName, lock;
     var currentSocket = Object.getPrototypeOf(this).socket;
     while (args = this.pendingTrees.shift()) {
 
       err = args[0];
       tree = args[1];
       callbackName = args[2];
+      lock = navigator.requestWakeLock('cpu');
 
-      setTimeout((function _processTree(callbackName, err, tree) {
-        if (this.sourceSocket !== currentSocket) { return; }
-
-        var method = this[callbackName];
-        if (typeof method === 'function') {
-          method(err, tree);
+      setTimeout((function _processTree(callbackName, err, tree, lock) {
+        if (this.sourceSocket === currentSocket) {
+          var method = this[callbackName];
+          if (typeof method === 'function') {
+            method(err, tree);
+          }
         }
-      }).bind(this, callbackName, err, tree));
+        lock.unlock();
+      }).bind(this, callbackName, err, tree, lock));
     }
   };
 
@@ -5581,6 +5658,38 @@ CoSeMe.namespace('protocol', (function(){
            undefined;
   };
 
+  BinaryReader.prototype.readNibble = function() {
+    var nibbles = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '.' ];
+    var b = this.message.read();
+    var ignoreLastNibble = (b & 0x80) != 0;
+    var size = (b & 0x7f);
+    var nrOfNibbles = size * 2 - ignoreLastNibble;
+    var buffer = new Uint8Array(size)
+    this.fillArray(buffer, size);
+    var charArray = [];
+    var c;
+    for (var i = 0, l = buffer.length; i < l; i++) {
+      b = buffer[i];
+      var dec = Number(buffer[i]) >> 4;
+      if (dec <= 11) {
+        charArray.push(nibbles[dec]);
+      } else {
+        throw new SyntaxError('Bad nibble ' + dec);
+      }
+
+      if (i != l - 1 || !ignoreLastNibble) {
+        var dec = Number(buffer[i]) & 0xf;
+        if (dec <= 11) {
+          charArray.push(nibbles[dec]);
+        } else {
+          throw new SyntaxError('Bad nibble ' + dec);
+        }
+      }
+    }
+
+    return charArray.join('');
+  };
+
   var SHORT_LIST_MARK = k.SHORT_LIST_MARK;
   var LONG_LIST_MARK  = k.LONG_LIST_MARK;
   var EMPTY_LIST_MARK = k.EMPTY_LIST_MARK;
@@ -5632,6 +5741,7 @@ CoSeMe.namespace('protocol', (function(){
   var SURROGATE_MARK = k.SURROGATE_MARK;
 
   var JID_MARK = k.JID_MARK;
+  var NIBBLE_MARK = k.NIBBLE_MARK;
 
   /**
    * Parses a string from the message buffer.
@@ -5679,6 +5789,11 @@ CoSeMe.namespace('protocol', (function(){
       else {
         throw new SyntaxError('could not reconstruct JID.');
       }
+
+    // Nibble
+    } else if (stringMark === NIBBLE_MARK) {
+      string = this.readNibble();
+
     } else {
       throw new SyntaxError('could not find a string.');
     }
@@ -5789,7 +5904,7 @@ CoSeMe.namespace('registration', (function(){
   'use strict';
 
   function getToken(phone) {
-    var plain = 'PdA2DJyKoUrwLw1Bg6EIhzh502dF9noR9uFCllGk1418865329241' + phone;
+    var plain = 'PdA2DJyKoUrwLw1Bg6EIhzh502dF9noR9uFCllGk1449624119131' + phone;
     var data = CryptoJS.enc.Latin1.parse(plain);
     var output = CryptoJS.MD5(data);
     return output.toString();
@@ -6330,19 +6445,10 @@ CoSeMe.namespace('auth', (function() {
 
   function getFeatures() {
     var features = [
-      new Tree('receipt_acks'),
-      new Tree('w:profile:picture', { attributes: {
-        type: 'all'
-      }}),
-      new Tree('w:profile:picture', { attributes: {
-        type: 'group'
-      }}),
-      new Tree('notification', { attributes: {
-        type: 'participant'
-      }}),
-      new Tree('status', { attributes: {
-        notification: 'true'
-      }})
+      new Tree('readreceipts'),
+      new Tree('groups_v2'),
+      new Tree('privacy'),
+      new Tree('presence')
     ];
 
     return new Tree('stream:features', { children: features });
@@ -6594,10 +6700,8 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
 
     get: function(iqType, idx, node) {
       var childNode = node.getChild(0);
-      if (childNode.getAttributeValue('xmlns') === 'urn:xmpp:ping') {
-        if (_autoPong) {
-          _onPing(idx);
-        }
+      if (node.getAttributeValue('xmlns') === 'urn:xmpp:ping') {
+        _signalInterface.onPing && _signalInterface.onPing(idx);
         _signalInterface.send('ping', [idx]);
       } else if (ProtocolTreeNode.tagEquals(childNode,'query') &&
                  node.getAttributeValue('from') &&
@@ -6672,7 +6776,8 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
         if (!xmlns || ((xmlns == 'urn:xmpp') && jid )) {
           var presenceType = node.getAttributeValue('type');
           if (presenceType == 'unavailable') {
-            _signalInterface.send('presence_unavailable', [jid]);
+            var last = node.getAttributeValue('last');
+            _signalInterface.send('presence_unavailable', [jid, last && parseInt(last, 10)]);
           } else if (!presenceType || (presenceType == 'available')) {
             _signalInterface.send('presence_available', [jid]);
           }
@@ -6761,6 +6866,49 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
           _signalInterface
             .send(notification, [from, jid, null, timestamp, msgId, null]);
 
+        } else if (type === 'w:gp2') {
+          // map new notifications to existing interface for now...
+          var notification = 'notification_group';
+          var action = node.getChild(0).tag;
+
+          if (action === 'add') {
+            notification += 'ParticipantAdded';
+            var jid = node.getChild(0).getChild(0).getAttributeValue('jid');
+            _signalInterface
+              .send(notification, [from, jid, null, timestamp, msgId, null]);
+
+          } else if (action === 'create') {
+            notification += 'Created';
+            var displayName = node.getAttributeValue('notify');
+            var author = node.getAttributeValue('participant');
+            var bodyNode = node.getChild(0).getChild(0);
+            var subject = stringFromUtf8(bodyNode.getAttributeValue('subject'));
+
+            _signalInterface
+              .send(notification, [from, timestamp, msgId, subject, displayName,
+                                   author]);
+
+          } else if (action === 'remove') {
+            notification += 'ParticipantRemoved';
+            var jid = node.getChild(0).getChild(0).getAttributeValue('jid');
+            _signalInterface
+              .send(notification, [from, jid, null, timestamp, msgId, null]);
+
+          } else if (action === 'subject') {
+            notification += 'SubjectUpdated';
+            var displayName = node.getAttributeValue('notify');
+            var author = node.getAttributeValue('participant');
+            var bodyNode = node.getChild(0);
+            var subject = stringFromUtf8(bodyNode.getAttributeValue('subject'));
+
+            _signalInterface
+              .send(notification, [from, timestamp, msgId, subject, displayName,
+                                   author]);
+          } else {
+            // ignore, but at least acknowledge it
+            _signalInterface.onUnknownNotification(from, msgId, type);
+          }
+
         } else if (type === 'picture') {
           var prefix = from.indexOf('-') >= 0 ? 'group' : 'contactProfile';
           var notification = 'notification_' + prefix + 'Picture';
@@ -6796,9 +6944,14 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
                                  author]);
         }
         else if (type === 'status') {
-          _signalInterface.send('notification_status', [from, msgId]);
+          var bodyNode = node.getChild(0);
+          var status = stringFromUtf8(bodyNode.data);
+          _signalInterface.send('notification_status', [from, msgId, status]);
         }
-
+        else {
+          // ignore, but at least acknowledge it
+          _signalInterface.onUnknownNotification(from, msgId, type);
+        }
       }
 
     } catch (x) {
@@ -6840,10 +6993,10 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
           if (isGroup) {
             _signalInterface.send("group_imageReceived",
                                   [msgId, fromAttribute, author, mediaPreview,
-                                  mediaUrl, mediaSize, wantsReceipt]);
+                                  mediaUrl, mediaSize, wantsReceipt, pushName]);
           } else {
             _signalInterface.send("image_received", [msgId, fromAttribute, mediaPreview, mediaUrl,
-                                                     mediaSize, wantsReceipt, isBroadcast]);
+                                                     mediaSize, wantsReceipt, isBroadcast, pushName]);
           }
         },
 
@@ -6851,10 +7004,10 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
           if (isGroup) {
             _signalInterface.send("group_videoReceived",
                                   [msgId, fromAttribute, author, mediaPreview, mediaUrl,
-                                   mediaSize, wantsReceipt]);
+                                   mediaSize, wantsReceipt, pushName]);
           } else {
             _signalInterface.send("video_received", [msgId, fromAttribute, mediaPreview,
-                                                     mediaUrl, mediaSize, wantsReceipt, isBroadcast]);
+                                                     mediaUrl, mediaSize, wantsReceipt, isBroadcast, pushName]);
           }
         },
 
@@ -6863,11 +7016,11 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
           if (isGroup) {
             _signalInterface.send("group_audioReceived",
                                   [msgId, fromAttribute, author,
-                                  mediaUrl, mediaSize, wantsReceipt]);
+                                  mediaUrl, mediaSize, wantsReceipt, pushName]);
           } else {
             _signalInterface.send("audio_received",
                                   [msgId, fromAttribute, mediaUrl,
-                                  mediaSize, wantsReceipt, isBroadcast]);
+                                  mediaSize, wantsReceipt, isBroadcast, pushName]);
           }
         },
 
@@ -6880,11 +7033,11 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
           if (isGroup) {
             _signalInterface.send("group_locationReceived",
                                   [msgId, fromAttribute, author, name, mediaPreview,
-                                   mlatitude, mlongitude, wantsReceipt]);
+                                   mlatitude, mlongitude, wantsReceipt, pushName]);
           } else {
             _signalInterface.send("location_received",
                                   [msgId, fromAttribute, name, mediaPreview, mlatitude,
-                                  mlongitude, wantsReceipt, isBroadcast]);
+                                  mlongitude, wantsReceipt, isBroadcast, pushName]);
           }
         },
 
@@ -6904,11 +7057,11 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
             if (isGroup) {
                 _signalInterface.send("group_vcardReceived",
                                       [msgId, fromAttribute, author, vcardName,
-                                       vcardData, wantsReceipt]);
+                                       vcardData, wantsReceipt, pushName]);
             } else {
               _signalInterface.send("vcard_received",
                                     [msgId, fromAttribute, vcardName,
-                                     vcardData, wantsReceipt, isBroadcast]);
+                                     vcardData, wantsReceipt, isBroadcast, pushName]);
             }
           }
         }
@@ -6988,8 +7141,12 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
       } else if (ProtocolTreeNode.tagEquals(childNode, "body") && msgId) {
         msgData = childNode.data;
 
+      } else if (ProtocolTreeNode.tagEquals(childNode, "enc")) {
+        _signalInterface.onEncryptedMessage(fromAttribute, msgId);
+
       } else if (!ProtocolTreeNode.tagEquals(childNode,"active")) {
         processActive(childNode);
+
       }
     }
 
@@ -7081,18 +7238,28 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
       var subjectT = groupNode.getAttributeValue("s_t");
       var subjectOwner = groupNode.getAttributeValue("s_o");
       var creation = groupNode.getAttributeValue("creation");
+      var participants = groupNode.children.map(function(child){
+        return child.getAttributeValue('jid');
+      });
 
-      _signalInterface.send("group_gotInfo",[jid, owner, subject, subjectOwner, subjectT, creation]);
+      _signalInterface.send("group_gotInfo",[jid, owner, subject, subjectOwner, subjectT, creation, participants]);
     }
   }
 
   function parseGetGroups(node) {
     var groups = [];
     var id = node.getAttributeValue('id');
-    node.children.forEach(function (groupNode) {
-      groups.push({
+    node.children[0].children.forEach(function (groupNode) {
+	groups.push({
         gid: groupNode.getAttributeValue('id'),
-        subject: stringFromUtf8(groupNode.getAttributeValue('subject'))
+        owner: groupNode.getAttributeValue('owner'),
+        subject: stringFromUtf8(groupNode.getAttributeValue('subject')),
+        subjectT: groupNode.getAttributeValue('s_t'),
+        subjectOwner: groupNode.getAttributeValue('s_o'),
+        creation: groupNode.getAttributeValue('creation'),
+        participants : groupNode.children.map(function(child){
+          return child.getAttributeValue('jid');
+        })
       });
     });
     _signalInterface.send('group_gotParticipating', [groups, id]);
@@ -7141,13 +7308,8 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
 
     for (var i = 0, l = addNodes.length; i < l; i++) {
       child = addNodes[i];
-      type = child.getAttributeValue('type');
-      if (type === 'success') {
-        jabberIds.push(child.getAttributeValue('participant'));
-      }
-      else {
-        logger.log('Failed to add',
-                   childCount.getAttributeValue('participant'));
+      if (child.tagName === 'participant') {
+        jabberIds.push(child.getAttributeValue('jid'));
       }
     }
 
@@ -7162,13 +7324,8 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
 
     for (var i = 0, l = removeNodes.length; i < l; i++) {
       child = removeNodes[i];
-      type = child.getAttributeValue('type');
-      if (type === 'success') {
-        jabberIds.push(child.getAttributeValue('participant'));
-      }
-      else {
-        logger.log('Failed to remove',
-                    childCount.getAttributeValue('participant'));
+      if (child.tagName === 'participant') {
+        jabberIds.push(child.getAttributeValue('jid'));
       }
     }
 
@@ -7297,12 +7454,10 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
 
     for (var i = 0, l = children.length; i < l; i++) {
       child = children[i];
-      if (child.getAttributeValue('id') !== null) {
-        _signalInterface.send(
-          "contact_gotProfilePictureId",
-          [child.getAttributeValue("jid"), child.getAttributeValue("id")]
-        );
-      }
+      _signalInterface.send(
+        "contact_gotProfilePictureId",
+        [child.getAttributeValue("jid"), child.getAttributeValue("id")]
+      );
     }
   }
 
@@ -7335,35 +7490,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
 
   var alive = false;
 
-  var _onPing;
-  var _ping;
-  var _autoPong;
-
   return {
-    set onPing(aFun) {
-      _onPing = aFun;
-    },
-
-    get onPing() {
-      return _onPing;
-    },
-
-    set autoPong(aValue) {
-      _autoPong = aValue;
-    },
-
-    get autoPong() {
-      return _autoPong;
-    },
-
-    set ping(aFun) {
-      _ping = aFun;
-    },
-
-    get ping() {
-      return _ping;
-    },
-
     set socket(aSocket) {
       if (aSocket) {
         _connection = aSocket;
@@ -7452,7 +7579,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
     // To-do: To be faithful with Yowsup, this should spawn a thread per handler
     signalHandlers[aSignal].forEach(function (aHandler) {
       try {
-        setTimeout(function() {aHandler.apply(undefined, aParams);}, 0);
+        aHandler.apply(undefined, aParams);
       } catch (x) {
         logger.error('FireEvent exception!', x);
       }
@@ -7668,14 +7795,35 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
       self._writeNode(newProtocolTreeNode('receipt', attributes));
     },
 
+    sendNotificationAck: function(to, id, type) {
+      var attributes = {
+        'class': 'notification',
+        id: id,
+        'to' : to
+      };
+      type && (attributes.type = type);
+
+      self._writeNode(newProtocolTreeNode('ack', attributes));
+    },
+
+    sendReceiptErrorEncrypted: function(to, id) {
+      var attributes = {
+        'type': 'error',
+        id: id,
+        'to': to
+      };
+
+      self._writeNode(newProtocolTreeNode('receipt', attributes, [ newProtocolTreeNode('error', { 'type': 'plaintext-only' })] ));
+    },
+
     getReceiptAck: function(to, id, type, participant, from) {
       var attributes = {
         'class': 'receipt',
-        type: type,
-        id: id
+        id: id,
+        'to' : to
       };
-      to && (attributes.to = to);
       from && (attributes.from = from);
+      type && (attributes.type = type);
       participant && (attributes.participant = participant);
 
       return newProtocolTreeNode('ack', attributes);
@@ -7698,6 +7846,17 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
         idx = self.iqId.toString(16);
       }
       return idx;
+    },
+
+    sendKeepalive: function() {
+      self._writeNode(null);
+    },
+
+    sendPing: function() {
+      var idx = self.makeId('ping_');
+      var iqNode =
+        newProtocolTreeNode('iq', {type: 'get', xmlns: 'w:p', to: self.domain, id: idx});
+      self._writeNode(iqNode);
     },
 
     sendPong: function(aIdx) {
@@ -7732,7 +7891,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
         id: idx,
         type: 'set',
         to: aGjid,
-        xmlns: 'w:g'
+        xmlns: 'w:g2'
       }, [operation]);
 
       self.readerThread.requests[idx] = aCallback;
@@ -7837,12 +7996,12 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
   }
 
   function _sendGetGroups(id, type) {
-    var commandNode = newProtocolTreeNode('list', { type: type });
+    var commandNode = newProtocolTreeNode(type, null);
     var iqNode = newProtocolTreeNode('iq', {
       id: id,
       type: 'get',
       to: 'g.us',
-      xmlns: 'w:g'
+      xmlns: 'w:g2'
     }, [commandNode]);
     self._writeNode(iqNode);
   }
@@ -7880,9 +8039,10 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
               self.socket.onconnectionclosed = self._onErrorSendDisconnected;
               self.socket.onconnectionlost = self._onErrorSendDisconnected;
               self.readerThread.socket = self.socket;
-              self.readerThread.autoPong = self.autoPong;
-              self.readerThread.onPing = self.sendPong;
               self.readerThread.signalInterface = {
+                onPing: (self.autoPong ? self.sendPong : null),
+                onUnknownNotification: self.sendNotificationAck,
+                onEncryptedMessage: self.sendReceiptErrorEncrypted,
                 send: fireEvent
               };
               self.jid = self.socket.jid;
@@ -7961,12 +8121,12 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
     message_ack: function(aJid, aMsgId, type) {
       self.sendReceipt(aJid, aMsgId, type);
     },
-    notification_ack: function(aJid, aNotificationId) {
-      self.sendReceipt(aJid, aNotificationId);
+    notification_ack: function(aJid, aNotificationId, type) {
+      self.sendNotificationAck(aJid, aNotificationId, type);
     },
     delivered_ack: function(aTo, aMsgId, type, participant, from) {
       self._writeNode(
-        self.getReceiptAck(aTo, aMsgId, 'delivery', participant, from)
+        self.getReceiptAck(aTo, aMsgId, type, participant, from)
       );
     },
     visible_ack: function(aJid, aMsgId) {
@@ -7985,18 +8145,20 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
 
     // Keep Alive
 
+    keepalive: self.sendKeepalive,
+    ping: self.sendPing,
     pong: self.sendPong,
 
     //Groups
 
     group_getInfo: function(aJid) {
-      var idx = self.makeId('get_g_info_');
+      var idx = self.makeId('get_groupv2_info_');
       var queryNode = newProtocolTreeNode('query');
       var iqNode = newProtocolTreeNode('iq', {
         id: idx,
         type: 'get',
         to: aJid,
-        xmlns: 'w:g'
+        xmlns: 'w:g2'
       }, [queryNode]);
 
       self.readerThread.requests[idx] = self.readerThread.parseGroupInfo;
@@ -8007,15 +8169,14 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
 
     group_create: function(aSubject) {
       var idx = self.makeId('create_group_');
-      var groupNode = newProtocolTreeNode('group', {
-        action: 'create',
+      var groupNode = newProtocolTreeNode('create', {
         subject: utf8FromString(aSubject)
       });
       var iqNode = newProtocolTreeNode('iq', {
         id: idx,
         type: 'set',
         to: 'g.us',
-        xmlns: 'w:g'
+        xmlns: 'w:g2'
       }, [groupNode]);
 
       self.readerThread.requests[idx] = self.readerThread.parseGroupCreated;
@@ -8053,7 +8214,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
         id: idx,
         type: 'set',
         to: 'g.us',
-        xmlns: 'w:g'
+        xmlns: 'w:g2'
       }, [leaveNode]);
 
       self.readerThread.requests[idx] = self.readerThread.parseGroupEnded;
@@ -8068,7 +8229,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
         id: idx,
         type: 'set',
         to: aGjid,
-        xmlns: 'w:g'
+        xmlns: 'w:g2'
       }, [subjectNode]);
 
       self.readerThread.requests[idx] = self.readerThread.parseGroupSubject;
@@ -8083,7 +8244,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
         id: idx,
         type: 'get',
         to: aGjid,
-        xmlns: 'w:g'
+        xmlns: 'w:g2'
       }, [listNode]);
 
       self.readerThread.requests[idx] = self.readerThread.parseParticipants;
@@ -8250,16 +8411,16 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
 
     disconnect: function(aReason) {
       logger.log('Disconnect sequence initiated...');
-      logger.log('Sending term signal to reader thread');
       if (self.readerThread.isAlive()) {
+        logger.log('Sending term signal to reader thread');
         self.readerThread.terminate();
         // TO-DO!!!! CHECK THE METHOD NAME!!!!
         self.socket.socket.close();
+        self.readerThread.sendDisconnected(aReason);
       }
 
       logger.log('Disconnected!', aReason);
       self.state = 0;
-      self.readerThread.sendDisconnected(aReason);
     },
 
     media_requestUpload: function(aB64Hash, aT, aSize, aB64OrigHash) {
@@ -8323,7 +8484,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
      var idx = self.makeId('get_groups_');
      self.readerThread.requests[idx] = self.readerThread.parseGroups;
 
-     var queryNode = newProtocolTreeNode('list',{xmlns: 'w:g', type: aGtype});
+     var queryNode = newProtocolTreeNode('list',{xmlns: 'w:g2', type: aGtype});
      var iqNode = newProtocolTreeNode('iq',{id: idx, type: 'get', to: 'g.us'},
                                       [queryNode]);
 
@@ -8463,4 +8624,3 @@ CoSeMe.namespace('contacts', (function(){
     }
   };
 }()));
-

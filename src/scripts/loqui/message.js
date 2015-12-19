@@ -1,20 +1,41 @@
-/* global Chat, Tools, Plus, App, Providers, Store, Activity, Lungo */
+/* global Chat, Tools, Plus, App, Providers, Store, Activity, Lungo, Make */
+
+/**
+* @file Holds {@link Message}
+* @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
+* @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
+* @author [Christof Meerwald]{@link https://github.com/cmeerw}
+* @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
+* @author [Sukant Garg]{@link https://github.com/gargsms}
+* @license AGPLv3
+*/
 
 'use strict';
 
-var Message = function (account, core, options) {
-  
-  this.account = account;
-  this.core = core;
-  this.options = {
-    send: (options && 'send' in options) ? options.send : true,
-    render: (options && 'render' in options) ? options.render : true,
-    otr: (options && 'otr' in options) ? options.otr : false,
-    logging: (options && 'logging' in options) ? options.logging : true,
-    muc: (options && 'muc' in options) ? options.muc : false
-  };
+/**
+ * @lends Message.prototype
+ */
+var Message = {
 
-  this._formatName = function (name) {
+  /**
+   * @constructs
+   * @param {Account} account
+   * @param {ChatCore} core
+   * @param {object} options
+   */
+  _make : function (account, core, options) {
+    options = options || {};
+
+    this.account = account;
+    this.core = core;
+    this.options = Make(options, MessageOptions)();
+  },
+
+  /**
+   * @param {string} name
+   * @private
+   */
+  _formatName : function (name) {
     var re = /[A-Za-z-]+/;
     var parts = name.split(' ');
     for (var idx in parts) {
@@ -26,17 +47,69 @@ var Message = function (account, core, options) {
       }
     }
     return parts.join(' ');
-  };
-  
-  this.__defineGetter__('chat', function () {
-    var chatJid = Strophe.getBareJidFromJid(this.options.muc ? this.core.to : (this.core.from == (account.core.user || account.core.fullJid) ? this.core.to : this.core.from));
+  },
+
+  /**
+   * @private
+   */
+  _replace : function() {
+    var msg = this;
+    var receipts = this.account.supports('receipts');
+
+    var afterRecover = function(key, block, message, chunk, free){
+      var old_id = message.id;
+
+      if (receipts) {
+        message.ack = 'sending';
+        message.id = msg.core.id;
+        msg.core.id = 0;
+        msg.setSendTimeout(block, index);
+      } else {
+        message.ack = '';
+      }
+
+      Store.update(key, block, chunk, free);
+
+      message = Make(Message)(msg.account, message);
+      message.reRender(block, old_id);
+
+      message.chat.core.last = message.core;
+      message.chat.save();
+    };
+
+    if(Array.isArray(this.core.original)){
+      var block = this.core.original[0];
+      var index = this.core.original[1];
+
+      Store.recover(block, function(key, chunk, free){
+        var message = chunk[index];
+
+        afterRecover(key, block, message, chunk, free);
+      });
+
+    } else {
+      this.chat.findMessage(this.core.original, null).then(function(result){
+        afterRecover(result.key, result.result.chunkIndex, result.result.message, result.result.chunk, result.free);
+      }, function(result){
+        Tools.log('HOW SHOULD WE REPLACE A MESSAGE WE CAN\'T FIND?', result);
+      });
+    }
+  },
+
+  /**
+   * @alias chat/get
+   * @return {Chat}
+   * @memberof Message.prototype
+   */
+  get chat() {
+    var chatJid = Strophe.getBareJidFromJid(this.options.muc ? this.core.to : (this.core.from == (this.account.core.user || this.account.core.fullJid) ? this.core.to : this.core.from));
     var ci = this.account.chatFind(chatJid);
     var chat= null;
     if (ci < 0) {
       var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', chatJid);
-      chat = new Chat({
-        jid: chatJid, 
-        title: contact ? contact.name || chatJid : chatJid,
+      chat = Make(Chat)({
+        jid: chatJid,
+        title: (contact ? contact.name : null) || this.core.pushName || chatJid,
         chunks: [],
         muc: this.options.muc
       }, this.account);
@@ -44,80 +117,87 @@ var Message = function (account, core, options) {
       this.account.core.chats.push(chat.core);
     } else {
       chat = this.account.chats[ci];
-      this.account.chats.push(chat);
-      this.account.core.chats.push(chat.core);
-      this.account.chats.splice(ci, 1);
-      this.account.core.chats.splice(ci, 1);
     }
     return chat;
-  }.bind(this));
+  },
 
-  this.read = function(chat){
-    var type = (this.core.from == this.account.core.user || this.core.from == this.account.core.realJid) ? 'out' : 'in';
+  /**
+   * @param {Chat} chat
+   */
+  read : function(chat){
+    var isIncoming = (this.core.from != this.account.core.user && this.core.from != this.account.core.realJid);
+    var isUnread = !this.core.viewed;
+    var hasId = 'id' in this.core;
+    var account = this.account;
+    var readReceipts = App.settings.readReceipts;
+
     chat= chat || this.chat;
-    if('id' in this.core && type == 'in' && 'ack' in this.account.connector){
-      chat.processQueue.push(function(){
-        return chat.findMessage(this.core.id, null, true).then(function(result){
-          if(!result.message.viewed){
-            result.message.viewed= true;
-            Store.update(result.chunkIndex, result.chunk, null);
-            if(!chat.core.muc){
-              account.connector.ack(result.message.id, result.message.from, 'read');
-            }
-            Tools.log("VIEWED", result.message.text, result.message.id, result.message.from, result);
-          }
-        });
-      }.bind(this));
+
+    if(hasId && isIncoming && account.supports('readReceipts') && readReceipts && isUnread) {
+      chat.findMessage(this.core.id, null, true).then(function(values){
+        var message = values.result.message;
+        var free = values.free;
+        var key = values.key;
+
+        message.viewed= true;
+
+        Store.update(key, values.result.chunkIndex, values.result.chunk, free);
+
+        if(!chat.core.muc){
+          account.connector.ack(message.id, message.from, 'read');
+        }
+
+        Tools.log("VIEWED", message.text, message.id, message.from, values.result);
+      });
     }
-  };
-  
-  // Try to send this message
-  this.send = function (delay) {
+  },
+
+  /**
+   * Try to send this message.
+   *
+   * @param {number} delay
+   */
+  send : function (delay) {
     var message = this;
     var chat = this.chat;
     if (chat.OTR) {
-      chat.OTR.sendMsg(message.core.text);
       this.options.send = false;
       this.options.otr = true;
+      this.core.id = Date.now() + 'OTR';
+
+      this.postSend();
+
+      chat.OTR.sendMsg(this.core.id, message.core.text);
+    } else {
+      this.postSend();
     }
-    this.postSend();
-  };
-  
-  this.postSend = function () {
-    var triedToSend = false;
-    Tools.log('SEND', this.core.text, this.options);
+  },
+
+  /**
+   * Pushes the message to the network interface to actually send it.
+   */
+  postSend : function () {
     if (this.account.connector.isConnected() && this.options.send) {
-      this.core.id = account.connector.send(this.core.to, this.core.text, {delay: (this.options && 'delay' in this.options) ? this.core.stamp : this.options.delay, muc: this.options.muc});
-      triedToSend = true;
-	    if (this.core.original) {
-		    var msg = this;
-		    var block = this.core.original[0];
-		    var index = this.core.original[1];
-		    var receipts = this.account.supports('receipts');
-		    Store.recover(block, function(chunk){
-			    var message = chunk[index];
-			    if (!triedToSend) {
-				    message.ack = 'failed';
-			    } else if (receipts) {
-				    message.ack = 'sending';
-				    message.id = msg.core.id;
-				    msg.core.id = 0;
-				    msg.setSendTimeout(block, index);
-			    } else {
-				    message.ack = '';
-			    }
-			    Store.update(block, chunk, null);
-			    (new Message(msg.account, message)).reRender(block);
-		    });
-	    }
+      this.core.id = this.account.connector.send(this.core.to, this.core.text, {delay: (this.options && 'delay' in this.options) ? this.core.stamp : this.options.delay, muc: this.options.muc});
+
+      if (this.core.original) {
+        this._replace();
+      }
     }
+
+    Tools.log('SEND', this.core.id, this.core.text, this.options);
+
     if (this.options.render) {
-      this.addToChat(triedToSend);
+      this.addToChat();
     }
-  };
-  
-  // Receive this message, process and store it properly
-  this.receive = function () {
+  },
+
+  /**
+   * Receive this message, process and store it properly.
+   *
+   * @param {function} callback
+   */
+  receive : function (callback) {
     Tools.log('RECEIVE', this.core.text, this.options);
     var message = this;
     var chat = this.chat;
@@ -130,21 +210,31 @@ var Message = function (account, core, options) {
         Plus.switchOTR(this.core.from, this.account);
       }
     } else {
-      this.postReceive();
+      this.postReceive(callback);
     }
-  };
-  
-  // Incoming
-  this.postReceive = function() {
+  },
+
+  /**
+   * Incoming
+   *
+   * @param {function} callback
+   */
+  postReceive : function(callback) {
     var message = this;
     var chat = this.chat;
+    var lock = navigator.requestWakeLock('cpu');
+    var account = this.account;
+
     chat.messageAppend.push({msg: message.core}, function (blockIndex) {
+      if (callback) callback();
+      lock.unlock();
+
       if ($('section#chat')[0].dataset.jid == chat.core.jid) {
         var ul = $('section#chat ul#messages');
         var li = ul.children('li[data-chunk="' + blockIndex + '"]');
         var last = ul.children('li[data-chunk]').last().children('div').last();
-        var avatarize = last[0].dataset.from != message.core.from;
-        var timeDiff = Tools.unstamp(message.core.stamp) - Tools.unstamp(last[0].dataset.stamp) > 300000;
+        var avatarize = !last.length || last[0].dataset.from != message.core.from;
+        var timeDiff = !last.length || (Tools.unstamp(message.core.stamp) - Tools.unstamp(last[0].dataset.stamp) > 300000);
         var conv = Tools.convenientDate(message.core.stamp);
         if (li.length) {
           if (timeDiff) {
@@ -180,14 +270,18 @@ var Message = function (account, core, options) {
         chat.core.unread++;
       }
     });
-  };
+  },
 
-  this.setSendTimeout= function(block, index){
+  /**
+   * @param {number} block
+   * @param {number} index
+   */
+  setSendTimeout : function(block, index){
 	  var message= this.core;
 	  var account= this.account;
       var msg= null;
 	  setTimeout(function(){
-		  Store.recover(block, function(chunk){
+		  Store.recover(block, function(key, chunk, free){
 			if(index !== null){
 				msg= chunk[index];
 			}else{
@@ -200,32 +294,38 @@ var Message = function (account, core, options) {
 			if(msg){
 				if(msg.ack == 'sending'){
 					msg.ack = 'failed';
-					msg= new Message(account, msg);
-					Store.update(block, chunk, null);
+					msg= Make(Message)(account, msg);
+					Store.update(key, block, chunk, free);
 					msg.reRender(block);
-				}
-			}
+				} else {
+                  free();
+                }
+			} else {
+              free();
+            }
 		  });
 	  }, 30000);
-  };
+  },
 
-  //Outcoming
-  this.addToChat = function (triedToSend) {
+  /**
+   * Outcoming
+   */
+  addToChat : function () {
     var message = this;
     var chat = this.chat;
     var account = this.account;
     var to = this.core.to;
     var receipts = account.supports('receipts');
-    if (!triedToSend) {
-      message.core.ack = 'failed';
-    } else if (receipts) {
+
+    if (receipts) {
       message.core.ack = 'sending';
     }
+
     chat.messageAppend.push({
       msg: message.core,
       delay: !account.connector.isConnected()
     }, function (blockIndex) {
-	  if (triedToSend && receipts) {
+	  if (receipts) {
 		  message.setSendTimeout(blockIndex, null);
 	  }
       if ($('section#chat')[0].dataset.jid == to && $('section#chat').hasClass('show')) {
@@ -248,27 +348,35 @@ var Message = function (account, core, options) {
           li.append(message.preRender());
           ul.append(li);
         }
-        ul[0].scrollTop = ul[0].scrollHeight;   
+        ul[0].scrollTop = ul[0].scrollHeight;
         chat.core.lastRead = Tools.localize(Tools.stamp());
       }
     });
-  };
+  },
 
-  this.reRender= function(blockIndex){
-    if($('section#chat')[0].dataset.jid == this.core.to && $('section#chat').hasClass('show')){
-      var element= $('section#chat ul#messages li[data-chunk="' + blockIndex + '"] div[data-id="' + this.core.id + '"]');
+  /**
+   * @param {number} blockIndex
+   * @param {string} old_id
+   */
+  reRender : function(blockIndex, old_id){
+    if($('section#chat')[0].dataset.jid == this.core.to){
+      var element= $('section#chat ul#messages li[data-chunk="' + blockIndex + '"] div[data-id="' + (old_id || this.core.id) + '"]');
       element.replaceWith(this.preRender());
     }
-  };
+  },
 
-  // Represent this message in HTML
-  this.preRender = function (index, avatarize) {
+  /**
+   * Represent this message in HTML
+   * @param {number} index
+   * @param {boolean} avatarize
+   */
+  preRender : function (index, avatarize) {
     var message = this;
     var account = this.account;
     var html= null;
     var onDivClick= null;
     if (this.core.text) {
-      html = App.emoji[Providers.data[this.account.core.provider].emoji].fy(Tools.urlHL(Tools.HTMLescape(this.core.text)));
+      html = App.emoji[Providers.data[this.account.core.provider].emoji].fy(Tools.urlHL(Tools.HTMLescape(this.core.text))).replace(/<br>/gi,"");
     } else if (this.core.media) {
       html = $('<img/>').attr('src', this.core.media.thumb);
       html[0].dataset.url = this.core.media.url;
@@ -287,6 +395,20 @@ var Message = function (account, core, options) {
             });
           };
           break;
+        case 'vCard':
+          onClick = function(e){
+            e.preventDefault();
+            return new MozActivity({
+              name: 'open',
+              data: {
+                type: 'text/vcard',
+                blob: new Blob([ message.core.media.payload[1] ],
+                               { type : 'text/vcard' })
+              }
+            });
+          };
+          break;
+
         default:
           html.addClass(this.core.media.type);
           var open = function (blob) {
@@ -315,11 +437,12 @@ var Message = function (account, core, options) {
                 Store.SD.save(localUrl, blob, function () {
                   open(blob);
                   var index = [$(img).closest('li[data-chunk]')[0].dataset.chunk, $(img).closest('div[data-index]')[0].dataset.index];
-                  Store.recover(index[0], function (chunk) {
+                  Store.recover(index[0], function (key, chunk, free) {
                     Tools.log(chunk, index);
                     chunk[index[1]].media.downloaded = true;
-                    Store.update(index[0], chunk, function () {
+                    Store.update(key, index[0], chunk, function () {
                       img.dataset.downloaded = true;
+                      free();
                       Tools.log('SUCCESS');
                     });
                   });
@@ -342,9 +465,9 @@ var Message = function (account, core, options) {
         }
       };
     }
-  	var type = (this.core.from == this.account.core.user || this.core.from == this.account.core.realJid) ? 'out' : 'in';
+    var type = (this.core.from == this.account.core.user || this.core.from == this.account.core.realJid) ? 'out' : 'in';
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', Strophe.getBareJidFromJid(this.core.from));
-    var name = type == 'in' ? this._formatName((contact ? (contact.name || contact.jid) : (this.core.pushName || this.core.from))) : _('Me');
+    var name = type == 'in' ? this._formatName((contact ? (contact.name || contact.jid) : (this.core.name || this.core.pushName || this.core.from))) : _('Me');
     var day = Tools.day(this.core.stamp);
     var div = $('<div/>');
     var last = $('section#chat ul#messages li > div').last();
@@ -354,35 +477,61 @@ var Message = function (account, core, options) {
     div[0].dataset.index = index;
     div[0].dataset.stamp = this.core.stamp;
     div[0].dataset.from = this.core.from;
+
     if (this.core.id) {
       div[0].dataset.id = this.core.id;
     }
+
     if (this.core.media) {
       div[0].dataset.mediaType = this.core.media.type;
     }
+
     if(type == 'out' && this.core.ack){
       div[0].dataset.ack= this.core.ack;
     }
-    if (avatarize) {
+
+    if (avatarize && type == 'in') {
       var img = $('<img/>');
-      img[0].dataset.jid = type == 'in' ? this.core.from : this.account.core.user;
-      var pic = $('<span/>').addClass('avatar hideable').append(
-        img
-      );
+
+      img[0].dataset.jid = this.core.from;
+
+      var pic = $('<span/>').addClass('avatar hideable').append(img);
       var nameSpan = $('<span/>').addClass('name').css('color', Tools.nickToColor(this.core.from)).text(name);
+
       div.append(pic).append(nameSpan).addClass('extended');
     }
+
     if (html) {
       var textSpan = $('<span/>').addClass('text').html(html);
       div.append(textSpan);
     }
+
     if (onDivClick !== undefined) {
       div[0].onclick = onDivClick;
     }
+
     div.on('hold', function (e) {
-      Activity('chat', null, $(this).children('.text').text());
+      Activity('chat', null, Tools.stripHTML(this));
     });
-  	return div[0];
-  };
-  
+
+    return div[0];
+  }
+};
+
+
+/**
+ * @typedef MessageOptions
+ * @type {object}
+ * @property {boolean} send
+ * @property {boolean} render
+ * @property {boolean} otr
+ * @property {boolean} logging
+ * @property {boolean} muc
+ */
+var MessageOptions = {
+  send: true,
+  render: true,
+  otr: false,
+  logging: true,
+  muc: false
 };

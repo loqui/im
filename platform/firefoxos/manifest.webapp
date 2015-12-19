@@ -7,7 +7,7 @@
   "type": "privileged",
   "launch_path": "/index.html",
   "description": "Loqui Instant Messenger unifies all your chat accounts in just one app.",
-  "version": "v0.4.0",
+  "version": "v0.4.11a",
   "icons": {
     "32": "/img/icon-32.png",
     "60": "/img/icon-60.png",
@@ -20,6 +20,9 @@
   "messages": [
     {
       "alarm": "/index.html"
+    },
+    {
+      "notification" : "/index.html"
     }
   ],
   "orientation": ["portrait"],
@@ -58,6 +61,9 @@
     },
     "geolocation": {
       "description": "Required for sending location messages to other users"
+    },
+    "storage": {
+      "description": "Storage without size limitations"
     }
   },
   "activities": {

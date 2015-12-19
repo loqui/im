@@ -1,49 +1,128 @@
-/* global Tools, App, Store, Message, Avatar, Providers, Plus, Lungo */
+/* global Tools, App, Store, Message, Avatar, Providers, Plus, Lungo, Make, hasPrototype */
+
+/**
+* @file Holds {@link Chat} and {@link ChatCore}
+* @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
+* @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
+* @author [Christof Meerwald]{@link https://github.com/cmeerw}
+* @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
+* @license AGPLv3
+*/
 
 'use strict';
 
-var Chat = function (core, account) {
+/**
+* @lends Chat.prototype
+*/
+var Chat = {
 
-  // Holds only chat data and no functions
-  this.core = core;
-  this.core.unread = this.core.unread || 0;
-  this.core.last = this.core.last || {};
-  this.core.lastAck = this.core.lastAck || undefined;
-  this.account = account;
-  this.notification = null;
-  this.lastRead = Tools.localize(Tools.stamp());
-  this.unread = this.core.unread;
-  this.unreadList= [];
-  this.processQueue= async.queue(function(job, callback){
-    job().then(callback);
-  });
-  this.processQueue.drain= function(){};
-  if (!('settings' in this.core)) {
-    this.core.settings = {};
-    $.extend(this.core.settings, App.defaults.Chat.core.settings);
-  }
-  if (!('info' in this.core)) {
-    this.core.info = {};
-  }
-  
-  // Render last chunk of messages
-  this.lastChunkRender = function () {
+  /**
+  * Holds a reference to the chats [{ChatCore}]{@link ChatCore} object.
+  *
+  * @type {ChatCore}
+  */
+  core : null,
+
+  /**
+  * Holds a back refernece to the account this chat is associated with.
+  * @type {Account}
+  */
+  account : null,
+
+  /**
+  * Holds a refeence to the latest [{Notification}]{@link external:System.Notification} object of this chat.
+  *
+  * @type {external:System.Notification}
+  */
+  notification : null,
+
+  /**
+  * Holds a refernece to this chats [{WakeLock}]{@link external:System.WakeLock} in case it's holding one.
+  * @type {?external:System.WakeLock}
+  */
+  wakeLock : null,
+
+  /**
+  * @type {string}
+  */
+  lastRead : null,
+
+  /**
+  * Holds the amount of unread messages.
+  *
+  * @type {number}
+  */
+  unread : null,
+
+  /**
+  * Contains the list all the unread [{Message}]{@link Message}
+  *
+  * @type {Message[]}
+  */
+  unreadList : null,
+
+  /**
+  * @constructs
+  * @param {ChatCore} core
+  * @param {Account} account
+  */
+  _make : function (core, account) {
+
+    this.core = hasPrototype(core, ChatCore) ? core : Make(core, ChatCore)();
+    this.account = account;
+    this.notification = null;
+    this.wakeLock = null;
+    this.lastRead = Tools.localize(Tools.stamp());
+    this.unread = this.core.unread;
+    this.unreadList= [];
+
+    this.messageAppend = async.queue(this.messageAppendProcessor.bind(this));
+    this.messageAppend.drain = this.messageAppendDrain.bind(this);
+
+    if (this.core.jid === null) {
+      this.core.jid = Date.now() + '@fakeJid.org';
+    }
+
+    if (!this.core.last.id) {
+      if(this.core.chunks.length > 0){
+        var chunk = this.core.chunks[this.core.chunks.length-1];
+        var chat = this;
+
+        Store.recover(chunk, function(key, chunk, free){
+          var lastMsg = chunk[chunk.length - 1];
+
+          chat.core.last = lastMsg;
+
+          free();
+        });
+      }
+    }
+  },
+
+  /**
+  * Render last chunk of messages
+  */
+  lastChunkRender : function () {
     var ul = $('section#chat ul#messages');
     ul.empty();
     var index = this.core.chunks.length - 1;
     if (index >= 0) {
       this.chunkRender(index);
     }
-  };
-  
-  // Render a chunk of messages
-  this.chunkRender = function (index) {
+  },
+
+  /**
+  * Render a chunk of messages
+  *
+  * @param {number} index
+  */
+  chunkRender : function (index) {
     var chat = this;
     var ul = $('section#chat ul#messages');
     if (index >= 0 && ul.children('li[data-index="' + index + '"]').length < 1) {
       var stIndex = this.core.chunks[index];
       var height = ul[0].scrollHeight - ul[0].scrollTop;
-      Store.recover(stIndex, function (chunk) {
+      Store.recover(stIndex, function (key, chunk, free) {
         if (chunk) {
           var li = $('<li/>');
           var frag = document.createDocumentFragment();
@@ -54,7 +133,7 @@ var Chat = function (core, account) {
           var prevRead = true;
           var lastRead = Tools.unstamp(chat.lastRead || chat.core.lastRead);
           for (var i in chunk) {
-            var msg = new Message(chat.account, chunk[i], { muc : chat.core.muc });
+            var msg = Make(Message)(chat.account, chunk[i], { muc : chat.core.muc });
             var type = msg.core.from == chat.account.core.fullJid ? undefined : msg.core.from;
             var time = Tools.unstamp(msg.core.stamp);
             var timeDiff = time - prevTime;
@@ -103,21 +182,32 @@ var Chat = function (core, account) {
           chat.chunkRender(index - 1);
         }
         chat.account.avatarsRender();
+
+        free();
       });
     }
-  };
-  
-  // Push messages to this queue to append them to this chat
-  this.messageAppend = async.queue(function (task, callback) {
+  },
+
+  /**
+  * Push messages to this queue to append them to this chat
+  *
+  * @param {Object} task
+  * @param {function} callback
+  */
+  messageAppendProcessor : function (task, callback) {
     var msg = task.msg;
     var delay = task.delay;
     var chat = this;
     var chunkListSize = this.core.chunks.length;
     var blockIndex = this.core.chunks[chunkListSize - 1];
     var storageIndex;
-    chat.core.last = msg;
+
+    if (!chat.wakeLock) {
+      chat.wakeLock = navigator.requestWakeLock('cpu');
+    }
+
     if (chunkListSize > 0) {
-      Store.recover(blockIndex, function (chunk) {
+      Store.recover(blockIndex, function (key, chunk, free) {
         if (!chunk || chunk.length >= App.defaults.Chat.chunkSize) {
           Tools.log('FULL OR NULL');
           chunk = [msg];
@@ -125,18 +215,28 @@ var Chat = function (core, account) {
           Tools.log('PUSHING', blockIndex, chunk);
           chat.core.chunks.push(blockIndex);
           storageIndex = [blockIndex, 0];
+
+          free();
           callback(blockIndex);
+
         } else {
           Tools.log('FITS');
           chunk.push(msg);
           chunk.sort(function (a, b) {
             return Tools.unstamp(a.stamp) > Tools.unstamp(b.stamp);
           });
+
           blockIndex = chat.core.chunks[chunkListSize - 1];
           Tools.log('PUSHING', blockIndex, chunk);
-          Store.update(blockIndex, chunk, callback);
+          Store.update(key, blockIndex, chunk, function(index){
+            free();
+            callback(index);
+          });
           storageIndex = [blockIndex, chunk.length-1];
         }
+
+        chat.core.last = chunk[chunk.length-1];
+
         if (delay) {
           chat.account.toSendQ(storageIndex);
         }
@@ -148,15 +248,18 @@ var Chat = function (core, account) {
       Tools.log('PUSHING', blockIndex, chunk);
       chat.core.chunks.push(blockIndex);
       storageIndex = [blockIndex, 0];
+      chat.core.last = msg;
       if (delay) {
         chat.account.toSendQ(storageIndex);
       }
       callback(blockIndex);
     }
-  }.bind(this));
-  
-  // This is runned when the message processing queue drains
-  this.messageAppend.drain = function () {
+  },
+
+  /**
+  * This is runned when the message processing queue drains.
+  */
+  messageAppendDrain : function () {
     var chat = this;
     var pic = new Avatar(App.avatars[chat.core.jid]);
     var last = chat.core.last;
@@ -177,7 +280,7 @@ var Chat = function (core, account) {
           if (src.slice(0, 1) == '/' && chat.core.muc) {
             src = 'https://raw.githubusercontent.com/loqui/im/dev/src/img/goovatar.png';
           }
-          chat.notification = App.notify({ subject: subject, text: text, pic: src, from : chat.core.jid, callback: callback }, 'received');
+          chat.notification = App.notify({ subject: subject, text: text, pic: src, from : chat.account.core.fullJid+'#'+chat.core.jid, callback: callback }, 'received');
         }.bind(chat));
       } else {
         chat.notification = App.notify({ subject: subject, text: text, pic: 'https://raw.githubusercontent.com/loqui/im/dev/src/img/foovatar.png', from : chat.core.jid, callback: callback }, 'received');
@@ -193,11 +296,19 @@ var Chat = function (core, account) {
     $('#chat #messages span.lastRead').remove();
     this.core.settings.hidden[0]= false;
     this.save(true);
-  }.bind(this);
-  
-  // Create a chat window for this contact
-  this.show = function () {
+    if (this.wakeLock) {
+      this.wakeLock.unlock();
+      this.wakeLock = null;
+    }
+  },
+
+  /**
+  * Create a chat window for this contact
+  */
+  show : function () {
     var section = $('section#chat');
+    var account = this.account;
+
     if (!(section[0].dataset.jid == this.core.jid && section[0].dataset.account == this.account.core.fullJid)) {
       var header = section.children('header');
       var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', this.core.jid);
@@ -216,13 +327,15 @@ var Chat = function (core, account) {
       var avatarize = function (url) {
         header.children('.avatar').children('img').attr('src', url);
       };
-      if (App.avatars[this.core.jid]) {
-        var existant = $('ul li[data-jid="' + this.core.jid + '"] .avatar img');
+      var avatars = App.avatars;
+      var jid = this.core.jid;
+      if (avatars[jid]) {
+        var existant = $('ul li[data-jid="' + jid + '"] .avatar img');
         if (existant.length) {
           avatarize(existant.attr('src'));
         } else {
           if (this.core.jid in App.avatars) {
-            (new Avatar(App.avatars[this.core.jid])).url.then(function (val) {
+            (new Avatar(avatars[jid])).url.then(function (val) {
               avatarize(val);
             });
           }
@@ -230,11 +343,16 @@ var Chat = function (core, account) {
       } else {
         header.children('.avatar').children('img').attr('src', 'img/foovatar.png');
         var method = this.core.muc ? this.account.connector.muc.avatar : this.account.connector.avatar;
+        Tools.log('REQUESTING AVATAR FOR', jid);
         method(function (a) {
           a.url.then(function (val) {
             avatarize(val);
+            if (account.supports('easyAvatars')) {
+              avatars[jid] = a.data;
+              App.avatars = avatars;
+            }
           });
-        }, this.core.jid);
+        }, jid);
       }
       if (this.core.settings.otr[0]) {
         Plus.switchOTR(this.core.jid, this.account);
@@ -248,15 +366,13 @@ var Chat = function (core, account) {
             header.children('.status').text(' ');
           }
         } else {
-          var show = contact ? (contact.presence.show || 'na') : 'na';
-          var status = contact ? (contact.presence.status || _('show' + show)) : ' ';
-          if (this.account.connector.presence.get) {
-            this.account.connector.presence.get(this.core.jid);
+          if (contact && this.account.connector.presence.subscribe) {
+            this.account.connector.presence.subscribe(this.core.jid);
           }
-          header.children('.status').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(status));
-          if (this.account.supports('show')) {
-            section[0].dataset.show = show;
+          if (contact && this.account.connector.contacts.getStatus && (contact.presence.status === null)) {
+            this.account.connector.contacts.getStatus([this.core.jid]);
           }
+          this.account.presenceRender(this.core.jid);
         }
         this.lastChunkRender();
         this.unreadList= [];
@@ -269,7 +385,7 @@ var Chat = function (core, account) {
     }
     if(this.unreadList.length){
       this.unreadList.forEach(function(msg){
-          msg.read();
+        msg.read();
       });
       this.unreadList= [];
     }
@@ -281,60 +397,161 @@ var Chat = function (core, account) {
     this.core.lastRead = Tools.localize(Tools.stamp());
     this.save();
     Lungo.Router.section('chat');
-  };
+  },
 
-  this.findMessage= function(msgId, chunkIndex, exists){
+  /**
+  * Finds a message in the chat
+  *
+  * @param {string} msgId
+  * @param {number} [chunkIndex]
+  * @param {boolean} [exists]
+  * @return {external:System.Promise}
+  */
+  findMessage : function(msgId, chunkIndex, exists){
     var chat= this.core;
+
     return new Promise(function(success, faild){
       var found= false;
+
       var checkChunk= function(chunk, chunkIndex){
         var result= null;
-        chunk.forEach(function(item, i){
-          if(item.id == msgId){
-            found= true;
-            result= {
-              index : i,
-              chunk : chunk,
-              chunkIndex : chat.chunks[chunkIndex],
-              message : item
-            };
-          }
-        });
-        return result;
+
+        if (chunk) {
+          chunk.forEach(function(item, i){
+            if((item.id || '').split('-')[0] == msgId.split('-')[0]){
+              found= true;
+              result= {
+                index : i,
+                chunk : chunk,
+                chunkIndex : chat.chunks[chunkIndex],
+                message : item
+              };
+            }
+          });
+
+          return result;
+        } else {
+          return null;
+        }
       };
-      if(chunkIndex || chunkIndex === 0){
-        Store.recover(chunkIndex, function(chunk){
+
+      if (chunkIndex || chunkIndex === 0) {
+        Store.recover(chunkIndex, function(key, chunk, free){
           var result= checkChunk(chunk, chunkIndex);
           if(found){
-            success(result);
+            success({key : key, result : result, free : free});
           }else{
+            free();
             faild();
           }
         });
-      }else{
+
+      } else {
         var currentChunk, lastChunk;
+
         currentChunk = lastChunk = chat.chunks.length - 1;
-        var afterRecover= function(chunk){
+
+        var afterRecover= function(key, chunk, free){
           var result= checkChunk(chunk, currentChunk);
-          if(found){
-            success(result);
-          }else if((exists || (lastChunk - currentChunk < 2)) && currentChunk > 0){
+
+          if (found) {
+            success({key : key, result : result, free : free});
+
+          } else if((exists || (lastChunk - currentChunk < 2)) && currentChunk > 0) {
             currentChunk--;
+            free();
             Store.recover(chat.chunks[currentChunk], afterRecover);
-          }else{
+
+          } else {
+            free();
             faild();
           }
         };
+
         Store.recover(chat.chunks[currentChunk], afterRecover);
       }
     });
-  };
-  
-  // Save or update this chat in store
-  this.save = function (up) {
+  },
+
+  /**
+  * Save or update this chat in store
+  *
+  * @param {boolean} up
+  */
+  save : function (up) {
     this.account.save();
     this.account.singleRender(this, up);
-  };
-    
+  }
+
 };
 
+/**
+* Holds only chat data and no functions
+*
+* @lends ChatCore.prototype
+*/
+var ChatCore = {
+
+  /**
+   * @type {string}
+   */
+  title : null,
+
+  /**
+  * @type {?number}
+  */
+  lastAck : null,
+
+  /**
+  * @type {number}
+  */
+  unread : 0,
+
+  /**
+  * @type {MessageCore}
+  */
+  last : null,
+
+  /**
+  * @type {ChatCore~Settings}
+  */
+  settings: null,
+
+  /**
+  * @type {Object}
+  */
+  info : null,
+
+  /**
+  * @constructs
+  */
+  _make : function(){
+
+    /**
+    * @name Settings
+    * @type {Object}
+    * @property {Array.<boolean|string>} muted
+    * @property {Array.<boolean|string>} otr
+    * @property {Array.<boolean|string>} hidden
+    * @memberof ChatCore
+    * @inner
+    */
+    var settings = {
+      muted: [false],
+      otr: [false, 'switchOTR'],
+      hidden: [false]
+    };
+
+    this.last = this.last || {};
+    this.info = this.info || {};
+    this.title = ((!this.title || this.title === this.jid) && this.last && this.last.pushName) ? this.last.pushName : this.title;
+
+    this.settings = this.settings || {};
+
+    Object.keys(settings).forEach(function(key){
+      if (!Array.isArray(this[key])) {
+        this[key]= settings[key];
+      }
+    }.bind(this.settings));
+  }
+};

@@ -1,5 +1,16 @@
 /* global App, Menu, Tools, Messenger, Accounts, Store, Plus, UI, Lungo */
 
+/**
+* @file Contains all the bindings
+* @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
+* @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
+* @author [Christof Meerwald]{@link https://github.com/cmeerw}
+* @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
+* @author [Sukant Garg]{@link https://github.com/gargsms}
+* @author [Carsten]{@link https://github.com/acidicX}
+* @license AGPLv3
+*/
+
 'use strict';
 
 Lungo.init({
@@ -10,7 +21,7 @@ $('document').ready(function(){
   document.addEventListener('localized', function(e) {
     $('section#welcome article#main h1').removeClass('hidden');
   });
-  
+
   setTimeout(function(){
     $('input[data-l10n-placeholder]').each(function () {
       var original = this.dataset.l10nPlaceholder;
@@ -23,10 +34,22 @@ $('document').ready(function(){
         Menu.show(menu, this);
       });
     });
+
     App.defaults.Connector.presence.status = _('DefaultStatus', {
       app: App.name,
       platform: (Lungo.Core.environment().os ? Lungo.Core.environment().os.name : 'PC')
     });
+
+    App.defaults.Selects.language[0] = { caption : _('Default'), value : 'default' };
+
+
+//  wakelock shim
+    navigator.requestWakeLock = navigator.requestWakeLock || function(){
+      return {
+        unlock : function(){}
+      };
+    };
+
     bindings();
     App.run();
   });
@@ -113,35 +136,43 @@ document.addEventListener("visibilitychange", function() {
 
 // Type in chat text box
 $('section#chat article#main div#text').on('keydown', function (e) {
-  if (e.which == 13) {
+
+  if (e.which == 13 && App.settings.sendOnEnter) {
     e.preventDefault();
     Messenger.say();
-    Messenger.csn('active');
+
   } else if (e.which == 8 || e.which == 46) {
-    if (this.textContent.length < 2) {
-      $('section#chat article#main button#plus').show();
-      $('section#chat article#main button#say').hide();
-      $('section#chat nav#plus').removeClass('show');
-      Messenger.csn('paused');
+    // if user wants to hide keyboard in landscape
+    // user can clear the box and press backspace to hide it
+    if (this.textContent.length === 0 && e.which == 8 && window.matchMedia('(orientation:landscape)').matches) {
+      $('section#chat article#main div#text').blur();
     }
-  } else {
-    $('section#chat article#main button#plus').hide();
-    $('section#chat article#main button#say').show();
-    $('section#chat nav#plus').addClass('show');
-    var ul = $('section#chat ul#messages');
-    ul[0].scrollTop = ul[0].scrollHeight;
+  }
+
+}).on('keydown', Tools.throttle(function(e){
+  var dirtyState = $('#footbox')[0].dataset.dirty;
+  var newDirtyState = ((e.which === 8 && this.textContent.length > 1) || (e.which !== 8 && this.textContent.length >= 0));
+
+  if (dirtyState !== newDirtyState.toString()) {
+    $('#footbox')[0].dataset.dirty = newDirtyState;
+  }
+
+  if (newDirtyState) {
     Messenger.csn('composing');
   }
-}).on('tap', function (e) {
-  Lungo.Router.article('chat', 'main');
-  $('section#chat nav#plus').addClass('show');
-  var ul = $('section#chat ul#messages');
-  ul[0].scrollTop = ul[0].scrollHeight + 500;
-}).on('blur', function (e) {
-  if ($(e.explicitOriginalTarget).closest('[data-control=menu]').length < 1) {
-    $('section#chat nav#plus').removeClass('show');
-  }
+
+}, 1500)).on('keyup', Tools.debounce(function(){
   Messenger.csn('paused');
+
+}, 5000)).on('tap', function (e) {
+  var ul = $('section#chat ul#messages');
+  ul[0].scrollTop = ul[0].scrollHeight;
+
+}).on('blur', function (e) {
+  Messenger.csn('paused');
+
+  var ul = $('section#chat ul#messages');
+  ul[0].scrollTop = ul[0].scrollHeight;
 });
 
 // Tap my avatar
@@ -150,7 +181,9 @@ $('section#me #card span.avatar').on('click', function (e) {
     var pick = new MozActivity({
       name: 'pick',
       data: {
-        type: ['image/png', 'image/jpg', 'image/jpeg']
+        type: ['image/*'],
+        width : 500,
+        height : 500
       }
     });
     pick.onsuccess = function() {
@@ -162,6 +195,30 @@ $('section#me #card span.avatar').on('click', function (e) {
     Lungo.Notification.error(_('NoDevice'), _('FxOSisBetter', 'exclamation-sign'));
   }
 });
+
+// Tap contact or muc avatar
+var listener= function(muc){
+  var jid= muc ? $('section#muc')[0].dataset.jid : $('section#contact')[0].dataset.jid;
+  var avatar= App.avatars[jid];
+
+  if(avatar){
+    Store.recover((avatar.original || avatar.chunk), function(key, url, free){
+      var blob = Tools.b64ToBlob(url.split(',').pop(), url.split(/[:;]/)[1]);
+      new MozActivity({
+        name: "open",
+        data: {
+          type: blob.type,
+          blob: blob
+        }
+      });
+
+      free();
+    });
+  }
+};
+
+$('section#contact #card .avatar').on('click', listener.bind(null, false));
+$('section#muc #card .avatar').on('click', listener.bind(null, true));
 
 // Change background
 $('section#me #card button.background.change').on('click', function (e) {
@@ -178,15 +235,21 @@ $('section#me #card button.background.change').on('click', function (e) {
       var sh = window.innerHeight;
       Tools.picThumb(blob, null, sh, function (url) {
         if (account.core.background) {
-          Store.update(account.core.background, url);
-        } else{
+          var key = Store.lock(account.core.background);
+
+          Store.update(key, account.core.background, url);
+
+          Store.unlock(account.core.background, key);
+        } else {
           account.core.background = Store.save(url);
         }
-        Store.recover(account.core.background, function (url) {
+        Store.recover(account.core.background, function (key, url, free) {
           $('section#chat ul#messages').css('background-image', 'url('+url+')');
           $('section.profile div#card').css('background-image', 'url('+url+')');
           Lungo.Notification.show('star', _('backChanged'), 3);
-        }.bind(this)); 
+
+          free();
+        }.bind(this));
       });
     };
     e.onerror = function () {
@@ -203,7 +266,7 @@ $('section#me #card button.background.delete').on('click', function (e) {
     Store.blockDrop(account.core.background, function () {
       $('section#chat ul#messages').css('background-image', 'none');
       $('section.profile div#card').css('background-image', 'none');
-      Lungo.Notification.show('star', _('backChanged'), 3); 
+      Lungo.Notification.show('star', _('backChanged'), 3);
     });
   }
   account.core.background = null;
@@ -237,6 +300,16 @@ if (navigator.mozAlarms) {
   navigator.mozSetMessageHandler("alarm", function (message) {
     App.alarmSet(message.data);
   });
+
+  navigator.mozSetMessageHandler('notification', function(notification){
+    var accountJid = notification.tag.split('#')[0];
+    var chatJid    = notification.tag.split('#')[1];
+    var chat       = Accounts.find(accountJid).chatGet(chatJid);
+
+    chat.account.show();
+    chat.show();
+    App.toForground();
+  });
 }
 
 Strophe.Connection.rawInput = function (data) {
@@ -260,35 +333,44 @@ var bindings = function () {
     e.preventDefault();
     e.target.classList.add('active');
   });
-  $('section#chat nav#plus a.cancel').on('click', function() {
-    $(this).parent().removeClass('show');
-  });
   $('section#welcome').on('click', function(){
      Menu.show('providers');
   });
   $('section#chat').on('swipeRight', function () {
     Lungo.Router.section('back');
   });
+
   $('section#main').on('click', function(e){
     if($(e.target).hasClass('asided')){
       Lungo.Aside.hide();
     }
-  }).on('swipeLeft', function(e){
+  })
+
+  .on('swipeLeft', function(e){
     if($(e.target).hasClass('asided')){
       Lungo.Aside.hide();
     } else if($('section#chat[data-jid]').length > 0) {
       Lungo.Router.section('chat');
     }
-  }).on('swipeRight', function () {
+  })
+
+  .on('swipeRight', function () {
     Lungo.Aside.show('accounts');
-  }).on('swipeUp', function () {
-    $('.floater').addClass('hidden');
-  }).on('swipeDown', function () {
-    $('.floater').removeClass('hidden');
   });
+
+  $('#main #chats').on('scroll', Tools.throttle(function (e) {
+
+    if (e.target.scrollTop > 0) {
+      $('.floater').addClass('hidden');
+    } else {
+      $('.floater').removeClass('hidden');
+    }
+  }, 100));
+
   $('aside').on('swipeLeft', function () {
     Lungo.Aside.hide();
   });
+
   $('#debugConsole #showConsole').on('click', function () {
     Plus.showConsole();
     $('#debugConsole #showConsole').hide();

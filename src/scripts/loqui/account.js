@@ -1,21 +1,44 @@
-/* global App, Providers, Store, Tools, Messenger, Activity, Menu, Avatar, Message, Chat, Lungo */
+/* global App, Providers, Store, Tools, Messenger, Activity, Menu, Avatar, Message, Chat, Lungo, Make */
+
+/**
+* @file Holds {@link Account}
+* @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
+* @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
+* @author [Christof Meerwald]{@link https://github.com/cmeerw}
+* @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
+* @author [Sukant Garg]{@link https://github.com/gargsms}
+* @license AGPLv3
+*/
 
 'use strict';
 
 var Account = function (core) {
-  
+
   // Holds only account data and no functions
   this.core = core;
   this.core.sendQ = this.core.sendQ || [];
   this.connector = new App.connectors[Providers.data[this.core.provider].connector.type](this);
   this.OTR = {};
   this.contacts = {};
-  this.names = [];
-  this.jidToNameMap = {};
   this._unread = new Blaze.Var(0);
   this._chats = new Blaze.Var([]);
   this._enabled = new Blaze.Var(false);
-  
+  this._pendingReconnect = null;
+  this._reconnectBackoff = 1;
+  this._initialConnect = true;
+  this._scheduleReconnect = function () {
+    if (App.settings.reconnect && ! this._initialConnect && this.enabled) {
+      // schedule reconnect after a short (exponentially increasing( timeout
+      this._reconnectBackoff = Math.min(this._reconnectBackoff * 2, 300);
+      this._pendingReconnect = setTimeout(function () {
+        if (this._pendingReconnect && App.online && this.enabled) {
+          this._pendingReconnect = null;
+          this.connect();
+        }
+      }.bind(this), 1000 * this._reconnectBackoff);
+    }
+  };
+
   this.__defineGetter__('enabled', function () {
     return this._enabled.get();
   });
@@ -26,12 +49,13 @@ var Account = function (core) {
       if (!val) {
         this.connector.disconnect();
       } else {
+        this._initialConnect = true;
         this.connect();
       }
       this.save();
     }
   });
-  
+
   this.__defineGetter__('chats', function () {
     return this._chats.get();
   });
@@ -76,7 +100,7 @@ var Account = function (core) {
             $('section#success span#imported').text(_('Imported', {number: (this.core.roster && this.core.roster.length) ? this.core.roster.length : 0}));
             this.connector.avatar(function (avatar) {
               avatar.url.then(function (src) {
-                $('section#success img#avatar').attr('src', src);              
+                $('section#success img#avatar').attr('src', src);
               });
             });
             Lungo.Router.section('success');
@@ -94,9 +118,13 @@ var Account = function (core) {
       }
     });
   };
-  
+
   // Connect
   this.connect = function () {
+    if (this._pendingReconnect) {
+      clearTimeout(this._pendingReconnect);
+      this._pendingReconnect = null;
+    }
     if (this.connector.isConnected()) {
       this.connector.start();
       this.sendQFlush();
@@ -108,9 +136,16 @@ var Account = function (core) {
           }.bind(this),
           connected: function () {
             this.enabled = true;
+            this._initialConnect = false;
+            this._reconnectBackoff = 1;
             var cb = function (rcb) {
               App.audio('login');
               this.connector.start();
+              if (this === Accounts.current) {
+                this.accountRender();
+                this.avatarsRender();
+              }
+              this.connector.presence.set(document.hidden ? 'away' : 'a');
               this.sendQFlush();
               if (rcb) {
                 rcb();
@@ -122,36 +157,34 @@ var Account = function (core) {
             this.enabled = 'loading';
           }.bind(this),
           authfail: function () {
-            var failStamps = this.connector.failStamps || {};
-            failStamps.push(new Date());
-            if (failStamps.length > 2 && Math.floor((failStamps.slice(-1)[0] - failStamps.slice(-3)[0])/1000) < 30) {
-              location.reload();
-            }
+            this._initialConnect = false;
             Lungo.Notification.error(_('NoAuth'), _('NoAuthNotice'), 'signal', 5);
+          }.bind(this),
+          connfail: function () {
+            if (this.enabled == 'loading') {
+              this._scheduleReconnect();
+            }
           }.bind(this),
           disconnected: function () {
             App.audio('logout');
             this.presenceRender();
-            this.connector.connected = false;
-            if (App.online && App.settings.reconnect && this.enabled) {
-              this.connect();
-            }
+            this._scheduleReconnect();
           }.bind(this)
         });
       }
     }
   };
-  
+
   // Download roster and register callbacks for roster updates handling
   this.sync = function (callback) {
     this.connector.sync(callback);
   };
-  
+
   // Bring account to foreground
   this.show = function () {
     Accounts.current = Accounts.find(this.core.fullJid);
   };
-  
+
   // Render everything for this account
   this.allRender = function () {
     this.accountRender();
@@ -159,36 +192,40 @@ var Account = function (core) {
     this.avatarsRender();
     this.presenceRender();
   };
-  
+
   // Changes some styles based on presence and connection status
   this.accountRender = function (front) {
     $('section#main header').css('border-color', this.connector.provider.color);
     $('aside#accounts .cover').css('background-color', this.connector.provider.color);
     $('aside#accounts .cover .avatar img').removeAttr('src');
+    $('section#main footer .avatar img').removeAttr('src');
+    $('section#me .avatar img').removeAttr('src');
     $('.floater').css('background-color', this.connector.provider.color);
     var vCard = $(this.connector.vcard);
     var address = ( vCard.length && vCard.find('FN').length ) ? vCard.find('FN').text() : this.core.user;
     var features = Providers.data[this.core.provider].features;
     var meSection = $('section#me');
     var mainSection = $('section#main');
-    meSection[0].dataset.features = features.join(' ');
-    mainSection[0].dataset.features = features.join(' ');
+    var attachmentSection = $('section#attachment');
+    attachmentSection[0].dataset.features = meSection[0].dataset.features = mainSection[0].dataset.features = features.join(' ');
     meSection.find('#nick input').val(this.connector.presence.name);
     meSection.find('#status input').val(this.connector.presence.status);
     meSection.find('#card .name').text(address == this.core.user ? '' : address);
     meSection.find('#card .user').text(this.core.user);
     meSection.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + this.core.provider + '.svg'));
     if(this.core.background){
-      Store.recover(this.core.background, function (url) {
+      Store.recover(this.core.background, function (key, url, free) {
         $('section#chat ul#messages').css('background-image', 'url('+url+')');
         $('section.profile div#card').css('background-image', 'url('+url+')');
+
+        free();
       });
     }else{
         $('section#chat ul#messages').css('background-image', '');
         $('section.profile div#card').css('background-image', '');
     }
   }.bind(this);
-  
+
   this.singleRender = function (chat, up) {
     var ul = $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"]');
     var li = ul.children('li[data-jid="' + chat.core.jid + '"]');
@@ -197,15 +234,17 @@ var Account = function (core) {
         li.detach();
         ul.prepend(li);
       }
-      li.children('.lastMessage').html(chat.core.last.text ? App.emoji[Providers.data[this.core.provider].emoji].fy(chat.core.last.text) : (chat.core.media ? _('AttachedFile') : ''));
+      li.children('.lastMessage').html(chat.core.last.text ? App.emoji[Providers.data[this.core.provider].emoji].fy(chat.core.last.text) : (chat.core.last.media ? _('SentYou', {type: _('MediaType_' + chat.core.last.media.type)}) : ''));
       li.children('.lastStamp date').html(chat.core.last.stamp ? Tools.convenientDate(chat.core.last.stamp).join('<br />') : '');
       li[0].dataset.unread = chat.core.unread;
       li[0].dataset.hidden = chat.core.settings.hidden[0] ? 1 : 0;
+      li[0].dataset.lastAck = chat.core.last.ack;
     } else {
       this.allRender();
+      this.presenceRender(chat.core.jid);
     }
   }.bind(this);
-  
+
   // List all chats for this account
   this.chatsRender = function (f, click, hold) {
     var account = this;
@@ -236,8 +275,9 @@ var Account = function (core) {
       };
       for (var i in this.core.chats) {
         var chat = this.core.chats[i];
-        var title = App.emoji[Providers.data[this.core.provider].emoji].fy(chat.title);
-        var lastMsg = chat.last ? (chat.last.text ? (App.emoji[Providers.data[account.core.provider].emoji].fy(chat.last.text)) : (chat.last.media ? media : '')) : ' ';
+        var name = chat.title;
+        var title = App.emoji[Providers.data[this.core.provider].emoji].fy(name);
+        var lastMsg = chat.last ? (chat.last.text ? App.emoji[Providers.data[this.core.provider].emoji].fy(chat.last.text) : (chat.last.media ? _('SentYou', {type: _('MediaType_' + chat.last.media.type)}) : '')) : '';
         var lastStamp = chat.last.stamp ? Tools.convenientDate(chat.last.stamp).join('<br />') : '';
         var li = $('<li/>');
         li[0].dataset.jid = chat.jid;
@@ -246,10 +286,12 @@ var Account = function (core) {
         li.append($('<span/>').addClass('name').html(title));
         li.append($('<span/>').addClass('lastMessage').html(lastMsg));
         li.append($('<span/>').addClass('lastStamp').append($('<date/>').attr('datetime', chat.last.stamp).html(lastStamp)));
+        li.append($('<span/>').addClass('lastAck'));
         li.append($('<span/>').addClass('show').addClass('backchange'));
         li[0].dataset.unread = chat.unread;
         li[0].dataset.hidden= chat.settings.hidden[0] ? 1 : 0;
-        if (!chat.muc && account.supports('muc') && chat.jid.substring(1).match(/\-/)) {
+        li[0].dataset.lastAck = chat.last.ack;
+        if (!chat.muc && account.supports('muc') && chat.jid && chat.jid.substring(1).match(/\-/)) {
           account.chats[i].core.muc = true;
           account.chats[i].save();
         }
@@ -273,14 +315,13 @@ var Account = function (core) {
     if (f) {
       f.appendChild($('<article/>').attr('id', 'chats').addClass('scroll').append(ul)[0]);
     } else {
-      oldUl.replaceWith(ul);    
+      oldUl.replaceWith(ul);
     }
   }.bind(this);
 
   // List all contacts for this account
   this.contactsRender = function (f, click, selected) {
     var account = this;
-    console.log(account);
     var article = $('<article/>').attr('id', 'contacts');
     var header = $('<header/>').addClass('beige')
       .append($('<button/>').addClass('new').text(_('ContactAdd')).on('click', function (event) {
@@ -288,7 +329,6 @@ var Account = function (core) {
       }));
     if (account.supports('localContacts')) {
       header.append($('<button/>').addClass('sync').text(_('ContactsSync')).on('click', function (event) {
-        delete account.core.roster;
         account.connector.contacts.sync(function (rcb) {
           account.save();
           Lungo.Router.section('main');
@@ -308,15 +348,15 @@ var Account = function (core) {
           account.contacts[part] += ' ' + contact.jid;
         else
           account.contacts[part] = contact.jid;
-        account.names.push(part);
-        account.jidToNameMap[contact.jid] = contact.name;
       }
       var li = document.createElement('li');
       li.dataset.jid = contact.jid;
-      if (selected && selected.indexOf(contact.jid) > -1) {
+      if (selected && Object.keys(selected).map(function (key) {
+        return selected[key];
+      }).indexOf(contact.jid) > -1) {
         li.classList.add('selected');
       }
-      li.innerHTML = 
+      li.innerHTML =
           '<span class=\'name\'>' + name + '</span>'
         + '<span class=\'status\'>' + contact.jid + '</span>';
       li.addEventListener('click', function (e) {
@@ -327,7 +367,7 @@ var Account = function (core) {
     article.append(header).append(ul);
     frag.appendChild(article[0]);
   }.bind(this);
-  
+
   // List all group chats for this account
   this.groupsRender = function (f, click) {
     var account = this;
@@ -353,7 +393,7 @@ var Account = function (core) {
         var title = chat.title;
         var li = document.createElement('li');
         li.dataset.jid = chat.jid;
-        li.innerHTML = 
+        li.innerHTML =
             '<span class=\'name\'>'
           +  App.emoji[Providers.data[account.core.provider].emoji].fy(title)
           + '</span>'
@@ -371,10 +411,12 @@ var Account = function (core) {
     article.append(header).append(ul);
     frag.appendChild(article[0]);
   }.bind(this);
-  
+
   // Render presence for every contact
   this.presenceRender = function (jid) {
     var contactPresenceRender = function (jid) {
+      var section = $('section#chat');
+      var header = section.children('header');
       var contact = Lungo.Core.findByProperty(this.core.roster, 'jid', jid);
       if (contact) {
         if (this.supports('show')) {
@@ -383,11 +425,24 @@ var Account = function (core) {
             li[0].dataset.show = contact.presence.show || 'na';
           }
         }
-        var section = $('section#chat');
         if (section[0].dataset.jid == contact.jid) {
           section[0].dataset.show = (this.supports('show') && contact.presence.show) || 'na';
-          section.find('header .status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status) || _('show' + (contact.presence.show || 'na')));
+
+          var show =_('show' + (contact.presence.show || 'na'));
+          var time = (contact.presence.show != 'a') && contact.presence.last && Tools.convenientDate(Tools.localize(Tools.stamp(contact.presence.last)));
+          var prefix = time
+            ? _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})})
+            : show;
+
+          var status = ((contact.presence.status || time) ? (prefix + ' - ') : '') +
+            (contact.presence.status
+              ? App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status)
+             : show);
+          header.find('.status').html(status);
         }
+      } else {
+        header.find('.status').html(App.emoji[Providers.data[this.core.provider].emoji].fy(' '));
+        section[0].dataset.show = 'na';
       }
     }.bind(this);
     if (jid) {
@@ -396,23 +451,26 @@ var Account = function (core) {
       var ul = $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"]');
       if (ul.length > 0) {
         ul[0].dataset.enabled = this.enabled;
-        for (var [key, val] in this.core.chats) {
+        Object.keys(this.core.chats).forEach(function(key){
+          var val = this[key];
+
           if(!val.muc){
-            contactPresenceRender(val.jid);
+            contactPresenceRender(val.jid, undefined);
           }
-        }
+        }.bind(this.core.chats));
       }
     }
   }.bind(this);
-  
+
   // Render all the avatars
   this.avatarsRender = function () {
     var account = this;
     var avatars = App.avatars;
-    $('span.avatar img:not([src])').each(function (i, el) {
+    var contactAvatarRender = function (i, el) {
       var closest = $(el).closest('[data-jid]');
       var jid = closest.length ? closest[0].dataset.jid : account.core.fullJid;
       var me = jid == account.core.fullJid;
+
       if (avatars[jid]) {
         (new Avatar(avatars[jid])).url.then(function (val) {
           $(el).attr('src', val);
@@ -436,11 +494,21 @@ var Account = function (core) {
           });
         }, jid);
       }
-    });
+    };
+
+    $('aside#accounts article#accounts div[data-jid="' + this.core.fullJid + '"] span.avatar img:not([src])').each(contactAvatarRender);
+    $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"] span.avatar img:not([src])').each(contactAvatarRender);
+    $('section#chat[data-account="' + this.core.fullJid + '"] article#main span.avatar img:not([src])').each(contactAvatarRender);
   }.bind(this);
 
   // Manage search through contacts
   this.searchRender = function (f, click) {
+    if(f) {
+      $('section#activity nav.on-right button').removeClass('hidden');
+    } else {
+      $('section#activity nav.on-right button').addClass('hidden');
+      return;
+    }
     if(!this.contacts)
       return false;
     var account = this;
@@ -477,35 +545,43 @@ var Account = function (core) {
       article.append($('<h1/>').text('Type some characters to start searching'));
       return false;
     }
-    text = text.toLowerCase();
-    var str = {};
+    text = text.toLowerCase().split(' ');
+    var roster = account.core.roster;
     // forEach is slow, and evil
-    for(var _i = 0, _len = account.names.length; _i < _len; _i++) {
-      if(account.names[_i].startsWith(text)) {
-        str[account.names[_i]] = 1; // Just a placeholder
-      }
-    }
-    var matches = [];
-    for(var match in str) {
-      if(str.hasOwnProperty(match))
-        matches.push(match);
-    }
+    // for(var _i = 0, _len = account.names.length; _i < _len; _i++) {
+    //   if(account.names[_i].startsWith(text)) {
+    //     str[account.names[_i]] = 1; // Just a placeholder
+    //   }
+    // }
+    // var matches = [];
+    // for(var match in str) {
+    //   if(str.hasOwnProperty(match))
+    //     matches.push(match);
+    // }
+
+    // Search now for the `text` match
+    var matches = roster.filter( function ( contactMap ) {
+      return ( text.filter( function ( token ) {
+        var regex = new RegExp( token, 'gi' );
+        return contactMap.jid.match( regex ) || contactMap.name.match( regex );
+      } ) || [ ] ).length;
+    } );
+
     var ul = $('<ul/>').addClass('list').addClass('scroll');
+    var _i, _len;
     for(_i = 0, _len = matches.length; _i < _len; _i++) {
-      var jids = account.contacts[matches[_i]].split(' ');
-      for(var _j = 0, _l = jids.length; _j < _l; _j++) {
-        var name = account.jidToNameMap[jids[_j]];
-        var li = document.createElement('li');
-        li.dataset.jid = jids[_j];
-        li.innerHTML = '<span class=\'name\'>' + name + '</span>'
-                       + '<span class=\'status\'>' + jids[_j] + '</span>';
-        li.addEventListener('click', click.bind(li, li));
-        ul[0].appendChild(li);
-      }
+      var name = matches[_i].name;
+      var jID = matches[_i].jid;
+      var li = document.createElement('li');
+      li.dataset.jid = jID;
+      li.innerHTML = '<span class=\'name\'>' + name + '</span>'
+                     + '<span class=\'status\'>' + jID + '</span>';
+      li.addEventListener('click', click.bind(li, li));
+      ul[0].appendChild(li);
     }
     article.append(ul[0]);
   };
-  
+
   this.OTRMenu = function () {
     var account = this;
     function OTRSetup() {
@@ -548,7 +624,7 @@ var Account = function (core) {
     }
     Lungo.Router.section('otrMenu');
   };
-  
+
   // Push message to sendQ
   this.toSendQ = function (storageIndex) {
     Tools.log('[sendQ] Queued', storageIndex);
@@ -558,7 +634,7 @@ var Account = function (core) {
     this.core.sendQ.push(storageIndex);
     this.save();
   };
-  
+
   // Send every message in SendQ
   this.sendQFlush = function () {
     var account = this;
@@ -566,9 +642,9 @@ var Account = function (core) {
       var sendQ = this.core.sendQ;
       var block = sendQ[0][0];
       Tools.log('[sendQ] Flushing', sendQ, sendQ[0]);
-      Store.recover(block, function (data) {
+      Store.recover(block, function (key, data, free) {
         var content = data[sendQ[0][1]];
-        var msg = new Message(account, {
+        var msg = Make(Message)(account, {
           from: content.from,
           to: content.to,
           text: content.text,
@@ -577,6 +653,9 @@ var Account = function (core) {
         }, {
           render: false
         });
+
+        free();
+
         msg.send(true, true);
         sendQ.splice(0, 1);
         account.sendQFlush();
@@ -585,7 +664,7 @@ var Account = function (core) {
       this.save();
     }
   };
-  
+
   // Find chat in chat array
   this.chatFind = function (jid) {
     var index = -1;
@@ -597,15 +676,15 @@ var Account = function (core) {
     }
     return index;
   };
-  
+
   // Get a chat for a jid (create if none)
   this.chatGet = function (jid, title) {
     var ci = this.chatFind(jid);
     var chat= null;
     if (ci >= 0) {
       chat = this.chats[ci];
-    } else { 
-      chat = new Chat({
+    } else {
+      chat = Make(Chat)({
         jid: jid,
         title: title || jid,
         chunks: []
@@ -619,35 +698,70 @@ var Account = function (core) {
     var msgId= task.msgId;
     var chat = this.chatGet(from);
     var account = this;
-    chat.findMessage(msgId, null, true).then(function(result){
-      var msg= result.message;
+
+    chat.findMessage(msgId, null, true).then(function(values){
+      var msg = values.result.message;
+      var free = values.free;
+      var key = values.key;
+
       if (msg.ack == 'sent') {
-        console.log('MARKING AS DELIVERED', from, msgId, chat, account, result);
+        console.log('MARKING AS DELIVERED', from, msgId, chat, account, values);
         msg.ack = 'delivered';
       } else if (msg.ack == 'delivered') {
-        console.log('MARKING AS VIEWED', from, msgId, chat, account, result);
+        console.log('MARKING AS VIEWED', from, msgId, chat, account, values);
         msg.ack = 'viewed';
-      } else {
-        console.log('MARKING AS SENT', from, msgId, chat, account, result);
+      } else if (msg.ack != 'viewed') {
+        console.log('MARKING AS SENT', from, msgId, chat, account, values);
         msg.ack = 'sent';
       }
-      msg = new Message(account, msg);
-      Store.update(result.chunkIndex, result.chunk, callback);
-      msg.reRender(result.chunkIndex);
+      Store.update(key, values.result.chunkIndex, values.result.chunk, function(){
+        free();
+        callback();
+      });
+
+      if (chat.core.last.id == msg.id) {
+        chat.core.last = msg;
+      }
+
+      msg = Make(Message)(account, msg);
+      msg.reRender(values.result.chunkIndex);
+      account.singleRender(chat);
+
+    }, function(e){
+        Tools.log('UNABLE TO FIND MESSAGE! CARRY ON', from, msgId, e);
+        setTimeout(function(){
+            task.retries = task.retries ? task.retries-1 : 2;
+
+            if (task.retries > 0) {
+              Tools.log('GONING TO RETRRY!', task.retries, 'RETRIES ARE LEFT');
+              account.markMessage.push(task);
+            }
+        }, 200);
+        callback();
     });
   }.bind(this));
 
-  this.markMessage.drain= function(){};
-    
+  this.markMessage.drain= function(){
+    var account = this;
+
+    account.save();
+  }.bind(this);
+
   // Check for feature support
   this.supports = function (feature) {
     return this.connector.provider.features.indexOf(feature) >= 0;
   };
-  
+
   // Save to store
   this.save = function () {
     var index = Accounts.find(this.core.fullJid || this.core.user);
-	  if (index > -1) {
+      this.core.chats.sort(function(a, b){
+        a = new Date(a.last ? a.last.stamp : 0);
+        b = new Date(b.last ? b.last.stamp : 0);
+        return a.getTime() > b.getTime();
+      });
+
+      if (index > -1) {
 		  var accounts = App.accounts;
 		  accounts[index] = this;
 		  App.accounts = accounts;
@@ -658,18 +772,21 @@ var Account = function (core) {
 
 var Accounts = {
 
-  _current: Blaze.Var(0),
+  _current: Blaze.Var(-1),
 
   get current () {
     return App.accounts[this._current.get()];
   },
   set current (i) {
-    this._current.set(i);
-    setTimeout(function () {
-      var ul = $('section#main ul[data-jid="' + (this.core.fullJid || this.core.user) + '"]');
-      ul.show().siblings('ul').hide();
-      this.allRender();
-    }.bind(this.current));
+    if (this._current.get() != i) {
+      this._current.set(i);
+      setTimeout(function () {
+        $('section#main header select')[0].selectedIndex = i;
+        var ul = $('section#main ul[data-jid="' + (this.core.fullJid || this.core.user) + '"]');
+        ul.show().siblings('ul').hide();
+        this.allRender();
+      }.bind(this.current));
+    }
   },
 
   // Find the index of an account
@@ -684,5 +801,5 @@ var Accounts = {
     }
     return index;
   }
-  
+
 };

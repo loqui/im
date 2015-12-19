@@ -1,16 +1,32 @@
 /* global App, Tools, Lungo */
 
+/**
+* @file Holds {@link Activity}
+* @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
+* @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
+* @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
+* @author [Sukant Garg]{@link https://github.com/gargsms}
+* @license AGPLv3
+*/
+
 'use strict';
 
+/**
+ * @function
+ * @param {string} action
+ * @param {Account} account
+ * @param {string} content
+ * @param {Object} options 
+ */
 var Activity = function (action, account, content, options) {
-  
+
   options = options || {};
 
   $.extend(options, {
     chats: (options && 'chats' in options) ? options.chats : true,
     groups: (options && 'groups' in options) ? options.groups : true
   });
-  
+
   var actions = {
     chat: function (f, account, content) {
       var click = function (t) {
@@ -65,9 +81,10 @@ var Activity = function (action, account, content, options) {
         content(t[0].dataset.jid, t.find('.name').text());
       };
       account.contactsRender(f, click, options.selected);
+      account.searchRender(null);
     }
   };
-  
+
   var accountSelect = function (f, title) {
     var article = document.createElement('article');
     article.id = 'accounts';
@@ -99,13 +116,13 @@ var Activity = function (action, account, content, options) {
     }
     f.appendChild(article);
   };
-  
+
   var t = '';
   var f = document.createDocumentFragment();
   var section = $('section#activity');
   var article = section.children('article').empty();
   section.children('article').remove();
-  
+
   if (account) {
     if (action in actions) {
       actions[action](f, account, content, options);
@@ -134,9 +151,9 @@ var Activity = function (action, account, content, options) {
     section.removeClass('extended');
     Lungo.Router.article('activity', 'accounts');
   }
-  
+
   Lungo.Router.section('activity');
-  
+
 };
 
 if ('mozSetMessageHandler' in navigator) {

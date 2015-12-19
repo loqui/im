@@ -1,6 +1,6 @@
 {
   "name": "LoquiIM",
-  "version": "v0.4.0",
+  "version": "v0.4.11a",
   "description": "Loqui Instant Messenger unifies all your chat accounts in just one app",
   "author": {
     "name": "LoquiIM Community",
@@ -13,20 +13,27 @@
   "license": {
     "type": "AGPL"
   },
-  "scripts" : {
-    "jshint": "node_modules/jshint/bin/jshint -c .jshintrc --exclude-path .gitignore src/scripts/loqui"
+  "scripts": {
+    "jshint": "node_modules/jshint/bin/jshint -c .jshintrc --exclude-path .gitignore src/scripts/loqui",
+    "jsdoc-init": "git clone -b gh-pages --single-branch https://github.com/loqui/im.git gh-pages",
+    "jsdoc-build" : "sh jsdoc/build.sh",
+    "jsdoc-publish": "sh jsdoc/publish.sh"
   },
-  "pre-commit": ["jshint"],
+  "pre-commit": [
+    "jshint"
+  ],
   "devDependencies": {
     "grunt": "~0.4.1",
-    "grunt-contrib-clean": "~0.5.0",
-    "grunt-contrib-compress": "~0.9.1",
-    "grunt-contrib-connect": "~0.6.0",
-    "grunt-contrib-copy": "~0.5.0",
-    "grunt-contrib-watch": "~0.5.3",
+    "grunt-contrib-clean": "~0.6.0",
+    "grunt-contrib-compress": "~0.13.0",
+    "grunt-contrib-connect": "~0.11.2",
+    "grunt-contrib-copy": "~0.8.1",
+    "grunt-contrib-watch": "~0.6.1",
     "grunt-execute": "~0.2.2",
-    "grunt-node-webkit-builder": "~0.2.0",
-    "jsdom": "~2.0.0",
+    "grunt-node-webkit-builder": "~1.0.2",
+    "grunt-sass": "^1.0.0",
+    "ink-docstrap": "git://github.com/TitanNano/docstrap.git",
+    "jsdom": "~6.5.1",
     "jshint": "^2.6.0",
     "pre-commit": "^1.0.1"
   }

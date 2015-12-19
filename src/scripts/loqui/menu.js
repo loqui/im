@@ -1,39 +1,97 @@
 /* global Lungo, Accounts, Messenger, Tools, Activity, App, Providers, Plus */
 
+/**
+* @file Holds {@link Menu}
+* @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
+* @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
+* @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
+* @author [Sukant Garg]{@link https://github.com/gargsms}
+* @license AGPLv3
+*/
+
 'use strict';
 
+/**
+ * @namespace
+ */
 var Menu = {
 
-  // Tells what menu to open
+  /**
+   * Tells what menu to open.
+   *
+   * @namespace
+   */
   map: {
+
+    /**
+     * Opens the providers section.
+     */
     providers: function () {
       Lungo.Router.section('providers');
     },
+
+    /**
+     * Opens the main section.
+     */
     main: function () {
       Accounts.current = 0;
       Lungo.Router.section('main');
       Lungo.Router._stack[0] = 'main';
     },
+
+    /**
+     * Opens the settings section.
+     */
     settings: function () {
       Lungo.Router.section('settings');
     },
+
+    /**
+     * Opens the me section.
+     */
     me: function () {
       Lungo.Router.section('me');
     },
+
+    /**
+     * Opens the contact section.
+     */
     contact: function () {
       Messenger.contactProfile();
     },
+
+    /**
+     * Opens the muc section.
+     */
     muc: function () {
       Messenger.mucProfile();
     },
+
+    /**
+     * Removes all participants from the active group
+     *
+     * @param {Object} obj
+     */
     mucClear: function (obj) {
       var gid = $(obj).closest('section')[0].dataset.jid;
       Messenger.mucClear(gid);
     },
+
+    /**
+     * Removes the active accout form the active group.
+     *
+     * @param {Object} obj
+     */
     mucExit: function (obj) {
       var gid = $(obj).closest('section')[0].dataset.jid;
       Messenger.mucExit(gid);
     },
+
+    /**
+     * Opens the group creation from.
+     *
+     * @param {Object} obj
+     */
     mucCreateForm: function (obj) {
       Lungo.Router.section('back');
       Lungo.Router.section('mucCreateForm');
@@ -126,6 +184,11 @@ var Menu = {
         groups: false,
         selected: listBox && listBox.children().map(function (i,e,a) {return e.dataset.jid;})
       };
+      $('#mucCreateForm').removeClass('show');
+      $('#activity').find('button.remove').click(function () {
+        $('#mucCreateForm').addClass('show');
+        $('#activity').find('button.remove').off("click");
+      });
       Activity('invite', account, cb, options);
     },
     mucDirectInvite: function (obj) {
@@ -187,12 +250,7 @@ var Menu = {
       Messenger.accountRemove(jid);
     },
     plus: function () {
-      var menu = $('section#chat nav#plus');
-      if (menu.hasClass('show')) {
-        menu.removeClass('show');
-      } else {
-        menu.addClass('show');
-      }
+      Lungo.Router.section('attachment');
     },
     emoji: function () {
       var account = Accounts.current;
@@ -200,7 +258,7 @@ var Menu = {
       var emojiList = App.emoji[Providers.data[account.core.provider].emoji].map;
       if (ul.children('li').length != emojiList.length) {
         Lungo.Notification.show('heart', _('Loading...'));
-        setTimeout(function () {      
+        setTimeout(function () {
           ul.empty();
           for (var i in emojiList) {
             var emoji = emojiList[i];
@@ -216,30 +274,39 @@ var Menu = {
           Lungo.Notification.hide();
         });
       }
-      $('#emoji').toggleClass('show');
+
+      $('#emoji').css('bottom', $('#footbox')[0].offsetHeight + 10 + 'px');
+
+      $('#emoji').addClass('show');
+      $('#screenBlocker').addClass('show');
     },
-    imageSend: function () {
-      Plus.imageSend();
+    emojiClose: function(){
+      $('#emoji').removeClass('show');
+      $('#screenBlocker').removeClass('show');
     },
-    videoSend: function () {
-      Plus.videoSend();
-    },
-    audioSend: function () {
-      Plus.audioSend();
+    fileSend: function () {
+      Lungo.Router.section('back');
+      Plus.fileSend();
     },
     locationSend: function () {
+      Lungo.Router.section('back');
       Plus.locationSend();
     },
+    vcardSend: function () {
+      Lungo.Router.section('back');
+      Plus.vcardSend();
+    },
     bolt: function () {
+      Lungo.Router.section('back');
       Plus.bolt();
     },
     call: function () {
-      $('section#chat nav#plus').removeClass('show');
+      Lungo.Router.section('back');
       Lungo.Router.article('chat', 'call');
       Plus.rtc({audio: true, video: false});
     },
     videocall: function () {
-      $('section#chat nav#plus').removeClass('show');
+      Lungo.Router.section('back');
       Lungo.Router.article('chat', 'videocall');
       Plus.rtc({audio: true, video: true});
     },
@@ -291,12 +358,18 @@ var Menu = {
       }
     }
   },
-  
-  // Opens a certain menu
+
+  /**
+   * Opens a certain menu.
+   *
+   * @param {string} which
+   * @param {*} attr
+   * @param {number} delay
+   */
   show: function (which, attr, delay) {
-    console.log('SHOW', which, attr, delay);
+    Tools.log('SHOW', which, attr, delay);
     var map = this.map;
     setTimeout(function () { map[which](attr); }, delay );
   }
-  
+
 };
