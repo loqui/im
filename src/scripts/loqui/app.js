@@ -105,7 +105,7 @@ var App = {
   * @type {string}
   * @const
   */
-  pathBackup: 'loqui/backup',
+  pathBackup: 'loqui/backups/',
 
   /**
   * @type {string}
