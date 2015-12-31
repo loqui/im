@@ -235,7 +235,7 @@ var Account = function (core) {
         ul.prepend(li);
       }
       li.children('.lastMessage').html(chat.core.last.text ? App.emoji[Providers.data[this.core.provider].emoji].fy(chat.core.last.text) : (chat.core.last.media ? _('SentYou', {type: _('MediaType_' + chat.core.last.media.type)}) : ''));
-      li.children('.lastStamp date').html(chat.core.last.stamp ? Tools.convenientDate(chat.core.last.stamp).join('<br />') : '');
+      li.children('.lastStamp').children('date').attr('datetime', chat.core.last.stamp).html(chat.core.last.stamp ? Tools.convenientDate(chat.core.last.stamp).join('<br />') : '');
       li[0].dataset.unread = chat.core.unread;
       li[0].dataset.hidden = chat.core.settings.hidden[0] ? 1 : 0;
       li[0].dataset.lastAck = chat.core.last.ack;
