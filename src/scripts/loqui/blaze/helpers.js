@@ -1,4 +1,4 @@
-/* global App, Providers, UI, Accounts, Tools */
+/* global App, Providers, UI, Accounts, Tools, VoiceRecorder */
 
 'use strict';
 
@@ -65,6 +65,18 @@ Template.providers_setup.helpers({
     article.append(App.logForms[data.connector.type](provider, article).html);
     return article[0].outerHTML;
   }
+});
+
+Template.footbox.helpers({
+  notRecording : function() {
+    return !!VoiceRecorder.recording.get() ? 'hidden' : '';
+  },
+
+  recording : function() {
+    return !VoiceRecorder.recording.get() ? 'hidden' : '';
+  },
+
+  duration : () => VoiceRecorder.duration.get()
 });
 
 UI.registerHelper('app', function () {

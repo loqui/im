@@ -32,6 +32,8 @@ var System = Make({
     document.body.className += ' ' + Object.keys(configClasses).filter(key => {
       return configClasses[key];
     }).join(' ');
+
+    navigator.getUserMedia = ( navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
   },
 
   /**

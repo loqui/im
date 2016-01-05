@@ -1,4 +1,4 @@
-/* global App, Providers, Accounts, Menu, Chungo, Activity, Lungo */
+/* global App, Providers, Accounts, Menu, Chungo, Activity, Lungo, VoiceRecorder, Messenger, Tools */
 
 'use strict';
 
@@ -95,4 +95,73 @@ Template.chats.events({
       groups: account.supports('muc')
     });
   }
+});
+
+Template.footbox.events({
+  'touchstart button.voice' : function(e){
+    VoiceRecorder.start();
+  },
+
+  'click button.voice' : function(e){
+    var to = $('section#chat')[0].dataset.jid;
+    var account = Accounts.current;
+
+    VoiceRecorder.getBlob().then(blob => {
+      if (blob) account.connector.fileSend(to, blob);
+    });
+  },
+
+  'click [data-menu-onclick]' : function (e) {
+    var menu = e.target.dataset.menuOnclick;
+
+    Menu.show(menu, e.target);
+  },
+
+  'keydown #text' : function (e) {
+    if (e.which == 13 && App.settings.sendOnEnter) {
+      e.preventDefault();
+      Messenger.say();
+
+    } else if (e.which == 8 || e.which == 46) {
+      // if user wants to hide keyboard in landscape
+      // user can clear the box and press backspace to hide it
+      if (e.target.textContent.length === 0 && e.which == 8 && window.matchMedia('(orientation:landscape)').matches) {
+        $('section#chat article#main div#text').blur();
+      }
+    }
+  },
+
+  'keydown div#text' : Tools.throttle(function(e){
+    var dirtyState = $('#footbox')[0].dataset.dirty;
+    var newDirtyState = ((e.which === 8 && e.target.textContent.length > 1) || (e.which !== 8 && e.target.textContent.length >= 0));
+
+    if (dirtyState !== newDirtyState.toString()) {
+      $('#footbox')[0].dataset.dirty = newDirtyState;
+    }
+
+    if (newDirtyState) {
+      Messenger.csn('composing');
+    }
+
+  }, 1500),
+
+  'keyup #text' : Tools.debounce(function(){
+    Messenger.csn('paused');
+  }, 5000),
+
+  'tap #text' : function (e) {
+    var ul = $('section#chat ul#messages');
+    ul[0].scrollTop = ul[0].scrollHeight;
+  },
+
+  'blur #text' : function (e) {
+    var ul = $('section#chat ul#messages');
+
+    Messenger.csn('paused');
+    ul[0].scrollTop = ul[0].scrollHeight;
+  },
+
+  'click #say' : () => Messenger.say(),
+
+  'mousedown #say' : (e) => e.preventDefault()
 });
