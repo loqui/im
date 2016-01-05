@@ -660,7 +660,7 @@ App.logForms.XMPP = function (provider, article) {
         var host = $(article).children('[name="host"]').val();
         var cc = $(article).children('[name="cc"]').val();
         if (user && pass) {
-          var account = new Account({
+          var account = Make(Account)({
             user: user,
             pass: pass,
             host: host,

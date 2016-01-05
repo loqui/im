@@ -552,16 +552,21 @@ App.connectors.coseme = function (account) {
         });
       } else {
 
-        Promise.all([ new Promise(function(done){ Tools.blobToBase64(blob, done); }), new Promise(function(done){ Tools.picThumb(blob, 96, 96, done); }) ]).then(function(values){
+        Promise.all([
+            new Promise(function(done){ Tools.blobToBase64(blob, done); }),
+            new Promise(function(done){ Tools.picThumb(blob, 96, 96, done); })
+        ]).then(function(values){
           var original= values[0];
           var tumb= values[1];
 
-          $('ul[data-jid="' + account.core.fullJid + '"] [data-jid="' + jid + '"] span.avatar img').attr('src', tumb);
-          $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', tumb);
           var cb = function (values) {
             avatars[jid] = (new Avatar({id: picId, chunk: values[0], original : values[1]})).data;
             App.avatars= avatars;
           };
+
+          $('ul[data-jid="' + account.core.fullJid + '"] [data-jid="' + jid + '"] span.avatar img').attr('src', tumb);
+          $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', tumb);
+
           if (jid in App.avatars) {
             var key = Store.lock(App.avatars[jid].chunk);
 
@@ -1195,7 +1200,7 @@ App.logForms.coseme = function (provider, article) {
                 form.siblings('.code').removeClass('hidden');
               } else if (data.status == 'ok') {
                 if (data.type == 'existing' || data.type == 'new') {
-                    var account = new Account({
+                    var account = Make(Account)({
                       user: user,
                       cc: cc,
                       data: data,
@@ -1247,7 +1252,7 @@ App.logForms.coseme = function (provider, article) {
                   form.siblings('.code').removeClass('hidden');
                 } else if (data.status == 'ok') {
                   if (data.type == 'existing' || data.type == 'new') {
-                      var account = new Account({
+                      var account = Make(Account)({
                         user: user,
                         cc: cc,
                         data: data,
@@ -1294,7 +1299,7 @@ App.logForms.coseme = function (provider, article) {
             var onready = function (data) {
               Tools.log(data);
               if (data.type == 'existing' || data.type == 'new') {
-                var account = new Account({
+                var account = Make(Account)({
                   user: user,
                   cc: cc,
                   data: data,

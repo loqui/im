@@ -411,7 +411,7 @@ var App = {
             var accounts = App.accounts;
             // Inflate accounts
             for (let [i, core] in Iterator(cores)) {
-              var account = new Account(core);
+              var account = Make(Account)(core);
 
               for (let [i, chcore] in Iterator(core.chats)) {
                 core.chats[i] = chcore = Make(chcore, ChatCore)();

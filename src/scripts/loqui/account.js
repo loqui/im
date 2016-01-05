@@ -12,23 +12,89 @@
 
 'use strict';
 
-var Account = function (core) {
+var Account = {
 
-  // Holds only account data and no functions
-  this.core = core;
-  this.core.sendQ = this.core.sendQ || [];
-  this.connector = new App.connectors[Providers.data[this.core.provider].connector.type](this);
-  this.OTR = {};
-  this.contacts = {};
-  this._unread = new Blaze.Var(0);
-  this._chats = new Blaze.Var([]);
-  this._enabled = new Blaze.Var(false);
-  this._pendingReconnect = null;
-  this._reconnectBackoff = 1;
-  this._initialConnect = true;
-  this._scheduleReconnect = function () {
+  /**
+   * @instance {AccountCore}
+   */
+  core : null,
+
+  /**
+   * @instance {Connector}
+   */
+  connector : null,
+
+  /**
+   * @type {AccountCore.OTR}
+   */
+  OTR : null,
+
+  /**
+   * @type {Object}
+   */
+  contacts : null,
+
+  /**
+   * @type{Blaze.Var}
+   */
+  _unread : null,
+
+  /**
+   * @type {Blaze.Var}
+   */
+  _chats : null,
+
+  /**
+   * @type {Blaze.Var}
+   */
+  _enabled : null,
+
+  /**
+   * @type {number}
+   */
+  _pendingReconnect : null,
+
+  /**
+   * @type {number}
+   */
+  _reconnectBackoff : 1,
+
+  /**
+   * @type {boolean}
+   */
+  _initialConnect : true,
+
+  /**
+   * @constructs
+   * @param {AccountCore} core
+   */
+  _make : function (core) {
+    this.core = core;
+    this.core.sendQ = this.core.sendQ || [];
+    this.connector = new App.connectors[Providers.data[this.core.provider].connector.type](this);
+    this.contacts = {};
+    this._unread = new Blaze.Var(0);
+    this._chats = new Blaze.Var([]);
+    this._enabled = new Blaze.Var(false);
+
+    this.markMessage = async.queue(this.markMessageWorker.bind(this));
+    this.markMessage.drain = this.markMessageDrain.bind(this);
+
+    if ('OTR' in core) {
+      this.OTR = $.extend({}, App.defaults.Account.core.OTR, core.OTR);
+      if (core.OTR.key) { // inflate the packed key
+        this.OTR.key = DSA.parsePrivate(core.OTR.key);
+      }
+    } else {
+      this.OTR = $.extend({}, App.defaults.Account.core.OTR);
+    }
+  },
+
+  /**
+   * schedule reconnect after a short (exponentially increasing timeout)
+   */
+  _scheduleReconnect : function () {
     if (App.settings.reconnect && ! this._initialConnect && this.enabled) {
-      // schedule reconnect after a short (exponentially increasing( timeout
       this._reconnectBackoff = Math.min(this._reconnectBackoff * 2, 300);
       this._pendingReconnect = setTimeout(function () {
         if (this._pendingReconnect && App.online && this.enabled) {
@@ -37,12 +103,21 @@ var Account = function (core) {
         }
       }.bind(this), 1000 * this._reconnectBackoff);
     }
-  };
+  },
 
-  this.__defineGetter__('enabled', function () {
+  /**
+   * @alias enabled/get
+   * @memberof Account.prototype
+   */
+  get enabled () {
     return this._enabled.get();
-  });
-  this.__defineSetter__('enabled', function (val) {
+  },
+
+  /**
+   * @alias enabled/set
+   * @memberof Account.prototype
+   */
+  set enabled (val) {
     this._enabled.set(val);
     if (val != 'loading') {
       this.core.enabled = val;
@@ -54,32 +129,35 @@ var Account = function (core) {
       }
       this.save();
     }
-  });
+  },
 
-  this.__defineGetter__('chats', function () {
+  /**
+   * Returns {Chat[]} for this account.
+   */
+  get chats () {
     return this._chats.get();
-  });
-  this.__defineSetter__('chats', function (val) {
-    this._chats.set(val);
-  });
+  },
 
-  this.__defineGetter__('unread', function () {
+  /**
+   * Sets the {Chat[]} for this account
+   */
+  set chats (val) {
+    this._chats.set(val);
+  },
+
+  /**
+   * Returns the amount of unread messages in this account.
+   */
+  get unread () {
     var val = this.chats.reduce(function (prev, cur) {return prev + cur.core.unread;}, 0);
     this._unread.set(val);
     return this._unread.get();
-  });
+  },
 
-  if ('OTR' in core) {
-    $.extend(this.OTR, core.OTR);
-    if (core.OTR.key) { // inflate the packed key
-      this.OTR.key = DSA.parsePrivate(core.OTR.key);
-    }
-  } else {
-    $.extend(this.OTR, App.defaults.Account.core.OTR);
-  }
-
-  // Test account
-  this.test = function () {
+  /**
+   * Tests if the account is working properly account
+   */
+  test : function () {
     this.connector.connect({
       connecting: function () {
         Lungo.Notification.show('globe', _('Connecting'));
@@ -117,10 +195,12 @@ var Account = function (core) {
         Lungo.Notification.error(_('NoAuth'), _('NoAuthNotice'), 'signal', 5);
       }
     });
-  };
+  },
 
-  // Connect
-  this.connect = function () {
+  /**
+   * establishes a connection to the accounts provider.
+   */
+  connect : function () {
     if (this._pendingReconnect) {
       clearTimeout(this._pendingReconnect);
       this._pendingReconnect = null;
@@ -173,28 +253,40 @@ var Account = function (core) {
         });
       }
     }
-  };
+  },
 
-  // Download roster and register callbacks for roster updates handling
-  this.sync = function (callback) {
+  /**
+   * Download roster and register callbacks for roster updates handling.
+   *
+   * @param {function} callback
+   */
+  sync : function (callback) {
     this.connector.sync(callback);
-  };
+  },
 
-  // Bring account to foreground
-  this.show = function () {
+  /**
+   * Bring account to foreground.
+   */
+  show : function () {
     Accounts.current = Accounts.find(this.core.fullJid);
-  };
+  },
 
-  // Render everything for this account
-  this.allRender = function () {
+  /**
+   * Render everything for this account.
+   */
+  allRender : function () {
     this.accountRender();
     this.chatsRender();
     this.avatarsRender();
     this.presenceRender();
-  };
+  },
 
-  // Changes some styles based on presence and connection status
-  this.accountRender = function (front) {
+  /**
+   * Changes some styles based on presence and connection status.
+   *
+   * @param {null} front
+   */
+  accountRender : function (front) {
     $('section#main header').css('border-color', this.connector.provider.color);
     $('aside#accounts .cover').css('background-color', this.connector.provider.color);
     $('aside#accounts .cover .avatar img').removeAttr('src');
@@ -224,9 +316,13 @@ var Account = function (core) {
         $('section#chat ul#messages').css('background-image', '');
         $('section.profile div#card').css('background-image', '');
     }
-  }.bind(this);
+  }, //bind(this) Why??
 
-  this.singleRender = function (chat, up) {
+  /**
+   * @param {Chat} chat
+   * @param {boolean} up
+   */
+  singleRender : function (chat, up) {
     var ul = $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"]');
     var li = ul.children('li[data-jid="' + chat.core.jid + '"]');
     if (li.length) {
@@ -243,10 +339,16 @@ var Account = function (core) {
       this.allRender();
       this.presenceRender(chat.core.jid);
     }
-  }.bind(this);
+  }, //.bind(this); why?
 
-  // List all chats for this account
-  this.chatsRender = function (f, click, hold) {
+  /**
+   * List all chats for this account
+   *
+   * @param {function} f
+   * @param {function} click
+   * @param {function} hold
+   */
+  chatsRender : function (f, click, hold) {
     var account = this;
     var oldUl = $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"]');
     var ul = oldUl.clone().empty();
@@ -317,10 +419,16 @@ var Account = function (core) {
     } else {
       oldUl.replaceWith(ul);
     }
-  }.bind(this);
+  }, //.bind(this); hmmm?
 
-  // List all contacts for this account
-  this.contactsRender = function (f, click, selected) {
+  /**
+   * List all contacts for this account.
+   *
+   * @param {function} f
+   * @param {function} click
+   * @param {boolean} selected
+   */
+  contactsRender : function (f, click, selected) {
     var account = this;
     var article = $('<article/>').attr('id', 'contacts');
     var header = $('<header/>').addClass('beige')
@@ -366,10 +474,15 @@ var Account = function (core) {
     });
     article.append(header).append(ul);
     frag.appendChild(article[0]);
-  }.bind(this);
+  }, //.bind(this); unnessecary?
 
-  // List all group chats for this account
-  this.groupsRender = function (f, click) {
+  /**
+   * List all group chats for this account.
+   *
+   * @param {function} f
+   * @param {function} click
+   */
+  groupsRender : function (f, click) {
     var account = this;
     var article = $('<article/>').attr('id', 'groups');
     var header = $('<header/>').addClass('beige');
@@ -410,10 +523,14 @@ var Account = function (core) {
     });
     article.append(header).append(ul);
     frag.appendChild(article[0]);
-  }.bind(this);
+  },//.bind(this);
 
-  // Render presence for every contact
-  this.presenceRender = function (jid) {
+  /**
+   * Render presence for every contact.
+   *
+   * @param {string} jid
+   */
+  presenceRender : function (jid) {
     var contactPresenceRender = function (jid) {
       var section = $('section#chat');
       var header = section.children('header');
@@ -460,10 +577,12 @@ var Account = function (core) {
         }.bind(this.core.chats));
       }
     }
-  }.bind(this);
+  }, //.bind(this);
 
-  // Render all the avatars
-  this.avatarsRender = function () {
+  /**
+   * Render all the avatars.
+   */
+  avatarsRender : function () {
     var account = this;
     var avatars = App.avatars;
     var contactAvatarRender = function (i, el) {
@@ -499,10 +618,15 @@ var Account = function (core) {
     $('aside#accounts article#accounts div[data-jid="' + this.core.fullJid + '"] span.avatar img:not([src])').each(contactAvatarRender);
     $('section#main article#chats ul[data-jid="' + this.core.fullJid + '"] span.avatar img:not([src])').each(contactAvatarRender);
     $('section#chat[data-account="' + this.core.fullJid + '"] article#main span.avatar img:not([src])').each(contactAvatarRender);
-  }.bind(this);
+  }, //.bind(this);
 
-  // Manage search through contacts
-  this.searchRender = function (f, click) {
+  /**
+   * Manage search through contacts.
+   *
+   * @param {function} f
+   * @param {function} click
+   */
+  searchRender : function (f, click) {
     if(f) {
       $('section#activity nav.on-right button').removeClass('hidden');
     } else {
@@ -534,10 +658,16 @@ var Account = function (core) {
     article.append(header).append($('<h1/>').text('Type some characters to start searching'));
     var frag = f;
     frag.appendChild(article[0]);
-  };
+  },
 
-  // Search through contacts for a loose match and append a list
-  this.search = function (article, text, click) {
+  /**
+   * Search through contacts for a loose match and append a list.
+   *
+   * @param {Node} article
+   * @param {string} text
+   * @param {function} click
+   */
+  search : function (article, text, click) {
     var account = this;
     if(article[0].lastChild.nodeName === 'UL' || article[0].lastChild.nodeName === 'H1')
       article[0].lastChild.remove();
@@ -580,9 +710,12 @@ var Account = function (core) {
       ul[0].appendChild(li);
     }
     article.append(ul[0]);
-  };
+  },
 
-  this.OTRMenu = function () {
+  /**
+   * Opens the OTR menu.
+   */
+  OTRMenu : function () {
     var account = this;
     function OTRSetup() {
       Lungo.Router.article('otrMenu', 'otrSetup');
@@ -623,20 +756,26 @@ var Account = function (core) {
       OTRSettings();
     }
     Lungo.Router.section('otrMenu');
-  };
+  },
 
-  // Push message to sendQ
-  this.toSendQ = function (storageIndex) {
+  /**
+   * Push message to sendQ.
+   *
+   * @param {number} storageIndex
+   */
+  toSendQ : function (storageIndex) {
     Tools.log('[sendQ] Queued', storageIndex);
     if (!this.core.sendQ) {
       this.core.sendQ = [];
     }
     this.core.sendQ.push(storageIndex);
     this.save();
-  };
+  },
 
-  // Send every message in SendQ
-  this.sendQFlush = function () {
+  /**
+   * Send every message in SendQ.
+   */
+  sendQFlush : function () {
     var account = this;
     if (this.core.sendQ.length) {
       var sendQ = this.core.sendQ;
@@ -663,10 +802,14 @@ var Account = function (core) {
     } else {
       this.save();
     }
-  };
+  },
 
-  // Find chat in chat array
-  this.chatFind = function (jid) {
+  /**
+   * Find chat in chat array.
+   *
+   * @param {string} jid
+   */
+  chatFind : function (jid) {
     var index = -1;
     for (var i in this.chats) {
       if (this.chats[i].core && this.chats[i].core.jid == jid) {
@@ -675,10 +818,15 @@ var Account = function (core) {
       }
     }
     return index;
-  };
+  },
 
-  // Get a chat for a jid (create if none)
-  this.chatGet = function (jid, title) {
+  /**
+   * Get a chat for a jid (create if none).
+   *
+   * @param {string} jid
+   * @param {string} title
+   */
+  chatGet : function (jid, title) {
     var ci = this.chatFind(jid);
     var chat= null;
     if (ci >= 0) {
@@ -691,9 +839,13 @@ var Account = function (core) {
       }, this);
     }
     return chat;
-  };
+  },
 
-  this.markMessage = async.queue(function(task, callback){
+  /**
+   * @param {Object} task
+   * @param {function} callback
+   */
+  markMessageWorker : function(task, callback){
     var from= task.from;
     var msgId= task.msgId;
     var chat = this.chatGet(from);
@@ -739,21 +891,30 @@ var Account = function (core) {
         }, 200);
         callback();
     });
-  }.bind(this));
+  }, // bind to account;
 
-  this.markMessage.drain= function(){
+  /**
+   * Will be executed when all messages in the queue are marked.
+   */
+  markMessageDrain: function(){
     var account = this;
 
     account.save();
-  }.bind(this);
+  }, //.bind(this);
 
-  // Check for feature support
-  this.supports = function (feature) {
+  /**
+   * Check for feature support.
+   *
+   * @param {string} feature
+   */
+  supports : function (feature) {
     return this.connector.provider.features.indexOf(feature) >= 0;
-  };
+  },
 
-  // Save to store
-  this.save = function () {
+  /**
+   * Save to store.
+   */
+  save : function () {
     var index = Accounts.find(this.core.fullJid || this.core.user);
       this.core.chats.sort(function(a, b){
         a = new Date(a.last ? a.last.stamp : 0);
@@ -766,17 +927,40 @@ var Account = function (core) {
 		  accounts[index] = this;
 		  App.accounts = accounts;
 	  }
-  };
+  }
 
 };
 
+/**
+ * Holds only account data and no functions.
+ */
+var AccountCore = {
+
+};
+
+/**
+ * @namespace
+ */
 var Accounts = {
 
+  /**
+   * @inner
+   */
   _current: Blaze.Var(-1),
 
+  /**
+   * @alias current/get
+   * @memberof Accounts
+   */
   get current () {
     return App.accounts[this._current.get()];
   },
+
+  /**
+   * @alias current/set
+   * @param {Account} i
+   * @memberof Accounts
+   */
   set current (i) {
     if (this._current.get() != i) {
       this._current.set(i);
@@ -789,7 +973,12 @@ var Accounts = {
     }
   },
 
-  // Find the index of an account
+  /**
+   * Find the index of an account.
+   *
+   * @param {string} jid
+   * @return {number}
+   */
   find: function (jid) {
     var index = -1;
     for (var i in App.accounts) {
