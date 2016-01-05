@@ -82,7 +82,7 @@ Template.accounts_list.events({
       $('#main header select').val(index);
       delete $('section#chat')[0].dataset.jid;
       Accounts.current = index;
-      Chungo.Aside.hide();    
+      Chungo.Aside.hide();
     }
   }
 });
