@@ -1,4 +1,4 @@
-/* global App, Menu, Tools, Messenger, Accounts, Store, Plus, UI, Lungo */
+/* global App, Menu, Tools, Messenger, Accounts, Store, Plus, UI, Lungo, VoiceRecorder */
 
 /**
 * @file Contains all the bindings
@@ -132,47 +132,6 @@ document.addEventListener("visibilitychange", function() {
     });
     chat.unreadList= [];
   }
-});
-
-// Type in chat text box
-$('section#chat article#main div#text').on('keydown', function (e) {
-
-  if (e.which == 13 && App.settings.sendOnEnter) {
-    e.preventDefault();
-    Messenger.say();
-
-  } else if (e.which == 8 || e.which == 46) {
-    // if user wants to hide keyboard in landscape
-    // user can clear the box and press backspace to hide it
-    if (this.textContent.length === 0 && e.which == 8 && window.matchMedia('(orientation:landscape)').matches) {
-      $('section#chat article#main div#text').blur();
-    }
-  }
-
-}).on('keydown', Tools.throttle(function(e){
-  var dirtyState = $('#footbox')[0].dataset.dirty;
-  var newDirtyState = ((e.which === 8 && this.textContent.length > 1) || (e.which !== 8 && this.textContent.length >= 0));
-
-  if (dirtyState !== newDirtyState.toString()) {
-    $('#footbox')[0].dataset.dirty = newDirtyState;
-  }
-
-  if (newDirtyState) {
-    Messenger.csn('composing');
-  }
-
-}, 1500)).on('keyup', Tools.debounce(function(){
-  Messenger.csn('paused');
-
-}, 5000)).on('tap', function (e) {
-  var ul = $('section#chat ul#messages');
-  ul[0].scrollTop = ul[0].scrollHeight;
-
-}).on('blur', function (e) {
-  Messenger.csn('paused');
-
-  var ul = $('section#chat ul#messages');
-  ul[0].scrollTop = ul[0].scrollHeight;
 });
 
 // Tap my avatar
@@ -327,12 +286,7 @@ var bindings = function () {
   $('section#contactAdd button.add').on('click', function() {
     Messenger.contactAdd();
   });
-  $('section#chat #footbox #say').on('click', function(e) {
-    Messenger.say();
-  }).on('mousedown', function(e){
-    e.preventDefault();
-    e.target.classList.add('active');
-  });
+
   $('section#welcome').on('click', function(){
      Menu.show('providers');
   });
@@ -397,5 +351,9 @@ var bindings = function () {
   $("script[type='text/spacebars']").each(function(index, script) {
     var name = script.getAttribute('name');
     UI.insert(UI.render(Template[name]), script.parentNode, script);
+  });
+
+  window.addEventListener('touchend', function(){
+    VoiceRecorder.stop();
   });
 };

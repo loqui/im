@@ -264,18 +264,40 @@
     <article id="main">
       <ul id="messages" class="scroll paper"></ul>
       <div id="footbox">
-        <progress value="0" max="100"></progress>
-        <div id="typing" data-l10n-id="Typing">Typing...</div>
-        <button id="emojis" class="recommend left" type="emojis" data-menu-onclick="emoji">
-          <i class="material-icons">&#xE24E;</i>
-        </button>
-        <button id="plus" class="recommend right" type="options" data-menu-onclick="plus" >
-          <i class="material-icons">&#xE226;</i>
-        </button>
-        <button id="say" class="recommend right" type="send">
-          <i class="material-icons">&#xE163;</i>
-        </button>
-        <div id="text" contenteditable></div>
+        <script type="text/spacebars" name="footbox">
+          <progress value="0" max="100"></progress>
+          <div id="typing" data-l10n-id="Typing">Typing...</div>
+          <div class="{{notRecording}}">
+            <button id="emojis" class="recommend left" type="emojis" data-menu-onclick="emoji">
+              <i class="material-icons">&#xE24E;</i>
+            </button>
+            <button class="recommend right voice" type="options">
+                <i class="material-icons">&#xE029;</i>
+            </button>
+            <button id="plus" class="recommend right" type="options" data-menu-onclick="plus" >
+              <i class="material-icons">&#xE226;</i>
+            </button>
+            <button id="say" class="recommend right" type="send">
+              <i class="material-icons">&#xE163;</i>
+            </button>
+            <div id="text" class="main" contenteditable></div>
+          </div>
+
+          <div class="{{recording}} voice-recorder">
+            <div class="duration"><span class="indicator"></span>{{duration}}</div>
+
+            <button>
+              <i class="material-icons">&#xE5CB;</i>
+            </button>
+
+            <div class="main">swipe left to abort</div>
+
+            <button class="voice">
+                <i class="material-icons">&#xE029;</i>
+            </button>
+
+          </div>
+        </script>
       </div>
     </article>
     <article id="screenBlocker" class="hidden" data-menu-onclick="emojiClose"></article>
@@ -550,6 +572,7 @@
   <script type="text/javascript;version=1.7" src="scripts/loqui/messenger.js"></script>
   <script type="text/javascript;version=1.7" src="scripts/loqui/message.js"></script>
   <script type="text/javascript;version=1.7" src="scripts/loqui/activity.js"></script>
+  <script type="text/javascript;version=1.7" src="scripts/loqui/VoiceRecorder.js"></script>
   <script type="text/javascript;version=1.7" src="scripts/loqui/geo.js"></script>
   <script type="text/javascript;version=1.7" src="scripts/loqui/bindings.js"></script>
   <script type="text/javascript;version=1.7" src="scripts/loqui/blaze/helpers.js"></script>

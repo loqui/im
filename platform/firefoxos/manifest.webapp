@@ -64,6 +64,9 @@
     },
     "storage": {
       "description": "Storage without size limitations"
+    },
+    "audio-capture" : {
+      "description" : "Required to record voice messages"
     }
   },
   "activities": {
