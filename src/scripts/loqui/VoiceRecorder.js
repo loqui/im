@@ -44,13 +44,14 @@ var VoiceRecorder = {
    */
   start : function() {
 
-    if (this.processing.get()) { return; }
+    if (this.processing.get() || this.recording.get()) { return; }
+
+    this._audioPromise = null;
 
     navigator.getUserMedia({audio : true}, (stream) => {
       var start = Date.now();
       var touch = null;
 
-      this._audioPromise = null;
       this._audioStream = stream;
       this._audioRecorder = new MediaRecorder(stream);
 

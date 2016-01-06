@@ -76,6 +76,12 @@ Template.footbox.helpers({
     return !VoiceRecorder.recording.get() ? 'hidden' : '';
   },
 
+  notSupported : function() {
+    var account = Accounts.current;
+
+    return (account && !account.supports('audioSend')) ? 'hidden' : '';
+  },
+
   duration : () => VoiceRecorder.duration.get()
 });
 
@@ -173,4 +179,8 @@ UI.registerHelper('time', function (ts) {
 
 UI.registerHelper('json', function(context) {
   return JSON.stringify(context);
+});
+
+UI.registerHelper('l10n', function(id) {
+  return document.webL10n.get(id);
 });
