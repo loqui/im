@@ -1,14 +1,14 @@
 /* global App, CoSeMe, Providers, Tools, Avatar, Store, Message, Chat, Account, Accounts, Lungo, Make */
 
 /**
-* @file Holds {@link Connector/Coseme}
-* @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
-* @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
-* @author [Christof Meerwald]{@link https://github.com/cmeerw}
-* @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
-* @author [Sukant Garg]{@link https://github.com/gargsms}
-* @license AGPLv3
-*/
+ * @file Holds {@link Connector/Coseme}
+ * @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
+ * @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
+ * @author [Christof Meerwald]{@link https://github.com/cmeerw}
+ * @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
+ * @author [Sukant Garg]{@link https://github.com/gargsms}
+ * @license AGPLv3
+ */
 
 'use strict';
 
@@ -173,904 +173,907 @@ App.connectors.coseme = function (account) {
                 ''
               )
               : (result.familyName ?
-                  result.familyName[0]
+                result.familyName[0]
                 : (result.tel
                   ? result.tel[0]
                   : ''
                 )
               )).trim();
-            if (result.tel) {
-              for (var i = 0; i < result.tel.length; i++) {
-                contacts._pre[result.tel[i].value] = fullname;
+              if (result.tel) {
+                for (var i = 0; i < result.tel.length; i++) {
+                  contacts._pre[result.tel[i].value] = fullname;
+                }
               }
+            } catch (e) {
+              Tools.log('CONTACT NORMALIZATION ERROR:', e);
             }
-          } catch (e) {
-            Tools.log('CONTACT NORMALIZATION ERROR:', e);
+            this.continue();
+          } else if (cb){
+            Tools.log('CONTACT ACQUIRE ERROR');
+            MI.call('contacts_sync', [Object.keys(contacts._pre)]);
+            contacts._cb = cb;
           }
-          this.continue();
-        } else if (cb){
-          Tools.log('CONTACT ACQUIRE ERROR');
-          MI.call('contacts_sync', [Object.keys(contacts._pre)]);
-          contacts._cb = cb;
-        }
-      };
-      allContacts.onerror = function (event) {
-        Tools.log('CONTACTS ERROR:', event);
-        Lungo.Notification.error(_('ContactsGetError'), _('ContactsGetErrorExp'), 'exclamation-sign', 5);
-        cb();
-      };
-    } else {
-      Lungo.Notification.error(_('ContactsGetError'), _('NoWhenOffline'), 'exclamation-sign', 5);
-    }
-  }.bind(this);
-
-  this.contacts.order = function (cb) {
-    this.account.core.roster.sort(function (a,b) {
-      var aname = a.name ? a.name : a.jid;
-      var bname = b.name ? b.name : b.jid;
-      return aname > bname;
-    });
-    if (cb) {
-      cb();
-    }
-  }.bind(this);
-
-  this.contacts.remove = function () {
-  };
-
-  this.presence.subscribe = function (jid) {
-    MI.call('presence_subscribe', [jid]);
-  }.bind(this);
-
-  this.presence.unsubscribe = function (jid) {
-    MI.call('presence_unsubscribe', [jid]);
-  }.bind(this);
-
-  this.presence.set = function (show, status, name) {
-    this.presence.send(show, status, name);
-    this.presence.show = show || this.presence.show;
-    this.presence.status = status || this.presence.status;
-    this.presence.name = name || this.presence.name;
-    this.account.core.presence = {
-      name: this.presence.name,
-      show: this.presence.show,
-      status: this.presence.status
-    };
-    this.account.save();
-  }.bind(this);
-
-  this.presence.send = function (show, status, name) {
-    if (App.online) {
-      show = show || this.presence.show;
-      name = name || this.presence.name;
-      var method = {
-        a: 'presence_sendAvailable',
-        away: 'presence_sendUnavailable',
-        xa: 'presence_sendUnavailable',
-        dnd: 'presence_sendUnavailable',
-        chat: 'presence_sendAvailableForChat'
-      };
-      MI.call(method[show], [name]);
-
-      var newStatus = status || this.presence.status;
-      if (newStatus != this.presence.status) {
-        MI.call('profile_setStatus', [newStatus]);
+        };
+        allContacts.onerror = function (event) {
+          Tools.log('CONTACTS ERROR:', event);
+          Lungo.Notification.error(_('ContactsGetError'), _('ContactsGetErrorExp'), 'exclamation-sign', 5);
+          cb();
+        };
+      } else {
+        Lungo.Notification.error(_('ContactsGetError'), _('NoWhenOffline'), 'exclamation-sign', 5);
       }
-    }
-  }.bind(this);
+    }.bind(this);
 
-  this.send = function (to, text, options) {
-    var method = options.isBroadcast ? 'message_broadcast' : 'message_send';
-    var params = [to, text];
-    return MI.call(method, params);
-  }.bind(this);
+    this.contacts.order = function (cb) {
+      this.account.core.roster.sort(function (a,b) {
+        var aname = a.name ? a.name : a.jid;
+        var bname = b.name ? b.name : b.jid;
+        return aname > bname;
+      });
+      if (cb) {
+        cb();
+      }
+    }.bind(this);
 
-  this.ack = function (id, from, type) {
-    type = type || 'delivery';
-    MI.call('message_ack', [from, id, type]);
-  };
+    this.contacts.remove = function () {
+    };
 
-  this.avatar = function (callback, id) {
-    var method = 'contact_getProfilePicture';
-    MI.call(method, [id]);
-    if (callback) {
-      callback(new Avatar({url: 'img/foovatar.png'}));
-    }
-  };
+    this.presence.subscribe = function (jid) {
+      MI.call('presence_subscribe', [jid]);
+    }.bind(this);
 
-  this.muc.avatar = function (callback, id) {
-    var method = 'group_getPicture';
-    MI.call(method, [id]);
-    if (callback) {
-      callback(new Avatar({url: 'img/goovatar.png'}));
-    }
-  };
+    this.presence.unsubscribe = function (jid) {
+      MI.call('presence_unsubscribe', [jid]);
+    }.bind(this);
 
-  this.emojiRender = function (img, emoji) {
-    App.emoji[Providers.data[this.account.core.provider].emoji].render(img, emoji);
-  }.bind(this);
+    this.presence.set = function (show, status, name) {
+      this.presence.send(show, status, name);
+      this.presence.show = show || this.presence.show;
+      this.presence.status = status || this.presence.status;
+      this.presence.name = name || this.presence.name;
+      this.account.core.presence = {
+        name: this.presence.name,
+        show: this.presence.show,
+        status: this.presence.status
+      };
+      this.account.save();
+    }.bind(this);
 
-  this.csnSend = function (to, state) {
-    var method = state == 'composing' ? 'typing_send' : 'typing_paused';
-    MI.call(method, [to]);
-  };
+    this.presence.send = function (show, status, name) {
+      if (App.online) {
+        show = show || this.presence.show;
+        name = name || this.presence.name;
+        var method = {
+          a: 'presence_sendAvailable',
+          away: 'presence_sendUnavailable',
+          xa: 'presence_sendUnavailable',
+          dnd: 'presence_sendUnavailable',
+          chat: 'presence_sendAvailableForChat'
+        };
+        MI.call(method[show], [name]);
 
-  this.groupsGet = function (type) {
-    var method = 'group_getGroups';
-    MI.call(method, [type]);
-  };
+        var newStatus = status || this.presence.status;
+        if (newStatus != this.presence.status) {
+          MI.call('profile_setStatus', [newStatus]);
+        }
+      }
+    }.bind(this);
 
-  this.muc.participantsGet = function (jid) {
-    var method = 'group_getInfo';
-    MI.call(method, [jid]);
-  }.bind(this);
+    this.send = function (to, text, options) {
+      var method = options.isBroadcast ? 'message_broadcast' : 'message_send';
+      var params = [to, text];
+      return MI.call(method, params);
+    }.bind(this);
 
-  this.muc.create = function (subject, server, members) {
-    var method = 'group_create';
-    var idx = MI.call(method, [subject]);
-    this.muc.membersCache[idx] = members;
-  }.bind(this);
+    this.ack = function (id, from, type) {
+      type = type || 'delivery';
+      MI.call('message_ack', [from, id, type]);
+    };
 
-  this.muc.expel = function (gid, jid) {
-    var [method, params] = jid ?
+    this.avatar = function (callback, id) {
+      var method = 'contact_getProfilePicture';
+      MI.call(method, [id]);
+      if (callback) {
+        callback(new Avatar({url: 'img/foovatar.png'}));
+      }
+    };
+
+    this.muc.avatar = function (callback, id) {
+      var method = 'group_getPicture';
+      MI.call(method, [id]);
+      if (callback) {
+        callback(new Avatar({url: 'img/goovatar.png'}));
+      }
+    };
+
+    this.emojiRender = function (img, emoji) {
+      App.emoji[Providers.data[this.account.core.provider].emoji].render(img, emoji);
+    }.bind(this);
+
+    this.csnSend = function (to, state) {
+      var method = state == 'composing' ? 'typing_send' : 'typing_paused';
+      MI.call(method, [to]);
+    };
+
+    this.groupsGet = function (type) {
+      var method = 'group_getGroups';
+      MI.call(method, [type]);
+    };
+
+    this.muc.participantsGet = function (jid) {
+      var method = 'group_getInfo';
+      MI.call(method, [jid]);
+    }.bind(this);
+
+    this.muc.create = function (subject, server, members) {
+      var method = 'group_create';
+      var idx = MI.call(method, [subject]);
+      this.muc.membersCache[idx] = members;
+    }.bind(this);
+
+    this.muc.expel = function (gid, jid) {
+      var [method, params] = jid ?
       ['group_removeParticipants', [gid, jid]] :
       ['group_end', [gid]];
-    MI.call(method, params);
-  }.bind(this);
+      MI.call(method, params);
+    }.bind(this);
 
-  this.muc.invite = function (gid, members, title) {
-    var method = 'group_addParticipants';
-    MI.call(method, [gid, members]);
-  }.bind(this);
+    this.muc.invite = function (gid, members, title) {
+      var method = 'group_addParticipants';
+      MI.call(method, [gid, members]);
+    }.bind(this);
 
-  this.fileSend = function (jid, blob) {
-    var reader = new FileReader();
-    reader.addEventListener("loadend", function () {
-      var aB64Hash = CryptoJS.SHA256(reader.result).toString(CryptoJS.enc.Base64);
-      var aT = blob.type.split("/")[0];
-      var aSize = blob.size;
-      var type = blob.type;
-      Tools.blobToBase64(blob, function (aB64OrigHash) {
-        Store.cache[aB64Hash] = {
-          to: jid,
-          data: aB64OrigHash
-        };
-        Tools.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
-        Lungo.Notification.show('up-sign', _('Uploading'), 3);
-        var method = 'media_requestUpload';
-        MI.call(method, [aB64Hash, aT, aSize]);
-      });
-    });
-    reader.readAsBinaryString(blob);
-  };
-
-  this.locationSend = function (jid, loc) {
-    var self = this;
-    Tools.locThumb(loc, 120, 120, function (thumb) {
-      var method = 'message_locationSend';
-      MI.call(method, [jid, loc.lat, loc.long, thumb]);
-      self.addMediaMessageToChat('url', thumb, 'https://maps.google.com/maps?q=' + loc.lat + ',' + loc.long, [ loc.lat, loc.long ], account.core.user, jid, Math.floor((new Date()).getTime() / 1000) + '-1');
-      App.audio('sent');
-    });
-  };
-
-  this.vcardSend = function (jid, name, vcard) {
-    var self = this;
-    Tools.vcardThumb(null, 120, 120, function (thumb) {
-      var method = 'message_vcardSend';
-      MI.call(method, [jid, vcard, name]);
-      self.addMediaMessageToChat('vCard', thumb, null, [ name, vcard ], account.core.user, jid, Math.floor((new Date()).getTime() / 1000) + '-1');
-    });
-  };
-
-  this.avatarSet = function (blob) {
-    function UrlToBin (url, cb) {
+    this.fileSend = function (jid, blob) {
       var reader = new FileReader();
-      reader.addEventListener('loadend', function() {
-        cb(reader.result);
-      });
-      reader.readAsBinaryString(Tools.b64ToBlob(url.split(',').pop(), 'image/jpg'));
-    }
-    Tools.picThumb(blob, 480, 480, function (url) {
-      UrlToBin(url, function (bin) {
-        var picBin = bin;
-        Tools.picThumb(blob, 96, 96, function (url) {
-          UrlToBin(url, function (bin) {
-            var thumbBin = bin;
-            var method = 'profile_setPicture';
-            MI.call(method, [thumbBin, picBin]);
-          });
+      reader.addEventListener("loadend", function () {
+        var aB64Hash = CryptoJS.SHA256(reader.result).toString(CryptoJS.enc.Base64);
+        var aT = blob.type.split("/")[0];
+        var aSize = blob.size;
+        var type = blob.type;
+        Tools.blobToBase64(blob, function (aB64OrigHash) {
+          Store.cache[aB64Hash] = {
+            to: jid,
+            data: aB64OrigHash
+          };
+          Tools.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
+          Lungo.Notification.show('up-sign', _('Uploading'), 3);
+          var method = 'media_requestUpload';
+          MI.call(method, [aB64Hash, aT, aSize]);
         });
       });
-    });
-  };
-
-  this.handlers.init = function () {
-    Tools.log('HANDLERS INIT');
-    var signals = {
-      auth_success: null,
-      auth_fail: null,
-      message_received: this.events.onMessage,
-      image_received: this.events.onImageReceived,
-      vcard_received: this.events.onVCardReceived,
-      video_received: this.events.onVideoReceived,
-      audio_received: this.events.onAudioReceived,
-      location_received: this.events.onLocationReceived,
-      message_error: this.events.onMessageError,
-      receipt_messageSent: this.events.onMessageSent,
-      receipt_messageDelivered: this.events.onMessageDelivered,
-      receipt_visible: this.events.onMessageVisible,
-      receipt_broadcastSent: null,
-      status_dirty: this.events.onStatusDirty,
-      presence_updated: this.events.onPresenceUpdated,
-      presence_available: this.events.onPresenceAvailable,
-      presence_unavailable: this.events.onPresenceUnavailable,
-      group_subjectReceived: null,
-      group_createSuccess: this.events.onGroupCreateSuccess,
-      group_createFail: null,
-      group_endSuccess: this.events.onGroupEndSuccess,
-      group_gotInfo: this.events.onGroupGotInfo,
-      group_infoError: this.events.onGroupInfoError,
-      group_addParticipantsSuccess: this.events.onGroupAddParticipantsSuccess,
-      group_removeParticipantsSuccess: this.events.onGroupRemoveParticipantsSuccess,
-      group_gotParticipants: this.events.onGroupGotParticipants,
-      group_setSubjectSuccess: null,
-      group_messageReceived: this.events.onGroupMessage,
-      group_imageReceived: this.events.onGroupImageReceived,
-      group_vcardReceived: this.events.onGroupVCardReceived,
-      group_videoReceived: this.events.onGroupVideoReceived,
-      group_audioReceived: this.events.onGroupAudioReceived,
-      group_locationReceived: this.events.onGroupLocationReceived,
-      group_setPictureSuccess: null,
-      group_setPictureError: null,
-      group_gotPicture: this.events.onGroupGotPicture,
-      group_gotGroups: null,
-      group_gotParticipating: this.events.onGroupGotParticipating,
-      notification_contactProfilePictureUpdated: this.events.onContactProfilePictureUpdated,
-      notification_contactProfilePictureRemoved: this.events.onContactProfilePictureRemoved,
-      notification_groupPictureUpdated: this.events.onGroupPictureUpdated,
-      notification_groupPictureRemoved: this.events.onGroupPictureRemoved,
-      notification_groupParticipantAdded: this.events.onGroupParticipantAdded,
-      notification_groupParticipantRemoved: this.events.onGroupParticipantRemoved,
-      notification_groupCreated: this.events.onGroupCreated,
-      notification_groupSubjectUpdated: this.events.onGroupSubjectUpdated,
-      notification_status: this.events.onContactStatusUpdated,
-      contact_gotProfilePictureId: this.events.onAvatar,
-      contact_gotProfilePicture: this.events.onAvatar,
-      contact_typing: this.events.onContactTyping,
-      contact_paused: this.events.onContactPaused,
-      contacts_gotStatus: this.events.onContactsGotStatus,
-      contacts_sync: this.events.onContactsSync,
-      profile_setPictureSuccess: this.events.onProfileSetPictureSuccess,
-      profile_setPictureError: this.events.onProfileSetPictureError,
-      profile_setStatusSuccess: this.events.onMessageDelivered,
-      ping: null,
-      pong: null,
-      disconnected: null,
-      media_uploadRequestSuccess: this.events.onUploadRequestSuccess,
-      media_uploadRequestFailed: this.events.onUploadRequestFailed,
-      media_uploadRequestDuplicate: this.events.onUploadRequestDuplicate
+      reader.readAsBinaryString(blob);
     };
-    Object.keys(signals).forEach(function(signal) {
-      var customCallback = signals[signal];
-      if (customCallback) {
-        Tools.log('REGISTER', signal, customCallback);
-        Yowsup.connectionmanager.signals[signal].length = 0;
-        SI.registerListener(signal, customCallback.bind(this));
-      }
-    }.bind(this));
-  }.bind(this);
 
-  this.events.onStatusDirty = function (categories) {
-    var method = 'cleardirty';
-    MI.call(method, [categories]);
-  };
-
-  this.events.onContactStatusUpdated = function (jid, msgId, status) {
-    this.events.onPresenceUpdated(jid, undefined, status);
-
-    var method = 'notification_ack';
-    MI.call(method, [jid, msgId]);
-  };
-
-  this.events.onMessage = function (msgId, from, msgData, timeStamp, wantsReceipt, pushName, isBroadcast) {
-    Tools.log('MESSAGE', msgId, from, msgData, timeStamp, wantsReceipt, pushName, isBroadcast);
-    var account = this.account;
-    var to = this.account.user + '@' + CoSeMe.config.domain;
-    var body = msgData;
-    if (body) {
-      var date = new Date(timeStamp);
-      var stamp = Tools.localize(Tools.stamp(timeStamp));
-      var fromUser = from.split('@')[0];
-      var msg = Make(Message)(account, {
-        id: msgId,
-        from: from,
-        to: to,
-        text: body,
-        stamp: stamp,
-        pushName: (pushName && pushName != fromUser) ? (fromUser + ': ' + pushName) : pushName
+    this.locationSend = function (jid, loc) {
+      var self = this;
+      Tools.locThumb(loc, 120, 120, function (thumb) {
+        var method = 'message_locationSend';
+        MI.call(method, [jid, loc.lat, loc.long, thumb]);
+        self.addMediaMessageToChat('url', thumb, 'https://maps.google.com/maps?q=' + loc.lat + ',' + loc.long, [ loc.lat, loc.long ], account.core.user, jid, Math.floor((new Date()).getTime() / 1000) + '-1');
+        App.audio('sent');
       });
+    };
 
-      if (wantsReceipt) {
-        msg.receive(function(){
-          this.ack(msgId, from);
-        }.bind(this));
+    this.vcardSend = function (jid, name, vcard) {
+      var self = this;
+      Tools.vcardThumb(null, 120, 120, function (thumb) {
+        var method = 'message_vcardSend';
+        MI.call(method, [jid, vcard, name]);
+        self.addMediaMessageToChat('vCard', thumb, null, [ name, vcard ], account.core.user, jid, Math.floor((new Date()).getTime() / 1000) + '-1');
+      });
+    };
 
-      } else {
-        msg.receive();
+    this.avatarSet = function (blob) {
+      function UrlToBin (url, cb) {
+        var reader = new FileReader();
+        reader.addEventListener('loadend', function() {
+          cb(reader.result);
+        });
+        reader.readAsBinaryString(Tools.b64ToBlob(url.split(',').pop(), 'image/jpg'));
       }
-    }
-    return true;
-  };
-
-  this.events.onMessageError = function (id, from, body, stamp, e, nick, g) {
-    Tools.log('MESSAGE NOT RECEIVED', id, from, body, stamp, e, nick, g);
-  };
-
-  this.events.onImageReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast, notifyName) {
-    var to = this.account.core.fullJid;
-    return this.mediaProcess('image',  msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, wantsReceipt, false, notifyName);
-  };
-
-  this.events.onVideoReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast, notifyName) {
-    var to = this.account.core.fullJid;
-    return this.mediaProcess('video', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, wantsReceipt, false, notifyName);
-  };
-
-  this.events.onAudioReceived = function (msgId, fromAttribute, mediaUrl, mediaSize, wantsReceipt, isBroadcast, notifyName) {
-    var to = this.account.core.fullJid;
-    return this.mediaProcess('audio', msgId, fromAttribute, to, null, mediaUrl, mediaSize, wantsReceipt, false, notifyName);
-  };
-
-  this.events.onLocationReceived = function (msgId, fromAttribute, name, mediaPreview, mlatitude, mlongitude, wantsReceipt, isBroadcast, notifyName) {
-    var to = this.account.core.fullJid;
-    return this.mediaProcess('url', msgId, fromAttribute, to, [mlatitude, mlongitude, name], null, null, wantsReceipt, false, notifyName);
-  };
-
-  this.events.onVCardReceived = function (msgId, fromAttribute, vcardName, vcardData, wantsReceipt, isBroadcast, notifyName) {
-    var to = this.account.core.fullJid;
-    return this.mediaProcess('vCard', msgId, fromAttribute, to, [vcardName, vcardData], null, null, wantsReceipt, false, notifyName);
-  };
-
-  this.events.onAvatar = function (jid, picId, blob) {
-    var account = this.account;
-    var avatars= App.avatars;
-
-    Tools.log(jid, picId, blob);
-    if (blob) {
-      if (jid == this.account.core.fullJid) {
-        Tools.picThumb(blob, 96, 96, function (url) {
-          $('section#main[data-jid="' + jid + '"] footer span.avatar img').attr('src', url);
-          $('aside#accounts article#accounts div[data-jid="' + jid + '"] span.avatar img').attr('src', url);
-          if (Accounts.current === account) {
-            $('section#me .avatar img').attr('src', url);
-          }
-          Store.save(url, function (index) {
-            avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
-            App.avatars= avatars;
+      Tools.picThumb(blob, 480, 480, function (url) {
+        UrlToBin(url, function (bin) {
+          var picBin = bin;
+          Tools.picThumb(blob, 96, 96, function (url) {
+            UrlToBin(url, function (bin) {
+              var thumbBin = bin;
+              var method = 'profile_setPicture';
+              MI.call(method, [thumbBin, picBin]);
+            });
           });
         });
-      } else {
+      });
+    };
 
-        Promise.all([
+    this.handlers.init = function () {
+      Tools.log('HANDLERS INIT');
+      var signals = {
+        auth_success: null,
+        auth_fail: null,
+        message_received: this.events.onMessage,
+        image_received: this.events.onImageReceived,
+        vcard_received: this.events.onVCardReceived,
+        video_received: this.events.onVideoReceived,
+        audio_received: this.events.onAudioReceived,
+        location_received: this.events.onLocationReceived,
+        message_error: this.events.onMessageError,
+        receipt_messageSent: this.events.onMessageSent,
+        receipt_messageDelivered: this.events.onMessageDelivered,
+        receipt_visible: this.events.onMessageVisible,
+        receipt_broadcastSent: null,
+        status_dirty: this.events.onStatusDirty,
+        presence_updated: this.events.onPresenceUpdated,
+        presence_available: this.events.onPresenceAvailable,
+        presence_unavailable: this.events.onPresenceUnavailable,
+        group_subjectReceived: null,
+        group_createSuccess: this.events.onGroupCreateSuccess,
+        group_createFail: null,
+        group_endSuccess: this.events.onGroupEndSuccess,
+        group_gotInfo: this.events.onGroupGotInfo,
+        group_infoError: this.events.onGroupInfoError,
+        group_addParticipantsSuccess: this.events.onGroupAddParticipantsSuccess,
+        group_removeParticipantsSuccess: this.events.onGroupRemoveParticipantsSuccess,
+        group_gotParticipants: this.events.onGroupGotParticipants,
+        group_setSubjectSuccess: null,
+        group_messageReceived: this.events.onGroupMessage,
+        group_imageReceived: this.events.onGroupImageReceived,
+        group_vcardReceived: this.events.onGroupVCardReceived,
+        group_videoReceived: this.events.onGroupVideoReceived,
+        group_audioReceived: this.events.onGroupAudioReceived,
+        group_locationReceived: this.events.onGroupLocationReceived,
+        group_setPictureSuccess: null,
+        group_setPictureError: null,
+        group_gotPicture: this.events.onGroupGotPicture,
+        group_gotGroups: null,
+        group_gotParticipating: this.events.onGroupGotParticipating,
+        notification_contactProfilePictureUpdated: this.events.onContactProfilePictureUpdated,
+        notification_contactProfilePictureRemoved: this.events.onContactProfilePictureRemoved,
+        notification_groupPictureUpdated: this.events.onGroupPictureUpdated,
+        notification_groupPictureRemoved: this.events.onGroupPictureRemoved,
+        notification_groupParticipantAdded: this.events.onGroupParticipantAdded,
+        notification_groupParticipantRemoved: this.events.onGroupParticipantRemoved,
+        notification_groupCreated: this.events.onGroupCreated,
+        notification_groupSubjectUpdated: this.events.onGroupSubjectUpdated,
+        notification_status: this.events.onContactStatusUpdated,
+        contact_gotProfilePictureId: this.events.onAvatar,
+        contact_gotProfilePicture: this.events.onAvatar,
+        contact_typing: this.events.onContactTyping,
+        contact_paused: this.events.onContactPaused,
+        contacts_gotStatus: this.events.onContactsGotStatus,
+        contacts_sync: this.events.onContactsSync,
+        profile_setPictureSuccess: this.events.onProfileSetPictureSuccess,
+        profile_setPictureError: this.events.onProfileSetPictureError,
+        profile_setStatusSuccess: this.events.onMessageDelivered,
+        ping: null,
+        pong: null,
+        disconnected: null,
+        media_uploadRequestSuccess: this.events.onUploadRequestSuccess,
+        media_uploadRequestFailed: this.events.onUploadRequestFailed,
+        media_uploadRequestDuplicate: this.events.onUploadRequestDuplicate
+      };
+      Object.keys(signals).forEach(function(signal) {
+        var customCallback = signals[signal];
+        if (customCallback) {
+          Tools.log('REGISTER', signal, customCallback);
+          Yowsup.connectionmanager.signals[signal].length = 0;
+          SI.registerListener(signal, customCallback.bind(this));
+        }
+      }.bind(this));
+    }.bind(this);
+
+    this.events.onStatusDirty = function (categories) {
+      var method = 'cleardirty';
+      MI.call(method, [categories]);
+    };
+
+    this.events.onContactStatusUpdated = function (jid, msgId, status) {
+      this.events.onPresenceUpdated(jid, undefined, status);
+
+      var method = 'notification_ack';
+      MI.call(method, [jid, msgId]);
+    };
+
+    this.events.onMessage = function (msgId, from, msgData, timeStamp, wantsReceipt, pushName, isBroadcast) {
+      Tools.log('MESSAGE', msgId, from, msgData, timeStamp, wantsReceipt, pushName, isBroadcast);
+      var account = this.account;
+      var to = this.account.user + '@' + CoSeMe.config.domain;
+      var body = msgData;
+      if (body) {
+        var date = new Date(timeStamp);
+        var stamp = Tools.localize(Tools.stamp(timeStamp));
+        var fromUser = from.split('@')[0];
+        var msg = Make(Message)(account, {
+          id: msgId,
+          from: from,
+          to: to,
+          text: body,
+          stamp: stamp,
+          pushName: (pushName && pushName != fromUser) ? (fromUser + ': ' + pushName) : pushName
+        });
+
+        if (wantsReceipt) {
+          msg.receive(function(){
+            this.ack(msgId, from);
+          }.bind(this));
+
+        } else {
+          msg.receive();
+        }
+      }
+      return true;
+    };
+
+    this.events.onMessageError = function (id, from, body, stamp, e, nick, g) {
+      Tools.log('MESSAGE NOT RECEIVED', id, from, body, stamp, e, nick, g);
+    };
+
+    this.events.onImageReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast, notifyName) {
+      var to = this.account.core.fullJid;
+      return this.mediaProcess('image',  msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, wantsReceipt, false, notifyName);
+    };
+
+    this.events.onVideoReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast, notifyName) {
+      var to = this.account.core.fullJid;
+      return this.mediaProcess('video', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, wantsReceipt, false, notifyName);
+    };
+
+    this.events.onAudioReceived = function (msgId, fromAttribute, mediaUrl, mediaSize, wantsReceipt, isBroadcast, notifyName) {
+      var to = this.account.core.fullJid;
+      return this.mediaProcess('audio', msgId, fromAttribute, to, null, mediaUrl, mediaSize, wantsReceipt, false, notifyName);
+    };
+
+    this.events.onLocationReceived = function (msgId, fromAttribute, name, mediaPreview, mlatitude, mlongitude, wantsReceipt, isBroadcast, notifyName) {
+      var to = this.account.core.fullJid;
+      return this.mediaProcess('url', msgId, fromAttribute, to, [mlatitude, mlongitude, name], null, null, wantsReceipt, false, notifyName);
+    };
+
+    this.events.onVCardReceived = function (msgId, fromAttribute, vcardName, vcardData, wantsReceipt, isBroadcast, notifyName) {
+      var to = this.account.core.fullJid;
+      return this.mediaProcess('vCard', msgId, fromAttribute, to, [vcardName, vcardData], null, null, wantsReceipt, false, notifyName);
+    };
+
+    this.events.onAvatar = function (jid, picId, blob) {
+      var account = this.account;
+      var avatars= App.avatars;
+
+      Tools.log(jid, picId, blob);
+      if (blob) {
+        if (jid == this.account.core.fullJid) {
+          Tools.picThumb(blob, 96, 96, function (url) {
+            $('section#main[data-jid="' + jid + '"] footer span.avatar img').attr('src', url);
+            $('aside#accounts article#accounts div[data-jid="' + jid + '"] span.avatar img').attr('src', url);
+            if (Accounts.current === account) {
+              $('section#me .avatar img').attr('src', url);
+            }
+            Store.save(url, function (index) {
+              avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
+              App.avatars= avatars;
+            });
+          });
+        } else {
+
+          Promise.all([
             new Promise(function(done){ Tools.blobToBase64(blob, done); }),
             new Promise(function(done){ Tools.picThumb(blob, 96, 96, done); })
-        ]).then(function(values){
-          var original= values[0];
-          var tumb= values[1];
+          ]).then(function(values){
+            var original= values[0];
+            var tumb= values[1];
 
-          var cb = function (values) {
-            avatars[jid] = (new Avatar({id: picId, chunk: values[0], original : values[1]})).data;
-            App.avatars= avatars;
-          };
+            var cb = function (values) {
+              avatars[jid] = (new Avatar({id: picId, chunk: values[0], original : values[1]})).data;
+              App.avatars= avatars;
+            };
 
-          $('ul[data-jid="' + account.core.fullJid + '"] [data-jid="' + jid + '"] span.avatar img').attr('src', tumb);
-          $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', tumb);
+            $('ul[data-jid="' + account.core.fullJid + '"] [data-jid="' + jid + '"] span.avatar img').attr('src', tumb);
+            $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', tumb);
 
-          if (jid in App.avatars) {
-            var key = Store.lock(App.avatars[jid].chunk);
+            if (jid in App.avatars) {
+              var key = Store.lock(App.avatars[jid].chunk);
 
-            Promise.all([
-                new Promise(function(done){ Store.update(key, App.avatars[jid].chunk, tumb, done); Store.unlock(App.avatars[jid].chunk, key); }),
+              Promise.all([
                 new Promise(function(done){
-                    if(App.avatars[jid].original){
-                      var key_o = Store.lock(App.avatars[jid].original);
+                  Store.update(key, App.avatars[jid].chunk, tumb, done);
+                  Store.unlock(App.avatars[jid].chunk, key);
+                }),
+                new Promise(function(done){
+                  if(App.avatars[jid].original){
+                    var key_o = Store.lock(App.avatars[jid].original);
 
-                      Store.update(key_o, App.avatars[jid].original, original, function(){
-                        Store.unlock(App.avatars[jid].original, key_o);
-                        done();
-                      });
+                    Store.update(key_o, App.avatars[jid].original, original, function(id){
+                      Store.unlock(App.avatars[jid].original, key_o);
+                      done(id);
+                    });
 
-                    }else{
-                        Store.save(original, done);
-                    }
+                  }else{
+                    Store.save(original, done);
+                  }
 
                 })
-            ]).then(cb);
-          } else {
-            Promise.all([
+              ]).then(cb);
+            } else {
+              Promise.all([
                 new Promise(function(done){ Store.save(tumb, done); }),
                 new Promise(function(done){ Store.save(original, done); })
-            ]).then(cb);
-          }
-        });
+              ]).then(cb);
+            }
+          });
+        }
+      } else if (picId) {
+        if (!(jid in App.avatars) || App.avatars[jid].id != picId) {
+          var method = 'contact_getProfilePicture';
+          var params = [jid];
+          MI.call(method, params);
+        }
+      } else {
+        if (jid in avatars) {
+          delete avatars[jid];
+          App.avatars = avatars;
+        }
       }
-    } else if (picId) {
-      if (!(jid in App.avatars) || App.avatars[jid].id != picId) {
-        var method = 'contact_getProfilePicture';
-        var params = [jid];
-        MI.call(method, params);
-      }
-    } else {
-      if (jid in avatars) {
-        delete avatars[jid];
-        App.avatars = avatars;
-      }
-    }
-  };
-
-  this.events.onContactTyping = function (from) {
-    if (from == $('section#chat')[0].dataset.jid) {
-      $("section#chat #typing").show();
-    }
-  };
-
-  this.events.onContactPaused = function (from) {
-    if (from == $('section#chat')[0].dataset.jid) {
-      $("section#chat #typing").hide();
-    }
-  };
-
-  this.events.onMessageSent = function (from, msgId) {
-    Tools.log('SENT', from, msgId);
-    account.markMessage.push({from : from, msgId : msgId});
-  };
-
-  this.events.onMessageDelivered = function (from, msgId, type) {
-    var account = this.account;
-    var chat = account.chatGet(from);
-    chat.core.lastAck = Tools.localize(Tools.stamp());
-    chat.save();
-    account.markMessage.push({from : from, msgId : msgId});
-    Tools.log('DELIVERED', from, msgId, type);
-    MI.call('delivered_ack', [from, msgId, type]);
-  };
-
-  this.events.onMessageVisible = function (from, msgId) {
-    Tools.log('VISIBLE', from, msgId);
-    MI.call('visible_ack', [from, msgId]);
-  };
-
-  this.events.onGroupInfoError = function (jid, owner, subject, subjectOwner, subjectTime, creation) {
-    Tools.log('ERROR GETTING GROUP INFO', jid, owner, subject, subjectOwner, subjectTime, creation);
-  };
-
-  this.events.onGroupGotParticipating = function (groups, id) {
-    for (let [i, group] in Iterator(groups)) {
-      this.events.onGroupGotInfo.bind(this)(group.gid + '@g.us', group.owner, group.subject, group.subjectOwner, group.subjectT, group.creation, group.participants);
-    }
-  };
-
-  this.events.onGroupGotInfo = function (jid, owner, subject, subjectOwner, subjectTime, creation, participants) {
-    var info = {
-      owner: owner,
-      subjectOwner: subjectOwner,
-      subjectTime: subjectTime,
-      creation: creation
     };
-    var account = this.account;
-    var ci = account.chatFind(jid);
-    var chat = null;
-    if (ci >= 0) {
-      chat = account.chats[ci];
-      var newTitle = decodeURIComponent(subject);
-      chat.core.title = newTitle;
-      chat.core.info = info;
-      chat.core.participants = participants;
+
+    this.events.onContactTyping = function (from) {
+      if (from == $('section#chat')[0].dataset.jid) {
+        $("section#chat #typing").show();
+      }
+    };
+
+    this.events.onContactPaused = function (from) {
+      if (from == $('section#chat')[0].dataset.jid) {
+        $("section#chat #typing").hide();
+      }
+    };
+
+    this.events.onMessageSent = function (from, msgId) {
+      Tools.log('SENT', from, msgId);
+      account.markMessage.push({from : from, msgId : msgId});
+    };
+
+    this.events.onMessageDelivered = function (from, msgId, type) {
+      var account = this.account;
+      var chat = account.chatGet(from);
+      chat.core.lastAck = Tools.localize(Tools.stamp());
       chat.save();
-    } else {
-      chat = Make(Chat)({
-        jid: jid,
-        title: decodeURIComponent(subject),
-        muc: true,
-        creation: creation,
+      account.markMessage.push({from : from, msgId : msgId});
+      Tools.log('DELIVERED', from, msgId, type);
+      MI.call('delivered_ack', [from, msgId, type]);
+    };
+
+    this.events.onMessageVisible = function (from, msgId) {
+      Tools.log('VISIBLE', from, msgId);
+      MI.call('visible_ack', [from, msgId]);
+    };
+
+    this.events.onGroupInfoError = function (jid, owner, subject, subjectOwner, subjectTime, creation) {
+      Tools.log('ERROR GETTING GROUP INFO', jid, owner, subject, subjectOwner, subjectTime, creation);
+    };
+
+    this.events.onGroupGotParticipating = function (groups, id) {
+      for (let [i, group] in Iterator(groups)) {
+        this.events.onGroupGotInfo.bind(this)(group.gid + '@g.us', group.owner, group.subject, group.subjectOwner, group.subjectT, group.creation, group.participants);
+      }
+    };
+
+    this.events.onGroupGotInfo = function (jid, owner, subject, subjectOwner, subjectTime, creation, participants) {
+      var info = {
         owner: owner,
-        participants: participants,
-        chunks: [],
-        info: info
-      }, account);
-      account.chats.push(chat);
-      account.core.chats.push(chat.core);
-      chat.save(true);
-    }
-  };
-
-  this.events.onGroupGotPicture = function (jid, picId, blob) {
-    var account = this.account;
-    var avatars= App.avatars;
-
-    if (blob) {
-      Promise.all([
-        new Promise(function(done){ Tools.picThumb(blob, 96, 96, done); }),
-        new Promise(function(done){ Tools.blobToBase64(blob, done); })
-      ]).then(function (values) {
-        var thumb= values[0];
-        var original= values[1];
-
-        $('ul[data-jid="' + account.core.fullJid + '"] li[data-jid="' + jid + '"] span.avatar img').attr('src', thumb);
-        $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', thumb);
-        Promise.all([
-          new Promise(function(done){ Store.save(thumb, done); }),
-          new Promise(function(done){ Store.save(original, done); })
-        ]).then(function(values) {
-          avatars[jid] = (new Avatar({id: picId, chunk: values[0], original : values[1]})).data;
-          App.avatars= avatars;
-        });
-      });
-    }
-  };
-
-  this.events.onGroupGotParticipants = function (jid, participants) {
-    var account = this.account;
-    var ci = account.chatFind(jid);
-    if (ci >= 0) {
-      var chat = account.chats[ci];
-      if (!chat.core.participants || (JSON.stringify(chat.core.participants) != JSON.stringify(participants))) {
+        subjectOwner: subjectOwner,
+        subjectTime: subjectTime,
+        creation: creation
+      };
+      var account = this.account;
+      var ci = account.chatFind(jid);
+      var chat = null;
+      if (ci >= 0) {
+        chat = account.chats[ci];
+        var newTitle = decodeURIComponent(subject);
+        chat.core.title = newTitle;
+        chat.core.info = info;
         chat.core.participants = participants;
+        chat.save();
+      } else {
+        chat = Make(Chat)({
+          jid: jid,
+          title: decodeURIComponent(subject),
+          muc: true,
+          creation: creation,
+          owner: owner,
+          participants: participants,
+          chunks: [],
+          info: info
+        }, account);
+        account.chats.push(chat);
+        account.core.chats.push(chat.core);
+        chat.save(true);
+      }
+    };
+
+    this.events.onGroupGotPicture = function (jid, picId, blob) {
+      var account = this.account;
+      var avatars= App.avatars;
+
+      if (blob) {
+        Promise.all([
+          new Promise(function(done){ Tools.picThumb(blob, 96, 96, done); }),
+          new Promise(function(done){ Tools.blobToBase64(blob, done); })
+        ]).then(function (values) {
+          var thumb= values[0];
+          var original= values[1];
+
+          $('ul[data-jid="' + account.core.fullJid + '"] li[data-jid="' + jid + '"] span.avatar img').attr('src', thumb);
+          $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', thumb);
+          Promise.all([
+            new Promise(function(done){ Store.save(thumb, done); }),
+            new Promise(function(done){ Store.save(original, done); })
+          ]).then(function(values) {
+            avatars[jid] = (new Avatar({id: picId, chunk: values[0], original : values[1]})).data;
+            App.avatars= avatars;
+          });
+        });
+      }
+    };
+
+    this.events.onGroupGotParticipants = function (jid, participants) {
+      var account = this.account;
+      var ci = account.chatFind(jid);
+      if (ci >= 0) {
+        var chat = account.chats[ci];
+        if (!chat.core.participants || (JSON.stringify(chat.core.participants) != JSON.stringify(participants))) {
+          chat.core.participants = participants;
+          chat.save();
+          if ($('section#chat').hasClass('show') && $('section#chat')[0].dataset.jid == chat.core.jid) {
+            chat.show();
+          }
+        }
+      }
+    };
+
+    this.events.onGroupAddParticipantsSuccess = function (jid, participants) {
+      var account = this.account;
+      var ci = account.chatFind(jid);
+      if (ci >= 0) {
+        var chat = account.chats[ci];
+        chat.core.participants = chat.core.participants.concat(participants);
         chat.save();
         if ($('section#chat').hasClass('show') && $('section#chat')[0].dataset.jid == chat.core.jid) {
           chat.show();
         }
       }
-    }
-  };
+    };
 
-  this.events.onGroupAddParticipantsSuccess = function (jid, participants) {
-    var account = this.account;
-    var ci = account.chatFind(jid);
-    if (ci >= 0) {
-      var chat = account.chats[ci];
-      chat.core.participants = chat.core.participants.concat(participants);
-      chat.save();
-      if ($('section#chat').hasClass('show') && $('section#chat')[0].dataset.jid == chat.core.jid) {
-        chat.show();
-      }
-    }
-  };
+    this.events.onGroupRemoveParticipantsSuccess = function (jid, participants) {
+      Lungo.Notification.success(_('Removed'), null, 'trash', 3);
+    };
 
-  this.events.onGroupRemoveParticipantsSuccess = function (jid, participants) {
-    Lungo.Notification.success(_('Removed'), null, 'trash', 3);
-  };
+    this.events.onGroupEndSuccess = function (gid) {
+      Lungo.Notification.success(_('Removed'), null, 'trash', 3);
+    };
 
-  this.events.onGroupEndSuccess = function (gid) {
-    Lungo.Notification.success(_('Removed'), null, 'trash', 3);
-  };
+    this.events.onGroupCreateSuccess = function (gid, idx) {
+      Lungo.Notification.show('download', _('Synchronizing'), 5);
+      Lungo.Router.section('back');
+      var members = this.muc.membersCache[idx];
+      MI.call('group_addParticipants', [gid, members]);
+      delete this.muc.membersCache[idx];
+    };
 
-  this.events.onGroupCreateSuccess = function (gid, idx) {
-    Lungo.Notification.show('download', _('Synchronizing'), 5);
-    Lungo.Router.section('back');
-    var members = this.muc.membersCache[idx];
-    MI.call('group_addParticipants', [gid, members]);
-    delete this.muc.membersCache[idx];
-  };
-
-  this.events.onGroupMessage = function (msgId, from, author, data, stamp, wantsReceipt, pushName) {
-    Tools.log('GROUPMESSAGE', msgId, from, author, data, stamp, wantsReceipt, pushName);
-    var account = this.account;
-    var to = from;
-    from = author;
-    var body = data;
-    if (body) {
-      var date = new Date(stamp);
-      stamp = Tools.localize(Tools.stamp(stamp));
-      var fromUser = from.split('@')[0];
-      var msg = Make(Message)(account, {
-        from: from,
-        to: to,
-        text: body,
-        stamp: stamp,
-        id : msgId,
-        pushName: (pushName && pushName != fromUser) ? (fromUser + ': ' + pushName) : pushName
-      }, {
-        muc: true
-      });
-      Tools.log('RECEIVED', msg);
-      if (wantsReceipt) {
-        msg.receive(function(){
-          this.ack(msgId, to);
-        }.bind(this));
-      } else {
-        msg.receive();
-      }
-    }
-    return true;
-  };
-
-  this.events.onContactProfilePictureUpdated = function (from, stamp, msgId, pictureId, jid) {
-    var method = 'notification_ack';
-    MI.call(method, [from, msgId]);
-    this.events.onAvatar(from, pictureId);
-  };
-
-  this.events.onContactProfilePictureRemoved = function (from, stamp, msgId, pictureId, jid) {
-    var method = 'notification_ack';
-    MI.call(method, [from, msgId]);
-  };
-
-  this.events.onGroupPictureUpdated = function (from, stamp, msgId, pictureId, jid) {
-    var method = 'notification_ack';
-    MI.call(method, [from, msgId]);
-  };
-
-  this.events.onGroupPictureRemoved = function (from, stamp, msgId, pictureId, jid) {
-    var method = 'notification_ack';
-    MI.call(method, [from, msgId]);
-    this.events.onAvatar(from, pictureId);
-  };
-
-  this.events.onGroupParticipantAdded = function (from, jid, _, stamp, msgId) {
-    var method = 'notification_ack';
-    MI.call(method, [from, msgId]);
-    this.muc.participantsGet(from);
-  };
-
-  this.events.onGroupParticipantRemoved = function (from, jid, _, stamp, msgId) {
-    var method = 'notification_ack';
-    MI.call(method, [from, msgId]);
-    if (jid != this.account.core.fullJid) {
-      this.muc.participantsGet(from);
-    }
-  };
-
-  this.events.onGroupCreated = function (from, stamp, msgId, subject, displayName, author) {
-    var method = 'notification_ack';
-    MI.call(method, [from, msgId]);
-    this.muc.participantsGet(from);
-  };
-
-  this.events.onGroupSubjectUpdated = function (from, stamp, msgId, subject, displayName, author) {
-    var method = 'notification_ack';
-    MI.call(method, [from, msgId]);
-    this.muc.participantsGet(from);
-  };
-
-  this.events.onGroupImageReceived = function (msgId, group, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt, notifyName) {
-    return this.mediaProcess('image', msgId, author, group, mediaPreview, mediaUrl, mediaSize, wantsReceipt, true, notifyName);
-  };
-
-  this.events.onGroupVideoReceived = function (msgId, group, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt, notifyName) {
-    return this.mediaProcess('video', msgId, author, group, mediaPreview, mediaUrl, mediaSize, wantsReceipt, true, notifyName);
-  };
-
-  this.events.onGroupAudioReceived = function (msgId, group, author, mediaUrl, mediaSize, wantsReceipt, notifyName) {
-    return this.mediaProcess('audio', msgId, author, group, null, mediaUrl, mediaSize, wantsReceipt, true, notifyName);
-  };
-
-  this.events.onGroupLocationReceived = function (msgId, group, author, name, mediaPreview, mlatitude, mlongitude, wantsReceipt, notifyName) {
-    return this.mediaProcess('url', msgId, author, group, [mlatitude, mlongitude, name], null, null, wantsReceipt, true, notifyName);
-  };
-
-  this.events.onGroupVCardReceived = function (msgId, group, author, vcardName, vcardData, wantsReceipt, notifyName) {
-    return this.mediaProcess('vCard', msgId, author, group, [vcardName, vcardData], null, null, wantsReceipt, true, notifyName);
-  };
-
-  this.events.onContactsGotStatus = function (id, statuses) {
-    var i = Iterator(statuses);
-    for (let [jid, status] in i) {
-      this.events.onPresenceUpdated(jid, undefined, status);
-    }
-  };
-
-  this.events.onContactsSync = function (id, positive, negative) {
-    this.account.core.roster = [];
-    for (var i in positive) {
-      var contact = positive[i];
-      this.account.core.roster.push({
-        jid: contact.jid,
-        name: this.contacts._pre[contact.phone],
-        presence: {
-          last: null,
-          show: 'na',
-          status: null
+    this.events.onGroupMessage = function (msgId, from, author, data, stamp, wantsReceipt, pushName) {
+      Tools.log('GROUPMESSAGE', msgId, from, author, data, stamp, wantsReceipt, pushName);
+      var account = this.account;
+      var to = from;
+      from = author;
+      var body = data;
+      if (body) {
+        var date = new Date(stamp);
+        stamp = Tools.localize(Tools.stamp(stamp));
+        var fromUser = from.split('@')[0];
+        var msg = Make(Message)(account, {
+          from: from,
+          to: to,
+          text: body,
+          stamp: stamp,
+          id : msgId,
+          pushName: (pushName && pushName != fromUser) ? (fromUser + ': ' + pushName) : pushName
+        }, {
+          muc: true
+        });
+        Tools.log('RECEIVED', msg);
+        if (wantsReceipt) {
+          msg.receive(function(){
+            this.ack(msgId, to);
+          }.bind(this));
+        } else {
+          msg.receive();
         }
-      });
-      var ci = this.account.chatFind(contact.jid);
-      if (ci > -1) {
-        var chat = this.account.chats[ci].core;
-        chat.title = this.contacts._pre[contact.phone];
       }
-    }
-    this.contacts.order(this.contacts._cb);
-    this.account.save();
-    this.account.allRender();
-  };
+      return true;
+    };
 
-  this.events.onPresenceUpdated = function (jid, lastSeen, msg) {
-    var account = this.account;
-    var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
-    if (contact) {
-      if (!('presence' in contact)) {
-        contact.presence = {};
+    this.events.onContactProfilePictureUpdated = function (from, stamp, msgId, pictureId, jid) {
+      var method = 'notification_ack';
+      MI.call(method, [from, msgId]);
+      this.events.onAvatar(from, pictureId);
+    };
+
+    this.events.onContactProfilePictureRemoved = function (from, stamp, msgId, pictureId, jid) {
+      var method = 'notification_ack';
+      MI.call(method, [from, msgId]);
+    };
+
+    this.events.onGroupPictureUpdated = function (from, stamp, msgId, pictureId, jid) {
+      var method = 'notification_ack';
+      MI.call(method, [from, msgId]);
+    };
+
+    this.events.onGroupPictureRemoved = function (from, stamp, msgId, pictureId, jid) {
+      var method = 'notification_ack';
+      MI.call(method, [from, msgId]);
+      this.events.onAvatar(from, pictureId);
+    };
+
+    this.events.onGroupParticipantAdded = function (from, jid, _, stamp, msgId) {
+      var method = 'notification_ack';
+      MI.call(method, [from, msgId]);
+      this.muc.participantsGet(from);
+    };
+
+    this.events.onGroupParticipantRemoved = function (from, jid, _, stamp, msgId) {
+      var method = 'notification_ack';
+      MI.call(method, [from, msgId]);
+      if (jid != this.account.core.fullJid) {
+        this.muc.participantsGet(from);
       }
-      if (msg && msg != contact.presence.status) {
-        contact.presence.status = msg;
+    };
+
+    this.events.onGroupCreated = function (from, stamp, msgId, subject, displayName, author) {
+      var method = 'notification_ack';
+      MI.call(method, [from, msgId]);
+      this.muc.participantsGet(from);
+    };
+
+    this.events.onGroupSubjectUpdated = function (from, stamp, msgId, subject, displayName, author) {
+      var method = 'notification_ack';
+      MI.call(method, [from, msgId]);
+      this.muc.participantsGet(from);
+    };
+
+    this.events.onGroupImageReceived = function (msgId, group, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt, notifyName) {
+      return this.mediaProcess('image', msgId, author, group, mediaPreview, mediaUrl, mediaSize, wantsReceipt, true, notifyName);
+    };
+
+    this.events.onGroupVideoReceived = function (msgId, group, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt, notifyName) {
+      return this.mediaProcess('video', msgId, author, group, mediaPreview, mediaUrl, mediaSize, wantsReceipt, true, notifyName);
+    };
+
+    this.events.onGroupAudioReceived = function (msgId, group, author, mediaUrl, mediaSize, wantsReceipt, notifyName) {
+      return this.mediaProcess('audio', msgId, author, group, null, mediaUrl, mediaSize, wantsReceipt, true, notifyName);
+    };
+
+    this.events.onGroupLocationReceived = function (msgId, group, author, name, mediaPreview, mlatitude, mlongitude, wantsReceipt, notifyName) {
+      return this.mediaProcess('url', msgId, author, group, [mlatitude, mlongitude, name], null, null, wantsReceipt, true, notifyName);
+    };
+
+    this.events.onGroupVCardReceived = function (msgId, group, author, vcardName, vcardData, wantsReceipt, notifyName) {
+      return this.mediaProcess('vCard', msgId, author, group, [vcardName, vcardData], null, null, wantsReceipt, true, notifyName);
+    };
+
+    this.events.onContactsGotStatus = function (id, statuses) {
+      var i = Iterator(statuses);
+      for (let [jid, status] in i) {
+        this.events.onPresenceUpdated(jid, undefined, status);
+      }
+    };
+
+    this.events.onContactsSync = function (id, positive, negative) {
+      this.account.core.roster = [];
+      for (var i in positive) {
+        var contact = positive[i];
+        this.account.core.roster.push({
+          jid: contact.jid,
+          name: this.contacts._pre[contact.phone],
+          presence: {
+            last: null,
+            show: 'na',
+            status: null
+          }
+        });
+        var ci = this.account.chatFind(contact.jid);
+        if (ci > -1) {
+          var chat = this.account.chats[ci].core;
+          chat.title = this.contacts._pre[contact.phone];
+        }
+      }
+      this.contacts.order(this.contacts._cb);
+      this.account.save();
+      this.account.allRender();
+    };
+
+    this.events.onPresenceUpdated = function (jid, lastSeen, msg) {
+      var account = this.account;
+      var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
+      if (contact) {
+        if (!('presence' in contact)) {
+          contact.presence = {};
+        }
+        if (msg && msg != contact.presence.status) {
+          contact.presence.status = msg;
+          account.presenceRender(jid);
+        }
+      }
+    }.bind(this);
+
+    this.events.onPresenceAvailable = function (jid) {
+      var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
+      if (contact) {
+        Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', 'a');
+        contact.presence.show = 'a';
         account.presenceRender(jid);
       }
-    }
-  }.bind(this);
+    };
 
-  this.events.onPresenceAvailable = function (jid) {
-    var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
-    if (contact) {
-      Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', 'a');
-      contact.presence.show = 'a';
-      account.presenceRender(jid);
-    }
-  };
+    this.events.onPresenceUnavailable = function (jid, last) {
+      var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
+      if (contact) {
+        Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', 'away');
+        contact.presence.show = 'away';
+        contact.presence.last = last;
+        account.presenceRender(jid);
+      }
+    };
 
-  this.events.onPresenceUnavailable = function (jid, last) {
-    var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', jid);
-    if (contact) {
-      Tools.log('PRESENCE for', jid, 'WAS', contact.presence.show, 'NOW IS', 'away');
-      contact.presence.show = 'away';
-      contact.presence.last = last;
-      account.presenceRender(jid);
-    }
-  };
+    this.events.onProfileSetPictureSuccess = function (pictureId) {
+      Tools.log('CHANGED AVATAR TO', pictureId);
+      this.events.onAvatar(this.account.core.fullJid, pictureId);
+    };
 
-  this.events.onProfileSetPictureSuccess = function (pictureId) {
-    Tools.log('CHANGED AVATAR TO', pictureId);
-    this.events.onAvatar(this.account.core.fullJid, pictureId);
-  };
+    this.events.onProfileSetPictureError = function (err) {
+      Lungo.Notification.error(_('NotUploaded'), _('ErrorUploading'), 'warning-sign', 5);
+    };
 
-  this.events.onProfileSetPictureError = function (err) {
-    Lungo.Notification.error(_('NotUploaded'), _('ErrorUploading'), 'warning-sign', 5);
-  };
-
-  this.events.onUploadRequestSuccess = function (hash, url, resumeFrom) {
-    Tools.log('onUploadRequest!');
-    var self = this;
-    var media = CoSeMe.media;
-    var account = this.account;
-    Tools.log('TEMP_RETRIEVING', hash, Store.cache[hash].data);
-    var obj = Store.cache[hash];
-    var type, method, thumbnailer = null;
-    if (obj.data.indexOf(':image') > 0) {
-      type = 'image';
-      method = 'message_imageSend';
-      thumbnailer = Tools.picThumb;
-    } else if (obj.data.indexOf(':video') > 0) {
-      type = 'video';
-      method = 'message_videoSend';
-      thumbnailer = Tools.vidThumb;
-    } else if (obj.data.indexOf(':audio') > 0) {
-      type = 'audio';
-      method = 'message_audioSend';
-      thumbnailer = Tools.audThumb;
-    }
-    var toJID = obj.to;
-    var blob = Tools.b64ToBlob(obj.data.split(',').pop(), obj.data.split(/[:;]/)[1]);
-    var uploadUrl = url;
-    var onSuccess = function (url) {
-      thumbnailer(blob, 120, null, function(thumb) {
-        var id = MI.call(
-          method,
-          [toJID, url, hash, '0', thumb.split(',').pop()]
+    this.events.onUploadRequestSuccess = function (hash, url, resumeFrom) {
+      Tools.log('onUploadRequest!');
+      var self = this;
+      var media = CoSeMe.media;
+      var account = this.account;
+      Tools.log('TEMP_RETRIEVING', hash, Store.cache[hash].data);
+      var obj = Store.cache[hash];
+      var type, method, thumbnailer = null;
+      if (obj.data.indexOf(':image') > 0) {
+        type = 'image';
+        method = 'message_imageSend';
+        thumbnailer = Tools.picThumb;
+      } else if (obj.data.indexOf(':video') > 0) {
+        type = 'video';
+        method = 'message_videoSend';
+        thumbnailer = Tools.vidThumb;
+      } else if (obj.data.indexOf(':audio') > 0) {
+        type = 'audio';
+        method = 'message_audioSend';
+        thumbnailer = Tools.audThumb;
+      }
+      var toJID = obj.to;
+      var blob = Tools.b64ToBlob(obj.data.split(',').pop(), obj.data.split(/[:;]/)[1]);
+      var uploadUrl = url;
+      var onSuccess = function (url) {
+        thumbnailer(blob, 120, null, function(thumb) {
+          var id = MI.call(
+            method,
+            [toJID, url, hash, '0', thumb.split(',').pop()]
+          );
+          self.addMediaMessageToChat(type, thumb, url, null, account.core.user, toJID, Math.floor((new Date()).getTime() / 1000) + '-1');
+          App.audio('sent');
+          var ext = url.split('.').pop();
+          var localUrl = App.pathFiles + Tools.localize(Tools.stamp(id)).replace(/[-:]/g, '') + url.split('/').pop().substring(0, 5).toUpperCase() + '.' + ext;
+          Store.SD.save(localUrl, blob);
+          delete Store.cache[hash];
+        });
+        Lungo.Notification.show('up-sign', _('Uploaded'), 1);
+        $('#main #footbox progress').val('0');
+      };
+      var onError = function (error) {
+        Lungo.Notification.error(
+          _('NotUploaded'),
+          _('ErrorUploading'),
+          'warning-sign', 5
         );
-        self.addMediaMessageToChat(type, thumb, url, null, account.core.user, toJID, Math.floor((new Date()).getTime() / 1000) + '-1');
-        App.audio('sent');
-        var ext = url.split('.').pop();
-        var localUrl = App.pathFiles + Tools.localize(Tools.stamp(id)).replace(/[-:]/g, '') + url.split('/').pop().substring(0, 5).toUpperCase() + '.' + ext;
-        Store.SD.save(localUrl, blob);
-        delete Store.cache[hash];
-      });
-      Lungo.Notification.show('up-sign', _('Uploaded'), 1);
-      $('#main #footbox progress').val('0');
+        Tools.log(error);
+        $('#main #footbox progress').val('0');
+      };
+      var onProgress = function(value) {
+        $('#main #footbox progress').val(value.toString());
+      };
+      media.upload(toJID, blob, uploadUrl, onSuccess, onError, onProgress);
     };
-    var onError = function (error) {
-      Lungo.Notification.error(
-        _('NotUploaded'),
-        _('ErrorUploading'),
-        'warning-sign', 5
-      );
-      Tools.log(error);
-      $('#main #footbox progress').val('0');
+    this.events.onUploadRequestFailed = function (hash) {
+      Lungo.Notification.error(_('NotUploaded'), _('ErrorUploading'), 'warning-sign', 5);
     };
-    var onProgress = function(value) {
-      $('#main #footbox progress').val(value.toString());
+    this.events.onUploadRequestDuplicate = function (hash) {
+      Lungo.Notification.error(_('NotUploaded'), _('DuplicatedUpload'), 'warning-sign', 5);
     };
-    media.upload(toJID, blob, uploadUrl, onSuccess, onError, onProgress);
-  };
-  this.events.onUploadRequestFailed = function (hash) {
-    Lungo.Notification.error(_('NotUploaded'), _('ErrorUploading'), 'warning-sign', 5);
-  };
-  this.events.onUploadRequestDuplicate = function (hash) {
-    Lungo.Notification.error(_('NotUploaded'), _('DuplicatedUpload'), 'warning-sign', 5);
-  };
-  this.addMediaMessageToChat = function(type, data, url, payload, from, to, id) {
-    var account = this.account;
-    var msgMedia = {
-      type: type,
-      thumb: data,
-      payload: payload,
-      url: url,
-      downloaded: true
-    };
-    var stamp = Tools.localize(Tools.stamp());
-    var msg = Make(Message)(account, {
-      from: account.core.user,
-      id: id,
-      to: to,
-      media: msgMedia,
-      stamp: stamp
-    });
-    msg.addToChat();
-  };
-
-  this.mediaProcess = function (fileType, msgId, from, to, payload, mediaUrl, mediaSize, wantsReceipt, isGroup, notifyName) {
-    Tools.log('Processing file of type', fileType);
-    var process = function (thumb) {
-      var media = {
-        type: fileType,
-        thumb: thumb,
-        payload: mediaUrl ? null : payload,
-        url: mediaUrl,
-        downloaded: false
+    this.addMediaMessageToChat = function(type, data, url, payload, from, to, id) {
+      var account = this.account;
+      var msgMedia = {
+        type: type,
+        thumb: data,
+        payload: payload,
+        url: url,
+        downloaded: true
       };
       var stamp = Tools.localize(Tools.stamp());
-      var name = notifyName ? from.split('@')[0] + ': ' + notifyName : null;
-      var msg = {
-        id: msgId,
-        from: from,
+      var msg = Make(Message)(account, {
+        from: account.core.user,
+        id: id,
         to: to,
-        media: media,
-        stamp: stamp,
-        sender: name
-      };
-      if (isGroup) {
-        msg.pushName = name || from;
-      }
-      msg = Make(Message)(this.account, msg, {
-        muc: isGroup
+        media: msgMedia,
+        stamp: stamp
       });
-      msg.receive();
-      this.ack(msgId, isGroup ? to : from);
-      Tools.log('Finished processing file of type', fileType);
-    }.bind(this);
-    switch (fileType) {
-      case 'image':
+      msg.addToChat();
+    };
+
+    this.mediaProcess = function (fileType, msgId, from, to, payload, mediaUrl, mediaSize, wantsReceipt, isGroup, notifyName) {
+      Tools.log('Processing file of type', fileType);
+      var process = function (thumb) {
+        var media = {
+          type: fileType,
+          thumb: thumb,
+          payload: mediaUrl ? null : payload,
+          url: mediaUrl,
+          downloaded: false
+        };
+        var stamp = Tools.localize(Tools.stamp());
+        var name = notifyName ? from.split('@')[0] + ': ' + notifyName : null;
+        var msg = {
+          id: msgId,
+          from: from,
+          to: to,
+          media: media,
+          stamp: stamp,
+          sender: name
+        };
+        if (isGroup) {
+          msg.pushName = name || from;
+        }
+        msg = Make(Message)(this.account, msg, {
+          muc: isGroup
+        });
+        msg.receive();
+        this.ack(msgId, isGroup ? to : from);
+        Tools.log('Finished processing file of type', fileType);
+      }.bind(this);
+      switch (fileType) {
+        case 'image':
         Tools.picThumb(CoSeMe.utils.aToBlob(payload, 'i'), 120, null, process);
         break;
-      case 'video':
+        case 'video':
         process('img/video.png');
         break;
-      case 'audio':
+        case 'audio':
         process('img/audio.png');
         break;
-      case 'url':
+        case 'url':
         mediaUrl = 'https://maps.google.com/maps?q=' + payload[0] + ',' + payload[1];
         process('img/location.png');
         break;
-      case 'vCard':
+        case 'vCard':
         process('img/contact.png');
         break;
-    }
+      }
+    };
+
   };
 
-};
-
-App.logForms.coseme = function (provider, article) {
-  var data = Providers.data[provider];
-  return {
-    get html () {
-      var country= null;
-      if (article) {
-        article
+  App.logForms.coseme = function (provider, article) {
+    var data = Providers.data[provider];
+    return {
+      get html () {
+        var country= null;
+        if (article) {
+          article
           .append($('<h1/>').css('color', data.color).html(_('SettingUp', { provider: data.longName })))
           .append($('<img/>').attr('src', 'img/providers/' + provider + '.svg'));
           var sms = $('<div/>').addClass('sms')
-            .append($('<p/>').text(_('ProviderSMS', { provider: data.longName })))
-            .append($('<label/>').attr('for', 'countrySelect').text(_(data.terms.country)));
+          .append($('<p/>').text(_('ProviderSMS', { provider: data.longName })))
+          .append($('<label/>').attr('for', 'countrySelect').text(_(data.terms.country)));
           var countrySelect = $('<select/>').attr('name', 'countrySelect');
           var countries = Tools.countries();
           countrySelect.append($('<option/>').attr('value', '').text('-- ' + _('YourCountry')));
@@ -1079,261 +1082,261 @@ App.logForms.coseme = function (provider, article) {
             countrySelect.append($('<option/>').attr('value', country.dial).text(country.name));
           }
           sms
-            .append(countrySelect)
-            .append($('<label/>').attr('for', 'user').text(_(data.terms.user)))
-            .append($('<input/>')
-              .attr('type', 'number')
-              .attr('name', 'country')
-              .attr('disabled', 'true')
-              .css('width', '3rem')
-              .addClass('spaced')
-            )
-            .append($('<input/>')
-              .attr('type', 'number')
-              .attr('name', 'user')
-              .css('width', 'calc(100% - 8rem)')
-            );
-          var smsButtons = $('<div/>').addClass('buttongroup');
-          var smsReq = $('<button/>').addClass('smsReq').css('backgroundColor', data.color).text(_('SMSRequest'));
-          smsReq[0].dataset.role= 'submit';
-          var voiceReq = $('<button/>').addClass('voiceReq').css('backgroundColor', data.color).text(_('VoiceRequest'));
-          voiceReq[0].dataset.role= 'submit';
-          var codeReady = $('<button/>').addClass('codeReady').css('backgroundColor', data.color).text(_('codeReady'));
-          codeReady[0].dataset.role= 'submit';
-          var back = $('<button/>').addClass('back').text(_('GoBack'));
-          smsButtons.append(smsReq).append(voiceReq).append(codeReady).append(back);
-          sms.append(smsButtons);
-          var code = $('<div/>').addClass('code hidden')
-            .append($('<p>').text(_('recodeLabel')))
-            .append($('<input/>')
-              .attr('type', 'number')
-              .attr('name', 'rCode')
-              .attr('placeholder', '123456')
-            );
-          var codeButtons = $('<div/>').addClass('buttongroup');
-          back = $('<button/>').addClass('back').text(_('GoBack'));
-          var validate = $('<button/>').addClass('valCode').css('backgroundColor', data.color).text(_('CodeValidate'));
-          codeButtons.append(validate);
-          codeButtons.append(back);
-          code.append(codeButtons);
-          var recode = $('<div/>').addClass('recode hidden')
-            .append($('<p/>').text(_('recodeSMS', { provider: data.longName })))
-            .append($('<label/>').attr('for', 'countrySelect').text(_(data.terms.country)));
-          countrySelect = $('<select/>').attr('name', 'countrySelect');
-          countries = Tools.countries();
-          countrySelect.append($('<option/>').attr('value', '').text('-- ' + _('YourCountry')));
-          for (i in countries) {
-            country = countries[i];
-            countrySelect.append($('<option/>').attr('value', country.dial).text(country.name));
-          }
-          recode
-            .append(countrySelect)
-            .append($('<label/>').attr('for', 'user').text(_(data.terms.user)))
-            .append($('<input/>')
-              .attr('type', 'number')
-              .attr('name', 'country')
-              .attr('disabled', 'true')
-              .css('width', '3rem')
-              .addClass('spaced')
-            )
-            .append($('<input/>')
-              .attr('type', 'number')
-              .attr('name', 'user')
-              .css('width', 'calc(100% - 8rem)')
-            )
-            .append($('<label/>').attr('for', 'user').text(_('recodeLabel')))
-            .append($('<input/>')
-              .attr('type', 'number')
-              .attr('name', 'rCode')
-              .attr('placeholder', '123456')
-            );
-            var recodeButtons = $('<div/>').addClass('buttongroup');
-            var valCode = $('<button/>').addClass('valCode').css('backgroundColor', data.color).text(_('recodeRequest'));
-            valCode[0].dataset.role= 'submit';
-            var sback = $('<button/>').addClass('sback').text(_('GoBack'));
-            recodeButtons.append(valCode).append(sback);
-            recode.append(recodeButtons);
-            var progress = $('<div/>').addClass('progress hidden')
-              .append('<span/>')
-              .append($('<progress/>').attr('value', '0'));
-            article
-              .append(sms)
-              .append(code)
-              .append(recode)
-              .append(progress);
-        }
-    },
-    events: function (target) {
-      var form = target.closest('div:not(.buttongroup)');
-      var article = form.closest('article')[0];
-      var provider= null;
-      var user= null;
-      var cc= null;
-      var codeGet= null;
-      var onhasid= null;
-      var onneedsid= null;
-      if (target.attr('name') == 'countrySelect') {
-        form.find('input[name="country"]').val(target.val());
-      } else if (target.hasClass('codeReady')) {
-        form.addClass('hidden');
-        form.siblings('.recode').removeClass('hidden');
-      } else if (target.hasClass('codeReady')) {
-        form.addClass('hidden');
-        form.siblings('.recode').removeClass('hidden');
-      } else if (target.hasClass('sback')) {
-        form.addClass('hidden');
-        form.siblings('.sms').removeClass('hidden');
-      } else if (target.hasClass('smsReq')) {
-        provider = article.parentNode.id;
-        user = $(article).find('[name="user"]').val();
-        cc  = $(article).find('[name="country"]').val();
-        if (cc && user) {
-          Lungo.Notification.show('envelope', _('SMSsending'));
-          codeGet = function (deviceId) {
-            $(article)[0].dataset.deviceId= deviceId;
-            var onsent = function (data) {
-              Tools.log(data);
-              if (data.status == 'sent') {
-                Tools.log('Sent SMS to', cc, user, 'with DID', deviceId, 'retry after', data.retry_after);
-                Lungo.Notification.success(_('SMSsent'), _('SMSsentExp'), 'envelope', 3);
-                form.addClass('hidden');
-                form.siblings('.code').removeClass('hidden');
-              } else if (data.status == 'ok') {
-                if (data.type == 'existing' || data.type == 'new') {
-                    var account = Make(Account)({
-                      user: user,
-                      cc: cc,
-                      data: data,
-                      provider: provider,
-                      resource: App.defaults.Account.core.resource,
-                      enabled: true,
-                      chats: []
-                    });
-                    account.test();
-                } else {
-                  Tools.log('Not valid', 'Reason:', data.reason, 'with DID', deviceId);
-                  Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
-                }
-              } else {
-                Tools.log('Could not sent SMS', 'Reason:', data.reason, 'with DID', deviceId);
-                Lungo.Notification.error(_('SMSnotSent'), _('SMSreason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
-              }
-            };
-            var onerror = function (data) {};
-            deviceId = CoSeMe.registration.getCode(cc, user, onsent, onerror, deviceId, 0, 0, document.webL10n.getLanguage(), 'sms');
-          };
-          onhasid = function (file) {
-            var onread = function (deviceId) {
-              codeGet(deviceId);
-            };
-            Tools.textUnblob(file, onread);
-          };
-          onneedsid = function (error) {
-            var deviceId = Math.random().toString(36).substring(2);
-            Store.SD.save('.coseme.id', [deviceId]);
-            codeGet(deviceId);
-          };
-          Store.SD.recover('.coseme.id', onhasid, onneedsid);
-        }
-      } else if (target.hasClass('voiceReq')) {
-          provider = article.parentNode.id;
-          user = $(article).find('[name="user"]').val();
-          cc  = $(article).find('[name="country"]').val();
-          if (cc && user) {
-            Lungo.Notification.show('phone', _('Voicesending'));
-            codeGet = function (deviceId) {
-              $(article)[0].dataset.deviceId= deviceId;
-              var onsent = function (data) {
-                Tools.log(data);
-                if (data.status == 'sent') {
-                  Tools.log('Sent phone call to', cc, user, 'with DID', deviceId, 'retry after', data.retry_after);
-                  Lungo.Notification.success(_('voicesent'), _('voicesentExp'), 'phone', 3);
-                  form.addClass('hidden');
-                  form.siblings('.code').removeClass('hidden');
-                } else if (data.status == 'ok') {
-                  if (data.type == 'existing' || data.type == 'new') {
-                      var account = Make(Account)({
-                        user: user,
-                        cc: cc,
-                        data: data,
-                        provider: provider,
-                        resource: App.defaults.Account.core.resource,
-                        enabled: true,
-                        chats: []
-                      });
-                      account.test();
-                  } else {
-                    Tools.log('Not valid', 'Reason:', data.reason, 'with DID', deviceId);
-                    Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
-                  }
-                } else {
-                  Tools.log('Could not sent phone call', 'Reason:', data.reason, 'with DID', deviceId);
-                  Lungo.Notification.error(_('VoicenotSent'), _('SMSreason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
-                }
-              };
-              var onerror = function (data) {};
-              deviceId = CoSeMe.registration.getCode(cc, user, onsent, onerror, deviceId, 0, 0, document.webL10n.getLanguage(), 'voice');
-            };
-            onhasid = function (file) {
-              var onread = function (deviceId) {
-                codeGet(deviceId);
-              };
-              Tools.textUnblob(file, onread);
-            };
-            onneedsid = function (error) {
-              var deviceId = Math.random().toString(36).substring(2);
-              Store.SD.save('.coseme.id', [deviceId]);
-              codeGet(deviceId);
-            };
-            Store.SD.recover('.coseme.id', onhasid, onneedsid);
-          }
-      } else if (target.hasClass('valCode')) {
-        provider = article.parentNode.id;
-        user = form.find('[name="user"]').val() ||
-          form.siblings('.sms').find('[name="user"]').val();
-        cc  = form.find('[name="country"]').val() ||
-          form.siblings('.sms').find('[name="country"]').val();
-        var rCode = form.find('[name="rCode"]').val().replace(/\D/g,'');
-        if (rCode) {
-          var register = function (deviceId) {
-            var onready = function (data) {
-              Tools.log(data);
-              if (data.type == 'existing' || data.type == 'new') {
-                var account = Make(Account)({
-                  user: user,
-                  cc: cc,
-                  data: data,
-                  provider: provider,
-                  resource: App.defaults.Account.core.resource,
-                  enabled: true,
-                  chats: []
-                });
-                account.test();
-              }
-            };
-            var onerror = function (error) {
-              Tools.log('Not valid', 'Reason:', data.reason);
-              Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
-            };
-            Lungo.Notification.show('copy', _('CodeValidating'));
-            CoSeMe.registration.register(cc, user, rCode, onready, onerror, deviceId);
-          };
-          onhasid = function (file) {
-            var onread = function (deviceId) {
-              register(deviceId);
-            };
-            Tools.textUnblob(file, onread);
-          };
-          onneedsid = function (error) {
-            var deviceId = Math.random().toString(36).substring(2);
-            Store.SD.save('.coseme.id', [deviceId]);
-            register(deviceId);
-          };
-          Store.SD.recover('.coseme.id', onhasid, onneedsid);
-        }
-      }
+          .append(countrySelect)
+          .append($('<label/>').attr('for', 'user').text(_(data.terms.user)))
+          .append($('<input/>')
+          .attr('type', 'number')
+          .attr('name', 'country')
+          .attr('disabled', 'true')
+          .css('width', '3rem')
+          .addClass('spaced')
+        )
+        .append($('<input/>')
+        .attr('type', 'number')
+        .attr('name', 'user')
+        .css('width', 'calc(100% - 8rem)')
+      );
+      var smsButtons = $('<div/>').addClass('buttongroup');
+      var smsReq = $('<button/>').addClass('smsReq').css('backgroundColor', data.color).text(_('SMSRequest'));
+      smsReq[0].dataset.role= 'submit';
+      var voiceReq = $('<button/>').addClass('voiceReq').css('backgroundColor', data.color).text(_('VoiceRequest'));
+      voiceReq[0].dataset.role= 'submit';
+      var codeReady = $('<button/>').addClass('codeReady').css('backgroundColor', data.color).text(_('codeReady'));
+      codeReady[0].dataset.role= 'submit';
+      var back = $('<button/>').addClass('back').text(_('GoBack'));
+      smsButtons.append(smsReq).append(voiceReq).append(codeReady).append(back);
+      sms.append(smsButtons);
+      var code = $('<div/>').addClass('code hidden')
+      .append($('<p>').text(_('recodeLabel')))
+      .append($('<input/>')
+      .attr('type', 'number')
+      .attr('name', 'rCode')
+      .attr('placeholder', '123456')
+    );
+    var codeButtons = $('<div/>').addClass('buttongroup');
+    back = $('<button/>').addClass('back').text(_('GoBack'));
+    var validate = $('<button/>').addClass('valCode').css('backgroundColor', data.color).text(_('CodeValidate'));
+    codeButtons.append(validate);
+    codeButtons.append(back);
+    code.append(codeButtons);
+    var recode = $('<div/>').addClass('recode hidden')
+    .append($('<p/>').text(_('recodeSMS', { provider: data.longName })))
+    .append($('<label/>').attr('for', 'countrySelect').text(_(data.terms.country)));
+    countrySelect = $('<select/>').attr('name', 'countrySelect');
+    countries = Tools.countries();
+    countrySelect.append($('<option/>').attr('value', '').text('-- ' + _('YourCountry')));
+    for (i in countries) {
+      country = countries[i];
+      countrySelect.append($('<option/>').attr('value', country.dial).text(country.name));
     }
-  };
+    recode
+    .append(countrySelect)
+    .append($('<label/>').attr('for', 'user').text(_(data.terms.user)))
+    .append($('<input/>')
+    .attr('type', 'number')
+    .attr('name', 'country')
+    .attr('disabled', 'true')
+    .css('width', '3rem')
+    .addClass('spaced')
+  )
+  .append($('<input/>')
+  .attr('type', 'number')
+  .attr('name', 'user')
+  .css('width', 'calc(100% - 8rem)')
+)
+.append($('<label/>').attr('for', 'user').text(_('recodeLabel')))
+.append($('<input/>')
+.attr('type', 'number')
+.attr('name', 'rCode')
+.attr('placeholder', '123456')
+);
+var recodeButtons = $('<div/>').addClass('buttongroup');
+var valCode = $('<button/>').addClass('valCode').css('backgroundColor', data.color).text(_('recodeRequest'));
+valCode[0].dataset.role= 'submit';
+var sback = $('<button/>').addClass('sback').text(_('GoBack'));
+recodeButtons.append(valCode).append(sback);
+recode.append(recodeButtons);
+var progress = $('<div/>').addClass('progress hidden')
+.append('<span/>')
+.append($('<progress/>').attr('value', '0'));
+article
+.append(sms)
+.append(code)
+.append(recode)
+.append(progress);
+}
+},
+events: function (target) {
+  var form = target.closest('div:not(.buttongroup)');
+  var article = form.closest('article')[0];
+  var provider= null;
+  var user= null;
+  var cc= null;
+  var codeGet= null;
+  var onhasid= null;
+  var onneedsid= null;
+  if (target.attr('name') == 'countrySelect') {
+    form.find('input[name="country"]').val(target.val());
+  } else if (target.hasClass('codeReady')) {
+    form.addClass('hidden');
+    form.siblings('.recode').removeClass('hidden');
+  } else if (target.hasClass('codeReady')) {
+    form.addClass('hidden');
+    form.siblings('.recode').removeClass('hidden');
+  } else if (target.hasClass('sback')) {
+    form.addClass('hidden');
+    form.siblings('.sms').removeClass('hidden');
+  } else if (target.hasClass('smsReq')) {
+    provider = article.parentNode.id;
+    user = $(article).find('[name="user"]').val();
+    cc  = $(article).find('[name="country"]').val();
+    if (cc && user) {
+      Lungo.Notification.show('envelope', _('SMSsending'));
+      codeGet = function (deviceId) {
+        $(article)[0].dataset.deviceId= deviceId;
+        var onsent = function (data) {
+          Tools.log(data);
+          if (data.status == 'sent') {
+            Tools.log('Sent SMS to', cc, user, 'with DID', deviceId, 'retry after', data.retry_after);
+            Lungo.Notification.success(_('SMSsent'), _('SMSsentExp'), 'envelope', 3);
+            form.addClass('hidden');
+            form.siblings('.code').removeClass('hidden');
+          } else if (data.status == 'ok') {
+            if (data.type == 'existing' || data.type == 'new') {
+              var account = Make(Account)({
+                user: user,
+                cc: cc,
+                data: data,
+                provider: provider,
+                resource: App.defaults.Account.core.resource,
+                enabled: true,
+                chats: []
+              });
+              account.test();
+            } else {
+              Tools.log('Not valid', 'Reason:', data.reason, 'with DID', deviceId);
+              Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
+            }
+          } else {
+            Tools.log('Could not sent SMS', 'Reason:', data.reason, 'with DID', deviceId);
+            Lungo.Notification.error(_('SMSnotSent'), _('SMSreason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
+          }
+        };
+        var onerror = function (data) {};
+        deviceId = CoSeMe.registration.getCode(cc, user, onsent, onerror, deviceId, 0, 0, document.webL10n.getLanguage(), 'sms');
+      };
+      onhasid = function (file) {
+        var onread = function (deviceId) {
+          codeGet(deviceId);
+        };
+        Tools.textUnblob(file, onread);
+      };
+      onneedsid = function (error) {
+        var deviceId = Math.random().toString(36).substring(2);
+        Store.SD.save('.coseme.id', [deviceId]);
+        codeGet(deviceId);
+      };
+      Store.SD.recover('.coseme.id', onhasid, onneedsid);
+    }
+  } else if (target.hasClass('voiceReq')) {
+    provider = article.parentNode.id;
+    user = $(article).find('[name="user"]').val();
+    cc  = $(article).find('[name="country"]').val();
+    if (cc && user) {
+      Lungo.Notification.show('phone', _('Voicesending'));
+      codeGet = function (deviceId) {
+        $(article)[0].dataset.deviceId= deviceId;
+        var onsent = function (data) {
+          Tools.log(data);
+          if (data.status == 'sent') {
+            Tools.log('Sent phone call to', cc, user, 'with DID', deviceId, 'retry after', data.retry_after);
+            Lungo.Notification.success(_('voicesent'), _('voicesentExp'), 'phone', 3);
+            form.addClass('hidden');
+            form.siblings('.code').removeClass('hidden');
+          } else if (data.status == 'ok') {
+            if (data.type == 'existing' || data.type == 'new') {
+              var account = Make(Account)({
+                user: user,
+                cc: cc,
+                data: data,
+                provider: provider,
+                resource: App.defaults.Account.core.resource,
+                enabled: true,
+                chats: []
+              });
+              account.test();
+            } else {
+              Tools.log('Not valid', 'Reason:', data.reason, 'with DID', deviceId);
+              Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
+            }
+          } else {
+            Tools.log('Could not sent phone call', 'Reason:', data.reason, 'with DID', deviceId);
+            Lungo.Notification.error(_('VoicenotSent'), _('SMSreason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
+          }
+        };
+        var onerror = function (data) {};
+        deviceId = CoSeMe.registration.getCode(cc, user, onsent, onerror, deviceId, 0, 0, document.webL10n.getLanguage(), 'voice');
+      };
+      onhasid = function (file) {
+        var onread = function (deviceId) {
+          codeGet(deviceId);
+        };
+        Tools.textUnblob(file, onread);
+      };
+      onneedsid = function (error) {
+        var deviceId = Math.random().toString(36).substring(2);
+        Store.SD.save('.coseme.id', [deviceId]);
+        codeGet(deviceId);
+      };
+      Store.SD.recover('.coseme.id', onhasid, onneedsid);
+    }
+  } else if (target.hasClass('valCode')) {
+    provider = article.parentNode.id;
+    user = form.find('[name="user"]').val() ||
+    form.siblings('.sms').find('[name="user"]').val();
+    cc  = form.find('[name="country"]').val() ||
+    form.siblings('.sms').find('[name="country"]').val();
+    var rCode = form.find('[name="rCode"]').val().replace(/\D/g,'');
+    if (rCode) {
+      var register = function (deviceId) {
+        var onready = function (data) {
+          Tools.log(data);
+          if (data.type == 'existing' || data.type == 'new') {
+            var account = Make(Account)({
+              user: user,
+              cc: cc,
+              data: data,
+              provider: provider,
+              resource: App.defaults.Account.core.resource,
+              enabled: true,
+              chats: []
+            });
+            account.test();
+          }
+        };
+        var onerror = function (error) {
+          Tools.log('Not valid', 'Reason:', data.reason);
+          Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
+        };
+        Lungo.Notification.show('copy', _('CodeValidating'));
+        CoSeMe.registration.register(cc, user, rCode, onready, onerror, deviceId);
+      };
+      onhasid = function (file) {
+        var onread = function (deviceId) {
+          register(deviceId);
+        };
+        Tools.textUnblob(file, onread);
+      };
+      onneedsid = function (error) {
+        var deviceId = Math.random().toString(36).substring(2);
+        Store.SD.save('.coseme.id', [deviceId]);
+        register(deviceId);
+      };
+      Store.SD.recover('.coseme.id', onhasid, onneedsid);
+    }
+  }
+}
+};
 };
 
 App.emoji.coseme = {
@@ -1368,174 +1371,174 @@ App.emoji.coseme = {
     // Signs and clocks
     ["1f4b2","1f4b2"],["e149","1f4b1"],["e24e","00a9"],["e24f","00ae"],["e537","2122"],["e12c","303d"],["3030","3030"],["e24c","1f51d"],["1f51a","1f51a"],["1f519","1f519"],["1f51b","1f51b"],["1f51c","1f51c"],["e333","274c"],["e332","2b55"],["2757","2757"],["2753","2753"],["e337","2755"],["e336","2754"],["1f503","1f503"],["e02f","1f55b"],["1f567","1f567"],["e024","1f550"],["1f55c","1f55c"],["e025","1f551"],["1f55d","1f55d"],["e026","1f552"],["1f55e","1f55e"],["e027","1f553"],["1f55f","1f55f"],["e028","1f554"],["1f560","1f560"],["e029","1f555"],["e02a","1f556"],["e02b","1f557"],["e02c","1f558"],["e02d","1f559"],["e02e","1f55a"],["1f561","1f561"],["1f562","1f562"],["1f563","1f563"],["1f564","1f564"],["1f565","1f565"],["1f566","1f566"],["2716","2716"],["2795","2795"],["2796","2796"],["2797","2797"],["e20e","2660"],["e20c","2665"],["e20f","2663"],["e20d","2666"],["1f4ae","1f4ae"],["1f4af","1f4af"],["2714","2714"],["2611","2611"],["1f518","1f518"],["1f517","1f517"],["27b0","27b0"],["e031","1f531"],["e21a","1f532"],["e21b","1f533"],["25fc","25fc"],["25fb","25fb"],["25fe","25fe"],["25fd","25fd"],["25aa","25aa"],["25ab","25ab"],["1f53a","1f53a"],["2b1c","2b1c"],["2b1b","2b1b"],["26ab","26ab"],["26aa","26aa"],["e219","1f534"],["1f535","1f535"],["1f53b","1f53b"],["1f536","1f536"],["1f537","1f537"],["1f538","1f538"],["1f539","1f539"],["2049","2049"],["203c","203c"],
     // UNCATEGORIZED
-["e326","1f3b6"],
-["e03e","1f3b5"],
-["1f46e","1f46e"],
-["e04a","2600"],
-["e04b","2614"],
-["e049","2601"],
-["e048","26c4"],
-["e04c","1f319"],
-["e13d","26a1"],
-["e443","1f300"],
-["e43e","1f30a"],
-["e04f","1f431"],
-["e052","1f436"],
-["e053","1f42d"],
-["e524","1f439"],
-["e52c","1f430"],
-["e52a","1f43a"],
-["e531","1f438"],
-["e050","1f42f"],
-["e527","1f428"],
-["e051","1f43b"],
-["e10b","1f437"],
-["e52b","1f42e"],
-["e52f","1f417"],
-["e109","1f435"],
-["e528","1f412"],
-["e01a","1f434"],
-["e134","1f40e"],
-["e530","1f42b"],
-["e529","1f411"],
-["e526","1f418"],
-["e52d","1f40d"],
-["e521","1f426"],
-["e523","1f424"],
-["e52e","1f414"],
-["e055","1f427"],
-["e525","1f41b"],
-["e10a","1f419"],
-["e522","1f420"],
-["e019","1f41f"],
-["e054","1f433"],
-["e520","1f42c"],
-["e306","1f490"],
-["e030","1f338"],
-["e304","1f337"],
-["e110","1f340"],
-["e032","1f339"],
-["e303","1f33a"],
-["e305","1f33b"],
-["e118","1f341"],
-["e447","1f343"],
-["e119","1f342"],
-["e307","1f334"],
-["e308","1f335"],
-["e444","1f33e"],
-["e441","1f41a"],
-["e436","1f38d"],
-["e437","1f49d"],
-["e438","1f38e"],
-["e43a","1f392"],
-["e439","1f393"],
-["e43b","1f38f"],
-["e117","1f386"],
-["e440","1f387"],
-["e442","1f390"],
-["e446","1f391"],
-["e445","1f383"],
-["e11b","1f47b"],
-["e448","1f385"],
-["e033","1f384"],
-["e112","1f381"],
-["e325","1f514"],
-["e312","1f389"],
-["e310","1f388"],
-["e126","1f4bf"],
-["e127","1f4c0"],
-["e008","1f4f7"],
-["e03d","1f3a5"],
-["e00c","1f4bb"],
-["e12a","1f4fa"],
-["e00a","1f4f1"],
-["e00b","1f4e0"],
-["e009","260e"],
-["e316","1f4bd"],
-["e129","1f4fc"],
-["e141","1f50a"],
-["e142","1f4e2"],
-["e317","1f4e3"],
-["e128","1f4fb"],
-["e14b","1f4e1"],
-["e114","1f50d"],
-["e145","1f513"],
-["e144","1f512"],
-["e03f","1f511"],
-["e313","2702"],
-["e116","1f528"],
-["e10f","1f4a1"],
-["e104","1f4f2"],
-["e103","1f4e9"],
-["e101","1f4eb"],
-["e102","1f4ee"],
-["e13f","1f6c0"],
-["e140","1f6bd"],
-["e12f","1f4b0"],
-["e30e","1f6ac"],
-["e311","1f4a3"],
-["e30f","1f48a"],
-["e13b","1f489"],
-["e42b","1f3c8"],
-["e42a","1f3c0"],
-["e018","26bd"],
-["e016","26be"],
-["e015","1f3be"],
-["e013","26f3"],
-["e42c","1f3b1"],
-["e42d","1f3ca"],
-["e017","1f3c4"],
-["1f3bf","1f3bf"],
-["e131","1f3c6"],
-["e12b","1f47e"],
-["e130","1f3af"],
-["e12d","1f004"],
-["e324","1f3ac"],
-["e301","1f4dd"],
-["e148","1f4d3"],
-["e502","1f3a8"],
-["e03c","1f3a4"],
-["e30a","1f3a7"],
-["e040","1f3b7"],
-["e042","1f3ba"],
-["e041","1f3b8"],
-["e045","2615"],
-["e338","1f375"],
-["e047","1f37a"],
-["e30c","1f37b"],
-["e044","1f378"],
-["e30b","1f376"],
-["e043","1f374"],
-["e120","1f354"],
-["e33b","1f35f"],
-["e33f","1f35d"],
-["e341","1f35b"],
-["e34c","1f371"],
-["e344","1f363"],
-["e342","1f359"],
-["e33d","1f358"],
-["e33e","1f35a"],
-["e340","1f35c"],
-["e34d","1f372"],
-["e339","1f35e"],
-["e147","1f373"],
-["e343","1f362"],
-["e33c","1f361"],
-["e33a","1f366"],
-["e43f","1f367"],
-["e34b","1f382"],
-["e046","1f370"],
-["e345","1f34e"],
-["e346","1f34a"],
-["e348","1f349"],
-["e347","1f353"],
-["e34a","1f346"],
-["e349","1f345"],
-["1f52b","1f52b"],
-["e44c","1f308"],
-["e132","1f3c1"],
-["e143","1f38c"]
-],
+    ["e326","1f3b6"],
+    ["e03e","1f3b5"],
+    ["1f46e","1f46e"],
+    ["e04a","2600"],
+    ["e04b","2614"],
+    ["e049","2601"],
+    ["e048","26c4"],
+    ["e04c","1f319"],
+    ["e13d","26a1"],
+    ["e443","1f300"],
+    ["e43e","1f30a"],
+    ["e04f","1f431"],
+    ["e052","1f436"],
+    ["e053","1f42d"],
+    ["e524","1f439"],
+    ["e52c","1f430"],
+    ["e52a","1f43a"],
+    ["e531","1f438"],
+    ["e050","1f42f"],
+    ["e527","1f428"],
+    ["e051","1f43b"],
+    ["e10b","1f437"],
+    ["e52b","1f42e"],
+    ["e52f","1f417"],
+    ["e109","1f435"],
+    ["e528","1f412"],
+    ["e01a","1f434"],
+    ["e134","1f40e"],
+    ["e530","1f42b"],
+    ["e529","1f411"],
+    ["e526","1f418"],
+    ["e52d","1f40d"],
+    ["e521","1f426"],
+    ["e523","1f424"],
+    ["e52e","1f414"],
+    ["e055","1f427"],
+    ["e525","1f41b"],
+    ["e10a","1f419"],
+    ["e522","1f420"],
+    ["e019","1f41f"],
+    ["e054","1f433"],
+    ["e520","1f42c"],
+    ["e306","1f490"],
+    ["e030","1f338"],
+    ["e304","1f337"],
+    ["e110","1f340"],
+    ["e032","1f339"],
+    ["e303","1f33a"],
+    ["e305","1f33b"],
+    ["e118","1f341"],
+    ["e447","1f343"],
+    ["e119","1f342"],
+    ["e307","1f334"],
+    ["e308","1f335"],
+    ["e444","1f33e"],
+    ["e441","1f41a"],
+    ["e436","1f38d"],
+    ["e437","1f49d"],
+    ["e438","1f38e"],
+    ["e43a","1f392"],
+    ["e439","1f393"],
+    ["e43b","1f38f"],
+    ["e117","1f386"],
+    ["e440","1f387"],
+    ["e442","1f390"],
+    ["e446","1f391"],
+    ["e445","1f383"],
+    ["e11b","1f47b"],
+    ["e448","1f385"],
+    ["e033","1f384"],
+    ["e112","1f381"],
+    ["e325","1f514"],
+    ["e312","1f389"],
+    ["e310","1f388"],
+    ["e126","1f4bf"],
+    ["e127","1f4c0"],
+    ["e008","1f4f7"],
+    ["e03d","1f3a5"],
+    ["e00c","1f4bb"],
+    ["e12a","1f4fa"],
+    ["e00a","1f4f1"],
+    ["e00b","1f4e0"],
+    ["e009","260e"],
+    ["e316","1f4bd"],
+    ["e129","1f4fc"],
+    ["e141","1f50a"],
+    ["e142","1f4e2"],
+    ["e317","1f4e3"],
+    ["e128","1f4fb"],
+    ["e14b","1f4e1"],
+    ["e114","1f50d"],
+    ["e145","1f513"],
+    ["e144","1f512"],
+    ["e03f","1f511"],
+    ["e313","2702"],
+    ["e116","1f528"],
+    ["e10f","1f4a1"],
+    ["e104","1f4f2"],
+    ["e103","1f4e9"],
+    ["e101","1f4eb"],
+    ["e102","1f4ee"],
+    ["e13f","1f6c0"],
+    ["e140","1f6bd"],
+    ["e12f","1f4b0"],
+    ["e30e","1f6ac"],
+    ["e311","1f4a3"],
+    ["e30f","1f48a"],
+    ["e13b","1f489"],
+    ["e42b","1f3c8"],
+    ["e42a","1f3c0"],
+    ["e018","26bd"],
+    ["e016","26be"],
+    ["e015","1f3be"],
+    ["e013","26f3"],
+    ["e42c","1f3b1"],
+    ["e42d","1f3ca"],
+    ["e017","1f3c4"],
+    ["1f3bf","1f3bf"],
+    ["e131","1f3c6"],
+    ["e12b","1f47e"],
+    ["e130","1f3af"],
+    ["e12d","1f004"],
+    ["e324","1f3ac"],
+    ["e301","1f4dd"],
+    ["e148","1f4d3"],
+    ["e502","1f3a8"],
+    ["e03c","1f3a4"],
+    ["e30a","1f3a7"],
+    ["e040","1f3b7"],
+    ["e042","1f3ba"],
+    ["e041","1f3b8"],
+    ["e045","2615"],
+    ["e338","1f375"],
+    ["e047","1f37a"],
+    ["e30c","1f37b"],
+    ["e044","1f378"],
+    ["e30b","1f376"],
+    ["e043","1f374"],
+    ["e120","1f354"],
+    ["e33b","1f35f"],
+    ["e33f","1f35d"],
+    ["e341","1f35b"],
+    ["e34c","1f371"],
+    ["e344","1f363"],
+    ["e342","1f359"],
+    ["e33d","1f358"],
+    ["e33e","1f35a"],
+    ["e340","1f35c"],
+    ["e34d","1f372"],
+    ["e339","1f35e"],
+    ["e147","1f373"],
+    ["e343","1f362"],
+    ["e33c","1f361"],
+    ["e33a","1f366"],
+    ["e43f","1f367"],
+    ["e34b","1f382"],
+    ["e046","1f370"],
+    ["e345","1f34e"],
+    ["e346","1f34a"],
+    ["e348","1f349"],
+    ["e347","1f353"],
+    ["e34a","1f346"],
+    ["e349","1f345"],
+    ["1f52b","1f52b"],
+    ["e44c","1f308"],
+    ["e132","1f3c1"],
+    ["e143","1f38c"]
+  ],
 
   charToData: function (char) {
     var data = char;
