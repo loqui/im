@@ -354,6 +354,10 @@ var bindings = function () {
   });
 
   window.addEventListener('touchend', function(){
-    VoiceRecorder.stop();
+    VoiceRecorder.stop(duration => {
+      if (duration < 1) {
+        Lungo.Notification.error(_('HoldToRecordTitle'), _('HoldToRecordBody'), 'info-sign', 10);
+      }
+    });
   });
 };
