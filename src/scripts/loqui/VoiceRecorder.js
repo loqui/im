@@ -28,6 +28,12 @@ var VoiceRecorder = {
   _audioPromise : null,
 
   /**
+   * @type {boolean}
+   * @private
+   */
+  _active : false,
+
+  /**
    * @type {AudioStream}
    * @private
    */
@@ -40,6 +46,15 @@ var VoiceRecorder = {
   _audioRecorder : null,
 
   /**
+   * @private
+   */
+  getDurationSeconds : function(){
+    let [minutes, seconds] = this.duration.get().split(':').map(item => parseInt(item));
+
+    return minutes * 60 + seconds;
+  },
+
+  /**
    * Starts the audio recording.
    */
   start : function() {
@@ -47,28 +62,31 @@ var VoiceRecorder = {
     if (this.processing.get() || this.recording.get()) { return; }
 
     this._audioPromise = null;
+    this._active = true;
+    this.duration.set('00:00');
 
     navigator.getUserMedia({audio : true}, (stream) => {
-      var start = Date.now();
-      var touch = null;
+      if (this._active) {
+        var start = Date.now();
+        var touch = null;
 
-      this._audioStream = stream;
-      this._audioRecorder = new MediaRecorder(stream);
+        this._audioStream = stream;
+        this._audioRecorder = new MediaRecorder(stream);
 
-      var interval = setInterval(() => {
-        var time = (new Date());
-        time.setTime(Date.now() - start);
+        var interval = setInterval(() => {
+          var time = (new Date());
+          time.setTime(Date.now() - start);
 
-        this.duration.set((time.getMinutes() < 10 ? '0' : '') + time.getMinutes() + ':' + (time.getSeconds() < 10 ? '0' : '') + time.getSeconds());
-      }, 1000);
+          this.duration.set((time.getMinutes() < 10 ? '0' : '') + time.getMinutes() + ':' + (time.getSeconds() < 10 ? '0' : '') + time.getSeconds());
+        }, 1000);
 
-      this.duration.set('00:00');
-      this.recording.set(interval);
+        this.recording.set(interval);
+        this._audioRecorder.start();
 
-      this._audioRecorder.start();
-
-      Tools.log('recording now!');
-
+        Tools.log('recording now!');
+      } else {
+        stream.stop();
+      }
     }, function(e){
       console.error(e);
     });
@@ -88,7 +106,7 @@ var VoiceRecorder = {
         this.processing.set(false);
         this._audioPromise = null;
 
-        return blob;
+        return { blob : blob, duration : this.getDurationSeconds() };
       });
     } else {
       return Promise.resolve(null);
@@ -98,7 +116,13 @@ var VoiceRecorder = {
   /**
    * Stops the current recording.
    */
-  stop : function(){
+  stop : function(cb){
+
+    if (this._active) {
+      this._active = false;
+      cb(this.getDurationSeconds());
+    }
+
     if (this._audioStream && this._audioRecorder) {
       this._audioPromise = new Promise((resolve) => {
         this._audioRecorder.ondataavailable = e => resolve(e.data);

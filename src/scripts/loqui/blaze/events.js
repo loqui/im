@@ -106,8 +106,10 @@ Template.footbox.events({
     var to = $('section#chat')[0].dataset.jid;
     var account = Accounts.current;
 
-    VoiceRecorder.getBlob().then(blob => {
-      if (blob) account.connector.fileSend(to, blob);
+    VoiceRecorder.getBlob().then(recording => {
+      if (recording && recording.duration > 0) {
+        account.connector.fileSend(to, recording.blob);
+      }
     });
   },
 
