@@ -13,6 +13,73 @@
 'use strict';
 
 /**
+ * @class CoSeMeConnectorHelper
+ */
+var CosemeConnectorHelper = {
+  tokenDataKeys : [ 'v', 'r', 'u', 't', 'd' ],
+
+  init : function () {
+    CoSeMe.config.customLogger = Tools;
+
+    for (var i in this.tokenDataKeys) {
+      var key = this.tokenDataKeys[i];
+      CoSeMe.config.tokenData[key] = window.localStorage.getItem('CoSeMe.tokenData.' + key) || CoSeMe.config.tokenData[key];
+    }
+  },
+
+  updateTokenData : function (cb, cbUpdated) {
+    var self = this;
+    var ts = (new Date()).getTime() / 1000;
+    if (ts - 3600 > Number(window.localStorage.getItem('CoSeMe.dataUpdated'))) {
+      Tools.log("UPDATING token data");
+      var xhr = new XMLHttpRequest({mozSystem: true});
+      xhr.onload = function() {
+        var updated = false;
+        window.localStorage.setItem('CoSeMe.dataUpdated', ts);
+
+        if (this.response) {
+          Tools.log(this.response);
+          for (var i in self.tokenDataKeys) {
+            var key = self.tokenDataKeys[i];
+            var value = this.response[key];
+            if (value) {
+              if (CoSeMe.config.tokenData[key] != value) {
+                updated = true;
+              }
+              CoSeMe.config.tokenData[key] = value;
+              window.localStorage.setItem('CoSeMe.tokenData.' + key, value);
+            }
+          }
+        }
+
+        Tools.log('Token data ' + (updated ? '' : 'NOT ') + 'updated');
+
+        if (updated && cbUpdated) {
+          cbUpdated();
+        } else if (cb) {
+          cb();
+        }
+      };
+      xhr.onerror = function() {
+        window.localStorage.setItem('CoSeMe.dataUpdated', ts);
+        if (cb) {
+          cb();
+        }
+      };
+      xhr.open('GET', 'https://raw.githubusercontent.com/loqui/im/dev/tokenData.json');
+      xhr.overrideMimeType('json');
+      xhr.responseType = 'json';
+      xhr.setRequestHeader('Accept', 'text/json');
+      xhr.send();
+    } else if (cb) {
+      cb();
+    }
+  }
+};
+
+CosemeConnectorHelper.init();
+
+/**
  * @class Connector/CoSeMe
  * @implements Connector
  * @param {Account} account
@@ -24,8 +91,6 @@ App.connectors.coseme = function (account) {
   var MI = Yowsup.getMethodsInterface();
 
   var pulse= null;
-
-  CoSeMe.config.customLogger = Tools;
 
   this.account = account;
   this.provider = Providers.data[account.core.provider];
@@ -78,7 +143,7 @@ App.connectors.coseme = function (account) {
       if (reason == 'connection-refused') {
         callback.connfail();
       } else {
-        callback.authfail(reason);
+        CosemeConnectorHelper.updateTokenData(function () { callback.authfail(reason); }, callback.connfail);
       }
     }.bind(this));
     Yowsup.connectionmanager.signals.disconnected.length = 0;
@@ -1236,7 +1301,9 @@ events: function (target) {
         Store.SD.save('.coseme.id', [deviceId]);
         codeGet(deviceId);
       };
-      Store.SD.recover('.coseme.id', onhasid, onneedsid);
+      CosemeConnectorHelper.updateTokenData(function () {
+        Store.SD.recover('.coseme.id', onhasid, onneedsid);
+      });
     }
   } else if (target.hasClass('voiceReq')) {
     provider = article.parentNode.id;
@@ -1288,7 +1355,9 @@ events: function (target) {
         Store.SD.save('.coseme.id', [deviceId]);
         codeGet(deviceId);
       };
-      Store.SD.recover('.coseme.id', onhasid, onneedsid);
+      CosemeConnectorHelper.updateTokenData(function () {
+        Store.SD.recover('.coseme.id', onhasid, onneedsid);
+      });
     }
   } else if (target.hasClass('valCode')) {
     provider = article.parentNode.id;
