@@ -1,6 +1,3 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 /*
 CryptoJS v3.1.2
 code.google.com/p/crypto-js
@@ -2788,7 +2785,7 @@ code.google.com/p/crypto-js/wiki/License
           throw new Error("Update not supported!");
         },
 
-        // This append doesn't actually append...
+        // This append doesn't actually append... 
         // It just stores a ref to data. So any previous data will be lost!
         _append: function (data) {
           this._data = data;
@@ -2910,7 +2907,7 @@ code.google.com/p/crypto-js/wiki/License
            this._doProcessBlock(dataWords, offset);
          }
        }
-       // Remove processed even if we didn't process any words...
+       // Remove processed even if we didn't process any words... 
        // the hard way. Let's assume dataWords is NOT an array
        var l = dataWords.length;
        var dataLeft = new Array(l - offset)
@@ -5268,8 +5265,7 @@ CoSeMe.namespace('protocol', (function(){
    */
   BinaryReader.prototype.checkForAnotherTree = function() {
     while (!this.waitingForMessage()) {
-
-       if (!this.isStreamStartRead) {
+      if (!this.isStreamStartRead) {
         this.readStreamStart();
         this.isStreamStartRead = true;
       } else {
@@ -5395,6 +5391,7 @@ CoSeMe.namespace('protocol', (function(){
           if (typeof method === 'function') {
             method(err, tree);
           }
+
         }
         lock.unlock();
       }).bind(this, callbackName, err, tree, lock));
@@ -5658,6 +5655,7 @@ CoSeMe.namespace('protocol', (function(){
            undefined;
   };
 
+  /* TODO: Explain and remove unused variables. There are some errors as well. */
   BinaryReader.prototype.readNibble = function() {
     var nibbles = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '.' ];
     var b = this.message.read();
@@ -6971,7 +6969,6 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
         author = messageNode.getAttributeValue("participant"),
         pushName = messageNode.getAttributeValue('notify'),
         msgId = messageNode.getAttributeValue("id"),
-        attribute_t = messageNode.getAttributeValue("t"),
         typeAttribute = messageNode.getAttributeValue("type"),
         wantsReceipt = false;
 
@@ -6993,10 +6990,12 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
           if (isGroup) {
             _signalInterface.send("group_imageReceived",
                                   [msgId, fromAttribute, author, mediaPreview,
-                                  mediaUrl, mediaSize, wantsReceipt, pushName]);
+                                  mediaUrl, mediaSize, wantsReceipt, pushName,
+                                  timestamp]);
           } else {
             _signalInterface.send("image_received", [msgId, fromAttribute, mediaPreview, mediaUrl,
-                                                     mediaSize, wantsReceipt, isBroadcast, pushName]);
+                                                     mediaSize, wantsReceipt, isBroadcast, pushName,
+                                                     timestamp]);
           }
         },
 
@@ -7004,10 +7003,11 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
           if (isGroup) {
             _signalInterface.send("group_videoReceived",
                                   [msgId, fromAttribute, author, mediaPreview, mediaUrl,
-                                   mediaSize, wantsReceipt, pushName]);
+                                   mediaSize, wantsReceipt, pushName, timestamp]);
           } else {
             _signalInterface.send("video_received", [msgId, fromAttribute, mediaPreview,
-                                                     mediaUrl, mediaSize, wantsReceipt, isBroadcast, pushName]);
+                                                     mediaUrl, mediaSize, wantsReceipt,
+                                                     isBroadcast, pushName, timestamp]);
           }
         },
 
@@ -7016,11 +7016,13 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
           if (isGroup) {
             _signalInterface.send("group_audioReceived",
                                   [msgId, fromAttribute, author,
-                                  mediaUrl, mediaSize, wantsReceipt, pushName]);
+                                  mediaUrl, mediaSize, wantsReceipt, pushName,
+                                  timestamp]);
           } else {
             _signalInterface.send("audio_received",
                                   [msgId, fromAttribute, mediaUrl,
-                                  mediaSize, wantsReceipt, isBroadcast, pushName]);
+                                  mediaSize, wantsReceipt, isBroadcast, pushName,
+                                  timestamp]);
           }
         },
 
@@ -7033,11 +7035,13 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
           if (isGroup) {
             _signalInterface.send("group_locationReceived",
                                   [msgId, fromAttribute, author, name, mediaPreview,
-                                   mlatitude, mlongitude, wantsReceipt, pushName]);
+                                   mlatitude, mlongitude, wantsReceipt, pushName,
+                                   timestamp]);
           } else {
             _signalInterface.send("location_received",
                                   [msgId, fromAttribute, name, mediaPreview, mlatitude,
-                                  mlongitude, wantsReceipt, isBroadcast, pushName]);
+                                  mlongitude, wantsReceipt, isBroadcast, pushName,
+                                  timestamp]);
           }
         },
 
@@ -7057,11 +7061,13 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
             if (isGroup) {
                 _signalInterface.send("group_vcardReceived",
                                       [msgId, fromAttribute, author, vcardName,
-                                       vcardData, wantsReceipt, pushName]);
+                                       vcardData, wantsReceipt, pushName,
+                                       timestamp]);
             } else {
               _signalInterface.send("vcard_received",
                                     [msgId, fromAttribute, vcardName,
-                                     vcardData, wantsReceipt, isBroadcast, pushName]);
+                                     vcardData, wantsReceipt, isBroadcast, pushName,
+                                     timestamp]);
             }
           }
         }
@@ -7146,7 +7152,6 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
 
       } else if (!ProtocolTreeNode.tagEquals(childNode,"active")) {
         processActive(childNode);
-
       }
     }
 
@@ -7169,7 +7174,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
         if (newSubject) {
           _signalInterface.send("group_subjectReceived",
                                 [msgId, fromAttribute, author, newSubject,
-                                 Number(attribute_t).valueOf(),  receiptRequested]);
+                                 timestamp, receiptRequested]);
         }
       },
 
@@ -7250,7 +7255,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
     var groups = [];
     var id = node.getAttributeValue('id');
     node.children[0].children.forEach(function (groupNode) {
-	groups.push({
+      groups.push({
         gid: groupNode.getAttributeValue('id'),
         owner: groupNode.getAttributeValue('owner'),
         subject: stringFromUtf8(groupNode.getAttributeValue('subject')),
@@ -7813,7 +7818,8 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
         'to': to
       };
 
-      self._writeNode(newProtocolTreeNode('receipt', attributes, [ newProtocolTreeNode('error', { 'type': 'plaintext-only' })] ));
+      self._writeNode(newProtocolTreeNode('receipt', attributes,
+        [ newProtocolTreeNode('error', { 'type': 'plaintext-only' })] ));
     },
 
     getReceiptAck: function(to, id, type, participant, from) {
