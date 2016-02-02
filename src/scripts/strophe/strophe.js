@@ -5537,7 +5537,7 @@ Strophe.Tcpsocket = function(connection) {
 
 Strophe.Tcpsocket.prototype = {
     /** PrivateFunction: _buildStream
-     *  _Private_ helper function to generate the <stream> start tag for WebSockets
+     *  _Private_ helper function to generate the <stream> start tag for Tcpsocket
      *
      *  Returns:
      *    A Strophe.Builder with a <stream> element.
@@ -5612,7 +5612,7 @@ Strophe.Tcpsocket.prototype = {
      *  Reset the connection.
      *
      *  This function is called by the reset function of the Strophe Connection.
-     *  Is not needed by WebSockets.
+     *  Is not needed by Tcpsocket.
      */
     _reset: function ()
     {
@@ -5710,7 +5710,7 @@ Strophe.Tcpsocket.prototype = {
     },
 
     _onReceive: function(message) {
-        var string = message.data;
+        var string = decodeURIComponent(escape(message.data));
         console.log("_onReceive: "+string);
 
         // Make sure we send only complete XML documents.
@@ -5874,9 +5874,8 @@ Strophe.Tcpsocket.prototype = {
             if (pres) {
                 this._conn.send(pres);
             }
-            var close = '</stream:stream>';
-            this._conn.xmlOutput(document.createElement("stream:stream"));
-            this._conn.rawOutput(close);
+            var closeString = '</stream:stream>';
+            this._conn.rawOutput(closeString);
             try {
                 this.socket.send(closeString);
             } catch (e) {
@@ -5890,17 +5889,17 @@ Strophe.Tcpsocket.prototype = {
     /** PrivateFunction: _doDisconnect
      *  _Private_ function to disconnect.
      *
-     *  Just closes the Socket for WebSockets
+     *  Just closes the Socket for Tcpsocket
      */
     _doDisconnect: function ()
     {
-        Strophe.info("WebSockets _doDisconnect was called");
+        Strophe.info("Tcpsocket _doDisconnect was called");
         this._closeSocket();
     },
 
     /** PrivateFunction _streamWrap
      *  _Private_ helper function to wrap a stanza in a <stream> tag.
-     *  This is used so Strophe can process stanzas from WebSockets like BOSH
+     *  This is used so Strophe can process stanzas from Tcpsocket like BOSH
      */
     _streamWrap: function (stanza)
     {
@@ -5909,7 +5908,7 @@ Strophe.Tcpsocket.prototype = {
 
 
     /** PrivateFunction: _closeSocket
-     *  _Private_ function to close the WebSocket.
+     *  _Private_ function to close the Tcpsocket.
      *
      *  Closes the socket if it is still open and deletes it
      */
@@ -5925,7 +5924,7 @@ Strophe.Tcpsocket.prototype = {
      * _Private_ function to check if the message queue is empty.
      *
      *  Returns:
-     *    True, because WebSocket messages are send immediately after queueing.
+     *    True, because Tcpsocket messages are send immediately after queueing.
      */
     _emptyQueue: function ()
     {
@@ -5933,17 +5932,17 @@ Strophe.Tcpsocket.prototype = {
     },
 
     /** PrivateFunction: _onClose
-     * _Private_ function to handle websockets closing.
+     * _Private_ function to handle Tcpsocket closing.
      *
-     * Nothing to do here for WebSockets
+     * Nothing to do here for Tcpsocket
      */
     _onClose: function() {
         console.log("onClose");
         if(this._conn.connected && !this._conn.disconnecting) {
-            Strophe.error("Websocket closed unexcectedly");
+            Strophe.error("Tcpsocket closed unexcectedly");
             this._conn._doDisconnect();
         } else {
-            Strophe.info("Websocket closed");
+            Strophe.info("Tcpsocket closed");
         }
     },
 
@@ -5966,7 +5965,7 @@ Strophe.Tcpsocket.prototype = {
     /** PrivateFunction: _onDisconnectTimeout
      *  _Private_ timeout handler for handling non-graceful disconnection.
      *
-     *  This does nothing for WebSockets
+     *  This does nothing for Tcpsocket
      */
     _onDisconnectTimeout: function () {},
 
@@ -5976,16 +5975,16 @@ Strophe.Tcpsocket.prototype = {
     _abortAllRequests: function () {},
 
     /** PrivateFunction: _onError
-     * _Private_ function to handle websockets errors.
+     * _Private_ function to handle tcpsocket errors.
      *
      * Parameters:
-     * (Object) error - The websocket error.
+     * (Object) error - The tcpsocket error.
      */
     _onError: function(error) {
         console.log("onError " + error);
         console.log(error);
-        Strophe.error("Websocket error " + error);
-        this._conn._changeConnectStatus(Strophe.Status.CONNFAIL, "The WebSocket connection could not be established was disconnected.");
+        Strophe.error("Tcpsocket error " + error);
+        this._conn._changeConnectStatus(Strophe.Status.CONNFAIL, "The Tcpsocket connection could not be established was disconnected.");
         this._disconnect();
     },
 
@@ -6009,7 +6008,7 @@ Strophe.Tcpsocket.prototype = {
                     }
                     this._conn.xmlOutput(stanza);
                     this._conn.rawOutput(rawStanza);
-                    this.socket.send(rawStanza);
+                    this.socket.send(unescape(encodeURIComponent(rawStanza)));
                 }
             }
             this._conn._data = [];
@@ -6093,7 +6092,7 @@ Strophe.Tcpsocket.prototype = {
     },
 
     /** PrivateFunction: _onOpen
-     * _Private_ function to handle websockets connection setup.
+     * _Private_ function to handle tcpsocket connection setup.
      *
      * The opening stream tag is sent here.
      */
@@ -6104,7 +6103,7 @@ Strophe.Tcpsocket.prototype = {
 
         var startString = this._removeClosingTag(start);
         this._conn.rawOutput(startString);
-        this.socket.send(startString);
+        this.socket.send(unescape(encodeURIComponent(startString)));
     },
 
     /** PrivateFunction: _removeClosingTag
@@ -6125,7 +6124,7 @@ Strophe.Tcpsocket.prototype = {
     /** PrivateFunction: _reqToData
      * _Private_ function to get a stanza out of a request.
      *
-     * WebSockets don't use requests, so the passed argument is just returned.
+     * Tcpsocket don't use requests, so the passed argument is just returned.
      *
      *  Parameters:
      *    (Object) stanza - The stanza.
@@ -6139,7 +6138,7 @@ Strophe.Tcpsocket.prototype = {
     },
 
     /** PrivateFunction: _send
-     *  _Private_ part of the Connection.send function for WebSocket
+     *  _Private_ part of the Connection.send function for Tcpsocket
      *
      * Just flushes the messages that are in the queue
      */
