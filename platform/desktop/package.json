@@ -1,7 +1,7 @@
 {
   "name": "LoquiIM",
   "description": "Loqui Instant Messenger unifies all your chat accounts in just one app.",
-  "version": "v0.4.14a",
+  "version": "v0.4.15",
   "main": "index.html",
   "window": {
     "toolbar": false,
