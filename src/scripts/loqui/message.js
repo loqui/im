@@ -165,11 +165,19 @@ var Message = {
       this.options.otr = true;
       this.core.id = Date.now() + 'OTR';
 
-      this.postSend();
-
-      chat.OTR.sendMsg(this.core.id, message.core.text);
+      this.postSend().then(function () {
+        chat.OTR.sendMsg(message.core.id, message.core.text);
+      });
     } else {
       this.postSend();
+    }
+  },
+
+  _sent : function () {
+    Tools.log('SEND', this.core.id, this.core.text, this.options);
+
+    if (this.options.render) {
+      this.addToChat();
     }
   },
 
@@ -178,17 +186,21 @@ var Message = {
    */
   postSend : function () {
     if (this.account.connector.isConnected() && this.options.send) {
-      this.core.id = this.account.connector.send(this.core.to, this.core.text, {delay: (this.options && 'delay' in this.options) ? this.core.stamp : this.options.delay, muc: this.options.muc});
+      var self = this;
+      return this.account.connector.sendAsync(this.core.to, this.core.text, {delay: (this.options && 'delay' in this.options) ? this.core.stamp : this.options.delay, muc: this.options.muc}).then(function (msgId) {
+        self.core.id = msgId;
 
-      if (this.core.original) {
-        this._replace();
-      }
-    }
+        if (self.core.original) {
+          self._replace();
+        }
 
-    Tools.log('SEND', this.core.id, this.core.text, this.options);
-
-    if (this.options.render) {
-      this.addToChat();
+        self._sent();
+      });
+    } else {
+      return new Promise(function (ready) {
+        this._sent();
+        ready();
+      });
     }
   },
 

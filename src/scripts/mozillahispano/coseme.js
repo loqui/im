@@ -3988,6 +3988,22 @@ CoSeMe.namespace('utils', (function(){
         template = template.replace('{' + param + '}', params[param], 'g');
       }
       return template;
+    },
+
+    adjustId: function (id) {
+      return ((id >> 24) ? String.fromCharCode((id >> 24) & 0xff) : '') +
+        String.fromCharCode((id >> 16) & 0xff) +
+        String.fromCharCode((id >> 8) & 0xff) +
+        String.fromCharCode((id >> 0) & 0xff);
+    },
+
+    deAdjustId: function (s) {
+      var id = 0;
+      for (var idx in s) {
+        id = (id << 8) + String.charCodeAt(s[idx]);
+      }
+
+      return id;
     }
   };
 
@@ -6806,19 +6822,23 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
           return;
         }
 
-        var params = [
-          fromAttribute,
-          msgId,
-          type,
-          participant,
-          toAttribute
-        ];
-
         if (fromAttribute == "s.us") {
           _signalInterface.send("profile_setStatusSuccess", ["s.us", msgId]);
-          return;
+        } else if (type == "error") {
+          var errorType = node.getChild('error').getAttributeValue('type');
+          _signalInterface.send("receipt_messageError",
+                                [ fromAttribute, msgId, participant, errorType ]);
+        } else if (type == "retry") {
+          var count = node.getChild('retry').getAttributeValue('count');
+          var regId = CoSeMe.utils.deAdjustId(node.getChild('registration').data);
+          _signalInterface.send("receipt_messageRetry",
+                                [ fromAttribute, msgId, participant, count,
+                                  regId ]);
+        } else {
+          _signalInterface.send("receipt_messageDelivered",
+                                [ fromAttribute, msgId, type,
+                                  participant, toAttribute ]);
         }
-        _signalInterface.send("receipt_messageDelivered", params);
         return;
 
       } else if (ProtocolTreeNode.tagEquals(node, 'chatstate')) {
@@ -6946,6 +6966,10 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
           var bodyNode = node.getChild(0);
           var status = stringFromUtf8(bodyNode.data);
           _signalInterface.send('notification_status', [from, msgId, status]);
+        }
+        else if (type === 'encrypt') {
+          var count = node.getChild(0).getAttributeValue('count');
+          _signalInterface.send('notification_encrypt', [from, msgId, count]);
         }
         else {
           // ignore, but at least acknowledge it
@@ -7149,7 +7173,21 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
         msgData = childNode.data;
 
       } else if (ProtocolTreeNode.tagEquals(childNode, "enc")) {
-        _signalInterface.onEncryptedMessage(fromAttribute, msgId);
+        var type = childNode.getAttributeValue("type");
+        var v = childNode.getAttributeValue("v");
+        var count = childNode.getAttributeValue("count");
+
+        if (isGroup) {
+          _signalInterface.send("encrypt_groupMessageReceived",
+                                [ msgId, fromAttribute, author,
+                                  CoSeMe.utils.bytesFromLatin1(childNode.data),
+                                  type, v, count, timestamp, pushName ]);
+        } else {
+          _signalInterface.send("encrypt_messageReceived",
+                                [ msgId, fromAttribute,
+                                  CoSeMe.utils.bytesFromLatin1(childNode.data),
+                                  type, v, count, timestamp, pushName ]);
+        }
 
       } else if (!ProtocolTreeNode.tagEquals(childNode,"active")) {
         processActive(childNode);
@@ -7494,6 +7532,25 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
     }
   }
 
+  function parseEncryptGetKeys(node) {
+    var keys = [];
+    var id = node.getAttributeValue('id');
+    node.children[0].children.forEach(function (userNode) {
+      keys.push({
+        jid: userNode.getAttributeValue('jid'),
+        registration: CoSeMe.utils.deAdjustId(userNode.getChild('registration').data),
+        type: userNode.getChild('type').data,
+        identity: CoSeMe.utils.bytesFromLatin1(userNode.getChild('identity').data).buffer,
+        skey: { id: CoSeMe.utils.deAdjustId(userNode.getChild('skey').getChild('id').data),
+                value: CoSeMe.utils.bytesFromLatin1(userNode.getChild('skey').getChild('value').data).buffer,
+                signature: CoSeMe.utils.bytesFromLatin1(userNode.getChild('skey').getChild('signature').data).buffer },
+        key: { id: CoSeMe.utils.deAdjustId(userNode.getChild('key').getChild('id').data),
+               value: CoSeMe.utils.bytesFromLatin1(userNode.getChild('key').getChild('value').data).buffer }
+      });
+    });
+    _signalInterface.send('encrypt_gotKeys', [keys, id]);
+  }
+
   var alive = false;
 
   return {
@@ -7550,6 +7607,8 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
     parseContactsStatus: parseContactsStatus,
 
     parseGetPictureIds: parseGetPictureIds,
+
+    parseEncryptGetKeys : parseEncryptGetKeys,
 
     // Not very pretty but then, what is?
     set signalInterface(si) {
@@ -7609,6 +7668,8 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
 
       receipt_messageSent: [],
       receipt_messageDelivered: [],
+      receipt_messageError: [],
+      receipt_messageRetry: [],
       receipt_visible: [],
       receipt_broadcastSent: [],
       status_dirty: [],
@@ -7648,7 +7709,11 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
       notification_groupParticipantAdded: [],
       notification_groupParticipantRemoved: [],
       notification_status: [],
+      notification_encrypt: [],
 
+      encrypt_gotKeys: [],
+      encrypt_messageReceived: [],
+      encrypt_groupMessageReceived: [],
 
       contact_gotProfilePictureId: [],
       contact_gotProfilePicture: [],
@@ -7714,7 +7779,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
       }
     },
 
-    getMessageNode: function(aJid, aChild) {
+    getMessageNode: function(aJid, aChild, aMsgId) {
       var messageChildren = [];
       if (aChild instanceof Array) {
         messageChildren = messageChildren.concat(aChild);
@@ -7722,7 +7787,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
         messageChildren.push(aChild);
       }
 
-      var msgId = Math.floor(Date.now() / 1000)  + '-' + self.currKeyId;
+      var msgId = aMsgId ? aMsgId : (Math.floor(Date.now() / 1000)  + '-' + self.currKeyId);
 
       var messageNode = newProtocolTreeNode('message', {
         to: aJid,
@@ -7738,12 +7803,13 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
     sendMessage:  function() {
       var aParams = Array.prototype.slice.call(arguments);
       var aFun = aParams.shift();
+      var msgId = aParams.shift();
       var node = aFun.apply(self, aParams);
       var jid =
         (typeof aParams[0] === 'string') || (aParams[0] instanceof String) ?
             aParams[0] :
             'broadcast';
-      var messageNode = self.getMessageNode(jid, node);
+      var messageNode = self.getMessageNode(jid, node, msgId);
       self._writeNode(messageNode);
       // To-Do: Check that ProtocolTreeNode has getAttributeValue!!!
       return messageNode.getAttributeValue('id');
@@ -7812,15 +7878,28 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
       self._writeNode(newProtocolTreeNode('ack', attributes));
     },
 
-    sendReceiptErrorEncrypted: function(to, id) {
+    sendReceiptRetry: function(jid, mid, regId, count, vers, participant) {
+      attributes = {
+        to: jid,
+        id: mid,
+        type: 'retry'
+      };
+      participant && (attributes.participant = participant);
+      self._writeNode(newProtocolTreeNode('receipt', attributes,
+          [ newProtocolTreeNode('registration', null, null, CoSeMe.utils.adjustId(regId)),
+            newProtocolTreeNode('retry', { count : count, id : mid, v : vers }) ]));
+    },
+
+    sendReceiptError: function(to, id, type, participant) {
       var attributes = {
         'type': 'error',
         id: id,
         'to': to
       };
+      participant && (attributes.participant = participant);
 
       self._writeNode(newProtocolTreeNode('receipt', attributes,
-        [ newProtocolTreeNode('error', { 'type': 'plaintext-only' })] ));
+        [ newProtocolTreeNode('error', { 'type': type })] ));
     },
 
     getReceiptAck: function(to, id, type, participant, from) {
@@ -8025,6 +8104,49 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
     self._writeNode(iqNode);
   }
 
+  function sendEncryptGetKeys(jids) {
+    var id = self.makeId('encrypt_');
+    var keyNode = newProtocolTreeNode('key', null, jids.map(function(jid) {
+      return newProtocolTreeNode('user', { jid: jid });
+    }));
+
+    var iqNode = newProtocolTreeNode('iq', {
+      to: 's.whatsapp.net',
+      id: id,
+      type: 'get',
+      xmlns: 'encrypt'
+    }, [keyNode]);
+    self.readerThread.requests[id] = self.readerThread.parseEncryptGetKeys;
+    self._writeNode(iqNode);
+  }
+
+  function sendEncryptSetKeys(identity, registration, type, keys, skey) {
+    var id = self.makeId('encrypt_');
+
+    var keyListNode = newProtocolTreeNode('list', null, keys.map(function(key) {
+      return newProtocolTreeNode('key', null, [
+        newProtocolTreeNode('id', null, null, CoSeMe.utils.adjustId(key.id)),
+        newProtocolTreeNode('value', null, null, key.value) ]);
+    }));
+    var identityNode = newProtocolTreeNode('identity', null, null, identity);
+    var registrationNode = newProtocolTreeNode('registration', null, null, CoSeMe.utils.adjustId(registration));
+    var typeNode = newProtocolTreeNode('type', null, null, type);
+    var skeyNode = newProtocolTreeNode('skey', null, [
+      newProtocolTreeNode('id', null, null, CoSeMe.utils.adjustId(skey.id)),
+      newProtocolTreeNode('value', null, null, skey.value),
+      newProtocolTreeNode('signature', null, null, skey.signature)
+    ]);
+
+    var iqNode = newProtocolTreeNode('iq', {
+      to: 's.whatsapp.net',
+      id: id,
+      type: 'set',
+      xmlns: 'encrypt'
+    }, [keyListNode, identityNode, registrationNode, typeNode, skeyNode]);
+
+    self._writeNode(iqNode);
+  }
+
   var methodList = {
 
     is_online: function () {
@@ -8049,7 +8171,6 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
               self.readerThread.signalInterface = {
                 onPing: (self.autoPong ? self.sendPong : null),
                 onUnknownNotification: self.sendNotificationAck,
-                onEncryptedMessage: self.sendReceiptErrorEncrypted,
                 send: fireEvent
               };
               self.jid = self.socket.jid;
@@ -8099,13 +8220,13 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
     // Hmm... To-Do? I don't think this will actually work...
     message_imageSend: self.sendMessage.bind(self, self.mediaNode.bind(self, function() {
       return 'image';
-    })),
+    }), null),
     message_videoSend: self.sendMessage.bind(self, self.mediaNode.bind(self, function() {
       return 'video';
-    })),
+    }), null),
     message_audioSend: self.sendMessage.bind(self, self.mediaNode.bind(self, function() {
       return 'audio';
-    })),
+    }), null),
 
     message_locationSend: self.sendMessage.bind(self,
       function(aJid, aLatitude, aLongitude, aPreview) {
@@ -8115,13 +8236,13 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
            latitude: aLatitude,
            longitude: aLongitude},
           null, aPreview);
-    }),
+      }, null),
     message_vcardSend: self.sendMessage.bind(self, function(aJid, aData, aName) {
       aName = utf8FromString(aName);
       var cardNode = newProtocolTreeNode('vcard', {name: aName}, null, aData);
       return newProtocolTreeNode('media',
           {xmlns: 'urn:xmpp:whatsapp:mms', type: 'vcard'}, [cardNode]);
-    }),
+    }, null),
 
     //Message and Notification Acks
 
@@ -8135,6 +8256,12 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
       self._writeNode(
         self.getReceiptAck(aTo, aMsgId, type, participant, from)
       );
+    },
+    message_retry: function(aJid, aMsgId, regId, count, vers, participant) {
+      self.sendReceiptRetry(aJid, aMsgId, regId, count, vers, participant);
+    },
+    message_error: function(aJid, aMsgId, type, participant) {
+      self.sendReceiptError(aJid, aMsgId, type, participant);
     },
     visible_ack: function(aJid, aMsgId) {
       self._writeNode(self.getReceiptAck(aJid, aMsgId, 'visible'));
@@ -8394,6 +8521,22 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
 
     profile_setPicture: function (preview, thumb) {
       return sendSetPicture(self.jid, preview, thumb);
+    },
+
+    // Encrypt
+
+    encrypt_sendMessage: self.sendMessage.bind(self, function(aJid, buffer, type, v, count) {
+      var attrs = { type : type, v : v };
+      count && (attrs.count = count);
+      return newProtocolTreeNode('enc', attrs, undefined, buffer);
+    }),
+
+    encrypt_getKeys: function (jids) {
+      return sendEncryptGetKeys(jids);
+    },
+
+    encrypt_setKeys: function (identity, registration, type, keys, skey) {
+      return sendEncryptSetKeys(identity, registration, type, keys, skey);
     },
 
     // Misc
