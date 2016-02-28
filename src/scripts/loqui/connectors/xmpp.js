@@ -651,7 +651,7 @@ App.logForms.XMPP = function (provider, article) {
       }
     },
     events: function (target) {
-      var article = target[0].closest('article');
+      var article = target.closest('article')[0];
       var provider = article.parentNode.id;
       var user = Providers.autoComplete($(article).children('[name="user"]').val(), provider);
 
