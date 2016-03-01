@@ -1,4 +1,4 @@
-/* global App, CoSeMe, Providers, Tools, Avatar, Store, Message, Chat, Account, Accounts, Lungo, Make */
+/* global IDBKeyRange, App, CoSeMe, Providers, Tools, Avatar, Store, Message, Chat, Account, Accounts, Lungo, Make, async, axolotl */
 
 /**
  * @file Holds {@link Connector/Coseme}
@@ -19,12 +19,46 @@ var CosemeConnectorHelper = {
   tokenDataKeys : [ 'v', 'r', 'u', 't', 'd' ],
 
   init : function () {
-    CoSeMe.config.customLogger = Tools;
+    var self = this;
+    return new Promise(function (ready) {
+      CoSeMe.config.customLogger = Tools;
 
-    for (var i in this.tokenDataKeys) {
-      var key = this.tokenDataKeys[i];
-      CoSeMe.config.tokenData[key] = window.localStorage.getItem('CoSeMe.tokenData.' + key) || CoSeMe.config.tokenData[key];
-    }
+      for (var i in self.tokenDataKeys) {
+        var key = self.tokenDataKeys[i];
+        var value = window.localStorage.getItem('CoSeMe.tokenData.' + key);
+        CoSeMe.config.tokenData[key] = (value !== null) ? value : CoSeMe.config.tokenData[key];
+      }
+
+      var req = window.indexedDB.open('AxolotlStore', 1);
+      req.onerror = function(e) {
+        Tools.log('init onerror', e);
+      };
+      req.onsuccess = function(e) {
+        ready(req.result);
+      };
+      req.onupgradeneeded = function(e) {
+        var db = req.result;
+        var ver = db.version || 0; // version is empty string for a new DB
+        Tools.log('init onupgradeneeded', db);
+
+        if (!db.objectStoreNames.contains('localReg'))
+        {
+          db.createObjectStore('localReg', { keyPath : 'jid' });
+        }
+        if (!db.objectStoreNames.contains('localKeys'))
+        {
+          db.createObjectStore('localKeys', { keyPath : [ 'jid', 'id' ] });
+        }
+        if (!db.objectStoreNames.contains('localSKeys'))
+        {
+          db.createObjectStore('localSKeys', { keyPath : [ 'jid', 'id' ] });
+        }
+        if (!db.objectStoreNames.contains('session'))
+        {
+          db.createObjectStore('session', { keyPath : [ 'jid', 'remoteJid' ] });
+        }
+      };
+    });
   },
 
   updateTokenData : function (cb, cbUpdated) {
@@ -77,7 +111,6 @@ var CosemeConnectorHelper = {
   }
 };
 
-CosemeConnectorHelper.init();
 
 /**
  * @class Connector/CoSeMe
@@ -90,7 +123,16 @@ App.connectors.coseme = function (account) {
   var SI = Yowsup.getSignalsInterface();
   var MI = Yowsup.getMethodsInterface();
 
-  var pulse= null;
+  var pulse = null;
+  var axol = null;
+  var axolDb = null;
+  var axolLocalReg = null;
+  var axolSendKeys = false;
+  var axolEncryptQueues = { };
+  var axolDecryptQueue = async.queue(function (task, callback) {
+    handleEncryptedMessage(task.self, task.msg, callback);
+  });
+  var init = CosemeConnectorHelper.init();
 
   this.account = account;
   this.provider = Providers.data[account.core.provider];
@@ -108,61 +150,251 @@ App.connectors.coseme = function (account) {
   };
   this.connected = false;
 
+  function sendSetKeys (jid) {
+    axol.generatePreKeys(Math.floor(Math.random() * 0xfffffe), 50).then(function (preKeys) {
+      var tx = axolDb.transaction(['localKeys'], 'readwrite');
+      var objStore = tx.objectStore('localKeys');
+
+      for (var idx in preKeys) {
+        preKeys[idx].jid = jid;
+        objStore.put(preKeys[idx]);
+      }
+
+      axol.generateSignedPreKey(axolLocalReg.identityKeyPair, Math.floor(Math.random() * 0xfffffe)).then(function (signedPreKey) {
+        var tx = axolDb.transaction(['localSKeys'], 'readwrite');
+        tx.objectStore('localSKeys').put(signedPreKey);
+        signedPreKey.jid = jid;
+
+        axolSendKeys = false;
+        CoSeMe.yowsup.getMethodsInterface().call('encrypt_setKeys', [
+          axolLocalReg.identityKeyPair.public.slice(1),
+          axolLocalReg.registrationId,
+          '\x05',
+          preKeys.map(function (x) {
+            return { id: x.id, value: x.keyPair.public.slice(1) }; }),
+          { id: signedPreKey.id,
+            value : signedPreKey.keyPair.public.slice(1),
+            signature : signedPreKey.signature } ]);
+      });
+    });
+  }
+
+  function encryptMessageWorker(task, callback) {
+    var cpuLock = navigator.requestWakeLock('cpu');
+    var myJid = account.core.fullJid;
+    var tx = axolDb.transaction(['session']);
+    var req = tx.objectStore('session').get([ myJid, task.remoteJid ]);
+    req.onsuccess = function (e) {
+      if (req.result) {
+        var buffer = CoSeMe.utils.bytesFromLatin1(CoSeMe.utils.utf8FromString(task.plaintext));
+        axol.encryptMessage(req.result.session, buffer).then(function (m) {
+          Tools.log('ENCRYPTED MESSAGE', m);
+
+          var tx = axolDb.transaction(['session'], 'readwrite');
+          var req = tx.objectStore('session').put({ jid: myJid,
+                                                    remoteJid : task.remoteJid,
+                                                    session: m.session });
+
+          task.ready(m);
+          callback();
+          cpuLock.unlock();
+        }, function (e) {
+          Tools.log('ENCRYPT ERROR', e);
+          task.reject();
+          callback();
+          cpuLock.unlock();
+        });
+      } else {
+        task.reject();
+        callback();
+        cpuLock.unlock();
+      }
+    };
+    req.onerror = function(e) {
+      Tools.log('error getting session from db', task.remoteJid);
+    };
+  }
+
+  function encryptMessage (remoteJid, plaintext) {
+    return new Promise(function (ready, reject) {
+      var myJid = account.core.fullJid;
+
+      if (!(remoteJid in axolEncryptQueues)) {
+        var cpuLock = navigator.requestWakeLock('cpu');
+        var q = async.queue(encryptMessageWorker);
+        q.pause();
+        axolEncryptQueues[remoteJid] = q;
+
+        var tx = axolDb.transaction(['session']);
+        var req = tx.objectStore('session').get([ myJid, remoteJid ]);
+        req.onsuccess = function (e) {
+          if (req.result) {
+            Tools.log('EXISTING SESSION', req.result);
+            q.resume();
+          } else {
+            MI.call('encrypt_getKeys', [ [ remoteJid ] ]);
+          }
+
+          cpuLock.unlock();
+        };
+        req.onerror = function(e) {
+          Tools.log('error getting session from db', remoteJid);
+        };
+      }
+
+      axolEncryptQueues[remoteJid].push({ remoteJid : remoteJid,
+                                          plaintext : plaintext,
+                                          ready : ready, reject : reject });
+    });
+  }
+
+  function handleEncryptedMessage (self, msg, callback) {
+    function onDecryptError(e) {
+      Tools.log('ERROR', e);
+
+      if (!msg.count || Number(msg.count) < 1)  {
+        MI.call('message_retry', [msg.remoteJid, msg.msgId,
+                                  axolLocalReg.registrationId, '1', '1',
+                                  msg.author]);
+      } else {
+        MI.call('message_error', [msg.remoteJid, msg.msgId, 'plaintext-only']);
+      }
+
+      callback(e);
+    }
+
+    function onDecrypted(plaintext, session) {
+      Tools.log('DECRYPTED MESSAGE', plaintext, session);
+      self.events.onMessage.bind(self)(msg.msgId, msg.remoteJid, plaintext, msg.timeStamp, true, msg.pushName, false);
+
+      var tx = axolDb.transaction(['session'], 'readwrite');
+      var req = tx.objectStore('session').put({ jid : msg.jid,
+                                                remoteJid : msg.remoteJid,
+                                                session : session });
+
+      callback();
+    }
+
+    if (msg.type == 'pkmsg' || msg.type == 'msg') {
+      var tx = axolDb.transaction(['session']);
+      var req = tx.objectStore('session').get([ msg.jid, msg.remoteJid ]);
+      req.onsuccess = function (e) {
+        var session = req.result ? req.result.session : null;
+        var decryptFn = (msg.type == 'pkmsg') ? axol.decryptPreKeyWhisperMessage : axol.decryptWhisperMessage;
+        decryptFn(session, msg.msgData).then(function (m) {
+          var plaintext = CoSeMe.utils.stringFromUtf8(CoSeMe.utils.latin1FromBytes(new Uint8Array(m.message)));
+          onDecrypted(plaintext, m.session);
+        }, onDecryptError);
+      };
+      req.onerror = function(e) {
+        Tools.log('error getting session from db', msg.remoteJid);
+      };
+    } else {
+      onDecryptError(msg.type);
+    }
+  }
+
   this.connect = function (callback) {
     var self = this;
     var method = 'auth_login';
     var params = [this.account.core.data.login, this.account.core.data.pw];
-    var connTimeoutId = setTimeout(function () {
-      Tools.log("AUTH TIMED OUT");
-      connTimeoutId = null;
-      self.disconnect();
-      callback.connfail();
-    }, 60000);
 
-    Yowsup.connectionmanager.signals.auth_success.length = 0;
-    SI.registerListener('auth_success', function() {
-      Tools.log("CONNECTED");
-      this.connected = true;
-      clearTimeout(connTimeoutId);
-      connTimeoutId = null;
-      this.account.core.fullJid = CoSeMe.yowsup.connectionmanager.jid;
-      callback.connected();
-      if(!pulse){
-        pulse= setInterval(function(){
-          Tools.log('keep alive!');
-          MI.call('keepalive', []);
-        }, 60000);
-      }
-    }.bind(this));
-    Yowsup.connectionmanager.signals.auth_fail.length = 0;
-    SI.registerListener('auth_fail', function(username, _, reason) {
-      Tools.log("AUTH FAIL");
-      this.connected = false;
-      clearTimeout(connTimeoutId);
-      connTimeoutId = null;
-      if (reason == 'connection-refused') {
+    init.then(function (db) {
+      Tools.log('init');
+
+      axolDb = db;
+      axolSendKeys = false;
+      axolDecryptQueue.pause();
+      axol = axolotl({
+        getLocalIdentityKeyPair : function () {
+          Tools.log('getLocalIdentityKeyPair', axolLocalReg.identityKeyPair);
+          return axolLocalReg.identityKeyPair;
+        },
+        getLocalRegistrationId : function () {
+          Tools.log('getLocalRegistrationId', axolLocalReg.registrationId);
+          return axolLocalReg.registrationId;
+        },
+        getLocalSignedPreKeyPair : function (signedPreKeyId) {
+          Tools.log('getLocalSignedPreKeyPair', signedPreKeyId);
+
+          return new Promise(function (ready) {
+            var tx = axolDb.transaction(['localSKeys']);
+            var req = tx.objectStore('localSKeys').get([ account.core.fullJid, signedPreKeyId ]);
+            req.onsuccess = function (e) {
+              ready(req.result ? req.result.keyPair : null);
+            };
+          });
+        },
+        getLocalPreKeyPair : function (preKeyId) {
+          Tools.log('getLocalPreKeyPair', preKeyId);
+
+          return new Promise(function (ready) {
+            var tx = axolDb.transaction(['localKeys']);
+            var req = tx.objectStore('localKeys').get([ account.core.fullJid, preKeyId ]);
+            req.onsuccess = function (e) {
+              ready(req.result ? req.result.keyPair : null);
+            };
+          });
+        }
+      });
+
+      var connTimeoutId = setTimeout(function () {
+        Tools.log("AUTH TIMED OUT");
+        connTimeoutId = null;
+        self.disconnect();
         callback.connfail();
-      } else {
-        CosemeConnectorHelper.updateTokenData(function () { callback.authfail(reason); }, callback.connfail);
-      }
-    }.bind(this));
-    Yowsup.connectionmanager.signals.disconnected.length = 0;
-    SI.registerListener('disconnected', function () {
-      this.connected = false;
-      if (connTimeoutId) {
+      }, 60000);
+
+      Yowsup.connectionmanager.signals.auth_success.length = 0;
+      SI.registerListener('auth_success', function() {
+        Tools.log("CONNECTED");
+        this.connected = true;
         clearTimeout(connTimeoutId);
         connTimeoutId = null;
-      }
-      if (pulse) {
-        clearInterval(pulse);
-        pulse = null;
-      }
-      if (callback.disconnected) {
-        callback.disconnected();
-      }
-    }.bind(this));
-    MI.call(method, params);
-    callback.connecting();
+        var jid = CoSeMe.yowsup.connectionmanager.jid;
+        this.account.core.fullJid = jid;
+
+        callback.connected();
+        if(!pulse) {
+          pulse = setInterval(function(){
+            Tools.log('keep alive!');
+            MI.call('keepalive', []);
+          }, 60000);
+        }
+      }.bind(self));
+      Yowsup.connectionmanager.signals.auth_fail.length = 0;
+      SI.registerListener('auth_fail', function(username, _, reason) {
+        Tools.log("AUTH FAIL");
+        this.connected = false;
+        clearTimeout(connTimeoutId);
+        connTimeoutId = null;
+        if (reason == 'connection-refused') {
+          callback.connfail();
+        } else {
+          CosemeConnectorHelper.updateTokenData(function () {
+            callback.authfail(reason);
+          }, callback.connfail);
+        }
+      }.bind(self));
+      Yowsup.connectionmanager.signals.disconnected.length = 0;
+      SI.registerListener('disconnected', function () {
+        this.connected = false;
+        if (connTimeoutId) {
+          clearTimeout(connTimeoutId);
+          connTimeoutId = null;
+        }
+        if (pulse) {
+          clearInterval(pulse);
+          pulse = null;
+        }
+        if (callback.disconnected) {
+          callback.disconnected();
+        }
+      }.bind(self));
+
+      MI.call(method, params);
+      callback.connecting();
+    });
   };
 
   this.disconnect = function () {
@@ -183,6 +415,34 @@ App.connectors.coseme = function (account) {
   this.start = function () {
     Tools.log('CONNECTOR START');
     this.handlers.init();
+
+    var myJid = this.account.core.fullJid;
+
+    var tx = axolDb.transaction(['localReg']);
+    var req = tx.objectStore('localReg').get(myJid);
+    req.onsuccess = function (e) {
+      axolLocalReg = e.target.result;
+      if (! axolLocalReg) {
+        axol.generateIdentityKeyPair().then(function (identityKeyPair) {
+          axol.generateRegistrationId(true).then(function (registrationId) {
+            axolLocalReg = { jid : myJid,
+                             identityKeyPair : identityKeyPair,
+                             registrationId : registrationId };
+
+            var tx = axolDb.transaction(['localReg'], 'readwrite');
+            tx.objectStore('localReg').put(axolLocalReg);
+
+            sendSetKeys(myJid);
+            axolDecryptQueue.resume();
+          });
+        });
+      } else {
+        if (axolSendKeys) {
+          sendSetKeys(myJid);
+        }
+        axolDecryptQueue.resume();
+      }
+    };
   };
 
   this.sync = function (callback) {
@@ -324,10 +584,22 @@ App.connectors.coseme = function (account) {
       }
     }.bind(this);
 
-    this.send = function (to, text, options) {
-      var method = options.isBroadcast ? 'message_broadcast' : 'message_send';
-      var params = [to, text];
-      return MI.call(method, params);
+    this.sendAsync = function (to, text, options) {
+      return new Promise(function (ready, reject) {
+        encryptMessage(to, text).then(function (m) {
+          Tools.log('SEND ENCRYPTED', m);
+          var msgId = MI.call('encrypt_sendMessage',
+                              [null, to, m.body,
+                               (m.isPreKeyWhisperMessage ? 'pkmsg' : 'msg'),
+                               '1']);
+          ready(msgId);
+        }, function (e) {
+          Tools.log('PLAINTEXT FALLBACK', e);
+          var method = options.isBroadcast ? 'message_broadcast' : 'message_send';
+          var msgId = MI.call(method, [null, to, text]);
+          ready(msgId);
+        });
+      });
     }.bind(this);
 
     this.ack = function (id, from, type) {
@@ -463,6 +735,8 @@ App.connectors.coseme = function (account) {
         location_received: this.events.onLocationReceived,
         message_error: this.events.onMessageError,
         receipt_messageSent: this.events.onMessageSent,
+        receipt_messageError: this.events.onMessageError,
+        receipt_messageRetry: this.events.onMessageRetry,
         receipt_messageDelivered: this.events.onMessageDelivered,
         receipt_visible: this.events.onMessageVisible,
         receipt_broadcastSent: null,
@@ -500,6 +774,10 @@ App.connectors.coseme = function (account) {
         notification_groupCreated: this.events.onGroupCreated,
         notification_groupSubjectUpdated: this.events.onGroupSubjectUpdated,
         notification_status: this.events.onContactStatusUpdated,
+        notification_encrypt: this.events.onNotificationEncrypt,
+        encrypt_gotKeys: this.events.onEncryptGotKeys,
+        encrypt_messageReceived: this.events.onEncryptMessageReceived,
+        encrypt_groupMessageReceived: this.events.onEncryptGroupMessageReceived,
         contact_gotProfilePictureId: this.events.onAvatar,
         contact_gotProfilePicture: this.events.onAvatar,
         contact_typing: this.events.onContactTyping,
@@ -536,6 +814,97 @@ App.connectors.coseme = function (account) {
 
       var method = 'notification_ack';
       MI.call(method, [jid, msgId]);
+    };
+
+    this.events.onNotificationEncrypt = function (from, id, count) {
+      var method = 'notification_ack';
+      MI.call(method, [from, id]);
+
+      if (axolLocalReg) {
+        sendSetKeys(this.account.core.fullJid);
+      } else {
+        axolSendKeys = true;
+      }
+    };
+
+    this.events.onEncryptGotKeys = function (keys, id) {
+      Tools.log('GOT KEYS', keys);
+      var myJid = this.account.core.fullJid;
+
+      function prependType(type, buf) {
+        var result = new Uint8Array(buf.byteLength + 1);
+        result.set(new Uint8Array(buf), 1);
+        result[0] = type.charCodeAt();
+        return result.buffer;
+      }
+
+      function noSession(cpuLock, jid) {
+        Tools.log('create session failed', jid);
+        var tx = axolDb.transaction(['session'], 'readwrite');
+        var req = tx.objectStore('session').delete({ jid : myJid,
+                                                     remoteJid : jid });
+        req.onsuccess = function (e) {
+          axolEncryptQueues[jid].resume();
+          cpuLock.unlock();
+        };
+      }
+
+      for (var idx in keys) {
+        var cpuLock = navigator.requestWakeLock('cpu');
+        var v = keys[idx];
+        var jid = v.jid;
+
+        if (v.key && v.skey) {
+          axol.createSessionFromPreKeyBundle( {
+            identityKey : prependType(v.type, v.identity),
+            preKeyId : v.key.id,
+            preKey : prependType(v.type, v.key.value),
+            signedPreKeyId : v.skey.id,
+            signedPreKey : prependType(v.type, v.skey.value),
+            signedPreKeySignature : v.skey.signature
+          }).then(function (session) {
+            Tools.log('session created from pre keys', v.jid, session);
+            var tx = axolDb.transaction(['session'], 'readwrite');
+            var req = tx.objectStore('session').put({ jid : myJid,
+                                                      remoteJid : v.jid,
+                                                      session : session });
+            req.onsuccess = function (e) {
+              axolEncryptQueues[v.jid].resume();
+              cpuLock.unlock();
+            };
+            req.onerror = function(e) {
+              Tools.log('error storing session in db', v.jid);
+            };
+          }, function (e) {
+            noSession(cpuLock, v.jid);
+          });
+        } else {
+          noSession(cpuLock, v.jid);
+        }
+      }
+    };
+
+    this.events.onEncryptMessageReceived = function (msgId, from, msgData, type, v, count, timeStamp, pushName) {
+      Tools.log('ENCRYPTED MESSAGE', msgData);
+
+      var self = this;
+      var msg = { jid : this.account.core.fullJid,
+                  remoteJid : from,
+                  msgId : msgId,
+                  msgData : msgData.buffer,
+                  type : type,
+                  v : v,
+                  count : count,
+                  timeStamp : timeStamp,
+                  pushName : pushName };
+
+      var cpuLock = navigator.requestWakeLock('cpu');
+      axolDecryptQueue.push({ self : self, msg : msg },
+                            function () { cpuLock.unlock(); });
+    };
+
+    this.events.onEncryptGroupMessageReceived = function (msgId, from, author, msgData, type, v, count, timeStamp, pushName) {
+      MI.call('message_error', [from, msgId, 'plaintext-only', author]);
     };
 
     this.events.onMessage = function (msgId, from, msgData, timeStamp, wantsReceipt, pushName, isBroadcast) {
@@ -694,12 +1063,61 @@ App.connectors.coseme = function (account) {
       account.markMessage.push({from : from, msgId : msgId});
     };
 
+    this.events.onMessageError = function (from, msgId, participant, errorType) {
+      var cpuLock = navigator.requestWakeLock('cpu');
+      Tools.log('ERROR', from, msgId);
+      account.findMessage(from, msgId, function (msg) {
+        if (errorType == 'plaintext-only') {
+          MI.call('message_send', [msg.id, from, msg.text]);
+        }
+        cpuLock.unlock();
+      }.bind(this));
+
+      MI.call('delivered_ack', [from, msgId, 'error']);
+    };
+
+    this.events.onMessageRetry = function (from, msgId, participant, count, regId) {
+      var cpuLock = navigator.requestWakeLock('cpu');
+      var myJid = account.core.fullJid;
+      Tools.log('RETRY', from, msgId);
+      account.findMessage(from, msgId, function (msg) {
+        var q = axolEncryptQueues[from];
+        if (!q || !q.paused) {
+          if (!q) {
+            q = async.queue(encryptMessageWorker);
+            axolEncryptQueues[from] = q;
+          }
+
+          q.pause();
+
+          MI.call('encrypt_getKeys', [ [ from ] ]);
+        }
+
+        q.push({ remoteJid : from,
+                 plaintext : msg.text,
+                 ready : function (m) {
+                   var msgId = MI.call('encrypt_sendMessage',
+                                       [msg.id, from, m.body,
+                                        (m.isPreKeyWhisperMessage ? 'pkmsg' : 'msg'),
+                                        '1', '1']);
+                 },
+                 reject : function (e) {
+                   var msgId = MI.call('message_send', [msg.id, from, msg.text]);
+                 } });
+
+        cpuLock.unlock();
+      }.bind(this));
+
+      MI.call('delivered_ack', [from, msgId, 'retry']);
+    };
+
     this.events.onMessageDelivered = function (from, msgId, type) {
       var account = this.account;
       var chat = account.chatGet(from);
       chat.core.lastAck = Tools.localize(Tools.stamp());
       chat.save();
-      account.markMessage.push({from : from, msgId : msgId});
+      account.markMessage.push({from : from, msgId : msgId,
+                                type : type || 'delivery'});
       Tools.log('DELIVERED', from, msgId, type);
       MI.call('delivered_ack', [from, msgId, type]);
     };

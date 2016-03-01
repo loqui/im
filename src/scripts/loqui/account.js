@@ -220,13 +220,11 @@ var Account = {
             this._reconnectBackoff = 1;
             var cb = function (rcb) {
               App.audio('login');
-              this.connector.start();
               if (this === Accounts.current) {
                 this.accountRender();
                 this.avatarsRender();
               }
               this.connector.presence.set(document.hidden ? 'away' : 'a');
-              this.sendQFlush();
               if (rcb) {
                 rcb();
               }
@@ -841,13 +839,25 @@ var Account = {
     return chat;
   },
 
+  findMessage : function (from, msgId, callback) {
+    var chat = this.chatGet(from);
+    chat.findMessage(msgId, null, true).then(function (values) {
+      var msg = values.result.message;
+      var free = values.free;
+
+      free();
+      callback(msg);
+    }.bind(this));
+  },
+
   /**
    * @param {Object} task
    * @param {function} callback
    */
   markMessageWorker : function(task, callback){
-    var from= task.from;
-    var msgId= task.msgId;
+    var from = task.from;
+    var msgId = task.msgId;
+    var type = task.type;
     var chat = this.chatGet(from);
     var account = this;
 
@@ -856,19 +866,19 @@ var Account = {
       var free = values.free;
       var key = values.key;
 
-      if (msg.ack == 'sent') {
+      if (msg.ack != 'viewed' && type == 'delivery') {
         console.log('MARKING AS DELIVERED', from, msgId, chat, account, values);
         msg.ack = 'delivered';
-      } else if (msg.ack == 'delivered') {
+      } else if (type == 'read') {
         console.log('MARKING AS VIEWED', from, msgId, chat, account, values);
         msg.ack = 'viewed';
-      } else if (msg.ack != 'viewed') {
+      } else if (msg.ack != 'viewed' && msg.ack != 'delivered') {
         console.log('MARKING AS SENT', from, msgId, chat, account, values);
         msg.ack = 'sent';
       }
       Store.update(key, values.result.chunkIndex, values.result.chunk, function(){
         free();
-        callback();
+        callback(msg);
       });
 
       if (chat.core.last.id == msg.id) {
