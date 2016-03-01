@@ -471,7 +471,7 @@ var Store = {
 
                                 r.onsuccess = function(){
                                     console.log('log saved!', 'new size is: ', file.size);
-                                    buffer = [];
+                                    buffer.splice(0, buffer.length);
                                     callback();
                                 };
 
