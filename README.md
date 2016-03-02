@@ -44,7 +44,7 @@ We would like to thank:
 LICENSING
 ===
  * LoquiIM → AGPLv3
- * CoSeMe → AGPLv3
+ * CoSeMe → Apache License v2.0
  * Strophe.js → MIT
  * SHA1.js → BSD
  * QuoJS → MIT
@@ -52,6 +52,10 @@ LICENSING
  * OTR.js → MPLv2.0
  * libphonenumber → Apache License v2.0
  * L10n.js → BSD/MIT/WTFPL
+ * libaxolotl-javascript → LGPLv3
+ * traceur-runtime → Apache License v2.0
+ * protobuf.js → Apache License v2.0
+ * bytebuffer.js → Apache License v2.0
 
 DISCLAIMER
 ===
