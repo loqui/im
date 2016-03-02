@@ -219,32 +219,36 @@ App.connectors.coseme = function (account) {
     return new Promise(function (ready, reject) {
       var myJid = account.core.fullJid;
 
-      if (!(remoteJid in axolEncryptQueues)) {
-        var cpuLock = navigator.requestWakeLock('cpu');
-        var q = async.queue(encryptMessageWorker);
-        q.pause();
-        axolEncryptQueues[remoteJid] = q;
+      if (axolLocalReg) {
+        if (!(remoteJid in axolEncryptQueues)) {
+          var cpuLock = navigator.requestWakeLock('cpu');
+          var q = async.queue(encryptMessageWorker);
+          q.pause();
+          axolEncryptQueues[remoteJid] = q;
 
-        var tx = axolDb.transaction(['session']);
-        var req = tx.objectStore('session').get([ myJid, remoteJid ]);
-        req.onsuccess = function (e) {
-          if (req.result) {
-            Tools.log('EXISTING SESSION', req.result);
-            q.resume();
-          } else {
-            MI.call('encrypt_getKeys', [ [ remoteJid ] ]);
-          }
+          var tx = axolDb.transaction(['session']);
+          var req = tx.objectStore('session').get([ myJid, remoteJid ]);
+          req.onsuccess = function (e) {
+            if (req.result) {
+              Tools.log('EXISTING SESSION', req.result);
+              q.resume();
+            } else {
+              MI.call('encrypt_getKeys', [ [ remoteJid ] ]);
+            }
 
-          cpuLock.unlock();
-        };
-        req.onerror = function(e) {
-          Tools.log('error getting session from db', remoteJid);
-        };
+            cpuLock.unlock();
+          };
+          req.onerror = function(e) {
+            Tools.log('error getting session from db', remoteJid);
+          };
+        }
+
+        axolEncryptQueues[remoteJid].push({ remoteJid : remoteJid,
+                                            plaintext : plaintext,
+                                            ready : ready, reject : reject });
+      } else {
+        reject();
       }
-
-      axolEncryptQueues[remoteJid].push({ remoteJid : remoteJid,
-                                          plaintext : plaintext,
-                                          ready : ready, reject : reject });
     });
   }
 
@@ -252,7 +256,7 @@ App.connectors.coseme = function (account) {
     function onDecryptError(e) {
       Tools.log('ERROR', e);
 
-      if (!msg.count || Number(msg.count) < 1)  {
+      if (axolLocalReg && (!msg.count || Number(msg.count) < 1))  {
         MI.call('message_retry', [msg.remoteJid, msg.msgId,
                                   axolLocalReg.registrationId, '1', '1',
                                   msg.author]);
@@ -275,7 +279,7 @@ App.connectors.coseme = function (account) {
       callback();
     }
 
-    if (msg.type == 'pkmsg' || msg.type == 'msg') {
+    if (axolLocalReg && (msg.type == 'pkmsg' || msg.type == 'msg')) {
       var tx = axolDb.transaction(['session']);
       var req = tx.objectStore('session').get([ msg.jid, msg.remoteJid ]);
       req.onsuccess = function (e) {
@@ -434,7 +438,13 @@ App.connectors.coseme = function (account) {
 
             sendSetKeys(myJid);
             axolDecryptQueue.resume();
+          }, function (e) {
+            Tools.log('FAILED generateIdentityKeyPair');
+            axolDecryptQueue.resume();
           });
+        }, function (e) {
+          Tools.log('FAILED generateIdentityKeyPair');
+          axolDecryptQueue.resume();
         });
       } else {
         if (axolSendKeys) {
@@ -839,10 +849,8 @@ App.connectors.coseme = function (account) {
       }
 
       function noSession(cpuLock, jid) {
-        Tools.log('create session failed', jid);
         var tx = axolDb.transaction(['session'], 'readwrite');
-        var req = tx.objectStore('session').delete({ jid : myJid,
-                                                     remoteJid : jid });
+        var req = tx.objectStore('session').delete([ myJid, jid ]);
         req.onsuccess = function (e) {
           axolEncryptQueues[jid].resume();
           cpuLock.unlock();
@@ -876,9 +884,11 @@ App.connectors.coseme = function (account) {
               Tools.log('error storing session in db', v.jid);
             };
           }, function (e) {
+            Tools.log('FAILED create session', v, e);
             noSession(cpuLock, v.jid);
           });
         } else {
+          Tools.log('FAILED create session', v);
           noSession(cpuLock, v.jid);
         }
       }
