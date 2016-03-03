@@ -158,16 +158,12 @@ var Message = {
    * @param {number} delay
    */
   send : function (delay) {
-    var message = this;
-    var chat = this.chat;
-    if (chat.OTR) {
-      this.options.send = false;
+    if (this.chat.OTR) {
       this.options.otr = true;
       this.core.id = Date.now() + 'OTR';
 
-      this.postSend().then(function () {
-        chat.OTR.sendMsg(message.core.id, message.core.text);
-      });
+      this._sent();
+      this.chat.OTR.sendMsg(this.core.id, this.core.text);
     } else {
       this.postSend();
     }
@@ -185,22 +181,21 @@ var Message = {
    * Pushes the message to the network interface to actually send it.
    */
   postSend : function () {
-    if (this.account.connector.isConnected() && this.options.send) {
-      var self = this;
+    if (this.account.connector.isConnected()) {
       return this.account.connector.sendAsync(this.core.to, this.core.text, {delay: (this.options && 'delay' in this.options) ? this.core.stamp : this.options.delay, muc: this.options.muc}).then(function (msgId) {
-        self.core.id = msgId;
+        this.core.id = msgId;
 
-        if (self.core.original) {
-          self._replace();
+        if (this.core.original) {
+          this._replace();
         }
 
-        self._sent();
-      });
+        this._sent();
+      }.bind(this));
     } else {
       return new Promise(function (ready) {
         this._sent();
         ready();
-      });
+      }.bind(this));
     }
   },
 
@@ -541,7 +536,6 @@ var Message = {
  * @property {boolean} muc
  */
 var MessageOptions = {
-  send: true,
   render: true,
   otr: false,
   logging: true,
