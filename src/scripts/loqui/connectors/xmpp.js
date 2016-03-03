@@ -496,7 +496,7 @@ App.connectors.XMPP = function (account) {
     var chat = account.chatGet(from);
     chat.core.lastAck = Tools.localize(Tools.stamp());
     chat.save();
-    account.markMessage.push({from : from, msgId : msgId});
+    account.markMessage.push({from : from, msgId : msgId, type : 'delivery'});
     return true;
   }.bind(this);
 
