@@ -153,6 +153,7 @@ App.connectors.coseme = function (account) {
   var axolDecryptQueue = async.queue(function (task, callback) {
     handleEncryptedMessage(task.self, task.msg, callback);
   });
+  var requestData = {};
   var init = CosemeConnectorHelper.init();
 
   this.account = account;
@@ -170,6 +171,10 @@ App.connectors.coseme = function (account) {
     membersCache: []
   };
   this.connected = false;
+
+  function isNotGroupJid (jid) {
+    return (jid.indexOf('@g.us') < 0);
+  }
 
   function sendSetKeys (jid) {
     axol.generatePreKeys(Math.floor(Math.random() * 0xfffffe), 50).then(function (preKeys) {
@@ -233,6 +238,7 @@ App.connectors.coseme = function (account) {
     };
     req.onerror = function(e) {
       Tools.log('error getting session from db', task.remoteJid);
+      cpuLock.unlock();
     };
   }
 
@@ -240,7 +246,7 @@ App.connectors.coseme = function (account) {
     return new Promise(function (ready, reject) {
       var myJid = account.core.fullJid;
 
-      if (axolLocalReg) {
+      if (axolLocalReg && isNotGroupJid(remoteJid)) {
         if (!(remoteJid in axolEncryptQueues)) {
           var cpuLock = navigator.requestWakeLock('cpu');
           var q = async.queue(encryptMessageWorker);
@@ -254,13 +260,15 @@ App.connectors.coseme = function (account) {
               Tools.log('EXISTING SESSION', req.result);
               q.resume();
             } else {
-              MI.call('encrypt_getKeys', [ [ remoteJid ] ]);
+              var id = MI.call('encrypt_getKeys', [ [ remoteJid ] ]);
+              requestData[id] = [ remoteJid ];
             }
 
             cpuLock.unlock();
           };
           req.onerror = function(e) {
             Tools.log('error getting session from db', remoteJid);
+            cpuLock.unlock();
           };
         }
 
@@ -327,6 +335,7 @@ App.connectors.coseme = function (account) {
     init.then(function (db) {
       Tools.log('init');
 
+      requestData = {};
       axolDb = db;
       axolSendKeys = false;
       axolDecryptQueue.pause();
@@ -447,7 +456,7 @@ App.connectors.coseme = function (account) {
     var req = tx.objectStore('localReg').get(myJid);
     req.onsuccess = function (e) {
       axolLocalReg = e.target.result;
-      if (! axolLocalReg) {
+      if (! axolLocalReg && window.crypto.subtle) {
         axol.generateIdentityKeyPair().then(function (identityKeyPair) {
           axol.generateRegistrationId(true).then(function (registrationId) {
             axolLocalReg = { jid : myJid,
@@ -468,7 +477,7 @@ App.connectors.coseme = function (account) {
           axolDecryptQueue.resume();
         });
       } else {
-        if (axolSendKeys) {
+        if (axolSendKeys && axolLocalReg) {
           sendSetKeys(myJid);
         }
         axolDecryptQueue.resume();
@@ -479,7 +488,7 @@ App.connectors.coseme = function (account) {
   this.sync = function (callback) {
     var getStatusesAndPics = function (contacts) {
       contacts = contacts || this.account.core.chats.map(function(e){ return e.jid; });
-      var status_contacts= contacts.filter(function(item){ return item.indexOf('@g.us') < 0; });
+      var status_contacts= contacts.filter(isNotGroupJid);
 
       MI.call('contacts_getStatus', [status_contacts]);
 
@@ -861,6 +870,8 @@ App.connectors.coseme = function (account) {
     this.events.onEncryptGotKeys = function (keys, id) {
       Tools.log('GOT KEYS', keys);
       var myJid = this.account.core.fullJid;
+      var data = requestData[id] || [];
+      delete requestData[id];
 
       function prependType(type, buf) {
         var result = new Uint8Array(buf.byteLength + 1);
@@ -873,7 +884,8 @@ App.connectors.coseme = function (account) {
         var tx = axolDb.transaction(['session'], 'readwrite');
         var req = tx.objectStore('session').delete([ myJid, jid ]);
         req.onsuccess = function (e) {
-          axolEncryptQueues[jid].resume();
+          var q = axolEncryptQueues[jid];
+          if (q) { q.resume(); }
           cpuLock.unlock();
         };
       }
@@ -882,6 +894,11 @@ App.connectors.coseme = function (account) {
         var cpuLock = navigator.requestWakeLock('cpu');
         var v = keys[idx];
         var jid = v.jid;
+
+        var dataIdx = data.indexOf(jid);
+        if (dataIdx >= 0) {
+          data.splice(dataIdx, 1);
+        }
 
         if (v.key && v.skey) {
           axol.createSessionFromPreKeyBundle( {
@@ -898,7 +915,8 @@ App.connectors.coseme = function (account) {
                                                       remoteJid : v.jid,
                                                       session : session });
             req.onsuccess = function (e) {
-              axolEncryptQueues[v.jid].resume();
+              var q = axolEncryptQueues[jid];
+              if (q) { q.resume(); }
               cpuLock.unlock();
             };
             req.onerror = function(e) {
@@ -912,6 +930,10 @@ App.connectors.coseme = function (account) {
           Tools.log('FAILED create session', v);
           noSession(cpuLock, v.jid);
         }
+      }
+
+      for (idx in data) {
+        noSession(navigator.requestWakeLock('cpu'), data[idx]);
       }
     };
 
@@ -1121,7 +1143,8 @@ App.connectors.coseme = function (account) {
 
           q.pause();
 
-          MI.call('encrypt_getKeys', [ [ from ] ]);
+          var id = MI.call('encrypt_getKeys', [ [ from ] ]);
+          requestData[id] = [ from ];
         }
 
         q.push({ remoteJid : from,
