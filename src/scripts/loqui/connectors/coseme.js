@@ -477,6 +477,12 @@ App.connectors.coseme = function (account) {
           axolDecryptQueue.resume();
         });
       } else {
+        if (axolLocalReg) {
+          Tools.log('LOCAL REGISTRATION ID', axolLocalReg.registrationId);
+        } else {
+          Tools.log('ENCRYPTION NOT SUPPORTED');
+        }
+
         if (axolSendKeys && axolLocalReg) {
           sendSetKeys(myJid);
         }
