@@ -4637,6 +4637,7 @@ Strophe.Bosh.prototype = {
                 }
             }
 
+            var cpuLock = navigator.requestWakeLock('cpu');
             var reqIs0 = (this._requests[0] == req);
             var reqIs1 = (this._requests[1] == req);
 
@@ -4685,6 +4686,7 @@ Strophe.Bosh.prototype = {
                   req.sends > 5)) {
                 this._throttledRequestHandler();
             }
+            cpuLock.unlock();
         }
     },
 
@@ -5393,6 +5395,7 @@ Strophe.Websocket.prototype = {
      * (string) message - The websocket message.
      */
     _onMessage: function(message) {
+        var cpuLock = navigator.requestWakeLock('cpu');
         var elem, data;
         // check for closing stream
         var close = '<close xmlns="urn:ietf:params:xml:ns:xmpp-framing" />';
@@ -5402,12 +5405,14 @@ Strophe.Websocket.prototype = {
             if (!this._conn.disconnecting) {
                 this._conn._doDisconnect();
             }
+            cpuLock.unlock();
             return;
         } else if (message.data.search("<open ") === 0) {
             // This handles stream restarts
             elem = new DOMParser().parseFromString(message.data, "text/xml").documentElement;
 
             if (!this._handleStreamStart(elem)) {
+                cpuLock.unlock();
                 return;
             }
         } else {
@@ -5416,6 +5421,7 @@ Strophe.Websocket.prototype = {
         }
 
         if (this._check_streamerror(elem, Strophe.Status.ERROR)) {
+            cpuLock.unlock();
             return;
         }
 
@@ -5427,9 +5433,11 @@ Strophe.Websocket.prototype = {
             this._conn.rawInput(Strophe.serialize(elem));
             // if we are already disconnecting we will ignore the unavailable stanza and
             // wait for the </stream:stream> tag before we close the connection
+            cpuLock.unlock();
             return;
         }
         this._conn._dataRecv(elem, message.data);
+        cpuLock.unlock();
     },
 
     /** PrivateFunction: _onOpen
@@ -5710,6 +5718,7 @@ Strophe.Tcpsocket.prototype = {
     },
 
     _onReceive: function(message) {
+        var cpuLock = navigator.requestWakeLock('cpu');
         var string = decodeURIComponent(escape(message.data));
         console.log("_onReceive: "+string);
 
@@ -5739,6 +5748,8 @@ Strophe.Tcpsocket.prototype = {
                 break;
             }
         }
+
+        cpuLock.unlock();
     },
 
     /** PrivateFunction: _connect_cb
