@@ -18,7 +18,7 @@
 var CosemeConnectorHelper = {
   tokenDataKeys : [ 'v', 'r', 'u', 't', 'd' ],
 
-  axolLoaded : function () {
+  _axolLoaded : function () {
     function loadScript (src) {
       return new Promise(function (resolve, reject) {
         var s;
@@ -37,49 +37,55 @@ var CosemeConnectorHelper = {
     });
   }(),
 
+  _initPromise : null,
+
   init : function () {
-    var self = this;
-    return this.axolLoaded.then(function () {
-      return new Promise(function (ready) {
-        CoSeMe.config.customLogger = Tools;
+    if (!this._initPromise) {
+      var self = this;
+      this._initPromise = this._axolLoaded.then(function () {
+        return new Promise(function (ready) {
+          CoSeMe.config.customLogger = Tools;
 
-        for (var i in self.tokenDataKeys) {
-          var key = self.tokenDataKeys[i];
-          var value = window.localStorage.getItem('CoSeMe.tokenData.' + key);
-          CoSeMe.config.tokenData[key] = (value !== null) ? value : CoSeMe.config.tokenData[key];
-        }
+          for (var i in self.tokenDataKeys) {
+            var key = self.tokenDataKeys[i];
+            var value = window.localStorage.getItem('CoSeMe.tokenData.' + key);
+            CoSeMe.config.tokenData[key] = (value !== null) ? value : CoSeMe.config.tokenData[key];
+          }
 
-        var req = window.indexedDB.open('AxolotlStore', 1);
-        req.onerror = function(e) {
-          Tools.log('init onerror', e);
-        };
-        req.onsuccess = function(e) {
-          ready(req.result);
-        };
-        req.onupgradeneeded = function(e) {
-          var db = req.result;
-          var ver = db.version || 0; // version is empty string for a new DB
-          Tools.log('init onupgradeneeded', db);
+          var req = window.indexedDB.open('AxolotlStore', 1);
+          req.onerror = function(e) {
+            Tools.log('init onerror', e);
+          };
+          req.onsuccess = function(e) {
+            ready(req.result);
+          };
+          req.onupgradeneeded = function(e) {
+            var db = req.result;
+            var ver = db.version || 0; // version is empty string for a new DB
+            Tools.log('init onupgradeneeded', db);
 
-          if (!db.objectStoreNames.contains('localReg'))
-          {
-            db.createObjectStore('localReg', { keyPath : 'jid' });
-          }
-          if (!db.objectStoreNames.contains('localKeys'))
-          {
-            db.createObjectStore('localKeys', { keyPath : [ 'jid', 'id' ] });
-          }
-          if (!db.objectStoreNames.contains('localSKeys'))
-          {
-            db.createObjectStore('localSKeys', { keyPath : [ 'jid', 'id' ] });
-          }
-          if (!db.objectStoreNames.contains('session'))
-          {
-            db.createObjectStore('session', { keyPath : [ 'jid', 'remoteJid' ] });
-          }
-        };
+            if (!db.objectStoreNames.contains('localReg'))
+            {
+              db.createObjectStore('localReg', { keyPath : 'jid' });
+            }
+            if (!db.objectStoreNames.contains('localKeys'))
+            {
+              db.createObjectStore('localKeys', { keyPath : [ 'jid', 'id' ] });
+            }
+            if (!db.objectStoreNames.contains('localSKeys'))
+            {
+              db.createObjectStore('localSKeys', { keyPath : [ 'jid', 'id' ] });
+            }
+            if (!db.objectStoreNames.contains('session'))
+            {
+              db.createObjectStore('session', { keyPath : [ 'jid', 'remoteJid' ] });
+            }
+          };
+        });
       });
-    });
+    }
+
+    return this._initPromise;
   },
 
   updateTokenData : function (cb, cbUpdated) {
@@ -462,6 +468,7 @@ App.connectors.coseme = function (account) {
             axolLocalReg = { jid : myJid,
                              identityKeyPair : identityKeyPair,
                              registrationId : registrationId };
+            Tools.log('GENERATED REGISTRATION ID', axolLocalReg.registrationId);
 
             var tx = axolDb.transaction(['localReg'], 'readwrite');
             tx.objectStore('localReg').put(axolLocalReg);
