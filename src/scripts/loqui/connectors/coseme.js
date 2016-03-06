@@ -57,11 +57,11 @@ var CosemeConnectorHelper = {
             Tools.log('init onerror', e);
           };
           req.onsuccess = function(e) {
+            Tools.log('init onsuccess');
             ready(req.result);
           };
           req.onupgradeneeded = function(e) {
             var db = req.result;
-            var ver = db.version || 0; // version is empty string for a new DB
             Tools.log('init onupgradeneeded', db);
 
             if (!db.objectStoreNames.contains('localReg'))
@@ -184,18 +184,22 @@ App.connectors.coseme = function (account) {
 
   function sendSetKeys (jid) {
     axol.generatePreKeys(Math.floor(Math.random() * 0xfffffe), 50).then(function (preKeys) {
+      Tools.log('generatePreKeys done', preKeys.length, preKeys);
+
       var tx = axolDb.transaction(['localKeys'], 'readwrite');
       var objStore = tx.objectStore('localKeys');
-
       for (var idx in preKeys) {
         preKeys[idx].jid = jid;
         objStore.put(preKeys[idx]);
       }
+      Tools.log('generatePreKeys stored');
 
       axol.generateSignedPreKey(axolLocalReg.identityKeyPair, Math.floor(Math.random() * 0xfffffe)).then(function (signedPreKey) {
+        Tools.log('generateSignedPreKey done', signedPreKey);
+
         var tx = axolDb.transaction(['localSKeys'], 'readwrite');
-        tx.objectStore('localSKeys').put(signedPreKey);
         signedPreKey.jid = jid;
+        tx.objectStore('localSKeys').put(signedPreKey);
 
         axolSendKeys = false;
         CoSeMe.yowsup.getMethodsInterface().call('encrypt_setKeys', [
@@ -207,7 +211,11 @@ App.connectors.coseme = function (account) {
           { id: signedPreKey.id,
             value : signedPreKey.keyPair.public.slice(1),
             signature : signedPreKey.signature } ]);
+      }, function (e) {
+        Tools.log('ERROR generateSignedPreKey', e);
       });
+    }, function (e) {
+      Tools.log('ERROR generatePreKeys', e);
     });
   }
 
@@ -365,7 +373,9 @@ App.connectors.coseme = function (account) {
             var tx = axolDb.transaction(['localSKeys']);
             var req = tx.objectStore('localSKeys').get([ account.core.fullJid, signedPreKeyId ]);
             req.onsuccess = function (e) {
-              ready(req.result ? req.result.keyPair : null);
+              var signedPreKeyPair = req.result ? req.result.keyPair : null
+              Tools.log('getLocalSignedPreKeyPair', signedPreKeyPair);
+              ready(signedPreKeyPair);
             };
           });
         },
@@ -376,7 +386,9 @@ App.connectors.coseme = function (account) {
             var tx = axolDb.transaction(['localKeys']);
             var req = tx.objectStore('localKeys').get([ account.core.fullJid, preKeyId ]);
             req.onsuccess = function (e) {
-              ready(req.result ? req.result.keyPair : null);
+              var preKeyPair = req.result ? req.result.keyPair : null
+              Tools.log('getLocalPreKeyPair', preKeyPair);
+              ready(preKeyPair);
             };
           });
         }
