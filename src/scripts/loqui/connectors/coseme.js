@@ -321,7 +321,11 @@ App.connectors.coseme = function (account) {
         var session = req.result ? req.result.session : null;
         var decryptFn = (msg.type == 'pkmsg') ? axol.decryptPreKeyWhisperMessage : axol.decryptWhisperMessage;
         decryptFn(session, msg.msgData).then(function (m) {
-          var plaintext = CoSeMe.utils.stringFromUtf8(CoSeMe.utils.latin1FromBytes(new Uint8Array(m.message)));
+          var data = new Uint8Array(m.message);
+          if (msg.v == '2' && data[0] == 10 && data[data.length - 1] == 1) {
+            data = data.subarray((data.length < 128) ? 2 : 3, -1);
+          }
+          var plaintext = CoSeMe.utils.stringFromUtf8(CoSeMe.utils.latin1FromBytes(data));
           onDecrypted(plaintext, m.session);
         }, onDecryptError);
       };
