@@ -88,6 +88,13 @@ var CosemeConnectorHelper = {
     return this._initPromise;
   },
 
+  resetTokenData : function () {
+    for (var i in this.tokenDataKeys) {
+      var key = this.tokenDataKeys[i];
+      window.localStorage.removeItem('CoSeMe.tokenData.' + key);
+    }
+  },
+
   updateTokenData : function (cb, cbUpdated) {
     var self = this;
     var ts = (new Date()).getTime() / 1000;
@@ -373,7 +380,7 @@ App.connectors.coseme = function (account) {
             var tx = axolDb.transaction(['localSKeys']);
             var req = tx.objectStore('localSKeys').get([ account.core.fullJid, signedPreKeyId ]);
             req.onsuccess = function (e) {
-              var signedPreKeyPair = req.result ? req.result.keyPair : null
+              var signedPreKeyPair = req.result ? req.result.keyPair : null;
               Tools.log('getLocalSignedPreKeyPair', signedPreKeyPair);
               ready(signedPreKeyPair);
             };
@@ -386,7 +393,7 @@ App.connectors.coseme = function (account) {
             var tx = axolDb.transaction(['localKeys']);
             var req = tx.objectStore('localKeys').get([ account.core.fullJid, preKeyId ]);
             req.onsuccess = function (e) {
-              var preKeyPair = req.result ? req.result.keyPair : null
+              var preKeyPair = req.result ? req.result.keyPair : null;
               Tools.log('getLocalPreKeyPair', preKeyPair);
               ready(preKeyPair);
             };

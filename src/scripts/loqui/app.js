@@ -1,4 +1,4 @@
-/* global Store, Account, Chat, Messenger, Accounts, Menu, Tools, Lungo, Make, ChatCore */
+/* global Store, Account, Chat, Messenger, Accounts, Menu, Tools, Lungo, Make, ChatCore, CosemeConnectorHelper */
 
 /**
  * @file Holds {@link App}
@@ -534,6 +534,9 @@ var App = {
     if (last < App.version && last in from) {
       Lungo.Notification.show('forward', _('Upgrading'), 5);
       from[last]();
+    }
+    if (last != App.version) {
+      CosemeConnectorHelper.resetTokenData();
     }
     localStorage.setItem('version', App.version);
   },
