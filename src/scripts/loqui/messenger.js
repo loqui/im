@@ -30,7 +30,10 @@ var Messenger = {
     var muc = $('section#chat')[0].dataset.muc == "true";
     var account = Accounts.current;
 
-    text = text || $('section#chat div#text').html().replace(/(<br>)$/gi,"").replace(/<br>/gi,"\n").replace(/&nbsp;/gi, " ").replace(/(<([^>]+)>)/gi, "");
+    if (!text) {
+      $('section#chat div#text br').text('\n');
+      text = $('section#chat div#text').text();
+    }
     text = text.trim();
 
     if (text.length) {
