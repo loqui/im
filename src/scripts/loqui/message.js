@@ -383,7 +383,7 @@ var Message = {
     var html= null;
     var onDivClick= null;
     if (this.core.text) {
-      html = App.emoji[Providers.data[this.account.core.provider].emoji].fy(Tools.urlHL(Tools.HTMLescape(this.core.text))).replace(/<br>/gi,"");
+      html = App.emoji[Providers.data[this.account.core.provider].emoji].fy(Tools.urlHL(Tools.HTMLescape(this.core.text)));
     } else if (this.core.media) {
       html = $('<img/>').attr('src', this.core.media.thumb);
       html[0].dataset.url = this.core.media.url;
