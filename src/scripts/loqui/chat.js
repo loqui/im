@@ -319,7 +319,7 @@ var Chat = {
       section[0].dataset.muc = this.core.muc || false;
       section[0].dataset.mine = this.core.muc && this.core.info && this.core.info.owner == this.account.core.fullJid;
       section[0].dataset.unread = App.unread - this.core.unread;
-      header.children('.title').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(this.core.title));
+      header.children('.title').html(App.emoji[Providers.data[this.account.core.provider].emoji].fy(Tools.HTMLescape(this.core.title)));
       section.find('#plus').removeClass('show');
       section.find('#typing').hide();
       section.find('#messages').empty();

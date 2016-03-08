@@ -105,7 +105,7 @@ var Messenger = {
     section.find('#card .name').text(name == jid ? jid.split('@')[0] : name);
     section.find('#card .user').text(jid);
     section.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + account.core.provider + '.svg'));
-    section.find('#status p').html(App.emoji[Providers.data[account.core.provider].emoji].fy(status));
+    section.find('#status p').html(App.emoji[Providers.data[account.core.provider].emoji].fy(Tools.HTMLescape(status)));
 
     var accountSwitch = function (e) {
       var sw = $(this);
@@ -175,7 +175,7 @@ var Messenger = {
       var chat = account.chats[ci];
       section[0].dataset.jid= jid;
       section[0].dataset.mine= (chat.core.info && chat.core.info.owner == account.core.fullJid);
-      section.find('#card .name').html(App.emoji[Providers.data[account.core.provider].emoji].fy(chat.core.title));
+      section.find('#card .name').html(App.emoji[Providers.data[account.core.provider].emoji].fy(Tools.HTMLescape(chat.core.title)));
       section.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + account.core.provider + '.svg'));
       section.find('#participants h2').text(_('NumParticipants', {number: chat.core.participants.length}));
       var partUl = section.find('#participants ul').empty();
