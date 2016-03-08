@@ -551,7 +551,7 @@ var Account = {
 
           var status = ((contact.presence.status || time) ? (prefix + ' - ') : '') +
             (contact.presence.status
-              ? App.emoji[Providers.data[this.core.provider].emoji].fy(contact.presence.status)
+             ? App.emoji[Providers.data[this.core.provider].emoji].fy(Tools.HTMLescape(contact.presence.status))
              : show);
           header.find('.status').html(status);
         }
