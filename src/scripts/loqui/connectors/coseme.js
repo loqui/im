@@ -190,6 +190,7 @@ App.connectors.coseme = function (account) {
   }
 
   function sendSetKeys (jid) {
+    axolSendKeys = true;
     axol.generatePreKeys(Math.floor(Math.random() * 0xfffffe), 50).then(function (preKeys) {
       Tools.log('generatePreKeys done', preKeys.length, preKeys);
 
@@ -208,7 +209,6 @@ App.connectors.coseme = function (account) {
         signedPreKey.jid = jid;
         tx.objectStore('localSKeys').put(signedPreKey);
 
-        axolSendKeys = false;
         CoSeMe.yowsup.getMethodsInterface().call('encrypt_setKeys', [
           axolLocalReg.identityKeyPair.public.slice(1),
           axolLocalReg.registrationId,
@@ -223,6 +223,29 @@ App.connectors.coseme = function (account) {
       });
     }, function (e) {
       Tools.log('ERROR generatePreKeys', e);
+    });
+  }
+
+  function sendRegistration (myJid) {
+    axol.generateIdentityKeyPair().then(function (identityKeyPair) {
+      axol.generateRegistrationId(true).then(function (registrationId) {
+        axolLocalReg = { jid : myJid,
+                         identityKeyPair : identityKeyPair,
+                         registrationId : registrationId };
+        Tools.log('GENERATED REGISTRATION ID', axolLocalReg.registrationId);
+
+        var tx = axolDb.transaction(['localReg'], 'readwrite');
+        tx.objectStore('localReg').put(axolLocalReg);
+
+        sendSetKeys(myJid);
+        axolDecryptQueue.resume();
+      }, function (e) {
+        Tools.log('FAILED generateIdentityKeyPair');
+        axolDecryptQueue.resume();
+      });
+    }, function (e) {
+      Tools.log('FAILED generateIdentityKeyPair');
+      axolDecryptQueue.resume();
     });
   }
 
@@ -486,26 +509,7 @@ App.connectors.coseme = function (account) {
     req.onsuccess = function (e) {
       axolLocalReg = e.target.result;
       if (! axolLocalReg && window.crypto.subtle) {
-        axol.generateIdentityKeyPair().then(function (identityKeyPair) {
-          axol.generateRegistrationId(true).then(function (registrationId) {
-            axolLocalReg = { jid : myJid,
-                             identityKeyPair : identityKeyPair,
-                             registrationId : registrationId };
-            Tools.log('GENERATED REGISTRATION ID', axolLocalReg.registrationId);
-
-            var tx = axolDb.transaction(['localReg'], 'readwrite');
-            tx.objectStore('localReg').put(axolLocalReg);
-
-            sendSetKeys(myJid);
-            axolDecryptQueue.resume();
-          }, function (e) {
-            Tools.log('FAILED generateIdentityKeyPair');
-            axolDecryptQueue.resume();
-          });
-        }, function (e) {
-          Tools.log('FAILED generateIdentityKeyPair');
-          axolDecryptQueue.resume();
-        });
+        sendRegistration(myJid);
       } else {
         if (axolLocalReg) {
           Tools.log('LOCAL REGISTRATION ID', axolLocalReg.registrationId);
@@ -851,7 +855,8 @@ App.connectors.coseme = function (account) {
         notification_groupSubjectUpdated: this.events.onGroupSubjectUpdated,
         notification_status: this.events.onContactStatusUpdated,
         notification_encrypt: this.events.onNotificationEncrypt,
-        encrypt_gotKeys: this.events.onEncryptGotKeys,
+        encrypt_keysGot: this.events.onEncryptKeysGot,
+        encrypt_keysSet: this.events.onEncryptKeysSet,
         encrypt_messageReceived: this.events.onEncryptMessageReceived,
         encrypt_groupMessageReceived: this.events.onEncryptGroupMessageReceived,
         contact_gotProfilePictureId: this.events.onAvatar,
@@ -896,14 +901,14 @@ App.connectors.coseme = function (account) {
       var method = 'notification_ack';
       MI.call(method, [from, id]);
 
-      if (axolLocalReg) {
+      if (!axolSendKeys && axolLocalReg) {
         sendSetKeys(this.account.core.fullJid);
       } else {
         axolSendKeys = true;
       }
     };
 
-    this.events.onEncryptGotKeys = function (keys, id) {
+    this.events.onEncryptKeysGot = function (keys, id) {
       Tools.log('GOT KEYS', keys);
       var myJid = this.account.core.fullJid;
       var data = requestData[id] || [];
@@ -970,6 +975,22 @@ App.connectors.coseme = function (account) {
 
       for (idx in data) {
         noSession(navigator.requestWakeLock('cpu'), data[idx]);
+      }
+    };
+
+    this.events.onEncryptKeysSet = function (id, errorCode) {
+      Tools.log('SET KEYS', errorCode);
+      if (errorCode) {
+        // keys weren't accepted, so reschedule
+        axolLocalReg = null;
+        axolDecryptQueue.pause();
+        setTimeout(function () {
+          if (this.connected && axolSendKeys && !axolLocalReg) {
+            sendRegistration(this.account.core.fullJid);
+          }
+        }.bind(this), 120000);
+      } else {
+        axolSendKeys = false;
       }
     };
 
