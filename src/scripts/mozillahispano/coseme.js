@@ -6968,7 +6968,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
           _signalInterface.send('notification_status', [from, msgId, status]);
         }
         else if (type === 'encrypt') {
-          var count = node.getChild(0).getAttributeValue('count');
+          var count = node.getChild(0).getAttributeValue('value');
           _signalInterface.send('notification_encrypt', [from, msgId, count]);
         }
         else {
@@ -7548,7 +7548,14 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
                value: CoSeMe.utils.bytesFromLatin1(userNode.getChild('key').getChild('value').data).buffer }
       });
     });
-    _signalInterface.send('encrypt_gotKeys', [keys, id]);
+    _signalInterface.send('encrypt_keysGot', [keys, id]);
+  }
+
+  function parseEncryptSetKeys(node) {
+    var id = node.getAttributeValue('id');
+    var child = node.getChild(0);
+    var errorCode = (child && child.tag === 'error') ? child.getAttributeValue('code') : 0;
+    _signalInterface.send('encrypt_keysSet', [id, errorCode]);
   }
 
   var alive = false;
@@ -7609,6 +7616,8 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
     parseGetPictureIds: parseGetPictureIds,
 
     parseEncryptGetKeys : parseEncryptGetKeys,
+
+    parseEncryptSetKeys : parseEncryptSetKeys,
 
     // Not very pretty but then, what is?
     set signalInterface(si) {
@@ -7711,7 +7720,8 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
       notification_status: [],
       notification_encrypt: [],
 
-      encrypt_gotKeys: [],
+      encrypt_keysGot: [],
+      encrypt_keysSet: [],
       encrypt_messageReceived: [],
       encrypt_groupMessageReceived: [],
 
@@ -8143,7 +8153,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
       type: 'set',
       xmlns: 'encrypt'
     }, [keyListNode, identityNode, registrationNode, typeNode, skeyNode]);
-
+    self.readerThread.requests[id] = self.readerThread.parseEncryptSetKeys;
     self._writeNode(iqNode);
   }
 
