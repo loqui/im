@@ -597,10 +597,10 @@ var Account = {
           }
         });
       } else if (account.connector.isConnected() && account.supports('easyAvatars')) {
-        console.log('REQUESTING AVATAR FOR', jid);
+        Tools.log('REQUESTING AVATAR FOR', jid);
         account.connector.avatar(function (a) {
           a.url.then(function (val) {
-            console.log(a.data);
+            Tools.log('RETRIEVED AVATAR', a.data);
             $(el).attr('src', val);
             if (me) {
               $('section#main footer .avatar img').attr('src', val);
@@ -867,13 +867,13 @@ var Account = {
       var key = values.key;
 
       if (msg.ack != 'viewed' && type == 'delivery') {
-        console.log('MARKING AS DELIVERED', from, msgId, chat, account, values);
+        Tools.log('MARKING AS DELIVERED', from, msgId, chat, account, values);
         msg.ack = 'delivered';
       } else if (type == 'read') {
-        console.log('MARKING AS VIEWED', from, msgId, chat, account, values);
+        Tools.log('MARKING AS VIEWED', from, msgId, chat, account, values);
         msg.ack = 'viewed';
       } else if (msg.ack != 'viewed' && msg.ack != 'delivered') {
-        console.log('MARKING AS SENT', from, msgId, chat, account, values);
+        Tools.log('MARKING AS SENT', from, msgId, chat, account, values);
         msg.ack = 'sent';
       }
       Store.update(key, values.result.chunkIndex, values.result.chunk, function(){
@@ -895,7 +895,7 @@ var Account = {
             task.retries = task.retries ? task.retries-1 : 2;
 
             if (task.retries > 0) {
-              Tools.log('GONING TO RETRRY!', task.retries, 'RETRIES ARE LEFT');
+              Tools.log('GOING TO RETRY!', task.retries, 'RETRIES LEFT');
               account.markMessage.push(task);
             }
         }, 200);
