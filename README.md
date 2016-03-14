@@ -56,6 +56,7 @@ LICENSING
  * traceur-runtime → Apache License v2.0
  * protobuf.js → Apache License v2.0
  * bytebuffer.js → Apache License v2.0
+ * asmcrypto.js → MIT
 
 DISCLAIMER
 ===
