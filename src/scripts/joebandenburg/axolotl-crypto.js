@@ -54,43 +54,61 @@
             return curve25519.verifySignature(signerPublicKey.slice(1), dataToSign, purportedSignature);
         },
         hmac: function(key, data) {
-            var keyOptions = {
-                name: "HMAC",
-                hash: {
-                    name: "SHA-256"
-                }
-            };
-            var signOptions = {
-                name: "HMAC",
-                hash: "SHA-256"
-            };
-            return window.crypto.subtle.importKey("raw", key, keyOptions, false, ["sign"]).then(function(key) {
-                return window.crypto.subtle.sign(signOptions, key, data);
-            });
+            if (window.crypto.subtle) {
+                var keyOptions = {
+                    name: "HMAC",
+                    hash: {
+                        name: "SHA-256"
+                    }
+                };
+                var signOptions = {
+                    name: "HMAC",
+                    hash: "SHA-256"
+                };
+                return window.crypto.subtle.importKey("raw", key, keyOptions, false, ["sign"]).then(function(key) {
+                    return window.crypto.subtle.sign(signOptions, key, data);
+                });
+            } else {
+                return new Promise(function (resolve, reject) {
+                    resolve(asmCrypto.HMAC_SHA256.bytes(data, key).buffer);
+                });
+            }
         },
         encrypt: function(key, message, iv) {
-            var keyOptions = {
-                name: "AES-CBC"
-            };
-            var encryptOptions = {
-                name: "AES-CBC",
-                iv: new Uint8Array(iv)
-            };
-            return window.crypto.subtle.importKey("raw", key, keyOptions, false, ["encrypt"]).then(function(key) {
-                return window.crypto.subtle.encrypt(encryptOptions, key, message);
-            });
+            if (window.crypto.subtle) {
+                var keyOptions = {
+                    name: "AES-CBC"
+                };
+                var encryptOptions = {
+                    name: "AES-CBC",
+                    iv: new Uint8Array(iv)
+                };
+                return window.crypto.subtle.importKey("raw", key, keyOptions, false, ["encrypt"]).then(function(key) {
+                    return window.crypto.subtle.encrypt(encryptOptions, key, message);
+                });
+            } else {
+                return new Promise(function (resolve, reject) {
+                    resolve(asmCrypto.AES_CBC.encrypt(message, key, true, iv).buffer);
+                });
+            }
         },
         decrypt: function(key, ciphertext, iv) {
-            var keyOptions = {
-                name: "AES-CBC"
-            };
-            var decryptOptions = {
-                name: "AES-CBC",
-                iv: new Uint8Array(iv)
-            };
-            return window.crypto.subtle.importKey("raw", key, keyOptions, false, ["decrypt"]).then(function(key) {
-                return window.crypto.subtle.decrypt(decryptOptions, key, ciphertext);
-            });
+            if (window.crypto.subtle) {
+                var keyOptions = {
+                    name: "AES-CBC"
+                };
+                var decryptOptions = {
+                    name: "AES-CBC",
+                    iv: new Uint8Array(iv)
+                };
+                return window.crypto.subtle.importKey("raw", key, keyOptions, false, ["decrypt"]).then(function(key) {
+                    return window.crypto.subtle.decrypt(decryptOptions, key, ciphertext);
+                });
+            } else {
+                return new Promise(function (resolve, reject) {
+                    resolve(asmCrypto.AES_CBC.decrypt(ciphertext, key, true, iv).buffer);
+                });
+            }
         }
     };
     return crypto;
