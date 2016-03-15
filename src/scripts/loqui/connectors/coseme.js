@@ -31,8 +31,10 @@ var CosemeConnectorHelper = {
     }
 
     return loadScript('scripts/joebandenburg/curve25519.js').then(function () {
-      return loadScript('scripts/joebandenburg/axolotl-crypto.js').then(function () {
-        return loadScript('scripts/joebandenburg/axolotl.js');
+      return (window.crypto.subtle ? new Promise(function (resolve, reject) { resolve(); }) : loadScript('scripts/vibornoff/asmcrypto.js')).then(function () {
+        return loadScript('scripts/joebandenburg/axolotl-crypto.js').then(function () {
+          return loadScript('scripts/joebandenburg/axolotl.js');
+        });
       });
     });
   }(),
@@ -508,7 +510,7 @@ App.connectors.coseme = function (account) {
     var req = tx.objectStore('localReg').get(myJid);
     req.onsuccess = function (e) {
       axolLocalReg = e.target.result;
-      if (! axolLocalReg && window.crypto.subtle) {
+      if (! axolLocalReg) {
         sendRegistration(myJid);
       } else {
         if (axolLocalReg) {
