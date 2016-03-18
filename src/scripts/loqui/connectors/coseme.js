@@ -574,7 +574,7 @@ App.connectors.coseme = function (account) {
         if (this.result) {
           try {
             var result = this.result;
-            var fullname = (result.givenName[0]
+            var fullname = (result.givenName
               ? result.givenName[0] + ' ' + (result.familyName
                 ? (result.familyName[0] || '') :
                 ''
