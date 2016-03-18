@@ -1331,32 +1331,112 @@ section nav {
 
 #emoji {
     background: none repeat scroll 0% 0% #FFF;
-    height: 15rem;
-    box-shadow: 0 0 .4rem rgba(0, 0, 0, .4);
     position: absolute;
-    left: 10px;
     top: auto;
-    bottom: 10rem;
-    width: 16.1rem;
-    padding: .5rem;
+    bottom: 0;
 
-    ul {
+    ul.category-select {
         list-style-type: none;
-        height: 100%;
         width: 100%;
-        padding: 0;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 1px 0 0 0;
+        background-color: #E66000;
+        border-bottom: 2px solid white;
+        box-sizing: border-box;
+
+            [class^="icon-"], [class*=" icon-"] {
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
+            }
+
+            [class^="icon-"]::before, [class*=" icon-"]::before {
+                content: "\00a0 ";
+            }
+
+            .icon-people {
+                background-image: url('../../img/emoji/category_icons/people.svg');
+            }
+
+            .icon-nature {
+                background-image: url('../../img/emoji/category_icons/nature.svg');
+            }
+
+            .icon-foods {
+                background-image: url('../../img/emoji/category_icons/foods.svg');
+            }
+
+            .icon-activity {
+                background-image: url('../../img/emoji/category_icons/activity.svg');
+            }
+
+            .icon-travel {
+                background-image: url('../../img/emoji/category_icons/travel.svg');
+            }
+
+            .icon-objects {
+                background-image: url('../../img/emoji/category_icons/objects.svg');
+            }
+
+            .icon-symbols {
+                background-image: url('../../img/emoji/category_icons/symbols.svg');
+            }
+
+            .icon-flags {
+                background-image: url('../../img/emoji/category_icons/flags.svg');
+            }
+
+            .icon-facebook {
+                background-image: url('../../img/emoji/category_icons/facebook.svg');
+            }
+
+            .icon-gtalk {
+                background-image: url('../../img/emoji/category_icons/gtalk.svg');
+            }
+
+            .icon-xmpp {
+                background-image: url('../../img/emoji/category_icons/xmpp.svg');
+            }
+
+        li {
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            border-bottom: 2px solid white;
+            width: 10vw;
+            height: auto;
+            padding-bottom: 1px;
+            margin-top: 1px;
+            margin-bottom: -2px;
+            cursor: pointer;
+        }
+        
+        :last-of-type {
+            margin-top: -2px;
+            padding-top: 2px;
+            background-color: #FF9500;
+            color: gainsboro;
+            font-size:inherit;
+        }
+
+        .active {
+            border-bottom: 2px solid black;
+        }
+    }
+
+    .emoji-category {
+        width: 100%;
+        height: 17ex;
+        display: block;
+        padding: 2px 1px;
+        background-color: silver;
         overflow: auto;
     }
 
-    li {
-        display: inline-block;
-        padding: .5rem;
-        cursor: pointer;
-    }
-
     img {
-        width: 2.2rem;
-        height: 2.2rem;
+        padding: 2px;
     }
 
     button {

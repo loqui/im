@@ -7,3 +7,6 @@ gh-pages/
 *.log
 .DS_Store
 src/scripts/loqui/blaze/renderers.js
+/src/nbproject/private/
+src/nbproject/project.properties
+src/nbproject/project.xml

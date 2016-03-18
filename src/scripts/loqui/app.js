@@ -547,7 +547,7 @@ var App = {
   */
   start: function (last) {
     App.online = App.online;
-
+    emojione.imagePathPNG = '/img/emoji/emojione/';
     // If there is already a configured account
     if (App.accounts.length) {
 

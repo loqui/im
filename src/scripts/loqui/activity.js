@@ -157,7 +157,16 @@ var Activity = function (action, account, content, options) {
 };
 
 if ('mozSetMessageHandler' in navigator) {
-  document.addEventListener('appReady', function(){
+  document.addEventListener('appReady', function() {
+    $('div[contenteditable="true"]').focus(function() {
+      // move cursor to the end of an editable when it gains focus
+      var range = document.createRange();
+      range.selectNodeContents(this);
+      range.collapse(false);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    });
     navigator.mozSetMessageHandler('activity', function(a) {
       if (a.source.name === 'share') {
         if (a.source.data.type == 'url') {

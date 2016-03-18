@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="style/google/material-icons.css">
     <link rel="stylesheet" href="style/loqui/chungo.css">
     <link rel="stylesheet" href="style/loqui/index.css">
+    <link rel="stylesheet" href="style/emojione/emojione.css">
     <link rel="prefetch" type="application/l10n" href="l10n/main.ini" />
     <link rel="shortcut icon" href="img/icon-32.png" type="image/png" />
 </head>
@@ -280,7 +281,7 @@
             <button id="say" class="recommend right" type="send">
               <i class="material-icons">&#xE163;</i>
             </button>
-            <div id="text" class="main" contenteditable></div>
+            <div id="text" class="main" contentEditable="true"></div>
           </div>
 
           <div class="{{recording}} voice-recorder">
@@ -302,7 +303,6 @@
     </article>
     <article id="screenBlocker" class="hidden" data-menu-onclick="emojiClose"></article>
     <article id="emoji">
-      <ul></ul>
     </article>
     <article id="call">
       <h1 data-l10n-id="Call">Call</h1>
@@ -562,6 +562,7 @@
   <script type="text/javascript;version=1.7" src="scripts/dcodeIO/protobuf-light.min.js"></script>
   <script type="text/javascript;version=1.7" src="scripts/mozillahispano/coseme.js"></script>
   <script type="text/javascript;version=1.7" src="scripts/TitanNano.de/Make.js"></script>
+  <script type="text/javascript;version=1.7" src="scripts/emojione/emojione.js"></script>
   <script type="text/javascript;version=1.7" src="scripts/loqui/tools.js"></script>
   <script type="text/javascript;version=1.7" src="scripts/loqui/system.js"></script>
   <script type="text/javascript;version=1.7" src="scripts/loqui/store.js"></script>
