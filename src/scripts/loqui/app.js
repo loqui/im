@@ -741,22 +741,24 @@ var App = {
 
         avatars[account.fullJid]= App.avatars[account.fullJid];
 
-        jobs.push(new Promise(function(done){
-          Store.recover(avatars[account.fullJid].chunk, function(key, chunk, free){
-            avatarChunks[avatars[account.fullJid].chunk.toString()]= chunk;
-            done();
-            free();
-          });
-        }));
-
-        if(avatars[account.fullJid].original){
+        if (avatars[account.fullJid]) {
           jobs.push(new Promise(function(done){
-            Store.recover(avatars[account.fullJid].original, function(key, chunk, free){
-              avatarChunks[avatars[account.fullJid].original.toString()]= chunk;
+            Store.recover(avatars[account.fullJid].chunk, function(key, chunk, free){
+              avatarChunks[avatars[account.fullJid].chunk.toString()]= chunk;
               done();
               free();
             });
           }));
+
+          if(avatars[account.fullJid].original){
+            jobs.push(new Promise(function(done){
+              Store.recover(avatars[account.fullJid].original, function(key, chunk, free){
+                avatarChunks[avatars[account.fullJid].original.toString()]= chunk;
+                done();
+                free();
+              });
+            }));
+          }
         }
       });
 
