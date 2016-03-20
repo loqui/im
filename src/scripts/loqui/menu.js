@@ -310,7 +310,7 @@ var Menu = {
       }
 
       $('#emoji').addClass('show');
-      $('section#chat article#main').css("bottom", "20ex"); // reduce height for emoji div
+      $('section#chat article#main').css("bottom", "75vw"); // reduce height for emoji div
       $('#screenBlocker').addClass('show');
     },
     emojiClose: function(){
