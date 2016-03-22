@@ -684,9 +684,9 @@ App.connectors.coseme = function (account) {
       });
     }.bind(this);
 
-    this.ack = function (id, from, type) {
+    this.ack = function (id, from, type, participant) {
       type = type || 'delivery';
-      MI.call('message_ack', [from, id, type]);
+      MI.call('message_ack', [from, id, type, participant]);
     };
 
     this.avatar = function (callback, id) {
@@ -1376,7 +1376,7 @@ App.connectors.coseme = function (account) {
         Tools.log('RECEIVED', msg);
         if (wantsReceipt) {
           msg.receive(function(){
-            this.ack(msgId, to);
+            this.ack(msgId, to, null, author);
           }.bind(this));
         } else {
           msg.receive();
