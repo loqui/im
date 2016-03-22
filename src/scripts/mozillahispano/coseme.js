@@ -7867,13 +7867,14 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
       return mmNode;
     },
 
-    sendReceipt: function(jid, mid, type) {
+    sendReceipt: function(jid, mid, type, participant) {
       attributes = {
         to: jid,
         id: mid,
         t: Date.now()
       };
       type && (attributes.type = type);
+      participant && (attributes.participant = participant);
       self._writeNode(newProtocolTreeNode('receipt', attributes));
     },
 
@@ -8256,8 +8257,8 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
 
     //Message and Notification Acks
 
-    message_ack: function(aJid, aMsgId, type) {
-      self.sendReceipt(aJid, aMsgId, type);
+    message_ack: function(aJid, aMsgId, type, participant) {
+      self.sendReceipt(aJid, aMsgId, type, participant);
     },
     notification_ack: function(aJid, aNotificationId, type) {
       self.sendNotificationAck(aJid, aNotificationId, type);
