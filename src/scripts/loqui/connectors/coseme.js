@@ -1633,7 +1633,7 @@ App.connectors.coseme = function (account) {
           muc: isGroup
         });
         msg.receive();
-        this.ack(msgId, isGroup ? to : from);
+        this.ack(msgId, isGroup ? to : from, null, isGroup ? from : null);
         Tools.log('Finished processing file of type', fileType);
       }.bind(this);
       switch (fileType) {
