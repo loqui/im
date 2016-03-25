@@ -705,9 +705,9 @@ App.connectors.coseme = function (account) {
       }
     };
 
-    this.emojiRender = function (img, emoji) {
-      App.emoji[Providers.data[this.account.core.provider].emoji].render(img, emoji);
-    }.bind(this);
+    this.emojiRender = function (emoji) {
+      return App.emoji[Providers.data[this.account.core.provider].emoji].render(emoji);
+    };
 
     this.csnSend = function (to, state) {
       var method = state == 'composing' ? 'typing_send' : 'typing_paused';
@@ -1940,236 +1940,28 @@ events: function (target) {
 };
 
 App.emoji.coseme = {
-
-  map: [
-    // Smileys
-    ["e415","1f604"],["e057","1f603"],["1f600","1f600"],["e056","1f60a"],["e414","263a"],["e405","1f609"],["e106","1f60d"],["e418","1f618"],["e417","1f61a"],["1f617","1f617"],["1f619","1f619"],["e105","1f61c"],["e409","1f61d"],["1f61b","1f61b"],["e40d","1f633"],["e404","1f601"],["e40a","1f614"],["e403","1f60c"],["e40e","1f612"],["e058","1f61e"],["e406","1f623"],["e413","1f622"],["e412","1f602"],["e411","1f62d"],["e408","1f62a"],["e401","1f625"],["e40f","1f630"],["1f605","1f605"],["e108","1f613"],["1f629","1f629"],["1f62b","1f62b"],["e40b","1f628"],["e107","1f631"],["e059","1f620"],["e416","1f621"],["1f624","1f624"],["e407","1f616"],["1f606","1f606"],["1f60b","1f60b"],["e40c","1f637"],["1f60e","1f60e"],["1f634","1f634"],["1f635","1f635"],["e410","1f632"],["1f61f","1f61f"],["1f626","1f626"],["1f627","1f627"],["1f608","1f608"],["e11a","1f47f"],["1f62e","1f62e"],["1f62c","1f62c"],["1f610","1f610"],["1f615","1f615"],["1f62f","1f62f"],["1f636","1f636"],["1f607","1f607"],["e402","1f60f"],["1f611","1f611"],
-    // Faces
-    ["e516","1f472"],["e517","1f473"],["e152","1f46e"],["e51b","1f477"],["e51e","1f482"],["e51a","1f476"],["e001","1f466"],["e002","1f467"],["e004","1f468"],["e005","1f469"],["e518","1f474"],["e519","1f475"],["e515","1f471"],["e04e","1f47c"],["e51c","1f478"],["1f63a","1f63a"],["1f638","1f638"],["1f63b","1f63b"],["1f63d","1f63d"],["1f63c","1f63c"],["1f640","1f640"],["1f63f","1f63f"],["1f639","1f639"],["1f63e","1f63e"],["1f479","1f479"],["1f47a","1f47a"],["1f648","1f648"],["1f649","1f649"],["1f64a","1f64a"],["e11c","1f480"],["e10c","1f47d"],["e05a","1f4a9"],
-    // Elements
-    ["e11d","1f525"],["e32e","2728"],["e32f","1f31f"],["1f4ab","1f4ab"],["1f4a5","1f4a5"],["e334","1f4a2"],["e331","1f4a6"],["1f4a7","1f4a7"],["e13c","1f4a4"],["e330","1f4a8"],
-    // Parts of the body
-    ["e41b","1f442"],["e419","1f440"],["e41a","1f443"],["1f445","1f445"],["e41c","1f444"],["e00e","1f44d"],["e421","1f44e"],["e420","1f44c"],["e00d","1f44a"],["e010","270a"],["e011","270c"],["e41e","1f44b"],["e012","270b"],["e422","1f450"],["e22e","1f446"],["e22f","1f447"],["e231","1f449"],["e230","1f448"],["e427","1f64c"],["e41d","1f64f"],["e00f","261d"],["e41f","1f44f"],["e14c","1f4aa"],["e201","1f6b6"],["e115","1f3c3"],["e51f","1f483"],["e428","1f46b"],["1f46a","1f46a"],["1f46c","1f46c"],["1f46d","1f46d"],["e111","1f48f"],["e425","1f491"],["e429","1f46f"],["e424","1f646"],["e423","1f645"],["e253","1f481"],["1f64b","1f64b"],["e31e","1f486"],["e31f","1f487"],["e31d","1f485"],["1f470","1f470"],["1f64e","1f64e"],["1f64d","1f64d"],["e426","1f647"],
-    // Clothes
-    ["e503","1f3a9"],["e10e","1f451"],["e318","1f452"],["e007","1f45f"],["1f45e","1f45e"],["e31a","1f461"],["e13e","1f460"],["e31b","1f462"],["e006","1f455"],["e302","1f454"],["1f45a","1f45a"],["e319","1f457"],["1f3bd","1f3bd"],["1f456","1f456"],["e321","1f458"],["e322","1f459"],["e11e","1f4bc"],["e323","1f45c"],["1f45d","1f45d"],["1f45b","1f45b"],["1f453","1f453"],["e314","1f380"],["e43c","1f302"],["e31c","1f484"],
-    // Love and social
-    ["e32c","1f49b"],["e32a","1f499"],["e32d","1f49c"],["e32b","1f49a"],["e022","2764"],["e023","1f494"],["e328","1f497"],["e327","1f493"],["1f495","1f495"],["1f496","1f496"],["1f49e","1f49e"],["e329","1f498"],["1f48c","1f48c"],["e003","1f48b"],["e034","1f48d"],["e035","1f48e"],["1f464","1f464"],["1f465","1f465"],["1f4ac","1f4ac"],["e536","1f463"],["1f4ad","1f4ad"],
-    // Buildings
-    ["e036","1f3e0"],["1f3e1","1f3e1"],["e157","1f3eb"],["e038","1f3e2"],["e153","1f3e3"],["e155","1f3e5"],["e14d","1f3e6"],["e156","1f3ea"],["e501","1f3e9"],["e158","1f3e8"],["e43d","1f492"],["e037","26ea"],["e504","1f3ec"],["1f3ea","1f3e4"],
-    // Places
-    ["e44a","1f307"],["e146","1f306"],["e505","1f3ef"],["e506","1f3f0"],["e122","26fa"],["e508","1f3ed"],["e509","1f5fc"],["1f5fe","1f5fe"],["e03b","1f5fb"],["e04d","1f304"],["e449","1f305"],["e44b","1f303"],["e51d","1f5fd"],["1f309","1f309"],["1f3a0","1f3a0"],["e124","1f3a1"],["e121","26f2"],["e433","1f3a2"],
-    // Means of transport
-    ["e202","1f6a2"],["e01c","26f5"],["e135","1f6a4"],["1f6a3","1f6a3"],["2693","2693"],["e10d","1f680"],["e01d","2708"],["e11f","1f4ba"],["1f681","1f681"],["1f682","1f682"],["1f68a","1f68a"],["e039","1f689"],["1f69e","1f69e"],["1f686","1f686"],["e435","1f684"],["1f688","1f688"],["e434","1f687"],["1f69d","1f69d"],["1f68b","1f68b"],["e01e","1f683"],["1f68e","1f68e"],["e159","1f68c"],["1f68d","1f68d"],["e42e","1f699"],["1f698","1f698"],["e01b","1f697"],["e15a","1f695"],["1f696","1f696"],["1f69b","1f69b"],["e42f","1f69a"],["1f6a8","1f6a8"],["e432","1f693"],["1f694","1f694"],["e430","1f692"],["e431","1f691"],["1f690","1f690"],["e136","1f6b2"],["1f6a1","1f6a1"],["1f69f","1f69f"],["1f6a0","1f6a0"],["1f69c","1f69c"],
-    // Street objects
-    ["e320","1f488"],["e150","1f68f"],["e125","1f3ab"],["1f6a6","1f6a6"],["e14e","1f6a5"],["e252","26a0"],["e137","1f6a7"],["e209","1f530"],["e03a","26fd"],["1f3ee","1f3ee"],["e133","1f3b0"],["e123","2668"],["1f5ff","1f5ff"],["1f3aa","1f3aa"],["1f3ad","1f3ad"],["1f4cd","1f4cd"],["1f6a9","1f6a9"],
-    // Country flags
-    ["e50b",["1f1ef","1f1f5"]],["e514",["1f1f0","1f1f7"]],["e513",["1f1e8","1f1f3"]],["e50c",["1f1fa","1f1f8"]],["e50d",["1f1eb","1f1f7"]],["e511",["1f1ea","1f1f8"]],["e50f",["1f1ee","1f1f9"]],["e512",["1f1f7","1f1fa"]],["e510",["1f1ec","1f1e7"]],["e50e",["1f1e9","1f1ea"]],
-    // Numbers and arrows
-    ["e21c",["31","20e3"]],["e21d",["32","20e3"]],["e21e",["33","20e3"]],["e21f",["34","20e3"]],["e220",["35","20e3"]],["e221",["36","20e3"]],["e222",["37","20e3"]],["e223",["38","20e3"]],["e224",["39","20e3"]],["e225",["30","20e3"]],["1f51f","1f51f"],["1f522","1f522"],["e210",["23","20e3"]],["1f523","1f523"],["e232","2b06"],["e233","2b07"],["e235","2b05"],["e234","27a1"],["1f520","1f520"],["1f521","1f521"],["1f524","1f524"],["e236","2197"],["e237","2196"],["e238","2198"],["e239","2199"],["2194","2194"],["2195","2195"],["1f504","1f504"],["e23b","25c0"],["e23a","25b6"],["1f53c","1f53c"],["1f53d","1f53d"],["21a9","21a9"],["21aa","21aa"],["2139","2139"],["e23d","23ea"],["e23c","23e9"],["23eb","23eb"],["23ec","23ec"],["2935","2935"],["2934","2934"],["e24d","1f197"],["1f500","1f500"],["1f501","1f501"],["1f502","1f502"],
-    // Ideograph and horoscope
-    ["e212","1f195"],["e213","1f199"],["e214","1f192"],["1f193","1f193"],["1f196","1f196"],["e20b","1f4f6"],["e507","1f3a6"],["e203","1f201"],["e22c","1f22f"],["e22b","1f233"],["e22a","1f235"],["1f234","1f234"],["1f232","1f232"],["e226","1f250"],["e227","1f239"],["e22d","1f23a"],["e215","1f236"],["e216","1f21a"],["e151","1f6bb"],["e138","1f6b9"],["e139","1f6ba"],["e13a","1f6bc"],["e309","1f6be"],["1f6b0","1f6b0"],["1f6ae","1f6ae"],["e14f","1f17f"],["e20a","267f"],["e208","1f6ad"],["e217","1f237"],["e218","1f238"],["e228","1f202"],["24c2","24c2"],["1f6c2","1f6c2"],["1f6c4","1f6c4"],["1f6c5","1f6c5"],["1f6c3","1f6c3"],["1f251","1f251"],["e315","3299"],["e30d","3297"],["1f191","1f191"],["1f198","1f198"],["e229","1f194"],["1f6ab","1f6ab"],["e207","1f51e"],["1f4f5","1f4f5"],["1f6af","1f6af"],["1f6b1","1f6b1"],["1f6b3","1f6b3"],["1f6b7","1f6b7"],["1f6b8","1f6b8"],["26d4","26d4"],["e206","2733"],["2747","2747"],["274e","274e"],["2705","2705"],["e205","2734"],["e204","1f49f"],["e12e","1f19a"],["e250","1f4f3"],["e251","1f4f4"],["e532","1f170"],["e533","1f171"],["e534","1f18e"],["e535","1f17e"],["1f4a0","1f4a0"],["e211","27bf"],["267b","267b"],["e23f","2648"],["e240","2649"],["e241","264a"],["e242","264b"],["e243","264c"],["e244","264d"],["e245","264e"],["e246","264f"],["e247","2650"],["e248","2651"],["e249","2652"],["e24a","2653"],["e24b","26ce"],["e23e","1f52f"],["e154","1f3e7"],["e14a","1f4b9"],
-    // Signs and clocks
-    ["1f4b2","1f4b2"],["e149","1f4b1"],["e24e","00a9"],["e24f","00ae"],["e537","2122"],["e12c","303d"],["3030","3030"],["e24c","1f51d"],["1f51a","1f51a"],["1f519","1f519"],["1f51b","1f51b"],["1f51c","1f51c"],["e333","274c"],["e332","2b55"],["2757","2757"],["2753","2753"],["e337","2755"],["e336","2754"],["1f503","1f503"],["e02f","1f55b"],["1f567","1f567"],["e024","1f550"],["1f55c","1f55c"],["e025","1f551"],["1f55d","1f55d"],["e026","1f552"],["1f55e","1f55e"],["e027","1f553"],["1f55f","1f55f"],["e028","1f554"],["1f560","1f560"],["e029","1f555"],["e02a","1f556"],["e02b","1f557"],["e02c","1f558"],["e02d","1f559"],["e02e","1f55a"],["1f561","1f561"],["1f562","1f562"],["1f563","1f563"],["1f564","1f564"],["1f565","1f565"],["1f566","1f566"],["2716","2716"],["2795","2795"],["2796","2796"],["2797","2797"],["e20e","2660"],["e20c","2665"],["e20f","2663"],["e20d","2666"],["1f4ae","1f4ae"],["1f4af","1f4af"],["2714","2714"],["2611","2611"],["1f518","1f518"],["1f517","1f517"],["27b0","27b0"],["e031","1f531"],["e21a","1f532"],["e21b","1f533"],["25fc","25fc"],["25fb","25fb"],["25fe","25fe"],["25fd","25fd"],["25aa","25aa"],["25ab","25ab"],["1f53a","1f53a"],["2b1c","2b1c"],["2b1b","2b1b"],["26ab","26ab"],["26aa","26aa"],["e219","1f534"],["1f535","1f535"],["1f53b","1f53b"],["1f536","1f536"],["1f537","1f537"],["1f538","1f538"],["1f539","1f539"],["2049","2049"],["203c","203c"],
-    // UNCATEGORIZED
-    ["e326","1f3b6"],
-    ["e03e","1f3b5"],
-    ["1f46e","1f46e"],
-    ["e04a","2600"],
-    ["e04b","2614"],
-    ["e049","2601"],
-    ["e048","26c4"],
-    ["e04c","1f319"],
-    ["e13d","26a1"],
-    ["e443","1f300"],
-    ["e43e","1f30a"],
-    ["e04f","1f431"],
-    ["e052","1f436"],
-    ["e053","1f42d"],
-    ["e524","1f439"],
-    ["e52c","1f430"],
-    ["e52a","1f43a"],
-    ["e531","1f438"],
-    ["e050","1f42f"],
-    ["e527","1f428"],
-    ["e051","1f43b"],
-    ["e10b","1f437"],
-    ["e52b","1f42e"],
-    ["e52f","1f417"],
-    ["e109","1f435"],
-    ["e528","1f412"],
-    ["e01a","1f434"],
-    ["e134","1f40e"],
-    ["e530","1f42b"],
-    ["e529","1f411"],
-    ["e526","1f418"],
-    ["e52d","1f40d"],
-    ["e521","1f426"],
-    ["e523","1f424"],
-    ["e52e","1f414"],
-    ["e055","1f427"],
-    ["e525","1f41b"],
-    ["e10a","1f419"],
-    ["e522","1f420"],
-    ["e019","1f41f"],
-    ["e054","1f433"],
-    ["e520","1f42c"],
-    ["e306","1f490"],
-    ["e030","1f338"],
-    ["e304","1f337"],
-    ["e110","1f340"],
-    ["e032","1f339"],
-    ["e303","1f33a"],
-    ["e305","1f33b"],
-    ["e118","1f341"],
-    ["e447","1f343"],
-    ["e119","1f342"],
-    ["e307","1f334"],
-    ["e308","1f335"],
-    ["e444","1f33e"],
-    ["e441","1f41a"],
-    ["e436","1f38d"],
-    ["e437","1f49d"],
-    ["e438","1f38e"],
-    ["e43a","1f392"],
-    ["e439","1f393"],
-    ["e43b","1f38f"],
-    ["e117","1f386"],
-    ["e440","1f387"],
-    ["e442","1f390"],
-    ["e446","1f391"],
-    ["e445","1f383"],
-    ["e11b","1f47b"],
-    ["e448","1f385"],
-    ["e033","1f384"],
-    ["e112","1f381"],
-    ["e325","1f514"],
-    ["e312","1f389"],
-    ["e310","1f388"],
-    ["e126","1f4bf"],
-    ["e127","1f4c0"],
-    ["e008","1f4f7"],
-    ["e03d","1f3a5"],
-    ["e00c","1f4bb"],
-    ["e12a","1f4fa"],
-    ["e00a","1f4f1"],
-    ["e00b","1f4e0"],
-    ["e009","260e"],
-    ["e316","1f4bd"],
-    ["e129","1f4fc"],
-    ["e141","1f50a"],
-    ["e142","1f4e2"],
-    ["e317","1f4e3"],
-    ["e128","1f4fb"],
-    ["e14b","1f4e1"],
-    ["e114","1f50d"],
-    ["e145","1f513"],
-    ["e144","1f512"],
-    ["e03f","1f511"],
-    ["e313","2702"],
-    ["e116","1f528"],
-    ["e10f","1f4a1"],
-    ["e104","1f4f2"],
-    ["e103","1f4e9"],
-    ["e101","1f4eb"],
-    ["e102","1f4ee"],
-    ["e13f","1f6c0"],
-    ["e140","1f6bd"],
-    ["e12f","1f4b0"],
-    ["e30e","1f6ac"],
-    ["e311","1f4a3"],
-    ["e30f","1f48a"],
-    ["e13b","1f489"],
-    ["e42b","1f3c8"],
-    ["e42a","1f3c0"],
-    ["e018","26bd"],
-    ["e016","26be"],
-    ["e015","1f3be"],
-    ["e013","26f3"],
-    ["e42c","1f3b1"],
-    ["e42d","1f3ca"],
-    ["e017","1f3c4"],
-    ["1f3bf","1f3bf"],
-    ["e131","1f3c6"],
-    ["e12b","1f47e"],
-    ["e130","1f3af"],
-    ["e12d","1f004"],
-    ["e324","1f3ac"],
-    ["e301","1f4dd"],
-    ["e148","1f4d3"],
-    ["e502","1f3a8"],
-    ["e03c","1f3a4"],
-    ["e30a","1f3a7"],
-    ["e040","1f3b7"],
-    ["e042","1f3ba"],
-    ["e041","1f3b8"],
-    ["e045","2615"],
-    ["e338","1f375"],
-    ["e047","1f37a"],
-    ["e30c","1f37b"],
-    ["e044","1f378"],
-    ["e30b","1f376"],
-    ["e043","1f374"],
-    ["e120","1f354"],
-    ["e33b","1f35f"],
-    ["e33f","1f35d"],
-    ["e341","1f35b"],
-    ["e34c","1f371"],
-    ["e344","1f363"],
-    ["e342","1f359"],
-    ["e33d","1f358"],
-    ["e33e","1f35a"],
-    ["e340","1f35c"],
-    ["e34d","1f372"],
-    ["e339","1f35e"],
-    ["e147","1f373"],
-    ["e343","1f362"],
-    ["e33c","1f361"],
-    ["e33a","1f366"],
-    ["e43f","1f367"],
-    ["e34b","1f382"],
-    ["e046","1f370"],
-    ["e345","1f34e"],
-    ["e346","1f34a"],
-    ["e348","1f349"],
-    ["e347","1f353"],
-    ["e34a","1f346"],
-    ["e349","1f345"],
-    ["1f52b","1f52b"],
-    ["e44c","1f308"],
-    ["e132","1f3c1"],
-    ["e143","1f38c"]
+  emojis: [
+    [ ["people", "icon-people"], [":grinning:", ":grimacing:", ":grin:", ":joy:", ":smiley:", ":smile:", ":sweat_smile:", ":laughing:", ":innocent:", ":wink:", ":blush:", ":slight_smile:", ":upside_down:", ":relaxed:", ":yum:", ":relieved:", ":heart_eyes:", ":kissing_heart:", ":kissing:", ":kissing_smiling_eyes:", ":kissing_closed_eyes:", ":stuck_out_tongue_winking_eye:", ":stuck_out_tongue_closed_eyes:", ":stuck_out_tongue:", ":money_mouth:", ":nerd:", ":sunglasses:", ":hugging:", ":smirk:", ":no_mouth:", ":neutral_face:", ":expressionless:", ":unamused:", ":rolling_eyes:", ":thinking:", ":flushed:", ":disappointed:", ":worried:", ":angry:", ":rage:", ":pensive:", ":confused:", ":slight_frown:", ":frowning2:", ":persevere:", ":confounded:", ":tired_face:", ":weary:", ":triumph:", ":open_mouth:", ":scream:", ":fearful:", ":cold_sweat:", ":hushed:", ":frowning:", ":anguished:", ":cry:", ":disappointed_relieved:", ":sleepy:", ":sweat:", ":sob:", ":dizzy_face:", ":astonished:", ":zipper_mouth:", ":mask:", ":thermometer_face:", ":head_bandage:", ":sleeping:", ":zzz:", ":poop:", ":smiling_imp:", ":imp:", ":japanese_ogre:", ":japanese_goblin:", ":skull:", ":ghost:", ":alien:", ":robot:", ":smiley_cat:", ":smile_cat:", ":joy_cat:", ":heart_eyes_cat:", ":smirk_cat:", ":kissing_cat:", ":scream_cat:", ":crying_cat_face:", ":pouting_cat:", ":raised_hands:", ":clap:", ":wave:", ":thumbsup:", ":thumbsdown:", ":punch:", ":fist:", ":v:", ":ok_hand:", ":raised_hand:", ":open_hands:", ":muscle:", ":pray:", ":point_up:", ":point_up_2:", ":point_down:", ":point_left:", ":point_right:", ":middle_finger:", ":hand_splayed:", ":metal:", ":vulcan:", ":writing_hand:", ":nail_care:", ":lips:", ":tongue:", ":ear:", ":nose:", ":eye:", ":eyes:", ":bust_in_silhouette:", ":busts_in_silhouette:", ":speaking_head:", ":baby:", ":boy:", ":girl:", ":man:", ":woman:", ":person_with_blond_hair:", ":older_man:", ":older_woman:", ":man_with_gua_pi_mao:", ":man_with_turban:", ":cop:", ":construction_worker:", ":guardsman:", ":spy:", ":santa:", ":angel:", ":princess:", ":bride_with_veil:", ":walking:", ":runner:", ":dancer:", ":dancers:", ":couple:", ":two_men_holding_hands:", ":two_women_holding_hands:", ":bow:", ":information_desk_person:", ":no_good:", ":ok_woman:", ":raising_hand:", ":person_with_pouting_face:", ":person_frowning:", ":haircut:", ":massage:", ":couple_with_heart:", ":couple_ww:", ":couple_mm:", ":couplekiss:", ":kiss_ww:", ":kiss_mm:", ":family:", ":family_mwg:", ":family_mwgb:", ":family_mwbb:", ":family_mwgg:", ":family_wwb:", ":family_wwg:", ":family_wwgb:", ":family_wwbb:", ":family_wwgg:", ":family_mmb:", ":family_mmg:", ":family_mmgb:", ":family_mmbb:", ":family_mmgg:", ":womans_clothes:", ":shirt:", ":jeans:", ":necktie:", ":dress:", ":bikini:", ":kimono:", ":lipstick:", ":kiss:", ":footprints:", ":high_heel:", ":sandal:", ":boot:", ":mans_shoe:", ":athletic_shoe:", ":womans_hat:", ":tophat:", ":helmet_with_cross:", ":mortar_board:", ":crown:", ":school_satchel:", ":pouch:", ":purse:", ":handbag:", ":briefcase:", ":eyeglasses:", ":dark_sunglasses:", ":ring:", ":closed_umbrella:", ":raised_hands_tone1:", ":raised_hands_tone2:", ":raised_hands_tone3:", ":raised_hands_tone4:", ":raised_hands_tone5:", ":clap_tone1:", ":clap_tone2:", ":clap_tone3:", ":clap_tone4:", ":clap_tone5:", ":wave_tone1:", ":wave_tone2:", ":wave_tone3:", ":wave_tone4:", ":wave_tone5:", ":thumbsup_tone1:", ":thumbsup_tone2:", ":thumbsup_tone3:", ":thumbsup_tone4:", ":thumbsup_tone5:", ":thumbsdown_tone1:", ":thumbsdown_tone2:", ":thumbsdown_tone3:", ":thumbsdown_tone4:", ":thumbsdown_tone5:", ":punch_tone1:", ":punch_tone2:", ":punch_tone3:", ":punch_tone4:", ":punch_tone5:", ":ok_hand_tone1:", ":ok_hand_tone2:", ":ok_hand_tone3:", ":ok_hand_tone4:", ":ok_hand_tone5:", ":open_hands_tone1:", ":open_hands_tone2:", ":open_hands_tone3:", ":open_hands_tone4:", ":open_hands_tone5:", ":muscle_tone1:", ":muscle_tone2:", ":muscle_tone3:", ":muscle_tone4:", ":muscle_tone5:", ":pray_tone1:", ":pray_tone2:", ":pray_tone3:", ":pray_tone4:", ":pray_tone5:", ":point_up_tone1:", ":point_up_tone2:", ":point_up_tone3:", ":point_up_tone4:", ":point_up_2_tone1:", ":point_up_2_tone2:", ":point_up_2_tone3:", ":point_up_2_tone4:", ":point_up_2_tone5:", ":point_down_tone1:", ":point_down_tone2:", ":point_down_tone3:", ":point_down_tone4:", ":point_down_tone5:", ":point_left_tone1:", ":point_left_tone2:", ":point_left_tone3:", ":point_left_tone4:", ":point_left_tone5:", ":point_right_tone1:", ":point_right_tone2:", ":point_right_tone3:", ":point_right_tone4:", ":point_right_tone5:", ":middle_finger_tone1:", ":middle_finger_tone2:", ":middle_finger_tone3:", ":middle_finger_tone4:", ":middle_finger_tone5:", ":hand_splayed_tone1:", ":hand_splayed_tone2:", ":hand_splayed_tone3:", ":hand_splayed_tone4:", ":hand_splayed_tone5:", ":metal_tone1:", ":metal_tone2:", ":metal_tone3:", ":metal_tone4:", ":metal_tone5:", ":vulcan_tone1:", ":vulcan_tone2:", ":vulcan_tone3:", ":vulcan_tone4:", ":vulcan_tone5:", ":nail_care_tone1:", ":nail_care_tone2:", ":nail_care_tone3:", ":nail_care_tone4:", ":nail_care_tone5:", ":ear_tone1:", ":ear_tone2:", ":ear_tone3:", ":ear_tone4:", ":ear_tone5:", ":nose_tone1:", ":nose_tone2:", ":nose_tone3:", ":nose_tone4:", ":nose_tone5:", ":baby_tone1:", ":baby_tone2:", ":baby_tone3:", ":baby_tone4:", ":baby_tone5:", ":boy_tone1:", ":boy_tone2:", ":boy_tone3:", ":boy_tone4:", ":boy_tone5:", ":girl_tone1:", ":girl_tone2:", ":girl_tone3:", ":girl_tone4:", ":girl_tone5:", ":man_tone1:", ":man_tone2:", ":man_tone3:", ":man_tone4:", ":man_tone5:", ":woman_tone1:", ":woman_tone2:", ":woman_tone3:", ":woman_tone4:", ":woman_tone5:", ":person_with_blond_hair_tone1:", ":person_with_blond_hair_tone2:", ":person_with_blond_hair_tone3:", ":person_with_blond_hair_tone4:", ":person_with_blond_hair_tone5:", ":older_man_tone1:", ":older_man_tone2:", ":older_man_tone3:", ":older_man_tone4:", ":older_man_tone5:", ":older_woman_tone1:", ":older_woman_tone2:", ":older_woman_tone3:", ":older_woman_tone4:", ":older_woman_tone5:", ":man_with_gua_pi_mao_tone1:", ":man_with_gua_pi_mao_tone2:", ":man_with_gua_pi_mao_tone3:", ":man_with_gua_pi_mao_tone4:", ":man_with_gua_pi_mao_tone5:", ":man_with_turban_tone1:", ":man_with_turban_tone2:", ":man_with_turban_tone3:", ":man_with_turban_tone4:", ":man_with_turban_tone5:", ":cop_tone1:", ":cop_tone2:", ":cop_tone3:", ":cop_tone4:", ":cop_tone5:", ":construction_worker_tone1:", ":construction_worker_tone2:", ":construction_worker_tone3:", ":construction_worker_tone4:", ":construction_worker_tone5:", ":guardsman_tone1:", ":guardsman_tone2:", ":guardsman_tone3:", ":guardsman_tone4:", ":guardsman_tone5:", ":santa_tone1:", ":santa_tone2:", ":santa_tone3:", ":santa_tone4:", ":santa_tone5:", ":angel_tone1:", ":angel_tone2:", ":angel_tone3:", ":angel_tone4:", ":angel_tone5:", ":princess_tone1:", ":princess_tone2:", ":princess_tone3:", ":princess_tone4:", ":princess_tone5:", ":bride_with_veil_tone1:", ":bride_with_veil_tone2:", ":bride_with_veil_tone3:", ":bride_with_veil_tone4:", ":bride_with_veil_tone5:", ":walking_tone1:", ":walking_tone2:", ":walking_tone3:", ":walking_tone4:", ":walking_tone5:", ":runner_tone1:", ":runner_tone2:", ":runner_tone3:", ":runner_tone4:", ":runner_tone5:", ":dancer_tone1:", ":dancer_tone2:", ":dancer_tone3:", ":dancer_tone4:", ":dancer_tone5:", ":bow_tone1:", ":bow_tone2:", ":bow_tone3:", ":bow_tone4:", ":bow_tone5:", ":information_desk_person_tone1:", ":information_desk_person_tone2:", ":information_desk_person_tone3:", ":information_desk_person_tone4:", ":information_desk_person_tone5:", ":no_good_tone1:", ":no_good_tone2:", ":no_good_tone3:", ":no_good_tone4:", ":no_good_tone5:", ":ok_woman_tone1:", ":ok_woman_tone2:", ":ok_woman_tone3:", ":ok_woman_tone4:", ":ok_woman_tone5:", ":raising_hand_tone1:", ":raising_hand_tone2:", ":raising_hand_tone3:", ":raising_hand_tone4:", ":raising_hand_tone5:", ":person_with_pouting_face_tone1:", ":person_with_pouting_face_tone2:", ":person_with_pouting_face_tone3:", ":person_with_pouting_face_tone4:", ":person_with_pouting_face_tone5:", ":person_frowning_tone1:", ":person_frowning_tone2:", ":person_frowning_tone3:", ":person_frowning_tone4:", ":person_frowning_tone5:", ":haircut_tone1:", ":haircut_tone2:", ":haircut_tone3:", ":haircut_tone4:", ":haircut_tone5:", ":massage_tone1:", ":massage_tone2:", ":massage_tone3:", ":massage_tone4:", ":massage_tone5:", ":spy_tone1:", ":spy_tone2:", ":spy_tone3:", ":spy_tone4:", ":spy_tone5:"] ],
+    [ ["nature", "icon-nature"], [":dog:", ":cat:", ":mouse:", ":hamster:", ":rabbit:", ":bear:", ":panda_face:", ":koala:", ":tiger:", ":lion_face:", ":cow:", ":pig:", ":pig_nose:", ":frog:", ":octopus:", ":monkey_face:", ":see_no_evil:", ":hear_no_evil:", ":speak_no_evil:", ":monkey:", ":chicken:", ":penguin:", ":bird:", ":baby_chick:", ":hatching_chick:", ":hatched_chick:", ":wolf:", ":boar:", ":horse:", ":unicorn:", ":bee:", ":bug:", ":snail:", ":beetle:", ":ant:", ":spider:", ":scorpion:", ":crab:", ":snake:", ":turtle:", ":tropical_fish:", ":fish:", ":blowfish:", ":dolphin:", ":whale:", ":whale2:", ":crocodile:", ":leopard:", ":tiger2:", ":water_buffalo:", ":ox:", ":cow2:", ":dromedary_camel:", ":camel:", ":elephant:", ":goat:", ":ram:", ":sheep:", ":racehorse:", ":pig2:", ":rat:", ":mouse2:", ":rooster:", ":turkey:", ":dove:", ":dog2:", ":poodle:", ":cat2:", ":rabbit2:", ":chipmunk:", ":feet:", ":dragon:", ":dragon_face:", ":cactus:", ":christmas_tree:", ":evergreen_tree:", ":deciduous_tree:", ":palm_tree:", ":seedling:", ":herb:", ":shamrock:", ":four_leaf_clover:", ":bamboo:", ":tanabata_tree:", ":leaves:", ":fallen_leaf:", ":maple_leaf:", ":ear_of_rice:", ":hibiscus:", ":sunflower:", ":rose:", ":tulip:", ":blossom:", ":cherry_blossom:", ":bouquet:", ":mushroom:", ":chestnut:", ":jack_o_lantern:", ":shell:", ":spider_web:", ":earth_americas:", ":earth_africa:", ":earth_asia:", ":full_moon:", ":waning_gibbous_moon:", ":last_quarter_moon:", ":waning_crescent_moon:", ":new_moon:", ":waxing_crescent_moon:", ":first_quarter_moon:", ":waxing_gibbous_moon:", ":new_moon_with_face:", ":full_moon_with_face:", ":first_quarter_moon_with_face:", ":last_quarter_moon_with_face:", ":sun_with_face:", ":crescent_moon:", ":star:", ":star2:", ":dizzy:", ":sparkles:", ":comet:", ":sunny:", ":white_sun_small_cloud:", ":partly_sunny:", ":white_sun_cloud:", ":white_sun_rain_cloud:", ":cloud:", ":cloud_rain:", ":thunder_cloud_rain:", ":cloud_lightning:", ":zap:", ":fire:", ":boom:", ":snowflake:", ":cloud_snow:", ":snowman2:", ":snowman:", ":wind_blowing_face:", ":dash:", ":cloud_tornado:", ":fog:", ":umbrella2:", ":umbrella:", ":droplet:", ":sweat_drops:", ":ocean:"] ],
+    [ ["food", "icon-foods"], [":green_apple:", ":apple:", ":pear:", ":tangerine:", ":lemon:", ":banana:", ":watermelon:", ":grapes:", ":strawberry:", ":melon:", ":cherries:", ":peach:", ":pineapple:", ":tomato:", ":eggplant:", ":hot_pepper:", ":corn:", ":sweet_potato:", ":honey_pot:", ":bread:", ":cheese:", ":poultry_leg:", ":meat_on_bone:", ":fried_shrimp:", ":egg:", ":hamburger:", ":fries:", ":hotdog:", ":pizza:", ":spaghetti:", ":taco:", ":burrito:", ":ramen:", ":stew:", ":fish_cake:", ":sushi:", ":bento:", ":curry:", ":rice_ball:", ":rice:", ":rice_cracker:", ":oden:", ":dango:", ":shaved_ice:", ":ice_cream:", ":icecream:", ":cake:", ":birthday:", ":custard:", ":candy:", ":lollipop:", ":chocolate_bar:", ":popcorn:", ":doughnut:", ":cookie:", ":beer:", ":beers:", ":wine_glass:", ":cocktail:", ":tropical_drink:", ":champagne:", ":sake:", ":tea:", ":coffee:", ":baby_bottle:", ":fork_and_knife:", ":fork_knife_plate:"] ],
+    [ ["activity", "icon-activity"], [":soccer:", ":basketball:", ":football:", ":baseball:", ":tennis:", ":volleyball:", ":rugby_football:", ":8ball:", ":golf:", ":golfer:", ":ping_pong:", ":badminton:", ":hockey:", ":field_hockey:", ":cricket:", ":ski:", ":skier:", ":snowboarder:", ":ice_skate:", ":bow_and_arrow:", ":fishing_pole_and_fish:", ":rowboat:", ":swimmer:", ":surfer:", ":bath:", ":basketball_player:", ":lifter:", ":bicyclist:", ":mountain_bicyclist:", ":horse_racing:", ":levitate:", ":trophy:", ":running_shirt_with_sash:", ":medal:", ":military_medal:", ":reminder_ribbon:", ":rosette:", ":ticket:", ":tickets:", ":performing_arts:", ":art:", ":circus_tent:", ":microphone:", ":headphones:", ":musical_score:", ":musical_keyboard:", ":saxophone:", ":trumpet:", ":guitar:", ":violin:", ":clapper:", ":video_game:", ":space_invader:", ":dart:", ":game_die:", ":slot_machine:", ":bowling:", ":rowboat_tone1:", ":rowboat_tone2:", ":rowboat_tone3:", ":rowboat_tone4:", ":rowboat_tone5:", ":swimmer_tone1:", ":swimmer_tone2:", ":swimmer_tone3:", ":swimmer_tone4:", ":swimmer_tone5:", ":surfer_tone1:", ":surfer_tone2:", ":surfer_tone3:", ":surfer_tone4:", ":surfer_tone5:", ":bath_tone1:", ":bath_tone2:", ":bath_tone3:", ":bath_tone4:", ":bath_tone5:", ":lifter_tone1:", ":lifter_tone2:", ":lifter_tone3:", ":lifter_tone4:", ":lifter_tone5:", ":bicyclist_tone1:", ":bicyclist_tone2:", ":bicyclist_tone3:", ":bicyclist_tone4:", ":bicyclist_tone5:", ":mountain_bicyclist_tone1:", ":mountain_bicyclist_tone2:", ":mountain_bicyclist_tone3:", ":mountain_bicyclist_tone4:", ":mountain_bicyclist_tone5:", ":horse_racing_tone1:", ":horse_racing_tone2:", ":horse_racing_tone3:", ":horse_racing_tone4:", ":horse_racing_tone5:"] ],
+    [ ["travel", "icon-travel"], [":red_car:", ":taxi:", ":blue_car:", ":bus:", ":trolleybus:", ":race_car:", ":police_car:", ":ambulance:", ":fire_engine:", ":minibus:", ":truck:", ":articulated_lorry:", ":tractor:", ":motorcycle:", ":bike:", ":rotating_light:", ":oncoming_police_car:", ":oncoming_bus:", ":oncoming_automobile:", ":oncoming_taxi:", ":aerial_tramway:", ":mountain_cableway:", ":suspension_railway:", ":railway_car:", ":train:", ":monorail:", ":bullettrain_side:", ":bullettrain_front:", ":light_rail:", ":mountain_railway:", ":steam_locomotive:", ":train2:", ":metro:", ":tram:", ":station:", ":helicopter:", ":airplane_small:", ":airplane:", ":airplane_departure:", ":airplane_arriving:", ":sailboat:", ":motorboat:", ":speedboat:", ":ferry:", ":cruise_ship:", ":rocket:", ":satellite_orbital:", ":seat:", ":anchor:", ":construction:", ":fuelpump:", ":busstop:", ":vertical_traffic_light:", ":traffic_light:", ":checkered_flag:", ":ship:", ":ferris_wheel:", ":roller_coaster:", ":carousel_horse:", ":construction_site:", ":foggy:", ":tokyo_tower:", ":factory:", ":fountain:", ":rice_scene:", ":mountain:", ":mountain_snow:", ":mount_fuji:", ":volcano:", ":japan:", ":camping:", ":tent:", ":park:", ":motorway:", ":railway_track:", ":sunrise:", ":sunrise_over_mountains:", ":desert:", ":beach:", ":island:", ":city_sunset:", ":city_dusk:", ":cityscape:", ":night_with_stars:", ":bridge_at_night:", ":milky_way:", ":stars:", ":sparkler:", ":fireworks:", ":rainbow:", ":homes:", ":european_castle:", ":japanese_castle:", ":stadium:", ":statue_of_liberty:", ":house:", ":house_with_garden:", ":house_abandoned:", ":office:", ":department_store:", ":post_office:", ":european_post_office:", ":hospital:", ":bank:", ":hotel:", ":convenience_store:", ":school:", ":love_hotel:", ":wedding:", ":classical_building:", ":church:", ":mosque:", ":synagogue:", ":kaaba:", ":shinto_shrine:"] ],
+    [ ["objects", "icon-objects"], [":watch:", ":iphone:", ":calling:", ":computer:", ":keyboard:", ":desktop:", ":printer:", ":mouse_three_button:", ":trackball:", ":joystick:", ":compression:", ":minidisc:", ":floppy_disk:", ":cd:", ":dvd:", ":vhs:", ":camera:", ":camera_with_flash:", ":video_camera:", ":movie_camera:", ":projector:", ":film_frames:", ":telephone_receiver:", ":telephone:", ":pager:", ":fax:", ":tv:", ":radio:", ":microphone2:", ":level_slider:", ":control_knobs:", ":stopwatch:", ":timer:", ":alarm_clock:", ":clock:", ":hourglass_flowing_sand:", ":hourglass:", ":satellite:", ":battery:", ":electric_plug:", ":bulb:", ":flashlight:", ":candle:", ":wastebasket:", ":oil:", ":money_with_wings:", ":dollar:", ":yen:", ":euro:", ":pound:", ":moneybag:", ":credit_card:", ":gem:", ":scales:", ":wrench:", ":hammer:", ":hammer_pick:", ":tools:", ":pick:", ":nut_and_bolt:", ":gear:", ":chains:", ":gun:", ":bomb:", ":knife:", ":dagger:", ":crossed_swords:", ":shield:", ":smoking:", ":skull_crossbones:", ":coffin:", ":urn:", ":amphora:", ":crystal_ball:", ":prayer_beads:", ":barber:", ":alembic:", ":telescope:", ":microscope:", ":hole:", ":pill:", ":syringe:", ":thermometer:", ":label:", ":bookmark:", ":toilet:", ":shower:", ":bathtub:", ":key:", ":key2:", ":couch:", ":sleeping_accommodation:", ":bed:", ":door:", ":bellhop:", ":frame_photo:", ":map:", ":beach_umbrella:", ":moyai:", ":shopping_bags:", ":balloon:", ":flags:", ":ribbon:", ":gift:", ":confetti_ball:", ":tada:", ":dolls:", ":wind_chime:", ":crossed_flags:", ":izakaya_lantern:", ":envelope:", ":envelope_with_arrow:", ":incoming_envelope:", ":e-mail:", ":love_letter:", ":postbox:", ":mailbox_closed:", ":mailbox:", ":mailbox_with_mail:", ":mailbox_with_no_mail:", ":package:", ":postal_horn:", ":inbox_tray:", ":outbox_tray:", ":scroll:", ":page_with_curl:", ":bookmark_tabs:", ":bar_chart:", ":chart_with_upwards_trend:", ":chart_with_downwards_trend:", ":page_facing_up:", ":date:", ":calendar:", ":calendar_spiral:", ":card_index:", ":card_box:", ":ballot_box:", ":file_cabinet:", ":clipboard:", ":notepad_spiral:", ":file_folder:", ":open_file_folder:", ":dividers:", ":newspaper2:", ":newspaper:", ":notebook:", ":closed_book:", ":green_book:", ":blue_book:", ":orange_book:", ":notebook_with_decorative_cover:", ":ledger:", ":books:", ":book:", ":link:", ":paperclip:", ":paperclips:", ":scissors:", ":triangular_ruler:", ":straight_ruler:", ":pushpin:", ":round_pushpin:", ":triangular_flag_on_post:", ":flag_white:", ":flag_black:", ":closed_lock_with_key:", ":lock:", ":unlock:", ":lock_with_ink_pen:", ":pen_ballpoint:", ":pen_fountain:", ":black_nib:", ":pencil:", ":pencil2:", ":crayon:", ":paintbrush:", ":mag:", ":mag_right:"] ],
+    [ ["symbols", "icon-symbols"], [":heart:", ":yellow_heart:", ":green_heart:", ":blue_heart:", ":purple_heart:", ":broken_heart:", ":heart_exclamation:", ":two_hearts:", ":revolving_hearts:", ":heartbeat:", ":heartpulse:", ":sparkling_heart:", ":cupid:", ":gift_heart:", ":heart_decoration:", ":peace:", ":cross:", ":star_and_crescent:", ":om_symbol:", ":wheel_of_dharma:", ":star_of_david:", ":six_pointed_star:", ":menorah:", ":yin_yang:", ":orthodox_cross:", ":place_of_worship:", ":ophiuchus:", ":aries:", ":taurus:", ":gemini:", ":cancer:", ":leo:", ":virgo:", ":libra:", ":scorpius:", ":sagittarius:", ":capricorn:", ":aquarius:", ":pisces:", ":id:", ":atom:", ":u7a7a:", ":u5272:", ":radioactive:", ":biohazard:", ":mobile_phone_off:", ":vibration_mode:", ":u6709:", ":u7121:", ":u7533:", ":u55b6:", ":u6708:", ":eight_pointed_black_star:", ":vs:", ":accept:", ":white_flower:", ":ideograph_advantage:", ":secret:", ":congratulations:", ":u5408:", ":u6e80:", ":u7981:", ":a:", ":b:", ":ab:", ":cl:", ":o2:", ":sos:", ":no_entry:", ":name_badge:", ":no_entry_sign:", ":x:", ":o:", ":anger:", ":hotsprings:", ":no_pedestrians:", ":do_not_litter:", ":no_bicycles:", ":non-potable_water:", ":underage:", ":no_mobile_phones:", ":exclamation:", ":grey_exclamation:", ":question:", ":grey_question:", ":bangbang:", ":interrobang:", ":100:", ":low_brightness:", ":high_brightness:", ":trident:", ":fleur-de-lis:", ":part_alternation_mark:", ":warning:", ":children_crossing:", ":beginner:", ":recycle:", ":u6307:", ":chart:", ":sparkle:", ":eight_spoked_asterisk:", ":negative_squared_cross_mark:", ":white_check_mark:", ":diamond_shape_with_a_dot_inside:", ":cyclone:", ":loop:", ":globe_with_meridians:", ":m:", ":atm:", ":sa:", ":passport_control:", ":customs:", ":baggage_claim:", ":left_luggage:", ":wheelchair:", ":no_smoking:", ":wc:", ":parking:", ":potable_water:", ":mens:", ":womens:", ":baby_symbol:", ":restroom:", ":put_litter_in_its_place:", ":cinema:", ":signal_strength:", ":koko:", ":ng:", ":ok:", ":up:", ":cool:", ":new:", ":free:", ":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":ten:", ":1234:", ":arrow_forward:", ":pause_button:", ":play_pause:", ":stop_button:", ":record_button:", ":track_next:", ":track_previous:", ":fast_forward:", ":rewind:", ":twisted_rightwards_arrows:", ":repeat:", ":repeat_one:", ":arrow_backward:", ":arrow_up_small:", ":arrow_down_small:", ":arrow_double_up:", ":arrow_double_down:", ":arrow_right:", ":arrow_left:", ":arrow_up:", ":arrow_down:", ":arrow_upper_right:", ":arrow_lower_right:", ":arrow_lower_left:", ":arrow_upper_left:", ":arrow_up_down:", ":left_right_arrow:", ":arrows_counterclockwise:", ":arrow_right_hook:", ":leftwards_arrow_with_hook:", ":arrow_heading_up:", ":arrow_heading_down:", ":hash:", ":asterisk:", ":information_source:", ":abc:", ":abcd:", ":capital_abcd:", ":symbols:", ":musical_note:", ":notes:", ":wavy_dash:", ":curly_loop:", ":heavy_check_mark:", ":arrows_clockwise:", ":heavy_plus_sign:", ":heavy_minus_sign:", ":heavy_division_sign:", ":heavy_multiplication_x:", ":heavy_dollar_sign:", ":currency_exchange:", ":copyright:", ":registered:", ":tm:", ":end:", ":back:", ":on:", ":top:", ":soon:", ":ballot_box_with_check:", ":radio_button:", ":white_circle:", ":black_circle:", ":red_circle:", ":large_blue_circle:", ":small_orange_diamond:", ":small_blue_diamond:", ":large_orange_diamond:", ":large_blue_diamond:", ":small_red_triangle:", ":black_small_square:", ":white_small_square:", ":black_large_square:", ":white_large_square:", ":small_red_triangle_down:", ":black_medium_square:", ":white_medium_square:", ":black_medium_small_square:", ":white_medium_small_square:", ":black_square_button:", ":white_square_button:", ":speaker:", ":sound:", ":loud_sound:", ":mute:", ":mega:", ":loudspeaker:", ":bell:", ":no_bell:", ":black_joker:", ":mahjong:", ":spades:", ":clubs:", ":hearts:", ":diamonds:", ":flower_playing_cards:", ":thought_balloon:", ":anger_right:", ":speech_balloon:", ":clock1:", ":clock2:", ":clock3:", ":clock4:", ":clock5:", ":clock6:", ":clock7:", ":clock8:", ":clock9:", ":clock10:", ":clock11:", ":clock12:", ":clock130:", ":clock230:", ":clock330:", ":clock430:", ":clock530:", ":clock630:", ":clock730:", ":clock830:", ":clock930:", ":clock1030:", ":clock1130:", ":clock1230:", ":eye_in_speech_bubble:"] ],
+    [ ["flags", "icon-flags"], [":flag_ac:", ":flag_af:", ":flag_al:", ":flag_dz:", ":flag_ad:", ":flag_ao:", ":flag_ai:", ":flag_ag:", ":flag_ar:", ":flag_am:", ":flag_aw:", ":flag_au:", ":flag_at:", ":flag_az:", ":flag_bs:", ":flag_bh:", ":flag_bd:", ":flag_bb:", ":flag_by:", ":flag_be:", ":flag_bz:", ":flag_bj:", ":flag_bm:", ":flag_bt:", ":flag_bo:", ":flag_ba:", ":flag_bw:", ":flag_br:", ":flag_bn:", ":flag_bg:", ":flag_bf:", ":flag_bi:", ":flag_cv:", ":flag_kh:", ":flag_cm:", ":flag_ca:", ":flag_ky:", ":flag_cf:", ":flag_td:", ":flag_cl:", ":flag_cn:", ":flag_co:", ":flag_km:", ":flag_cg:", ":flag_cd:", ":flag_cr:", ":flag_hr:", ":flag_cu:", ":flag_cy:", ":flag_cz:", ":flag_dk:", ":flag_dj:", ":flag_dm:", ":flag_do:", ":flag_ec:", ":flag_eg:", ":flag_sv:", ":flag_gq:", ":flag_er:", ":flag_ee:", ":flag_et:", ":flag_fk:", ":flag_fo:", ":flag_fj:", ":flag_fi:", ":flag_fr:", ":flag_pf:", ":flag_ga:", ":flag_gm:", ":flag_ge:", ":flag_de:", ":flag_gh:", ":flag_gi:", ":flag_gr:", ":flag_gl:", ":flag_gd:", ":flag_gu:", ":flag_gt:", ":flag_gn:", ":flag_gw:", ":flag_gy:", ":flag_ht:", ":flag_hn:", ":flag_hk:", ":flag_hu:", ":flag_is:", ":flag_in:", ":flag_id:", ":flag_ir:", ":flag_iq:", ":flag_ie:", ":flag_il:", ":flag_it:", ":flag_ci:", ":flag_jm:", ":flag_jp:", ":flag_je:", ":flag_jo:", ":flag_kz:", ":flag_ke:", ":flag_ki:", ":flag_xk:", ":flag_kw:", ":flag_kg:", ":flag_la:", ":flag_lv:", ":flag_lb:", ":flag_ls:", ":flag_lr:", ":flag_ly:", ":flag_li:", ":flag_lt:", ":flag_lu:", ":flag_mo:", ":flag_mk:", ":flag_mg:", ":flag_mw:", ":flag_my:", ":flag_mv:", ":flag_ml:", ":flag_mt:", ":flag_mh:", ":flag_mr:", ":flag_mu:", ":flag_mx:", ":flag_fm:", ":flag_md:", ":flag_mc:", ":flag_mn:", ":flag_me:", ":flag_ms:", ":flag_ma:", ":flag_mz:", ":flag_mm:", ":flag_na:", ":flag_nr:", ":flag_np:", ":flag_nl:", ":flag_nc:", ":flag_nz:", ":flag_ni:", ":flag_ne:", ":flag_ng:", ":flag_nu:", ":flag_kp:", ":flag_no:", ":flag_om:", ":flag_pk:", ":flag_pw:", ":flag_ps:", ":flag_pa:", ":flag_pg:", ":flag_py:", ":flag_pe:", ":flag_ph:", ":flag_pl:", ":flag_pt:", ":flag_pr:", ":flag_qa:", ":flag_ro:", ":flag_ru:", ":flag_rw:", ":flag_sh:", ":flag_kn:", ":flag_lc:", ":flag_vc:", ":flag_ws:", ":flag_sm:", ":flag_st:", ":flag_sa:", ":flag_sn:", ":flag_rs:", ":flag_sc:", ":flag_sl:", ":flag_sg:", ":flag_sk:", ":flag_si:", ":flag_sb:", ":flag_so:", ":flag_za:", ":flag_kr:", ":flag_es:", ":flag_lk:", ":flag_sd:", ":flag_sr:", ":flag_sz:", ":flag_se:", ":flag_ch:", ":flag_sy:", ":flag_tw:", ":flag_tj:", ":flag_tz:", ":flag_th:", ":flag_tl:", ":flag_tg:", ":flag_to:", ":flag_tt:", ":flag_tn:", ":flag_tr:", ":flag_tm:", ":flag_tv:", ":flag_ug:", ":flag_ua:", ":flag_ae:", ":flag_gb:", ":flag_us:", ":flag_vi:", ":flag_uy:", ":flag_uz:", ":flag_vu:", ":flag_va:", ":flag_ve:", ":flag_vn:", ":flag_wf:", ":flag_eh:", ":flag_ye:", ":flag_zm:", ":flag_zw:", ":flag_re:", ":flag_ax:", ":flag_ta:", ":flag_io:", ":flag_bq:", ":flag_cx:", ":flag_cc:", ":flag_gg:", ":flag_im:", ":flag_yt:", ":flag_nf:", ":flag_pn:", ":flag_bl:", ":flag_pm:", ":flag_gs:", ":flag_tk:", ":flag_bv:", ":flag_hm:", ":flag_sj:", ":flag_um:", ":flag_ic:", ":flag_ea:", ":flag_cp:", ":flag_dg:", ":flag_as:", ":flag_aq:", ":flag_vg:", ":flag_ck:", ":flag_cw:", ":flag_eu:", ":flag_gf:", ":flag_tf:", ":flag_gp:", ":flag_mq:", ":flag_mp:", ":flag_sx:", ":flag_ss:", ":flag_tc:", ":flag_mf:"] ]
   ],
 
-  charToData: function (char) {
-    var data = char;
-    for (var i in this.map) {
-      var code = this.map[i][0];
-      if (code == char) {
-        data = 'data:image/gif;base64,' + this.map[i][2];
-        break;
-      }
-    }
-    return data;
-  },
-
+// called to convert unicode symbols to emoji images
   fy: function (text) {
-    var mapped = text;
-    if (mapped && mapped.match(/[\ue000-\ue999]|[\u1f000-\u1f999]|[\u00aa-\uffff]/g)) {
-      var map = this.map;
-      for (var i in map) {
-        var codeA = String.fromCodePoint(parseInt(map[i][0], 16));
-        var codeB = map[i][1] instanceof Array ? (String.fromCodePoint(parseInt(map[i][1][0], 16)) + String.fromCodePoint(parseInt(map[i][1][1], 16))) : String.fromCodePoint(parseInt(map[i][1], 16));
-        var rexp = new RegExp('(' + codeA + '|' + codeB + ')', 'g');
-        mapped = mapped.replace(rexp, '<img src="/img/emoji/coseme/' + map[i][1] + '.png" alt="$1" />');
-      }
-    }
-    return mapped;
+    return emojione.unicodeToImage(text);
   },
 
-  render: function (img, emoji) {
-    var code = typeof emoji[1] == 'string' ? emoji[1] : emoji[1].join('-');
-    img.attr('src', '/img/emoji/coseme/' + code + '.png');
-    img[0].dataset.emoji= String.fromCodePoint(parseInt(emoji[1], 16));
+// turn shortname into img object for the emoji category div
+  render: function (emoji) {
+    var img = $(emojione.shortnameToImage(emoji));
+    img[0].dataset.emoji = emojione.shortnameToUnicode(emoji);
+    
+    return img;
   }
 
 };

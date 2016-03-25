@@ -276,8 +276,8 @@ App.connectors.XMPP = function (account) {
     this.connection.Messaging.csnSend(to, state);
   };
 
-  this.emojiRender = function (img, emoji) {
-    App.emoji[Providers.data[this.account.core.provider].emoji].render(img, emoji);
+  this.emojiRender = function (emoji) {
+    return App.emoji[Providers.data[this.account.core.provider].emoji].render(emoji);
   }.bind(this);
 
   this.contacts.remove = function (jid) {
@@ -706,27 +706,29 @@ App.logForms.XMPP = function (provider, article) {
 };
 
 App.emoji.XMPP = {
-
-  map: [
-    ['emoji1', '>:-(', '>:('],
-    ['emoji2', ';)', ';-)'],
-    ['emoji3', ':-!', ':!'],
-    ['emoji4', ':-[', ':['],
-    ['emoji5', ':-$', ':$'],
-    ['emoji6', ':-\\'],
-    ['emoji7', ':\'('],
-    ['emoji8', ':-(', ':('],
-    ['emoji9', '8-)', '8)'],
-    ['emoji10', ':-D', ':D'],
-    ['emoji11', '>:O'],
-    ['emoji12', ':-O', ':O', '=-O'],
-    ['emoji13', 'O:-)'],
-    ['emoji14', ':-)', ':)'],
-    ['emoji15', ':-P', ':P'],
-    ['emoji16', ':-X'],
-    ['emoji17', ':kiss:', ':heart:'],
-    ['emoji18', ':yes:'],
-    ['emoji19', ':no:']
+ emojis: [
+      [ ["people", "icon-xmpp"],
+       [['emoji1', '>:-(', '>:('],
+        ['emoji2', ';)', ';-)'],
+        ['emoji3', ':-!', ':!'],
+        ['emoji4', ':-[', ':['],
+        ['emoji5', ':-$', ':$'],
+        ['emoji6', ':-\\'],
+        ['emoji7', ':\'('],
+        ['emoji8', ':-(', ':('],
+        ['emoji9', '8-)', '8)'],
+        ['emoji10', ':-D', ':D'],
+        ['emoji11', '>:O'],
+        ['emoji12', ':-O', ':O', '=-O'],
+        ['emoji13', 'O:-)'],
+        ['emoji14', ':-)', ':)'],
+        ['emoji15', ':-P', ':P'],
+        ['emoji16', ':-X'],
+        ['emoji17', ':kiss:', ':heart:'],
+        ['emoji18', ':yes:'],
+        ['emoji19', ':no:']
+       ]
+      ]
   ],
 
   fy: function (text) {
@@ -748,43 +750,47 @@ App.emoji.XMPP = {
     return text;
   },
 
-  render: function (img, emoji) {
-    img.attr('src', 'img/emoji/xmpp/' + emoji[0] + '.png');
-    img[0].dataset.emoji= emoji[1];
+  render: function (emoji) {
+    var img = $('<img class="emojione" src="img/emoji/xmpp/' + emoji[0] + '.png"/>');
+    img[0].dataset.emoji = emoji[1];
+    
+    return img;
   }
 
 };
 
 App.emoji.FB = {
-
-  map: [
-    ['emoji1', '>:('],
-    ['emoji2', ':poop:'],
-    ['emoji3', '3:)'],
-    ['emoji4', '>:O','>:o'],
-    ['emoji5', 'O:)'],
-    ['emoji6', ':putnam:'],
-    ['emoji7', ':)', '=)'],
-    ['emoji8', ':(', '=('],
-    ['emoji9', ':P', ':p'],
-    ['emoji10', ':D'],
-    ['emoji11', ':O', ':o'],
-    ['emoji12', ':3'],
-    ['emoji13', '8)', '8-)'],
-    ['emoji14', '8|', '8-|'],
-    ['emoji15', ':\\', ':/', ':-\\', ':-/'],
-    ['emoji16', ':\'('],
-    ['emoji17', ':*', ':-*'],
-    ['emoji18', '<3'],
-    ['emoji19', 'o.O'],
-    ['emoji20', 'O.o'],
-    ['emoji21', ':v'],
-    ['emoji22', ';-)', ';)'],
-    ['emoji23', '^_^'],
-    ['emoji24', '-_-'],
-    ['emoji25', ':|]'],
-    ['emoji26', '(^^^)'],
-    ['emoji27', '<(")']
+ emojis: [
+      [ ["people", "icon-facebook"],
+       [['emoji1', '>:('],
+        ['emoji2', ':poop:'],
+        ['emoji3', '3:)'],
+        ['emoji4', '>:O','>:o'],
+        ['emoji5', 'O:)'],
+        ['emoji6', ':putnam:'],
+        ['emoji7', ':)', '=)'],
+        ['emoji8', ':(', '=('],
+        ['emoji9', ':P', ':p'],
+        ['emoji10', ':D'],
+        ['emoji11', ':O', ':o'],
+        ['emoji12', ':3'],
+        ['emoji13', '8)', '8-)'],
+        ['emoji14', '8|', '8-|'],
+        ['emoji15', ':\\', ':/', ':-\\', ':-/'],
+        ['emoji16', ':\'('],
+        ['emoji17', ':*', ':-*'],
+        ['emoji18', '<3'],
+        ['emoji19', 'o.O'],
+        ['emoji20', 'O.o'],
+        ['emoji21', ':v'],
+        ['emoji22', ';-)', ';)'],
+        ['emoji23', '^_^'],
+        ['emoji24', '-_-'],
+        ['emoji25', ':|]'],
+        ['emoji26', '(^^^)'],
+        ['emoji27', '<(")']
+       ]
+      ]
   ],
 
   fy: function (text) {
@@ -809,40 +815,44 @@ App.emoji.FB = {
     return text;
   },
 
-  render: function (img, emoji) {
-    img.attr('src', 'img/emoji/fb/' + emoji[0] + '.png');
-    img[0].dataset.emoji=emoji[1];
+  render: function (emoji) {
+    var img = $('<img class="emojione" src="img/emoji/fb/' + emoji[0] + '.png"/>');
+    img[0].dataset.emoji = emoji[1];
+    
+    return img;
   }
 
 };
 
 App.emoji.GTALK = {
-
-  map: [
-    ['angry', 'x-('],
-    ['brokenheart', '&lt;/3'],
-    ['cool', 'B-)'],
-    ['cowbell', '+/\'\\'],
-    ['crab', 'V.v.V'],
-    ['cry', ':\'('],
-    ['devil', '}:-)'],
-    ['frown', ':(', '=(', ':-('],
-    ['grin', ':D', '=D', ':-D'],
-    ['heart', '&lt;3'],
-    ['kissstar', ':*', ':-x'],
-    ['monkey', ':(|)'],
-    ['mustache', ':{'],
-    ['pig', ':(:)'],
-    ['poop', '~@~'],
-    ['robot', ':|]'],
-    ['rockout', '\\m/'],
-    ['shocked', ':-o'],
-    ['slant', ':-/', '=/'],
-    ['smile', ':)', '=D', ':-)'],
-    ['straightface', ':-\|'],
-    ['tongue', ':p', ':P', '=p', '=P', ':-p', ':-P'],
-    ['wince', '\\>.\\<'],
-    ['wink', ';)', ';-)', ';^)']
+  emojis: [
+     [ ["people", "icon-gtalk"],
+       [['angry', 'x-('],
+        ['brokenheart', '&lt;/3'],
+        ['cool', 'B-)'],
+        ['cowbell', '+/\'\\'],
+        ['crab', 'V.v.V'],
+        ['cry', ':\'('],
+        ['devil', '}:-)'],
+        ['frown', ':(', '=(', ':-('],
+        ['grin', ':D', '=D', ':-D'],
+        ['heart', '&lt;3'],
+        ['kissstar', ':*', ':-x'],
+        ['monkey', ':(|)'],
+        ['mustache', ':{'],
+        ['pig', ':(:)'],
+        ['poop', '~@~'],
+        ['robot', ':|]'],
+        ['rockout', '\\m/'],
+        ['shocked', ':-o'],
+        ['slant', ':-/', '=/'],
+        ['smile', ':)', '=D', ':-)'],
+        ['straightface', ':-\|'],
+        ['tongue', ':p', ':P', '=p', '=P', ':-p', ':-P'],
+        ['wince', '\\>.\\<'],
+        ['wink', ';)', ';-)', ';^)']
+       ]
+     ]
   ],
 
   fy: function (text) {
@@ -864,9 +874,11 @@ App.emoji.GTALK = {
     return text;
   },
 
-  render: function (img, emoji) {
-    img.attr('src', 'img/emoji/gtalk/' + emoji[0] + '.gif');
-    img[0].dataset.emoji= emoji[1];
+  render: function (emoji) {
+    var img = $('<img class="emojione" src="img/emoji/gtalk/' + emoji[0] + '.gif"/>');
+    img[0].dataset.emoji = emoji[1];
+    
+    return img;
   }
 
 };
