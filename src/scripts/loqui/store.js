@@ -437,7 +437,7 @@ var Store = {
         };
 
         var fileWriter = async.queue(function(buffer, callback){
-            if (window.FileHandle) {
+            if (false) { // if (window.FileHandle || window.IDBMutableFile) {
                 fileName = App.pathLogs + (new Date()).toISOString().split('T')[0] + '.log';
 
                 Store.SD.createFile(fileName, function(e){
