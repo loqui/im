@@ -1224,7 +1224,7 @@ App.connectors.coseme = function (account) {
       MI.call('delivered_ack', [from, msgId, 'retry']);
     };
 
-    this.events.onMessageDelivered = function (from, msgId, type) {
+    this.events.onMessageDelivered = function (from, msgId, type, participant) {
       var account = this.account;
       var chat = account.chatGet(from);
       chat.core.lastAck = Tools.localize(Tools.stamp());
@@ -1232,7 +1232,7 @@ App.connectors.coseme = function (account) {
       account.markMessage.push({from : from, msgId : msgId,
                                 type : type || 'delivery'});
       Tools.log('DELIVERED', from, msgId, type);
-      MI.call('delivered_ack', [from, msgId, type]);
+      MI.call('delivered_ack', [from, msgId, type, participant]);
     };
 
     this.events.onMessageVisible = function (from, msgId) {
