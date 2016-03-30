@@ -678,6 +678,8 @@ var App = {
   alarmSet: function (data) {
     if (navigator.mozAlarms) {
       navigator.mozAlarms.getAll().onsuccess = function(e){
+        var cpuLock = navigator.requestWakeLock('cpu');
+
         e.target.result.forEach(function(item) {
           Tools.log('REMOVE ALARM', item);
           navigator.mozAlarms.remove(item.id);
@@ -688,6 +690,9 @@ var App = {
           Tools.log('SET NEW ALARM', req.result);
         };
         req.onerror = function () { };
+
+        App.accounts.forEach(function (account) { account.connector.keepAlive(); });
+        cpuLock.unlock();
       };
     }
   },

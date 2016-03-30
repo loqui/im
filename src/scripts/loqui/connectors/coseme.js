@@ -159,7 +159,6 @@ App.connectors.coseme = function (account) {
   var SI = Yowsup.getSignalsInterface();
   var MI = Yowsup.getMethodsInterface();
 
-  var pulse = null;
   var axol = null;
   var axolDb = null;
   var axolLocalReg = null;
@@ -443,12 +442,6 @@ App.connectors.coseme = function (account) {
         this.account.core.fullJid = jid;
 
         callback.connected();
-        if(!pulse) {
-          pulse = setInterval(function(){
-            Tools.log('keep alive!');
-            MI.call('keepalive', []);
-          }, 60000);
-        }
       }.bind(self));
       Yowsup.connectionmanager.signals.auth_fail.length = 0;
       SI.registerListener('auth_fail', function(username, _, reason) {
@@ -471,10 +464,6 @@ App.connectors.coseme = function (account) {
           clearTimeout(connTimeoutId);
           connTimeoutId = null;
         }
-        if (pulse) {
-          clearInterval(pulse);
-          pulse = null;
-        }
         if (callback.disconnected) {
           callback.disconnected();
         }
@@ -489,15 +478,18 @@ App.connectors.coseme = function (account) {
     this.connected = false;
     var method = 'disconnect';
     var params = ['undefined'];
-    if (pulse) {
-      clearInterval(pulse);
-      pulse = null;
-    }
     MI.call(method, params);
   };
 
   this.isConnected = function () {
     return App.online && this.connected;
+  };
+
+  this.keepAlive = function () {
+    if (this.isConnected()) {
+      Tools.log('keep alive!');
+      MI.call('keepalive', []);
+    }
   };
 
   this.start = function () {
