@@ -706,7 +706,7 @@ App.logForms.XMPP = function (provider, article) {
 };
 
 App.emoji.XMPP = {
- emojis: [
+  emojis: [
       [ ["people", "icon-xmpp"],
        [['emoji1', '>:-(', '>:('],
         ['emoji2', ';)', ';-)'],
@@ -733,7 +733,7 @@ App.emoji.XMPP = {
 
   fy: function (text) {
     var mapped = text;
-    var map = this.map;
+    var map = this.emojis[0][1];
     if (mapped && map.length !== undefined) {
       for (var i in map) {
         var original = map[i][0];
@@ -795,7 +795,7 @@ App.emoji.FB = {
 
   fy: function (text) {
     var mapped = text;
-    var map = this.map;
+    var map = this.emojis[0][1];
     if (mapped && map.length !== undefined) {
       for (var i in map) {
         var original = map[i][0],
@@ -857,7 +857,7 @@ App.emoji.GTALK = {
 
   fy: function (text) {
     var mapped = text;
-    var map = this.map;
+    var map = this.emojis[0][1];
     if (mapped && map.length !== undefined) {
       for (var i in map) {
         var original = map[i][0];
