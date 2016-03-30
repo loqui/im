@@ -342,9 +342,23 @@ App.connectors.coseme = function (account) {
       callback(e);
     }
 
-    function onDecrypted(plaintext, session) {
-      Tools.log('DECRYPTED MESSAGE', plaintext, session);
-      self.events.onMessage.bind(self)(msg.msgId, msg.remoteJid, plaintext, msg.timeStamp, true, msg.pushName, false);
+    function onDecrypted(v2msg, session) {
+      Tools.log('DECRYPTED MESSAGE', v2msg, session);
+
+      if (v2msg.conversation) {
+        self.events.onMessage.bind(self)(msg.msgId, msg.remoteJid, v2msg.conversation, msg.timeStamp, true, msg.pushName, false);
+      } else if (v2msg.contact_message) {
+        var contact_msg = v2msg.contact_message;
+        self.events.onVCardReceived.bind(self)(msg.msgId, msg.remoteJid, contact_msg.display_name, contact_msg.vcard, true, false, msg.pushName, msg.timeStamp);
+      } else if (v2msg.image_message) {
+        var img_msg = v2msg.image_message;
+        self.events.onImageReceived.bind(self)(msg.msgId, msg.remoteJid, img_msg.jpeg_thumbnail, img_msg.url, img_msg.file_length, true, false, msg.pushName, msg.timeStamp);
+      } else if (v2msg.location_message) {
+        var loc_msg = v2msg.location_msg;
+        self.events.onLocationReceived.bind(self)(msg.msgId, msg.remoteJid, loc_msg.nsme, loc_msg.jpeg_thumbnail, loc_msg.degrees_latitude, loc_msg.degrees_longitude, true, false, msg.pushName, msg.timeStamp);
+      } else {
+        Tools.log('UNHANDLED v2msg');
+      }
 
       var tx = axolDb.transaction(['session'], 'readwrite');
       var req = tx.objectStore('session').put({ jid : msg.jid,
@@ -362,11 +376,14 @@ App.connectors.coseme = function (account) {
         var decryptFn = (msg.type == 'pkmsg') ? axol.decryptPreKeyWhisperMessage : axol.decryptWhisperMessage;
         decryptFn(session, msg.msgData).then(function (m) {
           var data = new Uint8Array(m.message);
-          if (msg.v == '2' && data[0] == 10 && data[data.length - 1] == 1) {
-            data = data.subarray((data.length < 128) ? 2 : 3, -1);
+          var v2msg;
+          if (msg.v == '2') {
+            v2msg = _root.com.whatsapp.proto.Message.decode(data);
+          } else {
+            v2msg = { conversation : CoSeMe.utils.stringFromUtf8(CoSeMe.utils.latin1FromBytes(data)) };
           }
-          var plaintext = CoSeMe.utils.stringFromUtf8(CoSeMe.utils.latin1FromBytes(data));
-          onDecrypted(plaintext, m.session);
+
+          onDecrypted(v2msg, m.session);
         }, onDecryptError);
       };
       req.onerror = function(e) {
