@@ -8534,6 +8534,25 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
       return sendSetPicture(self.jid, preview, thumb);
     },
 
+    profile_setPrivacy: function(settings) {
+      var id = self.makeId('sendsetprivacy_');
+
+      var categoryNodes = [];
+      settings.forEach(function (setting) {
+        categoryNodes.push(newProtocolTreeNode('category', {
+          name : setting[0], value : setting[1] }));
+      });
+      var privacyNode = newProtocolTreeNode('privacy', undefined, categoryNodes);
+      var iqNode = newProtocolTreeNode('iq', {
+        type: 'set',
+        id: id,
+        xmlns: 'privacy'
+      }, [privacyNode]);
+      self._writeNode(iqNode);
+
+      return id;
+    },
+
     // Encrypt
 
     encrypt_sendMessage: self.sendMessage.bind(self, function(aJid, buffer, type, v, count) {
