@@ -377,7 +377,7 @@ App.connectors.XMPP = function (account) {
   }.bind(this);
 
   this.muc.avatar = function (callback, id) {
-    callback(new Avatar({url: 'https://raw.githubusercontent.com/loqui/im/dev/src/img/goovatar.png'}));
+    callback(new Avatar({url: 'img/goovatar.png'}));
   };
 
   this.muc.participantsGet = function (jid) {
@@ -591,7 +591,7 @@ App.connectors.XMPP = function (account) {
       App.notify({
         subject: chat.core.title,
         text: _('SentYou', { type: _('MediaType_bolt') }),
-        pic: 'https://raw.github.com/loqui/im/dev/src/img/bolt.png',
+        pic: 'img/bolt.png',
         callback: function () {
           chat.show();
           App.toForeground();
