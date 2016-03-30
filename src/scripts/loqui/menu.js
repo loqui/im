@@ -257,7 +257,7 @@ var Menu = {
       var providerName = Providers.data[account.core.provider].emoji;
       var emojiDiv = $('section#chat article#emoji div#' + providerName);
 
-      if (emojiDiv.length == 0) {
+      if (emojiDiv.length === 0) {
         // Emojis for this provider are not loaded yet
         Lungo.Notification.show('heart', _('Loading...'));
         setTimeout(function () {
@@ -265,7 +265,7 @@ var Menu = {
 
           // Add category select bar
           var toolbar = $('<ul/>', { class: "category-select" }).appendTo($(div));
-          for each (var category in App.emoji[Providers.data[account.core.provider].emoji].emojis) {
+          App.emoji[Providers.data[account.core.provider].emoji].emojis.forEach(function (category) {
             // loop over each category and add selector li with category image
             var li = $('<li/>', { class: category[0][1] }).on('tap', function() {
               $('ul.category-select li').removeClass("active");
@@ -279,15 +279,15 @@ var Menu = {
 
             // add category divs
             var emojidiv = $('<div/>', {id: category[0][0], class: "emoji-category"} );
-            for each (var emoji in category[1]) {
+            category[1].forEach(function (emoji) {
               var img = account.connector.emojiRender(emoji);
               img.on('tap', function () {
                   Plus.emoji($(this)[0].dataset.emoji);
                 });
               emojidiv.append(img);
-            }
+            });
             div.append(emojidiv);
-          }
+          });
           toolbar.find("li:first-child").trigger("tap"); // activate first category
 
           // add backspace button to toolbar
