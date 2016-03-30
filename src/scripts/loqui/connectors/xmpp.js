@@ -97,6 +97,9 @@ App.connectors.XMPP = function (account) {
     return App.online && this.connected;
   };
 
+  this.keepAlive = function () {
+  };
+
   this.start = function () {
     this.handlers.init();
     this.capabilize();
