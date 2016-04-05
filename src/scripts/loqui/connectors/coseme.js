@@ -168,6 +168,7 @@ App.connectors.coseme = function (account) {
     handleEncryptedMessage(task.self, task.msg, callback);
   });
   var requestData = {};
+  var lastKeepalive = new Date();
   var init = CosemeConnectorHelper.init();
 
   this.account = account;
@@ -504,8 +505,12 @@ App.connectors.coseme = function (account) {
 
   this.keepAlive = function () {
     if (this.isConnected()) {
-      Tools.log('keep alive!');
-      MI.call('keepalive', []);
+      // send keep-alives less frequently if we are hidden (phone is sleeping)
+      if (!document.hidden || (new Date() - lastKeepalive) > 300 * 1000) {
+        lastKeepalive = new Date();
+        Tools.log('keep alive!');
+        MI.call('keepalive', []);
+      }
     }
   };
 
