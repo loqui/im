@@ -3365,7 +3365,7 @@ CoSeMe.namespace('config', (function(){
     tokenData: {
       "v": "2.13.39",
       // XXX: it is tokenData[d] + - + tokenData[v] + - + port
-      "r": "iPhone-2.12.12",
+      "r": "S40-2.13.30",
       "u": "WhatsApp/2.13.39 S40Version/14.26 Device/Nokia302",
       "t": "1456528956233",
       "d": "S40"
