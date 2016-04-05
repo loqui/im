@@ -13,6 +13,7 @@
 'use strict';
 
 App.connectors.XMPP = function (account) {
+  var lastKeepalive = new Date();
 
   this.account = account;
   this.provider = Providers.data[account.core.provider];
@@ -98,6 +99,13 @@ App.connectors.XMPP = function (account) {
   };
 
   this.keepAlive = function () {
+    if (this.isConnected()) {
+      // at least re-send our presence from time to time
+      if ((new Date() - lastKeepalive) > 600 * 1000) {
+        lastKeepalive = new Date();
+        this.presence.send();
+      }
+    }
   };
 
   this.start = function () {
