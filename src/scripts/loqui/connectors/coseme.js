@@ -376,14 +376,19 @@ App.connectors.coseme = function (account) {
         var decryptFn = (msg.type == 'pkmsg') ? axol.decryptPreKeyWhisperMessage : axol.decryptWhisperMessage;
         decryptFn(session, msg.msgData).then(function (m) {
           var data = new Uint8Array(m.message);
-          var v2msg;
-          if (msg.v == '2') {
-            v2msg = _root.com.whatsapp.proto.Message.decode(data.subarray(0, -data[data.length - 1]));
-          } else {
-            v2msg = { conversation : CoSeMe.utils.stringFromUtf8(CoSeMe.utils.latin1FromBytes(data)) };
-          }
 
-          onDecrypted(v2msg, m.session);
+          try {
+            var v2msg;
+            if (msg.v == '2') {
+              v2msg = _root.com.whatsapp.proto.Message.decode(data.subarray(0, -data[data.length - 1]));
+            } else {
+              v2msg = { conversation : CoSeMe.utils.stringFromUtf8(CoSeMe.utils.latin1FromBytes(data)) };
+            }
+
+            onDecrypted(v2msg, m.session);
+          } catch (e) {
+            onDecryptError(e);
+          }
         }, onDecryptError);
       };
       req.onerror = function(e) {
