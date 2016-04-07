@@ -70,42 +70,42 @@ var _root = dcodeIO.ProtoBuf.newBuilder({})['import']({
             "fields": [
                 {
                     "rule": "required",
-                    "type": "bytes",
+                    "type": "string",
                     "name": "url",
                     "id": 1
                 },
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "string",
                     "name": "mime_type",
                     "id": 2
                 },
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "string",
                     "name": "caption",
                     "id": 3
                 },
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "bytes",
                     "name": "file_sha256",
                     "id": 4
                 },
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "uint64",
                     "name": "file_length",
                     "id": 5
                 },
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "uint32",
                     "name": "height",
                     "id": 6
                 },
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "uint32",
                     "name": "width",
                     "id": 7
@@ -117,7 +117,7 @@ var _root = dcodeIO.ProtoBuf.newBuilder({})['import']({
                     "id": 8
                 },
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "bytes",
                     "name": "jpeg_thumbnail",
                     "id": 16
@@ -140,25 +140,25 @@ var _root = dcodeIO.ProtoBuf.newBuilder({})['import']({
                     "id": 2
                 },
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "string",
                     "name": "name",
                     "id": 3
                 },
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "string",
                     "name": "address",
                     "id": 4
                 },
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "string",
                     "name": "url",
                     "id": 5
                 },
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "bytes",
                     "name": "jpeg_thumbnail",
                     "id": 16
@@ -175,43 +175,43 @@ var _root = dcodeIO.ProtoBuf.newBuilder({})['import']({
                     "id": 1
                 },
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "string",
                     "name": "mimeType",
                     "id": 2
                 },
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "string",
                     "name": "title",
                     "id": 3
                 },
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "bytes",
                     "name": "file_sha256",
                     "id": 4
                 },
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "uint64",
                     "name": "file_length",
                     "id": 5
                 },
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "uint32",
                     "name": "page_count",
                     "id": 6
                 },
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "bytes",
                     "name": "media_key",
                     "id": 7
                 },
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "bytes",
                     "name": "jpeg_thumbnail",
                     "id": 16
@@ -228,31 +228,31 @@ var _root = dcodeIO.ProtoBuf.newBuilder({})['import']({
                     "id": 1
                 },
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "string",
                     "name": "matched_text",
                     "id": 2
                 },
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "string",
                     "name": "canonical_url",
                     "id": 4
                 },
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "string",
                     "name": "description",
                     "id": 5
                 },
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "string",
                     "name": "title",
                     "id": 6
                 },
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "string",
                     "name": "jpeg_thumbnail",
                     "id": 16
