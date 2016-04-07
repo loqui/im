@@ -187,6 +187,10 @@ var Tools = {
         var url = canvas.toDataURL('image/jpeg');
         callback(url);
       };
+      img.onerror = function (e) {
+        Tools.log('image onerror', e);
+        callback('about:blank');
+      };
       img.src = reader.result;
     };
     reader.onerror = function (e) {

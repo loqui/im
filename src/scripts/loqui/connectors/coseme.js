@@ -352,10 +352,16 @@ App.connectors.coseme = function (account) {
         self.events.onVCardReceived.bind(self)(msg.msgId, msg.remoteJid, contact_msg.display_name, contact_msg.vcard, true, false, msg.pushName, msg.timeStamp);
       } else if (v2msg.image_message) {
         var img_msg = v2msg.image_message;
-        self.events.onImageReceived.bind(self)(msg.msgId, msg.remoteJid, img_msg.jpeg_thumbnail, img_msg.url, img_msg.file_length, true, false, msg.pushName, msg.timeStamp);
+        var thumbnail = new Uint8Array(img_msg.jpeg_thumbnail.buffer,
+                                       img_msg.jpeg_thumbnail.offset,
+                                       img_msg.jpeg_thumbnail.limit - img_msg.jpeg_thumbnail.offset);
+        self.events.onImageReceived.bind(self)(msg.msgId, msg.remoteJid, thumbnail, img_msg.url, img_msg.file_length.toNumber(), true, false, msg.pushName, msg.timeStamp);
       } else if (v2msg.location_message) {
         var loc_msg = v2msg.location_msg;
-        self.events.onLocationReceived.bind(self)(msg.msgId, msg.remoteJid, loc_msg.nsme, loc_msg.jpeg_thumbnail, loc_msg.degrees_latitude, loc_msg.degrees_longitude, true, false, msg.pushName, msg.timeStamp);
+        var thumbnail = new Uint8Array(loc_msg.jpeg_thumbnail.buffer,
+                                       loc_msg.jpeg_thumbnail.offset,
+                                       loc_msg.jpeg_thumbnail.limit - loc_msg.jpeg_thumbnail.offset);
+        self.events.onLocationReceived.bind(self)(msg.msgId, msg.remoteJid, loc_msg.nsme, thumbnail, loc_msg.degrees_latitude, loc_msg.degrees_longitude, true, false, msg.pushName, msg.timeStamp);
       } else {
         Tools.log('UNHANDLED v2msg');
       }
@@ -1074,7 +1080,7 @@ App.connectors.coseme = function (account) {
 
     this.events.onImageReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast, notifyName, timeStamp) {
       var to = this.account.core.fullJid;
-      return this.mediaProcess('image',  msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, wantsReceipt, false, notifyName, timeStamp);
+      return this.mediaProcess('image', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, wantsReceipt, false, notifyName, timeStamp);
     };
 
     this.events.onVideoReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast, notifyName, timeStamp) {
@@ -1657,7 +1663,10 @@ App.connectors.coseme = function (account) {
       }.bind(this);
       switch (fileType) {
         case 'image':
-        Tools.picThumb(CoSeMe.utils.aToBlob(payload, 'i'), 120, null, process);
+        Tools.picThumb(((payload.buffer !== undefined) ?
+                        new Blob([payload], {type: 'i'}) :
+                        CoSeMe.utils.aToBlob(payload, 'i')),
+                       120, null, process);
         break;
         case 'video':
         process('img/video.png');
