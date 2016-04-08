@@ -7235,7 +7235,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
       return; // #REJECT THIS FUCKING MESSAGE!
     }
 
-    if (fromAttribute.contains('-')) {
+    if (fromAttribute.endsWith('@g.us') || fromAttribute.endsWith('@broadcast')) {
       isGroup = true;
     }
 
@@ -7311,7 +7311,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
 
   function parseGetPicture(node) {
     var jid = node.getAttributeValue("from");
-    var isGroup = jid.contains('-');
+    var isGroup = jid.endsWith('@g.us');
     if (node.getAttributeValue('type') === 'error') {
       _signalInterface.send(isGroup ?
                             'group_gotPicture' :
