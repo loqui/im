@@ -158,7 +158,7 @@ var Activity = function (action, account, content, options) {
 
 if ('mozSetMessageHandler' in navigator) {
   document.addEventListener('appReady', function() {
-    $('div[contenteditable="true"]').focus(function() {
+    $('span[contenteditable="true"]').focus(function() {
       // move cursor to the end of an editable when it gains focus
       var range = document.createRange();
       range.selectNodeContents(this);
