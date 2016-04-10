@@ -250,9 +250,10 @@ var Menu = {
       Messenger.accountRemove(jid);
     },
     plus: function () {
+      Menu.show('emojiHide');
       Lungo.Router.section('attachment');
     },
-    emoji: function () {
+    emojiOpen: function () {
       var account = Accounts.current;
       var providerName = Providers.data[account.core.provider].emoji;
       var emojiDiv = $('section#chat article#emoji div#' + providerName);
@@ -264,7 +265,7 @@ var Menu = {
           var div = $('<div/>', { id: providerName, class: "emoji-provider" }).appendTo('section#chat article#emoji');
 
           // Add category select bar
-          var toolbar = $('<ul/>', { class: "category-select" }).appendTo($(div));
+          var toolbar = $('<ul/>', { class: "category-select" });
           App.emoji[Providers.data[account.core.provider].emoji].emojis.forEach(function (category) {
             // loop over each category and add selector li with category image
             var li = $('<li/>', { class: category[0][1] }).on('tap', function() {
@@ -283,16 +284,16 @@ var Menu = {
               var img = account.connector.emojiRender(emoji);
               img.on('tap', function () {
                   Plus.emoji($(this)[0].dataset.emoji);
+                  $('div#text').trigger("keydown");
                 });
               emojidiv.append(img);
             });
             div.append(emojidiv);
           });
-          toolbar.find("li:first-child").trigger("tap"); // activate first category
 
           // add backspace button to toolbar
-          var li = $('<li/>').append($('<i/>', { class: "material-icons" }).append("backspace"));
-          li.on('tap', function() {
+          var backspace = $('<li/>').append($('<i/>', { class: "material-icons" }).append("backspace"));
+          backspace.on('tap', function() {
             var input = $('section#chat article#main div#footbox div#text');
             var str = input.html();
             if (str.length > 0) {         // unicode char
@@ -302,22 +303,34 @@ var Menu = {
               else {                      // regular char
                 input.html(str.substring(0, str.length - 1));
               }
+              $('div#text').trigger("keydown");
             }
           });
-          toolbar.append(li);
+          toolbar.append(backspace);
+          div.append(toolbar);
+          toolbar.find("li:first-child").trigger("tap"); // activate first category
           Lungo.Notification.hide();
         });
       }
 
       $('#emoji').addClass('show');
       $('section#chat article#main').css("bottom", "75vw"); // reduce height for emoji div
-      $('#screenBlocker').addClass('show');
+      $('#emojis').hide();
+      $('#keyboard').show();
+      $('section#chat div#text').prop("contenteditable", false);  // prevent additional popup of the keyboard
     },
-    emojiClose: function(){
-      $('section#chat div#text').focus();                   // activate the keyboard
+    emojiClose: function() {
+      Menu.show('emojiHide', "focus_input", 0);
+    },
+    emojiHide: function(focus_input) {
+      $('section#chat div#text').prop("contenteditable", true);   // restore input field
+      if ((focus_input !== undefined) && (focus_input === "focus_input")) {
+        $('section#chat div#text').focus();                 // activate the keyboard
+      }
       $('section#chat article#main').css("bottom", "0");    // restore size
       $('#emoji').removeClass('show');
-      $('#screenBlocker').removeClass('show');
+      $('#emojis').show();
+      $('#keyboard').hide();
     },
     fileSend: function () {
       Lungo.Router.section('back');
