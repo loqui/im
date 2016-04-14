@@ -371,23 +371,23 @@ var Store = {
      * @param {function} callback
      */
     createFile : function(fileName, callback) {
-        if(this.card){
-            var card = this.card;
+      if(this.card){
+        var card = this.card;
 
-            var request = card.get(fileName);
+        var request = card.get(fileName);
 
-            request.onerror = function(e){
-                if (request.error.name === 'NotFoundError') {
-                    request = card.addNamed(new Blob([''], {type: "text/plain"}), fileName);
-
-                    request.onsuccess = callback;
-                }
-
-                callback();
-            };
+        request.onerror = function(e){
+          if (request.error.name === 'NotFoundError') {
+            request = card.addNamed(new Blob([''], {type: "text/plain"}), fileName);
 
             request.onsuccess = callback;
-        }
+          }
+
+          callback();
+        };
+
+        request.onsuccess = callback;
+      }
     },
 
     /**
@@ -396,103 +396,105 @@ var Store = {
      * @param {function} callback
      */
     appendToFile: function(fileName, args, callback){
-        if(this.card){
-            var card = this.card;
-            var request = card.getEditable(fileName);
+      if(this.card){
+        var card = this.card;
+        var request = card.getEditable(fileName);
 
-            request.onsuccess = function(e){
-                var fileHandle = request.result.open('readwrite');
+        request.onsuccess = function(e){
+          var fileHandle = request.result.open('readwrite');
 
-                args.forEach(function(item){
-                    fileHandle.append(item.join(' ') + '\n');
-                });
+          args.forEach(function(item){
+            fileHandle.append(item.join(' ') + '\n');
+          });
 
-                fileHandle.flush();
-                fileHandle.abort();
-                callback();
-            };
+          fileHandle.flush();
+          fileHandle.abort();
+          callback();
+        };
 
-            request.onerror = function(e)　{
-                console.log('CAN\'T WRITE TO LOG FILE!!');
-                callback();
-            };
-        }
+        request.onerror = function(e)　{
+          console.log('CAN\'T WRITE TO LOG FILE!!');
+          callback();
+        };
+      }
     },
 
     /**
      * @param {Array} args
      */
-    writeToLog : (function(){ 
-        var buffer = [];
-        var fileName = null;
+    writeToLog : (function(){
+      var buffer = [];
+      var fileName = null;
+      var flushing = false;
 
-        var q = async.queue(function(args, callback) {
-            buffer.push((new Date()).toTimeString() + '|  ' + args.join(' '));
+      var callback = function () {
+        if (buffer.length > 0) {
+          flushBuffer();
+        } else {
+          flushing = false;
+        }
+      };
 
-            setTimeout(callback, 10);
-        });
+      var flushBuffer = function() {
+        if (false) { // if (window.FileHandle || window.IDBMutableFile) {
+          fileName = App.pathLogs + (new Date()).toISOString().split('T')[0] + '.log';
 
-        q.drain = function(){
-            fileWriter.push([buffer]);
-        };
+          Store.SD.createFile(fileName, function(e){
+            Store.SD.appendToFile(fileName, buffer.splice(0, buffer.length), callback);
+          });
+        } else {
+          var lastDate = localStorage.getItem('logFileDate');
+          var currentDate = (new Date()).toISOString().split('T')[0];
+          var part = ((currentDate === lastDate) ? (parseInt(localStorage.getItem('logFilePart')) || 0) : 0);
+          fileName = App.pathLogs + currentDate + '_' + part + '.log';
+          var card = Store.SD.card;
 
-        var fileWriter = async.queue(function(buffer, callback){
-            if (false) { // if (window.FileHandle || window.IDBMutableFile) {
-                fileName = App.pathLogs + (new Date()).toISOString().split('T')[0] + '.log';
+          Store.SD.createFile(fileName, function(e){
+            Store.SD.recover(fileName, function(file){
+              Tools.textUnblob(file, function(fileText){
+                console.log('current log file', file.size);
 
-                Store.SD.createFile(fileName, function(e){
-                    Store.SD.appendToFile(fileName, buffer, callback);
-                });
-            } else {
-                var lastDate = localStorage.getItem('logFileDate');
-                var currentDate = (new Date()).toISOString().split('T')[0];
-                var part = ((currentDate === lastDate) ? (parseInt(localStorage.getItem('logFilePart')) || 0) : 0);
-                fileName = App.pathLogs + currentDate + '_' + part + '.log';
-                var card = Store.SD.card;
+                var appendText = buffer.splice(0, buffer.length).join('\n');
 
-                Store.SD.createFile(fileName, function(e){
-                    Store.SD.recover(fileName, function(file){
-                        Tools.textUnblob(file, function(text){
-                            console.log('current log file', file.size);
+                if (file.size > 1000000) {
+                  part += 1;
+                  fileName = App.pathLogs + currentDate + '_' + part + '.log';
 
-                            if (file.size > 1000000) {
-                                part += 1;
-                                fileName = App.pathLogs + currentDate + '_' + part + '.log';
+                  file = new Blob([appendText, '\n'], { type : 'text/plain'});
+                } else {
+                  file = new Blob([fileText, appendText, '\n'], { type : 'text/plain' });
+                }
 
-                                file = new Blob([buffer.join('\n')], { type : 'text/plain'});
-                            } else {
-                                file = new Blob([text, buffer.join('\n'), '\n'], { type : 'text/plain' });
-                            }
+                var r = card.delete(fileName);
 
-                            var r = card.delete(fileName);
+                r.onsuccess = function(){
+                  var r = card.addNamed(file, fileName);
 
-                            r.onsuccess = function(){
-                                var r = card.addNamed(file, fileName);
+                  r.onsuccess = function(){
+                    console.log('log saved!', 'new size is: ', file.size);
+                    callback();
+                  };
 
-                                r.onsuccess = function(){
-                                    console.log('log saved!', 'new size is: ', file.size);
-                                    buffer.splice(0, buffer.length);
-                                    callback();
-                                };
+                  r.onerror = callback;
 
-                                r.onerror = callback;
+                  localStorage.setItem('logFilePart', part);
+                  localStorage.setItem('logFileDate', currentDate);
+                };
 
-                                localStorage.setItem('logFilePart', part);
-                                localStorage.setItem('logFileDate', currentDate);
-                            };
+                r.onerror = callback;
+              }, callback, true);
+            });
+          });
+        }
+      };
 
-                            r.onerror = callback;
-                        }, callback, true);
-                    });
-                });
-            }
-        });
-
-        fileWriter.drain = function(){};
-
-        return q.push.bind(q);
+      return function (args) {
+        buffer.push((new Date()).toTimeString() + '|  ' + args.join(' '));
+        if (!flushing) {
+          flushing = true;
+          setTimeout(flushBuffer, 10);
+        }
+      };
     })()
-
   }
-
 };

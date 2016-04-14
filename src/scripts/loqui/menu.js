@@ -294,7 +294,7 @@ var Menu = {
           // add backspace button to toolbar
           var backspace = $('<li/>').append($('<i/>', { class: "material-icons" }).append("backspace"));
           backspace.on('tap', function() {
-            var input = $('section#chat article#main div#footbox div#text');
+            var input = $('section#chat article#main div#footbox span#text');
             var str = input.html();
             if (str.length > 0) {         // unicode char
               if(/[\uD800-\uDFFF]/.test(str.slice(-1)) && (str.length > 1)) {
@@ -320,7 +320,7 @@ var Menu = {
       $('section#chat div#text').prop("contenteditable", false);  // prevent additional popup of the keyboard
     },
     emojiClose: function() {
-      Menu.show('emojiHide', "focus_input", 0);
+      Menu.show('emojiHide', "focus_input");
     },
     emojiHide: function(focus_input) {
       $('section#chat div#text').prop("contenteditable", true);   // restore input field

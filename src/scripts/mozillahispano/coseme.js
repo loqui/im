@@ -3363,11 +3363,11 @@ CoSeMe.namespace('config', (function(){
     groupDomain: 'g.us',
 
     tokenData: {
-      "v": "2.13.39",
+      "v": "2.16.4",
       // XXX: it is tokenData[d] + - + tokenData[v] + - + port
-      "r": "S40-2.13.30",
-      "u": "WhatsApp/2.13.39 S40Version/14.26 Device/Nokia302",
-      "t": "1456528956233",
+      "r": "S40-2.13.39",
+      "u": "WhatsApp/2.16.4 S40Version/14.26 Device/Nokia302",
+      "t": "1459919543356",
       "d": "S40"
     },
 
@@ -4175,12 +4175,14 @@ CoSeMe.namespace('protocol.dictionary', (function(){
     'all',
     'allow',
     'apple',
+    'audio',
     'auth',
     'author',
     'available',
     'bad-protocol',
     'bad-request',
     'before',
+    'bits',
     'body',
     'broadcast',
     'cancel',
@@ -4207,6 +4209,7 @@ CoSeMe.namespace('protocol.dictionary', (function(){
     'elapsed',
     'enable',
     'encoding',
+    'encrypt',
     'error',
     'event',
     'expiration',
@@ -4219,10 +4222,13 @@ CoSeMe.namespace('protocol.dictionary', (function(){
     'features',
     'feature-not-implemented',
     'field',
+    'file',
+    'filehash',
     'first',
     'free',
     'from',
     'g.us',
+    'gcm',
     'get',
     'google',
     'group',
@@ -4255,8 +4261,10 @@ CoSeMe.namespace('protocol.dictionary', (function(){
     'message',
     'method',
     'microsoft',
+    'mimetype',
     'missing',
     'modify',
+    'msg',
     'mute',
     'name',
     'nokia',
@@ -4281,6 +4289,7 @@ CoSeMe.namespace('protocol.dictionary', (function(){
     'picture',
     'pin',
     'ping',
+    'pkmsg',
     'platform',
     'port',
     'presence',
@@ -4288,6 +4297,7 @@ CoSeMe.namespace('protocol.dictionary', (function(){
     'probe',
     'prop',
     'props',
+    'qcount',
     'query',
     'raw',
     'read',
@@ -4316,7 +4326,10 @@ CoSeMe.namespace('protocol.dictionary', (function(){
     'set',
     'show',
     'silent',
+    'size',
+    'skmsg',
     'stat',
+    'state',
     'status',
     'stream:error',
     'stream:features',
@@ -4328,11 +4341,13 @@ CoSeMe.namespace('protocol.dictionary', (function(){
     'text',
     'timeout',
     'timestamp',
+    'tizen',
     'to',
     'true',
     'type',
     'unavailable',
     'unsubscribe',
+    'upgrade',
     'uri',
     'url',
     'urn:ietf:params:xml:ns:xmpp-sasl',
@@ -4346,8 +4361,10 @@ CoSeMe.namespace('protocol.dictionary', (function(){
     'urn:xmpp:whatsapp',
     'user',
     'user-not-found',
+    'v',
     'value',
     'version',
+    'voip',
     'w:g',
     'w:p:r',
     'w:p',
@@ -4368,13 +4385,6 @@ CoSeMe.namespace('protocol.dictionary', (function(){
     'promote',
     'demote',
     'creator',
-    'Bell.caf',
-    'Boing.caf',
-    'Glass.caf',
-    'Harp.caf',
-    'TimePassing.caf',
-    'Tri-tone.caf',
-    'Xylophone.caf',
     'background',
     'backoff',
     'chunked',
@@ -4388,21 +4398,21 @@ CoSeMe.namespace('protocol.dictionary', (function(){
     'urn:xmpp:whatsapp:sync',
     'flt',
     's16',
-    'u8',
-    'adpcm',
-    'amrnb',
-    'amrwb',
-    'mp3',
-    'pcm',
-    'qcelp',
-    'wma',
-    'h263',
-    'h264',
-    'jpeg'
+    'u8'
   ];
 
   var secondaryStrings = [
     [
+      'adpcm',
+      'amrnb',
+      'amrwb',
+      'mp3',
+      'pcm',
+      'qcelp',
+      'wma',
+      'h263',
+      'h264',
+      'jpeg',
       'mpeg4',
       'wmv',
       'audio/3gpp',
@@ -4446,7 +4456,6 @@ CoSeMe.namespace('protocol.dictionary', (function(){
       'app_uptime',
       'asampfmt',
       'asampfreq',
-      'audio',
       'clear',
       'conflict',
       'conn_no_nna',
@@ -4454,11 +4463,9 @@ CoSeMe.namespace('protocol.dictionary', (function(){
       'currency',
       'duration',
       'extend',
-      'file',
       'fps',
       'g_notify',
       'g_sound',
-      'gcm',
       'gone',
       'google_play',
       'hash',
@@ -4475,7 +4482,6 @@ CoSeMe.namespace('protocol.dictionary', (function(){
       'max_groups',
       'max_participants',
       'max_subject',
-      'mimetype',
       'mode',
       'napi_version',
       'normalize',
@@ -4493,7 +4499,6 @@ CoSeMe.namespace('protocol.dictionary', (function(){
       'Replaced by new connection',
       'resume',
       'signature',
-      'size',
       'sound',
       'source',
       'system-shutdown',
@@ -4543,6 +4548,23 @@ CoSeMe.namespace('protocol.dictionary', (function(){
       'recipient',
       'w:stats',
       'forbidden',
+      'max_list_recipients',
+      'en-AU',
+      'en-GB',
+      'es-MX',
+      'pt-PT',
+      'zh-Hans',
+      'zh-Hant',
+      'relayelection',
+      'relaylatency',
+      'interruption',
+      'Bell.caf',
+      'Boing.caf',
+      'Glass.caf',
+      'Harp.caf',
+      'TimePassing.caf',
+      'Tri-tone.caf',
+      'Xylophone.caf',
       'aurora.m4r',
       'bamboo.m4r',
       'chord.m4r',
@@ -4555,17 +4577,6 @@ CoSeMe.namespace('protocol.dictionary', (function(){
       'popcorn.m4r',
       'pulse.m4r',
       'synth.m4r',
-      'filehash',
-      'max_list_recipients',
-      'en-AU',
-      'en-GB',
-      'es-MX',
-      'pt-PT',
-      'zh-Hans',
-      'zh-Hant',
-      'relayelection',
-      'relaylatency',
-      'interruption',
       'Apex.m4r',
       'Beacon.m4r',
       'Bulletin.m4r',
@@ -4593,9 +4604,7 @@ CoSeMe.namespace('protocol.dictionary', (function(){
       'Twinkle.m4r',
       'Uplift.m4r',
       'Waves.m4r',
-      'voip',
       'eligible',
-      'upgrade',
       'planned',
       'current',
       'future',
@@ -4607,7 +4616,6 @@ CoSeMe.namespace('protocol.dictionary', (function(){
       'speed',
       'bearing',
       'recording',
-      'encrypt',
       'key',
       'identity',
       'w:gp2',
@@ -4619,14 +4627,45 @@ CoSeMe.namespace('protocol.dictionary', (function(){
       'archive',
       'adm',
       'plaintext_size',
+      'plaintext_disabled',
+      'plaintext_reenable_threshold',
       'compressed_size',
       'delivered',
-      'msg',
-      'pkmsg',
       'everyone',
-      'v',
       'transport',
-      'call-id'
+      'mspes',
+      'e2e_groups',
+      'e2e_images',
+      'encr_media',
+      'encrypt_v2',
+      'encrypt_image',
+      'encrypt_sends_push',
+      'force_long_connect',
+      'audio_opus',
+      'video_max_edge',
+      'call-id',
+      'call',
+      'preaccept',
+      'accept',
+      'offer',
+      'reject',
+      'busy',
+      'te',
+      'terminate',
+      'begin',
+      'end',
+      'opus',
+      'rtt',
+      'token',
+      'priority',
+      'p2p',
+      'rate',
+      'amr',
+      'ptt',
+      'srtp',
+      'os',
+      'browser',
+      'encrypt_group_gen2'
     ]
   ];
 
@@ -4711,8 +4750,10 @@ CoSeMe.namespace('protocol.dictionary', (function(){
 
   var SHORT_STRING_MARK = 252;
   var LONG_STRING_MARK  = 253;
+  var HUGE_STRING_MARK  = 254;
 
   var JID_MARK = 250;
+  var HEX_MARK = 251;
   var NIBBLE_MARK = 255;
 
   var MAC_LENGTH = 4;
@@ -4733,8 +4774,10 @@ CoSeMe.namespace('protocol.dictionary', (function(){
 
     get SHORT_STRING_MARK() { return SHORT_STRING_MARK; },
     get LONG_STRING_MARK() { return LONG_STRING_MARK; },
+    get HUGE_STRING_MARK() { return HUGE_STRING_MARK; },
 
     get JID_MARK() { return JID_MARK; },
+    get HEX_MARK() { return HEX_MARK; },
     get NIBBLE_MARK() { return NIBBLE_MARK; },
 
     get MAC_LENGTH() { return MAC_LENGTH; },
@@ -4781,7 +4824,7 @@ CoSeMe.namespace('protocol', (function(){
   };
 
   BinaryWriter.prototype._sendProtocol = function(counting) {
-    var dictionaryVersion = 5; // my guess: the dictionary version
+    var dictionaryVersion = 6; // my guess: the dictionary version
 
     this.resetBuffer(counting, IS_RAW);
     this.writeASCII('WA', counting);
@@ -4954,6 +4997,7 @@ CoSeMe.namespace('protocol', (function(){
 
   var SHORT_STRING_MARK = k.SHORT_STRING_MARK;
   var LONG_STRING_MARK  = k.LONG_STRING_MARK;
+  var HUGE_STRING_MARK  = k.HUGE_STRING_MARK;
 
   /**
    * Writes bytes from a JavaScript (latin1) string, an ArrayBuffer or any
@@ -4980,13 +5024,17 @@ CoSeMe.namespace('protocol', (function(){
 
     var l = bytes.length;
 
-    if (l < 256) {
+    if (l < 0x100) {
       counting ? this.messageLength++ : this.message.write(SHORT_STRING_MARK);
       this.writeInt8(l, counting);
     }
-    else {
+    else if (l < 0x100000) {
       counting ? this.messageLength++ : this.message.write(LONG_STRING_MARK);
-      this.writeInt24(l, counting);
+      this.writeInt20(l, counting);
+    }
+    else {
+      counting ? this.messageLength++ : this.message.write(HUGE_STRING_MARK);
+      this.writeInt31(l, counting);
     }
 
     for (var i = 0; i < l; i++) {
@@ -5049,12 +5097,33 @@ CoSeMe.namespace('protocol', (function(){
   };
 
   /**
+   * Writes a 20-bit integer into the output buffer.
+   */
+  BinaryWriter.prototype.writeInt20 = function(i, counting) {
+    counting ? this.messageLength++ : this.message.write((i & 0x0F0000) >>> 16);
+    counting ? this.messageLength++ : this.message.write((i & 0x00FF00) >>>  8);
+    counting ? this.messageLength++ : this.message.write((i & 0x0000FF));
+    return this;
+  };
+
+  /**
    * Writes a 24-bit integer into the output buffer.
    */
   BinaryWriter.prototype.writeInt24 = function(i, counting) {
     counting ? this.messageLength++ : this.message.write((i & 0xFF0000) >>> 16);
     counting ? this.messageLength++ : this.message.write((i & 0x00FF00) >>>  8);
     counting ? this.messageLength++ : this.message.write((i & 0x0000FF));
+    return this;
+  };
+
+  /**
+   * Writes a 31-bit integer into the output buffer.
+   */
+  BinaryWriter.prototype.writeInt31 = function(i, counting) {
+    counting ? this.messageLength++ : this.message.write((i & 0x7F000000) >>> 24);
+    counting ? this.messageLength++ : this.message.write((i & 0x00FF0000) >>> 16);
+    counting ? this.messageLength++ : this.message.write((i & 0x0000FF00) >>>  8);
+    counting ? this.messageLength++ : this.message.write((i & 0x000000FF));
     return this;
   };
 
@@ -5586,7 +5655,10 @@ CoSeMe.namespace('protocol', (function(){
     var listSize = this.readListSize(listMark);
 
     var stringMark = this.message.read();
-    if (stringMark === 2) {
+    if (stringMark === 1) {
+      stringMark = this.readInt8();
+    }
+    else if (stringMark === 2) {
       return null;
     }
 
@@ -5661,6 +5733,18 @@ CoSeMe.namespace('protocol', (function(){
   };
 
   /**
+   * Reads a 20-bit integer from the message buffer.
+   */
+  BinaryReader.prototype.readInt20 = function() {
+    var b2 = this.message.read();
+    var b1 = this.message.read();
+    var b0 = this.message.read();
+    return b2 !== undefined && b1 !== undefined && b0 !== undefined ?
+           (b2 << 16) + (b1 << 8) + b0 :
+           undefined;
+  };
+
+  /**
    * Reads a 24-bit integer from the message buffer.
    */
   BinaryReader.prototype.readInt24 = function() {
@@ -5672,9 +5756,24 @@ CoSeMe.namespace('protocol', (function(){
            undefined;
   };
 
-  /* TODO: Explain and remove unused variables. There are some errors as well. */
-  BinaryReader.prototype.readNibble = function() {
-    var nibbles = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '.' ];
+  /**
+   * Reads a 31-bit integer from the message buffer.
+   */
+  BinaryReader.prototype.readInt31 = function() {
+    var b3 = this.message.read();
+    var b2 = this.message.read();
+    var b1 = this.message.read();
+    var b0 = this.message.read();
+    return b3 !== undefined && b2 !== undefined && b1 !== undefined && b0 !== undefined ?
+           (b3 << 24) + (b2 << 16) + (b1 << 8) + b0 :
+           undefined;
+  };
+
+  BinaryReader.prototype.readPacked = function(isHex) {
+    var packedChars = isHex
+        ? [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            'A', 'B', 'C', 'D', 'E', 'F' ]
+        : [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '.' ];
     var b = this.message.read();
     var ignoreLastNibble = (b & 0x80) != 0;
     var size = (b & 0x7f);
@@ -5686,16 +5785,16 @@ CoSeMe.namespace('protocol', (function(){
     for (var i = 0, l = buffer.length; i < l; i++) {
       b = buffer[i];
       var dec = Number(buffer[i]) >> 4;
-      if (dec <= 11) {
-        charArray.push(nibbles[dec]);
+      if (dec < packedChars.length) {
+        charArray.push(packedChars[dec]);
       } else {
         throw new SyntaxError('Bad nibble ' + dec);
       }
 
       if (i != l - 1 || !ignoreLastNibble) {
         var dec = Number(buffer[i]) & 0xf;
-        if (dec <= 11) {
-          charArray.push(nibbles[dec]);
+        if (dec < packedChars.length) {
+          charArray.push(packedChars[dec]);
         } else {
           throw new SyntaxError('Bad nibble ' + dec);
         }
@@ -5752,10 +5851,12 @@ CoSeMe.namespace('protocol', (function(){
 
   var SHORT_STRING_MARK = k.SHORT_STRING_MARK;
   var LONG_STRING_MARK  = k.LONG_STRING_MARK;
+  var HUGE_STRING_MARK  = k.HUGE_STRING_MARK;
 
   var SURROGATE_MARK = k.SURROGATE_MARK;
 
   var JID_MARK = k.JID_MARK;
+  var HEX_MARK = k.HEX_MARK;
   var NIBBLE_MARK = k.NIBBLE_MARK;
 
   /**
@@ -5768,14 +5869,15 @@ CoSeMe.namespace('protocol', (function(){
       string = '';
 
     // The string is efficently encoded as a token.
-    } else if (stringMark > 2 && stringMark < 245) {
+    } else if (stringMark > 2 && stringMark < 236) {
       var code = stringMark;
       string = this.getToken(code);
 
     // Still a token but with a surrogate mark.
-    } else if (stringMark === SURROGATE_MARK) {
-      var code = this.message.read();
-      string = this.getToken(code + 245);
+    } else if (stringMark >= 236 && stringMark <= 239) {
+      var code = stringMark;
+      var code2 = this.message.read();
+      string = this.getTokenDouble(code - 236, code2);
 
     // Short 8-bit length string.
     } else if (stringMark === SHORT_STRING_MARK) {
@@ -5787,6 +5889,13 @@ CoSeMe.namespace('protocol', (function(){
     // Long 24-bit length string.
     } else if (stringMark === LONG_STRING_MARK) {
       var size = this.readInt24();
+      var buffer = new Uint8Array(size)
+      this.fillArray(buffer, size);
+      string = { hexdata: this.bufferToString(buffer) };
+
+    // Huge 31-bit length string.
+    } else if (stringMark === HUGE_STRING_MARK) {
+      var size = this.readInt31();
       var buffer = new Uint8Array(size)
       this.fillArray(buffer, size);
       string = { hexdata: this.bufferToString(buffer) };
@@ -5805,12 +5914,12 @@ CoSeMe.namespace('protocol', (function(){
         throw new SyntaxError('could not reconstruct JID.');
       }
 
-    // Nibble
-    } else if (stringMark === NIBBLE_MARK) {
-      string = this.readNibble();
+    // Packed
+    } else if ((stringMark === NIBBLE_MARK) || (stringMark === HEX_MARK)) {
+      string = this.readPacked(stringMark === HEX_MARK);
 
     } else {
-      throw new SyntaxError('could not find a string.');
+      throw new SyntaxError('could not find a string ' + stringMark);
     }
 
     if (returnRaw && string && string.hexdata) {
@@ -5829,6 +5938,14 @@ CoSeMe.namespace('protocol', (function(){
       code = this.readInt8();
       result = code2Token(code, result.submap);
     }
+    return result.token;
+  };
+
+  /**
+   * Get the string representation for the given token code.
+   */
+  BinaryReader.prototype.getTokenDouble = function(code, code2) {
+    var result = code2Token(code2, code);
     return result.token;
   };
 
@@ -6440,8 +6557,10 @@ CoSeMe.namespace('auth', (function() {
     var msg = CryptoJS.enc.Latin1.parse(username);
     msg.concat(CryptoJS.enc.Latin1.parse(challenge));
     msg.concat(utcNow);
-    msg.concat(CryptoJS.enc.Latin1.parse(CoSeMe.config.tokenData.u));
-    msg.concat(CryptoJS.enc.Latin1.parse(' MccMnc/' + mcc + mnc));
+    msg.concat(CryptoJS.enc.Latin1.parse('\x00\x00\x00\x00\x00\x00\x00\x00'));
+    msg.concat(CryptoJS.enc.Latin1.parse('14.26\x00'));
+    msg.concat(CryptoJS.enc.Latin1.parse('Nokia\x00'));
+    msg.concat(CryptoJS.enc.Latin1.parse('302\x00'));
 
     // Encode response
     var buffer = new ByteArray(msg.sigBytes).writeAll(msg);
@@ -6466,7 +6585,7 @@ CoSeMe.namespace('auth', (function() {
       new Tree('presence')
     ];
 
-    return new Tree('stream:features', { children: features });
+    return new Tree('stream:features');
   };
 
   function getAuth(existingChallenge) {

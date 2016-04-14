@@ -128,12 +128,12 @@ Template.footbox.events({
       // if user wants to hide keyboard in landscape
       // user can clear the box and press backspace to hide it
       if (e.target.textContent.length === 0 && e.which == 8 && window.matchMedia('(orientation:landscape)').matches) {
-        $('section#chat article#main div#text').blur();
+        $('section#chat article#main span#text').blur();
       }
     }
   },
 
-  'keydown div#text' : Tools.throttle(function(e){
+  'keydown span#text' : Tools.throttle(function(e){
     var dirtyState = $('#footbox')[0].dataset.dirty;
     var newDirtyState = ((e.which === 8 && e.target.textContent.length > 1) || (e.which !== 8 && e.target.textContent.length >= 0));
 
