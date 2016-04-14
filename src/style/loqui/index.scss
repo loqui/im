@@ -1530,7 +1530,8 @@ section nav {
     min-height: 8rem;
     color: #333;
     background-size: cover;
-
+    border-bottom: 2px groove darkgrey;
+    
     .avatar {
         position: absolute;
         display: block;
@@ -1558,6 +1559,20 @@ section nav {
         color: #222;
         font-weight: 300;
         text-shadow: 0 .05rem 0 #fff;
+    }
+
+    .cdate, .s_t {
+      color: #333;
+      text-shadow: 0 .05rem 0 #fff;
+      font-size: smaller;
+      line-height: 1;
+    }
+        
+    .cdate {
+      float: left;
+    }
+    .s_t {
+      float: right;
     }
 
     .user {
@@ -1710,8 +1725,12 @@ input[type='password'] {
         font-weight: 300;
         font-size: .9em;
         color: $primary-text-color;
+        
+        i {
+          float: right;
+        }
 
-        :last-child {
+        &:last-child {
             border: 0;
         }
     }

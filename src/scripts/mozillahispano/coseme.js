@@ -7296,13 +7296,13 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
     node.children[0].children.forEach(function (groupNode) {
       groups.push({
         gid: groupNode.getAttributeValue('id'),
-        owner: groupNode.getAttributeValue('owner'),
+        owner: groupNode.getAttributeValue('creator'),
         subject: stringFromUtf8(groupNode.getAttributeValue('subject')),
         subjectT: groupNode.getAttributeValue('s_t'),
         subjectOwner: groupNode.getAttributeValue('s_o'),
         creation: groupNode.getAttributeValue('creation'),
         participants : groupNode.children.map(function(child){
-          return child.getAttributeValue('jid');
+          return {"jid":child.getAttributeValue('jid'), "admin":(child.getAttributeValue('type')==='admin')};
         })
       });
     });

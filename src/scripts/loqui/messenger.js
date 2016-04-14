@@ -173,17 +173,22 @@ var Messenger = {
     var section = $('section#muc');
     if (ci >= 0) {
       var chat = account.chats[ci];
+      var cdate = new Date(chat.core.info.creation * 1000);
+      var sdate = new Date(chat.core.info.subjectTime * 1000);
+      
       section[0].dataset.jid= jid;
       section[0].dataset.mine= (chat.core.info && chat.core.info.owner == account.core.fullJid);
+      section.find('#card span.cdate').html(cdate.toDateString());
+      section.find('#card span.s_t').html(sdate.toDateString());
       section.find('#card .name').html(App.emoji[Providers.data[account.core.provider].emoji].fy(Tools.HTMLescape(chat.core.title)));
       section.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + account.core.provider + '.svg'));
       section.find('#participants h2').text(_('NumParticipants', {number: chat.core.participants.length}));
+
       var partUl = section.find('#participants ul').empty();
       for (var i in chat.core.participants) {
-        var participantJid = chat.core.participants[i];
+        var participantJid = chat.core.participants[i].jid;
         var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', participantJid);
         var label = "";
-
         if(contact) {
           label = contact.name;
         } else if (participantJid == account.core.fullJid) {
@@ -191,9 +196,20 @@ var Messenger = {
         } else {
           label = participantJid.split('@')[0];
         }
-
-        partUl.append($('<li/>').text(label));
+        var participantLabel = $('<li/>');
+        participantLabel.append(label);
+        if (chat.core.participants[i].admin === true) {
+          participantLabel.append($('<i/>', {class:"material-icons"}).text("account_circle"));
+        }
+        if (participantJid === chat.core.info.subjectOwner) {
+          participantLabel.append($('<i/>', {class:"material-icons"}).text("title"));
+        }
+        if (participantJid === chat.core.info.owner) {
+          participantLabel.append($('<i/>', {class:"material-icons"}).text("star"));
+        }
+        partUl.append(participantLabel);
       }
+
       var setUl = section.find('#settings ul').empty();
       var accountSwitch = function (e) {
         var sw = $(this);
