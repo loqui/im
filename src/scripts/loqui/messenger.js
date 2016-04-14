@@ -20,7 +20,7 @@ var Messenger = {
   },
 
   add: function (emoji) {
-    var textBox = $('article#main div#footbox div#text');
+    var textBox = $('article#main div#footbox span#text');
     textBox.append(emoji);
     textBox[0].dispatchEvent(new Event('keydown'));
   },
@@ -31,8 +31,8 @@ var Messenger = {
     var account = Accounts.current;
 
     if (!text) {
-      $('section#chat div#text br').text('\n');
-      text = $('section#chat div#text').text();
+      $('section#chat span#text br').text('\n');
+      text = $('section#chat span#text').text();
     }
     text = text.trim();
 
@@ -411,7 +411,7 @@ var Messenger = {
    * Cleans textBox
    */
   cleanTextBox : function() {
-    $('section#chat div#text').empty();
+    $('section#chat span#text').empty();
     $('#footbox')[0].dataset.dirty = false;
   }
 
