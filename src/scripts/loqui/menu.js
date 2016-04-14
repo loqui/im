@@ -312,6 +312,9 @@ var Menu = {
           Lungo.Notification.hide();
         });
       }
+      else {
+        emojiDiv.show();
+      }
 
       $('#emoji').addClass('show');
       $('section#chat article#main').css("bottom", "75vw"); // reduce height for emoji div
