@@ -332,6 +332,7 @@ var Menu = {
       }
       $('section#chat article#main').css("bottom", "0");    // restore size
       $('#emoji').removeClass('show');
+      $('section#chat article#emoji div#' + Providers.data[Accounts.current.core.provider].emoji).hide();
       $('#emojis').show();
       $('#keyboard').hide();
     },
