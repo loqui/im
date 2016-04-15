@@ -272,31 +272,31 @@
           <div id="typing" data-l10n-id="Typing">Typing...</div>
           <div class="{{notRecording}}">
             <button id="emojis" class="recommend left" type="emojis" data-menu-onclick="emoji">
-              <i class="material-icons">&#xE24E;</i>
+              <i class="material-icons">insert_emoticon</i>
             </button>
             <button class="recommend right voice {{notSupported}}" type="options">
-                <i class="material-icons">&#xE029;</i>
+                <i class="material-icons">mic</i>
             </button>
             <button id="plus" class="recommend right" type="options" data-menu-onclick="plus" >
-              <i class="material-icons">&#xE226;</i>
+              <i class="material-icons">attach_file</i>
             </button>
             <button id="say" class="recommend right" type="send">
-              <i class="material-icons">&#xE163;</i>
+              <i class="material-icons">send</i>
             </button>
-            <div id="text" class="main" contentEditable="true"></div>
+            <span id="text" contentEditable="true"></span>
           </div>
 
           <div class="{{recording}} voice-recorder">
             <div class="duration"><span class="indicator"></span>{{duration}}</div>
 
             <button>
-              <i class="material-icons">&#xE5CB;</i>
+              <i class="material-icons">chevron_left</i>
             </button>
 
             <div class="main">{{l10n "SwipeToAbort"}}</div>
 
             <button class="voice">
-                <i class="material-icons">&#xE029;</i>
+                <i class="material-icons">mic</i>
             </button>
 
           </div>
@@ -387,19 +387,19 @@
       <article class="scroll">
           <ul class="itemList">
             <li class="file" data-menu-onclick="fileSend">
-              <i class="material-icons">&#xE24D;</i>
+              <i class="material-icons">insert_drive_file</i>
               <span  data-l10n-id="MediaType_file">File</span>
             </li>
             <li class="location" data-menu-onclick="locationSend">
-              <i class="material-icons">&#xE0C8;</i>
+              <i class="material-icons">place</i>
               <span data-l10n-id="MediaType_url">Location</span>
             </li>
             <li class="vcard" data-menu-onclick="vcardSend">
-              <i class="material-icons">&#xE0C8;</i>
+              <i class="material-icons">contact_phone</i>
               <span data-l10n-id="MediaType_vCard">Contact</span>
             </li>
             <li class="bolt" data-menu-onclick="bolt">
-              <i class="material-icons">&#xE3E7;</i>
+              <i class="material-icons">flash_on</i>
               <span data-l10n-id="MediaType_bolt">Bolt</span>
             </li>
         <!--<li class="call" data-menu-onclick="call" data-icon="mobile-phone" data-l10n-id="Call">Call</li>
