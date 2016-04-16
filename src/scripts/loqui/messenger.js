@@ -191,21 +191,34 @@ var Messenger = {
         var label = "";
         if(contact) {
           label = contact.name;
-        } else if (participantJid == account.core.fullJid) {
+        } else if ((participantJid == account.core.fullJid) || (participantJid == account.core.fullJid.split('@')[0])){
           label = _('Me');
         } else {
           label = participantJid.split('@')[0];
         }
         var participantLabel = $('<li/>');
         participantLabel.append(label);
-        if (chat.core.participants[i].admin === true) {
-          participantLabel.append($('<i/>', {class:"material-icons"}).text("account_circle"));
-        }
-        if (participantJid === chat.core.info.subjectOwner) {
-          participantLabel.append($('<i/>', {class:"material-icons"}).text("title"));
-        }
-        if (participantJid === chat.core.info.owner) {
-          participantLabel.append($('<i/>', {class:"material-icons"}).text("star"));
+        switch(account.core.provider) {
+          case "whatsapp":
+            section.find("#card div").show();
+            if (chat.core.participants[i].admin === true) {
+              participantLabel.append($('<i/>', {class:"material-icons"}).text("supervisor_account"));
+            }
+            if (participantJid === chat.core.info.subjectOwner) {
+              participantLabel.append($('<i/>', {class:"material-icons"}).text("title"));
+            }
+            if (participantJid === chat.core.info.owner) {
+              participantLabel.append($('<i/>', {class:"material-icons"}).text("star"));
+            }
+            break;
+          case "xmpp":
+            section.find("#card div").hide();
+            if (chat.core.participants[i].owner === true) {
+              participantLabel.append($('<i/>', {class:"material-icons"}).text("star"));
+            }
+            participantLabel.append($('<span/>').text(chat.core.participants[i].affiliation)).append($('<i/>', {class:"material-icons"}).text("supervisor_account"));
+            participantLabel.append($('<span/>').text(chat.core.participants[i].role)).append($('<i/>', {class:"material-icons"}).text("person"));
+            break;
         }
         partUl.append(participantLabel);
       }

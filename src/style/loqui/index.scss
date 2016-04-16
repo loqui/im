@@ -1531,7 +1531,6 @@ section nav {
     min-height: 8rem;
     color: #333;
     background-size: cover;
-    border-bottom: 2px groove darkgrey;
     
     .avatar {
         position: absolute;
@@ -1701,6 +1700,7 @@ input[type='password'] {
 
 .profile article > div:not(#card) {
     padding: 0 1.6rem;
+    border-top: .05rem solid #CCC;
 
     h2 {
         font-size: 1.6rem;
@@ -1727,8 +1727,17 @@ input[type='password'] {
         font-size: .9em;
         color: $primary-text-color;
         
-        i {
+        i,span {
           float: right;
+        }
+
+        span {
+          font-size: 75%;
+          line-height: 2.2;
+        }
+
+        i:first-of-type {
+            margin-left: 1ex;
         }
 
         &:last-child {
