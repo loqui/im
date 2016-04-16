@@ -1276,6 +1276,7 @@ App.connectors.coseme = function (account) {
     };
 
     this.events.onGroupGotInfo = function (jid, owner, subject, subjectOwner, subjectTime, creation, participants) {
+console.log(participants);
       var info = {
         owner: owner,
         subjectOwner: subjectOwner,

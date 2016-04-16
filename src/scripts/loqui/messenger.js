@@ -173,6 +173,8 @@ var Messenger = {
     var section = $('section#muc');
     if (ci >= 0) {
       var chat = account.chats[ci];
+      console.log(" ******* chat.core ********************");
+      console.log(chat.core);
       var cdate = new Date(chat.core.info.creation * 1000);
       var sdate = new Date(chat.core.info.subjectTime * 1000);
       
