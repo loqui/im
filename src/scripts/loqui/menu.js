@@ -284,7 +284,7 @@ var Menu = {
               var img = account.connector.emojiRender(emoji);
               img.on('tap', function () {
                   Plus.emoji($(this)[0].dataset.emoji);
-                  $('div#text').trigger("keydown");
+                  $('span#text').trigger("keydown");
                 });
               emojidiv.append(img);
             });
@@ -303,7 +303,7 @@ var Menu = {
               else {                      // regular char
                 input.html(str.substring(0, str.length - 1));
               }
-              $('div#text').trigger("keydown");
+              $('span#text').trigger("keydown");
             }
           });
           toolbar.append(backspace);
@@ -320,15 +320,15 @@ var Menu = {
       $('section#chat article#main').css("bottom", "75vw"); // reduce height for emoji div
       $('#emojis').hide();
       $('#keyboard').show();
-      $('section#chat div#text').prop("contenteditable", false);  // prevent additional popup of the keyboard
+      $('section#chat span#text').prop("contenteditable", false);  // prevent additional popup of the keyboard
     },
     emojiClose: function() {
       Menu.show('emojiHide', "focus_input");
     },
     emojiHide: function(focus_input) {
-      $('section#chat div#text').prop("contenteditable", true);   // restore input field
+      $('section#chat span#text').prop("contenteditable", true);   // restore input field
       if ((focus_input !== undefined) && (focus_input === "focus_input")) {
-        $('section#chat div#text').focus();                 // activate the keyboard
+        $('section#chat span#text').focus();                 // activate the keyboard
       }
       $('section#chat article#main').css("bottom", "0");    // restore size
       $('#emoji').removeClass('show');
