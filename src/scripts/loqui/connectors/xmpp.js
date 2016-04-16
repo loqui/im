@@ -369,18 +369,13 @@ App.connectors.XMPP = function (account) {
       },
       function (e) {
         Tools.log('MUC ROSTER', e);
-        console.log(e);
-//        account.chatGet(jid).core.participants = Object.keys(e);
-        var participants = [];
+        account.chatGet(jid).core.participants = Object.keys(e);
         for (var [key, value] in Iterator(e)) {
-          console.log(value);
-          participants.push({"jid": value.nick})
           if (value.affiliation == 'owner') {
             chat.core.info.owner = Strophe.getBareJidFromJid(value.jid);
             break;
           }
         }
-        account.chatGet(jid).core.participants = participants;
         if ($('section#chat').hasClass('show') && $('section#chat')[0].dataset.jid == chat.core.jid) {
           chat.show();
         }
