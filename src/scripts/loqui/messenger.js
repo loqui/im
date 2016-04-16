@@ -219,6 +219,8 @@ var Messenger = {
             participantLabel.append($('<span/>').text(chat.core.participants[i].affiliation)).append($('<i/>', {class:"material-icons"}).text("supervisor_account"));
             participantLabel.append($('<span/>').text(chat.core.participants[i].role)).append($('<i/>', {class:"material-icons"}).text("person"));
             break;
+          default:
+            break;
         }
         partUl.append(participantLabel);
       }
