@@ -1008,6 +1008,7 @@ section nav {
     }
 }
 
+#keyboard,
 #say {
     display: none;
 }
@@ -1323,13 +1324,6 @@ section nav {
     }
 }
 
-#screenBlocker {
-    height: 100vh;
-    width: 100%;
-    position: absolute;
-    top: 0;
-}
-
 #emoji {
     background: none repeat scroll 0% 0% #FFF;
     position: absolute;
@@ -1340,11 +1334,9 @@ section nav {
         list-style-type: none;
         width: 100%;
         display: flex;
-        justify-content: space-around;
+        justify-content: space-between;
         align-items: center;
-        padding: 1px 0 0 0;
         background-color: #E66000;
-        border-bottom: 2px solid white;
         box-sizing: border-box;
 
             [class^="icon-"], [class*=" icon-"] {
@@ -1405,26 +1397,19 @@ section nav {
             display: inline-block;
             text-align: center;
             vertical-align: middle;
-            border-bottom: 2px solid white;
             width: 11vw;
             height: 10vw;
-            padding-bottom: 1px;
-            margin-top: 1px;
-            margin-bottom: -2px;
             cursor: pointer;
         }
         
         li:last-of-type {
-            margin-top: -1px;
             background-color: #FF9500;
-			border-top: 2px solid #FF9500;
-			border-bottom: 2px solid #FF9500;
-			color: gainsboro;
+            color: gainsboro;
             font-size: 8vw;
         }
 
         .active {
-            border-bottom: 2px solid black;
+            background-color: silver;
         }
     }
 
@@ -1436,11 +1421,11 @@ section nav {
         background-color: silver;
         overflow: auto;
 		
-		img {
-			width: 10vw;
-			height: 10vw;
-			margin: 1.25vw;
-		}
+        img {
+            width: 10vw;
+            height: 10vw;
+            margin: 1.25vw;
+        }
     }
 
     button {

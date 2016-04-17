@@ -254,7 +254,7 @@
   <section id="chat" data-transition="horizontal" class="fix head">
     <header>
       <nav class="on-left discreet">
-        <button data-view-section="back" data-icon="chevron-left" class="tab"></button>
+        <button data-view-section="back" data-icon="chevron-left" data-menu-onclick="emojiClose" class="tab"></button>
       </nav>
       <span class="totalUnread"></span>
       <span class="title"></span>
@@ -269,16 +269,19 @@
           <progress value="0" max="100"></progress>
           <div id="typing" data-l10n-id="Typing">Typing...</div>
           <div class="{{notRecording}}">
-            <button id="emojis" class="recommend left" type="emojis" data-menu-onclick="emoji">
+            <button id="emojis" class="recommend left" type="emojis" data-menu-onclick="emojiOpen">
               <i class="material-icons">insert_emoticon</i>
             </button>
-            <button class="recommend right voice {{notSupported}}" type="options">
+            <button id="keyboard" class="recommend left" type="keyboard" data-menu-onclick="emojiClose">
+              <i class="material-icons">keyboard</i>
+            </button>
+            <button class="recommend right voice {{notSupported}}" type="options" data-menu-onclick="emojiHide">
                 <i class="material-icons">mic</i>
             </button>
             <button id="plus" class="recommend right" type="options" data-menu-onclick="plus" >
               <i class="material-icons">attach_file</i>
             </button>
-            <button id="say" class="recommend right" type="send">
+            <button id="say" class="recommend right" type="send" data-menu-onclick="emojiHide">
               <i class="material-icons">send</i>
             </button>
             <span id="text" contentEditable="true"></span>
@@ -301,7 +304,6 @@
         </script>
       </div>
     </article>
-    <article id="screenBlocker" class="hidden" data-menu-onclick="emojiClose"></article>
     <article id="emoji">
     </article>
     <article id="call">
