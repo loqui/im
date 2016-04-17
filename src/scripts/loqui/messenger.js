@@ -173,27 +173,58 @@ var Messenger = {
     var section = $('section#muc');
     if (ci >= 0) {
       var chat = account.chats[ci];
+      var cdate = new Date(chat.core.info.creation * 1000);
+      var sdate = new Date(chat.core.info.subjectTime * 1000);
+      
       section[0].dataset.jid= jid;
       section[0].dataset.mine= (chat.core.info && chat.core.info.owner == account.core.fullJid);
+      section.find('#card span.cdate').html(cdate.toDateString());
+      section.find('#card span.s_t').html(sdate.toDateString());
       section.find('#card .name').html(App.emoji[Providers.data[account.core.provider].emoji].fy(Tools.HTMLescape(chat.core.title)));
       section.find('#card .provider').empty().append($('<img/>').attr('src', 'img/providers/squares/' + account.core.provider + '.svg'));
       section.find('#participants h2').text(_('NumParticipants', {number: chat.core.participants.length}));
+
       var partUl = section.find('#participants ul').empty();
       for (var i in chat.core.participants) {
-        var participantJid = chat.core.participants[i];
+        var participantJid = chat.core.participants[i].jid;
         var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', participantJid);
         var label = "";
-
         if(contact) {
           label = contact.name;
-        } else if (participantJid == account.core.fullJid) {
+        } else if ((participantJid == account.core.fullJid) || (participantJid == account.core.fullJid.split('@')[0])){
           label = _('Me');
         } else {
           label = participantJid.split('@')[0];
         }
-
-        partUl.append($('<li/>').text(label));
+        var participantLabel = $('<li/>');
+        participantLabel.append(label);
+        switch(account.core.provider) {
+          case "whatsapp":
+            section.find("#card div").show();
+            if (chat.core.participants[i].admin === true) {
+              participantLabel.append($('<i/>', {class:"material-icons"}).text("supervisor_account"));
+            }
+            if (participantJid === chat.core.info.subjectOwner) {
+              participantLabel.append($('<i/>', {class:"material-icons"}).text("title"));
+            }
+            if (participantJid === chat.core.info.owner) {
+              participantLabel.append($('<i/>', {class:"material-icons"}).text("star"));
+            }
+            break;
+          case "xmpp":
+            section.find("#card div").hide();
+            if (chat.core.participants[i].owner === true) {
+              participantLabel.append($('<i/>', {class:"material-icons"}).text("star"));
+            }
+            participantLabel.append($('<span/>').text(chat.core.participants[i].affiliation)).append($('<i/>', {class:"material-icons"}).text("supervisor_account"));
+            participantLabel.append($('<span/>').text(chat.core.participants[i].role)).append($('<i/>', {class:"material-icons"}).text("person"));
+            break;
+          default:
+            break;
+        }
+        partUl.append(participantLabel);
       }
+
       var setUl = section.find('#settings ul').empty();
       var accountSwitch = function (e) {
         var sw = $(this);

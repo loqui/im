@@ -1516,7 +1516,7 @@ section nav {
     min-height: 8rem;
     color: #333;
     background-size: cover;
-
+    
     .avatar {
         position: absolute;
         display: block;
@@ -1544,6 +1544,20 @@ section nav {
         color: #222;
         font-weight: 300;
         text-shadow: 0 .05rem 0 #fff;
+    }
+
+    .cdate, .s_t {
+      color: #333;
+      text-shadow: 0 .05rem 0 #fff;
+      font-size: smaller;
+      line-height: 1;
+    }
+        
+    .cdate {
+      float: left;
+    }
+    .s_t {
+      float: right;
     }
 
     .user {
@@ -1671,6 +1685,7 @@ input[type='password'] {
 
 .profile article > div:not(#card) {
     padding: 0 1.6rem;
+    border-top: .05rem solid #CCC;
 
     h2 {
         font-size: 1.6rem;
@@ -1696,8 +1711,21 @@ input[type='password'] {
         font-weight: 300;
         font-size: .9em;
         color: $primary-text-color;
+        
+        i,span {
+          float: right;
+        }
 
-        :last-child {
+        span {
+          font-size: 75%;
+          line-height: 2.2;
+        }
+
+        i:first-of-type {
+            margin-left: 1ex;
+        }
+
+        &:last-child {
             border: 0;
         }
     }
