@@ -352,16 +352,12 @@ App.connectors.coseme = function (account) {
         self.events.onVCardReceived.bind(self)(msg.msgId, msg.remoteJid, contact_msg.display_name, contact_msg.vcard, true, false, msg.pushName, msg.timeStamp);
       } else if (v2msg.image_message) {
         var img_msg = v2msg.image_message;
-        var thumbnail = new Uint8Array(img_msg.jpeg_thumbnail.buffer,
-                                       img_msg.jpeg_thumbnail.offset,
-                                       img_msg.jpeg_thumbnail.limit - img_msg.jpeg_thumbnail.offset);
-        self.events.onImageReceived.bind(self)(msg.msgId, msg.remoteJid, thumbnail, img_msg.url, img_msg.file_length.toNumber(), true, false, msg.pushName, msg.timeStamp);
+        var imgThumb = new Uint8Array(img_msg.jpeg_thumbnail.toArrayBuffer());
+        self.events.onImageReceived.bind(self)(msg.msgId, msg.remoteJid, imgThumb, img_msg.url, img_msg.file_length.toNumber(), true, false, msg.pushName, msg.timeStamp);
       } else if (v2msg.location_message) {
         var loc_msg = v2msg.location_msg;
-        var thumbnail = new Uint8Array(loc_msg.jpeg_thumbnail.buffer,
-                                       loc_msg.jpeg_thumbnail.offset,
-                                       loc_msg.jpeg_thumbnail.limit - loc_msg.jpeg_thumbnail.offset);
-        self.events.onLocationReceived.bind(self)(msg.msgId, msg.remoteJid, loc_msg.nsme, thumbnail, loc_msg.degrees_latitude, loc_msg.degrees_longitude, true, false, msg.pushName, msg.timeStamp);
+        var locThumb = new Uint8Array(loc_msg.jpeg_thumbnail.toArrayBuffer());
+        self.events.onLocationReceived.bind(self)(msg.msgId, msg.remoteJid, loc_msg.nsme, locThumb, loc_msg.degrees_latitude, loc_msg.degrees_longitude, true, false, msg.pushName, msg.timeStamp);
       } else {
         Tools.log('UNHANDLED v2msg');
       }
