@@ -707,7 +707,7 @@ App.logForms.XMPP = function (provider, article) {
               $(article).children('[name="host"]').val(links[0].href);
             }
           };
-          xhr.open('GET', 'http://xmppconnect.cmeerw.net/' + domain + '.json');
+          xhr.open('GET', 'http://xmppconnect.loqui.im/' + domain + '.json');
           xhr.overrideMimeType('json');
           xhr.responseType = 'json';
           xhr.setRequestHeader('Accept', 'text/json');
