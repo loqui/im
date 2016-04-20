@@ -7349,7 +7349,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
       }
     };
 
-    if (newSubject.contains("New version of WhatsApp Messenger is now available")) {
+    if (newSubject.includes("New version of WhatsApp Messenger is now available")) {
       logger.log("Rejecting server message");
       return; // #REJECT THIS FUCKING MESSAGE!
     }
@@ -7391,7 +7391,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
   function parseGroupInfo(node) {
     var jid = node.getAttributeValue("from");
     var groupNode = node.getChild(0);
-    if (groupNode.toString().contains('error code')) {
+    if (groupNode.toString().includes('error code')) {
       _signalInterface.send("group_infoError",[0]); // @@TODO replace with real error code
     } else {
       ProtocolTreeNode.require(groupNode,"group");
