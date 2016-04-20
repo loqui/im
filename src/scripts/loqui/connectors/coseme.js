@@ -689,19 +689,20 @@ App.connectors.coseme = function (account) {
 
     this.sendAsync = function (to, text, options) {
       return new Promise(function (ready, reject) {
-        encryptMessage(to, text).then(function (m) {
-          Tools.log('SEND ENCRYPTED', m);
-          var msgId = MI.call('encrypt_sendMessage',
-                              [null, to, m.body,
-                               (m.isPreKeyWhisperMessage ? 'pkmsg' : 'msg'),
-                               '1']);
-          ready(msgId);
-        }, function (e) {
-          Tools.log('PLAINTEXT FALLBACK', e);
-          var method = options.isBroadcast ? 'message_broadcast' : 'message_send';
-          var msgId = MI.call(method, [null, to, text]);
-          ready(msgId);
-        });
+        if (options.isBroadcast) {
+          ready(MI.call('message_broadcast', [null, to, text]));
+        } else {
+          encryptMessage(to, text).then(function (m) {
+            Tools.log('SEND ENCRYPTED', m);
+            ready(MI.call('encrypt_sendMessage',
+                          [null, to, m.body,
+                           (m.isPreKeyWhisperMessage ? 'pkmsg' : 'msg'),
+                           '1']));
+          }, function (e) {
+            Tools.log('PLAINTEXT FALLBACK', e);
+            ready(MI.call('message_send', [null, to, text]));
+          });
+        }
       });
     }.bind(this);
 
@@ -1043,7 +1044,7 @@ App.connectors.coseme = function (account) {
     this.events.onMessage = function (msgId, from, msgData, timeStamp, wantsReceipt, pushName, isBroadcast) {
       Tools.log('MESSAGE', msgId, from, msgData, timeStamp, wantsReceipt, pushName, isBroadcast);
       var account = this.account;
-      var to = this.account.user + '@' + CoSeMe.config.domain;
+      var to = account.core.fullJid;
       var body = msgData;
       if (body) {
         var date = new Date(timeStamp);
@@ -1242,7 +1243,7 @@ App.connectors.coseme = function (account) {
         cpuLock.unlock();
       }.bind(this));
 
-      MI.call('delivered_ack', [from, msgId, 'retry']);
+      MI.call('delivered_ack', [from, msgId, 'retry', participant]);
     };
 
     this.events.onMessageDelivered = function (from, msgId, type, participant) {
@@ -1377,27 +1378,26 @@ App.connectors.coseme = function (account) {
     this.events.onGroupMessage = function (msgId, from, author, data, stamp, wantsReceipt, pushName) {
       Tools.log('GROUPMESSAGE', msgId, from, author, data, stamp, wantsReceipt, pushName);
       var account = this.account;
-      var to = from;
-      from = author;
+      var isBroadcast = from.endsWith('@broadcast');
       var body = data;
       if (body) {
         var date = new Date(stamp);
         stamp = Tools.localize(Tools.stamp(stamp));
-        var fromUser = from.split('@')[0];
+        var fromUser = author.split('@')[0];
         var msg = Make(Message)(account, {
-          from: from,
-          to: to,
+          from: author,
+          to: from,
           text: body,
           stamp: stamp,
           id : msgId,
           pushName: (pushName && pushName != fromUser) ? (fromUser + ': ' + pushName) : pushName
         }, {
-          muc: true
+          muc: ! isBroadcast
         });
         Tools.log('RECEIVED', msg);
         if (wantsReceipt) {
           msg.receive(function(){
-            this.ack(msgId, to, null, author);
+            this.ack(msgId, from, null, author);
           }.bind(this));
         } else {
           msg.receive();
@@ -1651,7 +1651,7 @@ App.connectors.coseme = function (account) {
           msg.pushName = name || from;
         }
         msg = Make(Message)(this.account, msg, {
-          muc: isGroup
+          muc: isGroup && !to.endsWith('@broadcast')
         });
         msg.receive();
         this.ack(msgId, isGroup ? to : from, null, isGroup ? from : null);
