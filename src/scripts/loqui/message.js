@@ -143,7 +143,7 @@ var Message = {
 
         Store.update(key, values.result.chunkIndex, values.result.chunk, free);
 
-        if(!chat.core.muc){
+        if (!chat.core.muc && message.to == account.core.fullJid) {
           account.connector.ack(message.id, message.from, 'read');
         }
 
