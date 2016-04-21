@@ -260,57 +260,65 @@ var Menu = {
 
       if (emojiDiv.length === 0) {
         // Emojis for this provider are not loaded yet
-        Lungo.Notification.show('heart', _('Loading...'));
-        setTimeout(function () {
-          var div = $('<div/>', { id: providerName, class: "emoji-provider" }).appendTo('section#chat article#emoji');
+        var div = $('<div/>', { id: providerName, class: "emoji-provider" }).appendTo('section#chat article#emoji');
 
-          // Add category select bar
-          var toolbar = $('<ul/>', { class: "category-select" });
-          App.emoji[Providers.data[account.core.provider].emoji].emojis.forEach(function (category) {
-            // loop over each category and add selector li with category image
-            var li = $('<li/>', { class: category[0][1] }).on('tap', function() {
-              $('ul.category-select li').removeClass("active");
-              $(this).addClass("active");
-              $('section#chat article#emoji div.emoji-category').hide();
-              var active = $(this)[0].dataset.category;
-              $('section#chat article#emoji div#' + active).show();
-            });
-            li[0].dataset.category = category[0][0];
-            toolbar.append(li);
+        // Add category select bar
+        var toolbar = $('<ul/>', { class: "category-select" });
+        App.emoji[providerName].emojis.forEach(function (category, index) {
+          // for each category add selector li with category image
+          var li = $('<li/>', { class: category[0][1] }).on('tap', function() {
+            var provider = $(this)[0].dataset.provider;
+            var cat_index = index;
+            var active = $(this)[0].dataset.category;
+            var emojidiv = $('div#' + provider + ' div#' + active);
 
-            // add category divs
-            var emojidiv = $('<div/>', {id: category[0][0], class: "emoji-category"} );
-            category[1].forEach(function (emoji) {
-              var img = account.connector.emojiRender(emoji);
-              img.on('tap', function () {
-                  Plus.emoji($(this)[0].dataset.emoji);
-                  $('span#text').trigger("keydown");
-                });
-              emojidiv.append(img);
-            });
-            div.append(emojidiv);
-          });
-
-          // add backspace button to toolbar
-          var backspace = $('<li/>').append($('<i/>', { class: "material-icons" }).append("backspace"));
-          backspace.on('tap', function() {
-            var input = $('section#chat article#main div#footbox span#text');
-            var str = input.html();
-            if (str.length > 0) {         // unicode char
-              if(/[\uD800-\uDFFF]/.test(str.slice(-1)) && (str.length > 1)) {
-                input.html(str.substring(0, str.length - 2));
-              }
-              else {                      // regular char
-                input.html(str.substring(0, str.length - 1));
-              }
-              $('span#text').trigger("keydown");
+            if (emojidiv.children().length == 0) {
+              // the category emojis are not loaded yet
+              Lungo.Notification.show('heart', _('Loading...'));
+              setTimeout(function () {
+                App.emoji[provider].emojis[index][1].forEach(function (emoji) {
+                  var img = account.connector.emojiRender(emoji);
+                  img.on('tap', function () {
+                      Plus.emoji($(this)[0].dataset.emoji);
+                      $('span#text').trigger("keydown");
+                    });
+                  emojidiv.append(img);
+                 });
+              });
+              Lungo.Notification.hide();
             }
+
+            // activate new category
+            $('ul.category-select li').removeClass("active");
+            $(this).addClass("active");
+            $('section#chat article#emoji div.emoji-category').hide();
+            $('section#chat article#emoji div#' + active).show();
           });
-          toolbar.append(backspace);
-          div.append(toolbar);
-          toolbar.find("li:first-child").trigger("tap"); // activate first category
-          Lungo.Notification.hide();
+            
+          li[0].dataset.provider = providerName;
+          li[0].dataset.category = category[0][0];
+          toolbar.append(li);
+          div.append($('<div/>', {id: category[0][0], class: "emoji-category"}));
         });
+
+        // add backspace button to toolbar
+        var backspace = $('<li/>').append($('<i/>', { class: "material-icons" }).append("backspace"));
+        backspace.on('tap', function() {
+          var input = $('section#chat article#main div#footbox span#text');
+          var str = input.html();
+          if (str.length > 0) {         // unicode char
+            if(/[\uD800-\uDFFF]/.test(str.slice(-1)) && (str.length > 1)) {
+              input.html(str.substring(0, str.length - 2));
+            }
+            else {                      // regular char
+              input.html(str.substring(0, str.length - 1));
+            }
+            $('span#text').trigger("keydown");
+          }
+        });
+        toolbar.append(backspace);
+        div.append(toolbar);
+        toolbar.find("li:first-child").trigger("tap"); // activate first category
       }
       else {
         emojiDiv.show();
