@@ -260,7 +260,7 @@ App.connectors.coseme = function (account) {
       if (req.result) {
         var buffer = CoSeMe.utils.bytesFromLatin1(CoSeMe.utils.utf8FromString(task.plaintext));
         axol.encryptMessage(req.result.session, buffer).then(function (m) {
-          Tools.log('ENCRYPTED MESSAGE', m);
+          Tools.log('ENCRYPTED MESSAGE', m, CoSeMe.utils.hex(m.body));
 
           var tx = axolDb.transaction(['session'], 'readwrite');
           var req = tx.objectStore('session').put({ jid: myJid,
@@ -343,7 +343,7 @@ App.connectors.coseme = function (account) {
     }
 
     function onDecrypted(v2msg, session) {
-      Tools.log('DECRYPTED MESSAGE', v2msg, session);
+      Tools.log('DECODED MESSAGE', v2msg, session);
 
       if (v2msg.conversation) {
         self.events.onMessage.bind(self)(msg.msgId, msg.remoteJid, v2msg.conversation, msg.timeStamp, true, msg.pushName, false);
@@ -378,6 +378,7 @@ App.connectors.coseme = function (account) {
         var decryptFn = (msg.type == 'pkmsg') ? axol.decryptPreKeyWhisperMessage : axol.decryptWhisperMessage;
         decryptFn(session, msg.msgData).then(function (m) {
           var data = new Uint8Array(m.message);
+          Tools.log('DECRYPTED MESSAGE', CoSeMe.utils.hex(data));
 
           try {
             var v2msg;
@@ -693,7 +694,6 @@ App.connectors.coseme = function (account) {
           ready(MI.call('message_broadcast', [null, to, text]));
         } else {
           encryptMessage(to, text).then(function (m) {
-            Tools.log('SEND ENCRYPTED', m);
             ready(MI.call('encrypt_sendMessage',
                           [null, to, m.body,
                            (m.isPreKeyWhisperMessage ? 'pkmsg' : 'msg'),
@@ -902,7 +902,7 @@ App.connectors.coseme = function (account) {
       Object.keys(signals).forEach(function(signal) {
         var customCallback = signals[signal];
         if (customCallback) {
-          Tools.log('REGISTER', signal, customCallback);
+          Tools.log('REGISTER', signal);
           Yowsup.connectionmanager.signals[signal].length = 0;
           SI.registerListener(signal, customCallback.bind(this));
         }
