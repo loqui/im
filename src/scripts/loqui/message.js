@@ -368,7 +368,7 @@ var Message = {
   reRender : function(blockIndex, old_id){
     if($('section#chat')[0].dataset.jid == this.core.to){
       var element= $('section#chat ul#messages li[data-chunk="' + blockIndex + '"] div[data-id="' + (old_id || this.core.id) + '"]');
-      element.replaceWith(this.preRender());
+      element.replaceWith(this.preRender(element[0].dataset.index));
     }
   },
 
