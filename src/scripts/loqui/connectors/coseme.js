@@ -1,4 +1,4 @@
-/* global IDBKeyRange, App, CoSeMe, Providers, Tools, Avatar, Store, Message, Chat, Account, Accounts, Lungo, Make, async, axolotl, emojione, _root */
+/* global IDBKeyRange, App, CoSeMe, Providers, Tools, Avatar, Store, Message, Chat, Account, Accounts, Lungo, Make, async, axolotl, axolotlCrypto, emojione, _root */
 
 /**
  * @file Holds {@link Connector/Coseme}
@@ -353,11 +353,27 @@ App.connectors.coseme = function (account) {
       } else if (v2msg.image_message) {
         var img_msg = v2msg.image_message;
         var imgThumb = new Uint8Array(img_msg.jpeg_thumbnail.toArrayBuffer());
-        self.events.onImageReceived.bind(self)(msg.msgId, msg.remoteJid, imgThumb, img_msg.url, img_msg.file_length.toNumber(), true, false, msg.pushName, msg.timeStamp);
+        var imgEncKey = new Uint8Array(img_msg.media_key.toArrayBuffer());
+        axolotlCrypto.deriveHKDFv3Secrets(imgEncKey, CoSeMe.utils.bytesFromHex('576861747341707020496d616765204b657973'), 112).then(function (deriv) {
+          var iv = deriv.subarray(0, 16);
+          var key = deriv.subarray(16, 48);
+          Tools.log('MEDIA ENCRYPTION KEYS', CoSeMe.utils.hex(iv), CoSeMe.utils.hex(key));
+          self.events.onImageReceived.bind(self)(msg.msgId, msg.remoteJid, imgThumb, img_msg.url, img_msg.file_length.toNumber(), true, false, msg.pushName, msg.timeStamp, img_msg.mime_type, { iv: CoSeMe.utils.latin1FromBytes(iv), key: CoSeMe.utils.latin1FromBytes(key) });
+        });
       } else if (v2msg.location_message) {
-        var loc_msg = v2msg.location_msg;
+        var loc_msg = v2msg.location_message;
         var locThumb = new Uint8Array(loc_msg.jpeg_thumbnail.toArrayBuffer());
         self.events.onLocationReceived.bind(self)(msg.msgId, msg.remoteJid, loc_msg.nsme, locThumb, loc_msg.degrees_latitude, loc_msg.degrees_longitude, true, false, msg.pushName, msg.timeStamp);
+      } else if (v2msg.document_message) {
+        var doc_msg = v2msg.document_message;
+        var docThumb = new Uint8Array(doc_msg.jpeg_thumbnail.toArrayBuffer());
+        var docEncKey = new Uint8Array(doc_msg.media_key.toArrayBuffer());
+        axolotlCrypto.deriveHKDFv3Secrets(docEncKey, CoSeMe.utils.bytesFromHex('576861747341707020496d616765204b657973'), 112).then(function (deriv) {
+          var iv = deriv.subarray(0, 16);
+          var key = deriv.subarray(16, 48);
+          Tools.log('MEDIA ENCRYPTION KEYS', CoSeMe.utils.hex(iv), CoSeMe.utils.hex(key));
+          self.events.onImageReceived.bind(self)(msg.msgId, msg.remoteJid, docThumb, doc_msg.url, doc_msg.file_length.toNumber(), true, false, msg.pushName, msg.timeStamp, doc_msg.mime_type, { iv: CoSeMe.utils.latin1FromBytes(iv), key: CoSeMe.utils.latin1FromBytes(key) });
+        });
       } else {
         Tools.log('UNHANDLED v2msg');
       }
@@ -1075,9 +1091,9 @@ App.connectors.coseme = function (account) {
       Tools.log('MESSAGE NOT RECEIVED', id, from, body, stamp, e, nick, g);
     };
 
-    this.events.onImageReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast, notifyName, timeStamp) {
+    this.events.onImageReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast, notifyName, timeStamp, mimeType, encKey) {
       var to = this.account.core.fullJid;
-      return this.mediaProcess('image', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, wantsReceipt, false, notifyName, timeStamp);
+      return this.mediaProcess('image', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, wantsReceipt, false, notifyName, timeStamp, mimeType, encKey);
     };
 
     this.events.onVideoReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast, notifyName, timeStamp) {
@@ -1454,8 +1470,8 @@ App.connectors.coseme = function (account) {
       this.muc.participantsGet(from);
     };
 
-    this.events.onGroupImageReceived = function (msgId, group, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt, notifyName, timeStamp) {
-      return this.mediaProcess('image', msgId, author, group, mediaPreview, mediaUrl, mediaSize, wantsReceipt, true, notifyName, timeStamp);
+    this.events.onGroupImageReceived = function (msgId, group, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt, notifyName, timeStamp, encKey) {
+      return this.mediaProcess('image', msgId, author, group, mediaPreview, mediaUrl, mediaSize, wantsReceipt, true, notifyName, timeStamp, encKey);
     };
 
     this.events.onGroupVideoReceived = function (msgId, group, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt, notifyName, timeStamp) {
@@ -1627,7 +1643,7 @@ App.connectors.coseme = function (account) {
       msg.addToChat();
     };
 
-    this.mediaProcess = function (fileType, msgId, from, to, payload, mediaUrl, mediaSize, wantsReceipt, isGroup, notifyName, timeStamp) {
+    this.mediaProcess = function (fileType, msgId, from, to, payload, mediaUrl, mediaSize, wantsReceipt, isGroup, notifyName, timeStamp, mimeType, encKey) {
       Tools.log('Processing file of type', fileType);
       var process = function (thumb) {
         var media = {
@@ -1635,6 +1651,8 @@ App.connectors.coseme = function (account) {
           thumb: thumb,
           payload: mediaUrl ? null : payload,
           url: mediaUrl,
+          mimeType: mimeType,
+          encKey : encKey,
           downloaded: false
         };
         var stamp = Tools.localize(Tools.stamp(timeStamp));

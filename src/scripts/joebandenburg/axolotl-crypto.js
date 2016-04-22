@@ -74,6 +74,27 @@
                 });
             }
         },
+        deriveHKDFv3Secrets: function(refKey, cryptKeys, size) {
+            var numBlocks = Math.ceil(size / 32);
+            var buf = new Uint8Array(32 * numBlocks);
+            var self = this;
+
+            function expand(prk, t, i) {
+                var input = new Uint8Array(t.length + cryptKeys.length + 1);
+                input.set(t);
+                input.set(cryptKeys, t.length);
+                input[input.length - 1] = i + 1;
+                return self.hmac(prk, input).then(function (mac) {
+                    var macArray = new Uint8Array(mac);
+                    buf.set(macArray, i*32);
+                    return (++i < numBlocks) ? expand(prk, macArray, i) : buf.subarray(0, size);
+                });
+            };
+
+            return self.hmac(new Uint8Array(32).buffer, refKey).then(function (mac) {
+                return expand(new Uint8Array(mac), new Uint8Array(), 0);
+            });
+        },
         encrypt: function(key, message, iv) {
             if (window.crypto.subtle) {
                 var keyOptions = {

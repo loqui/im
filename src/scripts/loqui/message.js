@@ -1,4 +1,4 @@
-/* global Chat, Tools, Plus, App, Providers, Store, Activity, Lungo, Make */
+/* global Chat, CoSeMe, Tools, Plus, App, Providers, Store, Activity, Lungo, Make, axolotlCrypto */
 
 /**
 * @file Holds {@link Message}
@@ -332,9 +332,9 @@ var Message = {
       msg: message.core,
       delay: !account.connector.isConnected()
     }, function (blockIndex) {
-	  if (receipts) {
-		  message.setSendTimeout(blockIndex, null);
-	  }
+      if (receipts) {
+	message.setSendTimeout(blockIndex, null);
+      }
       if ($('section#chat')[0].dataset.jid == to && $('section#chat').hasClass('show')) {
         var ul = $('section#chat ul#messages');
         var li = ul.children('li[data-chunk="' + blockIndex + '"]');
@@ -386,7 +386,6 @@ var Message = {
       html = App.emoji[Providers.data[this.account.core.provider].emoji].fy(Tools.urlHL(Tools.HTMLescape(this.core.text)));
     } else if (this.core.media) {
       html = $('<img/>').attr('src', this.core.media.thumb);
-      html[0].dataset.url = this.core.media.url;
       html[0].dataset.downloaded = this.core.media.downloaded || false;
       switch (this.core.media.type) {
         case 'url':
@@ -429,9 +428,11 @@ var Message = {
           };
           onClick = function (e) {
             var img = e.target;
-            var url = img.dataset.url;
+            var url = message.core.media.url;
             var ext = url.split('.').pop();
-            if (ext == 'aac') {
+            if (message.core.media.mimeType) {
+              ext = message.core.media.mimeType.split('/').pop();
+            } else if (ext == 'aac') {
               ext = 'mp3';
             }
             var localUrl = App.pathFiles + $(e.target).closest('[data-stamp]')[0].dataset.stamp.replace(/[-:]/g, '') + url.split('/').pop().substring(0, 5).toUpperCase() + '.' + ext;
@@ -441,21 +442,42 @@ var Message = {
               });
             } else {
               Tools.fileGet(url, function (blob) {
-                Store.SD.save(localUrl, blob, function () {
-                  open(blob);
-                  var index = [$(img).closest('li[data-chunk]')[0].dataset.chunk, $(img).closest('div[data-index]')[0].dataset.index];
-                  Store.recover(index[0], function (key, chunk, free) {
-                    Tools.log(chunk, index);
-                    chunk[index[1]].media.downloaded = true;
-                    Store.update(key, index[0], chunk, function () {
-                      img.dataset.downloaded = true;
-                      free();
-                      Tools.log('SUCCESS');
+                function saveBlob(blob) {
+                  Store.SD.save(localUrl, blob, function () {
+                    open(blob);
+                    var index = [$(img).closest('li[data-chunk]')[0].dataset.chunk, $(img).closest('div[data-index]')[0].dataset.index];
+                    Store.recover(index[0], function (key, chunk, free) {
+                      Tools.log(chunk, index);
+                      chunk[index[1]].media.downloaded = true;
+                      Store.update(key, index[0], chunk, function () {
+                        img.dataset.downloaded = true;
+                        free();
+                        Tools.log('SUCCESS');
+                      });
+                    });
+                  }, function (error) {
+                    Tools.log('SAVE ERROR', error);
+                  });
+                }
+
+                var encKey = message.core.media.encKey;
+                if (encKey) {
+                  var reader = new FileReader();
+                  reader.addEventListener("loadend", function() {
+                    var key = CoSeMe.utils.bytesFromLatin1(encKey.key);
+                    var iv = CoSeMe.utils.bytesFromLatin1(encKey.iv);
+                    var ciphertext = reader.result.slice(0, -10);
+                    axolotlCrypto.decrypt(key, ciphertext, iv).then(function (data) {
+                      Tools.log('MEDIA DECRYPTED', data);
+                      saveBlob(new Blob([data], { type: message.core.media.mimeType } ));
+                    }, function (err) {
+                      Tools.log('MEDIA DECRYPTION FAILED', err);
                     });
                   });
-                }, function (error) {
-                  Tools.log('SAVE ERROR', error);
-                });
+                  reader.readAsArrayBuffer(blob);
+                } else {
+                  saveBlob(blob);
+                }
               });
             }
           };
