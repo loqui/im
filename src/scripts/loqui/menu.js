@@ -272,7 +272,7 @@ var Menu = {
             var active = $(this)[0].dataset.category;
             var emojidiv = $('div#' + provider + ' div#' + active);
 
-            if (emojidiv.children().length == 0) {
+            if (emojidiv.children().length === 0) {
               // the category emojis are not loaded yet
               Lungo.Notification.show('heart', _('Loading...'));
               setTimeout(function () {
