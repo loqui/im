@@ -177,7 +177,7 @@ var _root = dcodeIO.ProtoBuf.newBuilder({})['import']({
                 {
                     "rule": "optional",
                     "type": "string",
-                    "name": "mimeType",
+                    "name": "mime_type",
                     "id": 2
                 },
                 {
