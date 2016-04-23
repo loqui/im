@@ -784,7 +784,7 @@
 
 (function() {
   (function($$) {
-    var CURRENT_TOUCH, EVENT, FIRST_TOUCH, GESTURE, GESTURES, HOLD_DELAY, TAPS, TOUCH_TIMEOUT, _angle, _capturePinch, _captureRotation, _cleanGesture, _distance, _fingersPosition, _getTouches, _hold, _isSwipe, _listenTouches, _onTouchEnd, _onTouchMove, _onTouchStart, _parentIfText, _swipeDirection, _trigger;
+    var CURRENT_TOUCH, EVENT, FIRST_TOUCH, SWIPE_MIN_X, SWIPE_MIN_Y, GESTURE, GESTURES, HOLD_DELAY, TAPS, TOUCH_TIMEOUT, _angle, _capturePinch, _captureRotation, _cleanGesture, _distance, _fingersPosition, _getTouches, _hold, _isSwipe, _listenTouches, _onTouchEnd, _onTouchMove, _onTouchStart, _parentIfText, _swipeDirection, _trigger;
 
     TAPS = null;
     EVENT = void 0;
@@ -793,6 +793,8 @@
     CURRENT_TOUCH = [];
     TOUCH_TIMEOUT = void 0;
     HOLD_DELAY = 650;
+    SWIPE_MIN_X = 30;
+    SWIPE_MIN_Y = 30;
     GESTURES = ["touch", "tap", "singleTap", "doubleTap", "hold", "swipe", "swiping", "swipeLeft", "swipeRight", "swipeUp", "swipeDown", "rotate", "rotating", "rotateLeft", "rotateRight", "pinch", "pinching", "pinchIn", "pinchOut", "drag", "dragLeft", "dragRight", "dragUp", "dragDown"];
     GESTURES.forEach(function(event) {
       $$.fn[event] = function(callback) {
@@ -804,8 +806,20 @@
       return this;
     });
     $$(document).ready(function() {
+      _getSwipeMin();
       return _listenTouches();
     });
+    _getSwipeMin = function() {
+        var orientation = screen.mozOrientation;
+        if (orientation === "portrait") {
+          SWIPE_MIN_X = screen.width / 4;
+          SWIPE_MIN_Y = screen.height / 5;
+        }
+        if (orientation === "landscape") {
+          SWIPE_MIN_X = screen.width / 5;
+          SWIPE_MIN_Y = screen.height / 4;
+        }
+    };
     _listenTouches = function() {
       var environment;
 
@@ -813,6 +827,8 @@
       environment.bind("touchstart", _onTouchStart);
       environment.bind("touchmove", _onTouchMove);
       environment.bind("touchend", _onTouchEnd);
+      screen.addEventListener('mozorientationchange', _getSwipeMin);
+      
       return environment.bind("touchcancel", _cleanGesture);
     };
     _onTouchStart = function(event) {
@@ -876,8 +892,8 @@
 
       it_is = false;
       if (CURRENT_TOUCH[0]) {
-        move_horizontal = Math.abs(FIRST_TOUCH[0].x - CURRENT_TOUCH[0].x) > 30;
-        move_vertical = Math.abs(FIRST_TOUCH[0].y - CURRENT_TOUCH[0].y) > 30;
+        move_horizontal = Math.abs(FIRST_TOUCH[0].x - CURRENT_TOUCH[0].x) > SWIPE_MIN_X;
+        move_vertical = Math.abs(FIRST_TOUCH[0].y - CURRENT_TOUCH[0].y) > SWIPE_MIN_Y;
         it_is = GESTURE.el && (move_horizontal || move_vertical);
       }
       return it_is;
