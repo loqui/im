@@ -36,15 +36,27 @@ var _root = dcodeIO.ProtoBuf.newBuilder({})['import']({
                 },
                 {
                     "rule": "optional",
+                    "type": "UrlMessage",
+                    "name": "url_message",
+                    "id": 6
+                },
+                {
+                    "rule": "optional",
                     "type": "DocumentMessage",
                     "name": "document_message",
                     "id": 7
                 },
                 {
                     "rule": "optional",
-                    "type": "UrlMessage",
-                    "name": "url_message",
-                    "id": 6
+                    "type": "AudioMessage",
+                    "name": "audio_message",
+                    "id": 8
+                },
+                {
+                    "rule": "optional",
+                    "type": "VideoMessage",
+                    "name": "video_message",
+                    "id": 9
                 }
             ]
         },
@@ -254,6 +266,106 @@ var _root = dcodeIO.ProtoBuf.newBuilder({})['import']({
                 {
                     "rule": "optional",
                     "type": "string",
+                    "name": "jpeg_thumbnail",
+                    "id": 16
+                }
+            ]
+        },
+        {
+            "name": "AudioMessage",
+            "fields": [
+                {
+                    "rule": "required",
+                    "type": "string",
+                    "name": "url",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "mime_type",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
+                    "name": "file_sha256",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint64",
+                    "name": "file_length",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint64",
+                    "name": "duration",
+                    "id": 5
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "unk",
+                    "id": 6
+                },
+                {
+                    "rule": "required",
+                    "type": "bytes",
+                    "name": "media_key",
+                    "id": 7
+                }
+            ]
+        },
+        {
+            "name": "VideoMessage",
+            "fields": [
+                {
+                    "rule": "required",
+                    "type": "string",
+                    "name": "url",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "mime_type",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
+                    "name": "file_sha256",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint64",
+                    "name": "file_length",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint64",
+                    "name": "duration",
+                    "id": 5
+                },
+                {
+                    "rule": "required",
+                    "type": "bytes",
+                    "name": "media_key",
+                    "id": 6
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "caption",
+                    "id": 7
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
                     "name": "jpeg_thumbnail",
                     "id": 16
                 }

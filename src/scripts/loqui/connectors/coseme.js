@@ -368,11 +368,30 @@ App.connectors.coseme = function (account) {
         var doc_msg = v2msg.document_message;
         var docThumb = new Uint8Array(doc_msg.jpeg_thumbnail.toArrayBuffer());
         var docEncKey = new Uint8Array(doc_msg.media_key.toArrayBuffer());
-        axolotlCrypto.deriveHKDFv3Secrets(docEncKey, CoSeMe.utils.bytesFromHex('576861747341707020496d616765204b657973'), 112).then(function (deriv) {
+        axolotlCrypto.deriveHKDFv3Secrets(docEncKey, CoSeMe.utils.bytesFromHex('576861747341707020446f63756d656e74204b657973'), 112).then(function (deriv) {
           var iv = deriv.subarray(0, 16);
           var key = deriv.subarray(16, 48);
           Tools.log('MEDIA ENCRYPTION KEYS', CoSeMe.utils.hex(iv), CoSeMe.utils.hex(key));
           self.events.onImageReceived.bind(self)(msg.msgId, msg.remoteJid, docThumb, doc_msg.url, doc_msg.file_length.toNumber(), true, false, msg.pushName, msg.timeStamp, doc_msg.mime_type, { iv: CoSeMe.utils.latin1FromBytes(iv), key: CoSeMe.utils.latin1FromBytes(key) });
+        });
+      } else if (v2msg.audio_message) {
+        var audio_msg = v2msg.audio_message;
+        var audioEncKey = new Uint8Array(audio_msg.media_key.toArrayBuffer());
+        axolotlCrypto.deriveHKDFv3Secrets(audioEncKey, CoSeMe.utils.bytesFromHex('576861747341707020417564696f204b657973'), 112).then(function (deriv) {
+          var iv = deriv.subarray(0, 16);
+          var key = deriv.subarray(16, 48);
+          Tools.log('MEDIA ENCRYPTION KEYS', CoSeMe.utils.hex(iv), CoSeMe.utils.hex(key));
+          self.events.onAudioReceived.bind(self)(msg.msgId, msg.remoteJid, audio_msg.url, audio_msg.file_length.toNumber(), true, false, msg.pushName, msg.timeStamp, audio_msg.mime_type, { iv: CoSeMe.utils.latin1FromBytes(iv), key: CoSeMe.utils.latin1FromBytes(key) });
+        });
+      } else if (v2msg.video_message) {
+        var video_msg = v2msg.video_message;
+        var videoThumb = new Uint8Array(video_msg.jpeg_thumbnail.toArrayBuffer());
+        var videoEncKey = new Uint8Array(video_msg.media_key.toArrayBuffer());
+        axolotlCrypto.deriveHKDFv3Secrets(videoEncKey, CoSeMe.utils.bytesFromHex('576861747341707020566964656f204b657973'), 112).then(function (deriv) {
+          var iv = deriv.subarray(0, 16);
+          var key = deriv.subarray(16, 48);
+          Tools.log('MEDIA ENCRYPTION KEYS', CoSeMe.utils.hex(iv), CoSeMe.utils.hex(key));
+          self.events.onVideoReceived.bind(self)(msg.msgId, msg.remoteJid, videoThumb, video_msg.url, video_msg.file_length.toNumber(), true, false, msg.pushName, msg.timeStamp, video_msg.mime_type, { iv: CoSeMe.utils.latin1FromBytes(iv), key: CoSeMe.utils.latin1FromBytes(key) });
         });
       } else {
         Tools.log('UNHANDLED v2msg');
@@ -1096,14 +1115,14 @@ App.connectors.coseme = function (account) {
       return this.mediaProcess('image', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, wantsReceipt, false, notifyName, timeStamp, mimeType, encKey);
     };
 
-    this.events.onVideoReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast, notifyName, timeStamp) {
+    this.events.onVideoReceived = function (msgId, fromAttribute, mediaPreview, mediaUrl, mediaSize, wantsReceipt, isBroadcast, notifyName, timeStamp, mimeType, encKey) {
       var to = this.account.core.fullJid;
-      return this.mediaProcess('video', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, wantsReceipt, false, notifyName, timeStamp);
+      return this.mediaProcess('video', msgId, fromAttribute, to, mediaPreview, mediaUrl, mediaSize, wantsReceipt, false, notifyName, timeStamp, mimeType, encKey);
     };
 
-    this.events.onAudioReceived = function (msgId, fromAttribute, mediaUrl, mediaSize, wantsReceipt, isBroadcast, notifyName, timeStamp) {
+    this.events.onAudioReceived = function (msgId, fromAttribute, mediaUrl, mediaSize, wantsReceipt, isBroadcast, notifyName, timeStamp, mimeType, encKey) {
       var to = this.account.core.fullJid;
-      return this.mediaProcess('audio', msgId, fromAttribute, to, null, mediaUrl, mediaSize, wantsReceipt, false, notifyName, timeStamp);
+      return this.mediaProcess('audio', msgId, fromAttribute, to, null, mediaUrl, mediaSize, wantsReceipt, false, notifyName, timeStamp, mimeType, encKey);
     };
 
     this.events.onLocationReceived = function (msgId, fromAttribute, name, mediaPreview, mlatitude, mlongitude, wantsReceipt, isBroadcast, notifyName, timeStamp) {
@@ -1470,16 +1489,16 @@ App.connectors.coseme = function (account) {
       this.muc.participantsGet(from);
     };
 
-    this.events.onGroupImageReceived = function (msgId, group, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt, notifyName, timeStamp, encKey) {
-      return this.mediaProcess('image', msgId, author, group, mediaPreview, mediaUrl, mediaSize, wantsReceipt, true, notifyName, timeStamp, encKey);
+    this.events.onGroupImageReceived = function (msgId, group, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt, notifyName, timeStamp, mimeType, encKey) {
+      return this.mediaProcess('image', msgId, author, group, mediaPreview, mediaUrl, mediaSize, wantsReceipt, true, notifyName, timeStamp, mimeType, encKey);
     };
 
-    this.events.onGroupVideoReceived = function (msgId, group, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt, notifyName, timeStamp) {
-      return this.mediaProcess('video', msgId, author, group, mediaPreview, mediaUrl, mediaSize, wantsReceipt, true, notifyName, timeStamp);
+    this.events.onGroupVideoReceived = function (msgId, group, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt, notifyName, timeStamp, mimeType, encKey) {
+      return this.mediaProcess('video', msgId, author, group, mediaPreview, mediaUrl, mediaSize, wantsReceipt, true, notifyName, timeStamp, mimeType, encKey);
     };
 
-    this.events.onGroupAudioReceived = function (msgId, group, author, mediaUrl, mediaSize, wantsReceipt, notifyName, timeStamp) {
-      return this.mediaProcess('audio', msgId, author, group, null, mediaUrl, mediaSize, wantsReceipt, true, notifyName, timeStamp);
+    this.events.onGroupAudioReceived = function (msgId, group, author, mediaUrl, mediaSize, wantsReceipt, notifyName, timeStamp, mimeType, encKey) {
+      return this.mediaProcess('audio', msgId, author, group, null, mediaUrl, mediaSize, wantsReceipt, true, notifyName, timeStamp, mimeType, encKey);
     };
 
     this.events.onGroupLocationReceived = function (msgId, group, author, name, mediaPreview, mlatitude, mlongitude, wantsReceipt, notifyName, timeStamp) {
