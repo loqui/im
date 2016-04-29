@@ -1315,8 +1315,8 @@ section nav {
         padding: .5rem 0;
         border-bottom: .1rem solid #E95644;
 
-        :before,
-        :after {
+        &:before,
+        &:after {
             content: '↓';
             margin: 0 .5rem;
             font-style: normal;
@@ -1705,6 +1705,7 @@ input[type='password'] {
         font-size: 1.4rem;
         margin: .5rem 0 2rem;
         color: $primary-text-color;
+        word-wrap: break-word;
     }
 
     .buttongroup {
