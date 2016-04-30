@@ -40,7 +40,7 @@ module.exports = function(grunt) {
         cwd: 'src/',
         src: '**',
         dest: '<%= meta.build %>/ubuntu-touch/www',
-        flatten: true,
+        flatten: false,
         filter: 'isFile'
       },
       ubuntutouchToDist: {
@@ -48,7 +48,7 @@ module.exports = function(grunt) {
         cwd: 'platform/ubuntu-touch/',
         src: '**',
         dest: '<%= meta.build %>/ubuntu-touch/',
-        flatten: true,
+        flatten: false,
         filter: 'isFile'
       },
       srcToDesktop: {
