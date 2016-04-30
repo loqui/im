@@ -98,11 +98,11 @@ Template.chats.events({
 });
 
 Template.footbox.events({
-  'touchstart button.voice' : function(e){
+  'touchstart button.voice' : function(e) {
     VoiceRecorder.start();
   },
 
-  'click button.voice' : function(e){
+  'click button.voice' : function(e) {
     var to = $('section#chat')[0].dataset.jid;
     var account = Accounts.current;
 
@@ -147,20 +147,12 @@ Template.footbox.events({
 
   }, 1500),
 
-  'keyup #text' : Tools.debounce(function(){
+  'keyup #text' : Tools.debounce(function() {
     Messenger.csn('paused');
   }, 5000),
 
-  'tap #text' : function (e) {
-    var ul = $('section#chat ul#messages');
-    ul[0].scrollTop = ul[0].scrollHeight;
-  },
-
-  'blur #text' : function (e) {
-    var ul = $('section#chat ul#messages');
-
+  'blur #text' : function(e) {
     Messenger.csn('paused');
-    ul[0].scrollTop = ul[0].scrollHeight;
   },
 
   'click #say' : () => Messenger.say(),

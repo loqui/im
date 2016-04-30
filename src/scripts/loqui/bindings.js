@@ -283,77 +283,88 @@ var bindings = function () {
   $('section#success button.start').on('click', function() {
     App.start(true);
   });
+
   $('section#contactAdd button.add').on('click', function() {
     Messenger.contactAdd();
   });
 
-  $('section#welcome').on('click', function(){
+  $('section#welcome').on('click', function() {
      Menu.show('providers');
   });
-  $('section#chat').on('swipeRight', function () {
+  
+  $('section#chat').on('swipeRight', function() {
     Lungo.Router.section('back');
   });
 
-  $('section#main').on('click', function(e){
-    if($(e.target).hasClass('asided')){
+  $('section#chat ul#messages').on('doubleTap', function(e) {
+    e.delegateTarget.scrollTop = e.delegateTarget.scrollHeight;
+  });
+
+  $('section#main').on('click', function(e) {
+    if($(e.target).hasClass('asided')) {
       Lungo.Aside.hide();
     }
   })
 
-  .on('swipeLeft', function(e){
+  .on('swipeLeft', function(e) {
     if($(e.target).hasClass('asided')){
       Lungo.Aside.hide();
-    } else if($('section#chat[data-jid]').length > 0) {
+    } else if ($('section#chat[data-jid]').length > 0) {
       Lungo.Router.section('chat');
     }
   })
 
-  .on('swipeRight', function () {
+  .on('swipeRight', function() {
     Lungo.Aside.show('accounts');
   });
 
-  $('#main #chats').on('scroll', Tools.throttle(function (e) {
-
+  $('#main #chats').on('scroll', Tools.throttle(function(e) {
     if (e.target.scrollTop > 0) {
       $('.floater').addClass('hidden');
-    } else {
+    }
+    else {
       $('.floater').removeClass('hidden');
     }
   }, 100));
 
-  $('aside').on('swipeLeft', function () {
+  $('aside').on('swipeLeft', function() {
     Lungo.Aside.hide();
   });
 
-  $('#debugConsole #showConsole').on('click', function () {
+  $('#debugConsole #showConsole').on('click', function() {
     Plus.showConsole();
     $('#debugConsole #showConsole').hide();
     $('#debugConsole #hideConsole').show();
   });
+
   $('#debugConsole #hideConsole').on('click', function() {
     Plus.hideConsole();
     $('#debugConsole #showConsole').show();
     $('#debugConsole #hideConsole').hide();
   });
+
   $('#debugConsole #consoleClear').on('click', function() {
     Plus.clearConsole();
   });
-  $('select').on('change', function () {
+
+  $('select').on('change', function() {
     var select = $(this);
     var option = select.find('option[value="' + select.val() + '"]');
     if (option[0].dataset.reveal) {
       select.siblings('[name="' + option[0].dataset.reveal + '"]').removeClass('hidden');
-    } else {
+    }
+    else {
       option = select.find('[data-reveal]');
       select.siblings('[name="' + option[0].dataset.reveal + '"]').addClass('hidden').val('');
     }
   });
+  
   $("script[type='text/spacebars']").each(function(index, script) {
     var name = script.getAttribute('name');
     UI.insert(UI.render(Template[name]), script.parentNode, script);
   });
 
-  window.addEventListener('touchend', function(){
+  window.addEventListener('touchend', function() {
     VoiceRecorder.stop(duration => {
       if (duration < 1) {
         Lungo.Notification.error(_('HoldToRecordTitle'), _('HoldToRecordBody'), 'info-sign', 10);
