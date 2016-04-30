@@ -717,6 +717,7 @@ var App = {
     var chatChunks= {};
     var avatars= {};
     var avatarChunks= {};
+    var backgroundImages= {};
 
     Store.get('accountsCores', function(accounts){
       var jobs= [];
@@ -755,7 +756,7 @@ var App = {
             });
           }));
 
-          if(avatars[account.fullJid].original){
+          if (avatars[account.fullJid].original){
             jobs.push(new Promise(function(done){
               Store.recover(avatars[account.fullJid].original, function(key, chunk, free){
                 avatarChunks[avatars[account.fullJid].original.toString()]= chunk;
@@ -765,6 +766,16 @@ var App = {
             }));
           }
         }
+
+        jobs.push(new Promise(function(done){
+          Store.recover(account.background, function(key, url, free) {
+            if (url) {
+              backgroundImages[account.fullJid.toString()] = url;
+            }
+            done();
+            free();
+          });
+        }));
       });
 
       Promise.all(jobs).then(function(){
@@ -788,8 +799,12 @@ var App = {
               this[key]= CryptoJS.AES.encrypt(JSON.stringify(this[key]), password).toString();
             }.bind(avatarChunks));
 
+            Object.keys(backgroundImages).forEach(function(key){
+              this[key]= CryptoJS.AES.encrypt(JSON.stringify(this[key]), password).toString();
+            }.bind(backgroundImages));
+
             Lungo.Notification.show('save', _('SavingBackup'));
-            var blob= new Blob([JSON.stringify({accounts : accounts, avatars : avatars, chatChunks : chatChunks, avatarChunks : avatarChunks})], { type : 'application/json' });
+            var blob= new Blob([JSON.stringify({accounts : accounts, avatars : avatars, chatChunks : chatChunks, avatarChunks : avatarChunks, backgroundImages : backgroundImages})], { type : 'application/json' });
 
             Store.SD.save(App.pathBackup+'/'+ (new Date()).getTime() +'.backup', blob, function(){
               Lungo.Notification.success(_('Backup'), _('BackupStored'), 'save', 3);
@@ -837,6 +852,12 @@ var App = {
               backup.avatarChunks[key]= JSON.parse(CryptoJS.AES.decrypt(avatar, password).toString(CryptoJS.enc.Utf8));
             });
 
+            Object.keys(backup.backgroundImages).forEach(function(key){
+              var image= backup.backgroundImages[key];
+
+              backup.backgroundImages[key]= JSON.parse(CryptoJS.AES.decrypt(image, password).toString(CryptoJS.enc.Utf8));
+            });
+
             Tools.log('BACKUP DECRYPTED', backup);
 
             if(confirm(_('BackupApplyRequest'))){
@@ -872,6 +893,16 @@ var App = {
 
                   });
 
+                  Object.keys(backup.backgroundImages).forEach(function(index){
+                    var image= backup.backgroundImages[index];
+
+                    jobs.push(new Promise(function(done){
+                      Store.save(backup.backgroundImages[index.toString()], function(index){
+                      account.background= index;
+                      done();
+                      });
+                    }));
+                  });
                 });
 
                 Object.keys(backup.avatars).forEach(function(index){
