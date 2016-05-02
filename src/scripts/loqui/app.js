@@ -852,12 +852,14 @@ var App = {
               backup.avatarChunks[key]= JSON.parse(CryptoJS.AES.decrypt(avatar, password).toString(CryptoJS.enc.Utf8));
             });
 
-            Object.keys(backup.backgroundImages).forEach(function(key){
-              var image= backup.backgroundImages[key];
+            if (backup.backgroundImages) {
+              // This backup was done pre 0.5.4, without backgroundImage
+              Object.keys(backup.backgroundImages).forEach(function(key){
+                var image= backup.backgroundImages[key];
 
-              backup.backgroundImages[key]= JSON.parse(CryptoJS.AES.decrypt(image, password).toString(CryptoJS.enc.Utf8));
-            });
-
+                backup.backgroundImages[key]= JSON.parse(CryptoJS.AES.decrypt(image, password).toString(CryptoJS.enc.Utf8));
+              });
+            }
             Tools.log('BACKUP DECRYPTED', backup);
 
             if(confirm(_('BackupApplyRequest'))){
@@ -893,16 +895,19 @@ var App = {
 
                   });
 
-                  Object.keys(backup.backgroundImages).forEach(function(index){
-                    var image= backup.backgroundImages[index];
+                  if (backup.backgroundImages) {
+                    // This backup was done pre 0.5.4, without backgroundImage
+                    Object.keys(backup.backgroundImages).forEach(function(index){
+                      var image= backup.backgroundImages[index];
 
-                    jobs.push(new Promise(function(done){
-                      Store.save(backup.backgroundImages[index.toString()], function(index){
-                      account.background= index;
-                      done();
-                      });
-                    }));
-                  });
+                      jobs.push(new Promise(function(done){
+                        Store.save(backup.backgroundImages[index.toString()], function(index){
+                        account.background= index;
+                        done();
+                        });
+                      }));
+                    });
+                  }
                 });
 
                 Object.keys(backup.avatars).forEach(function(index){
