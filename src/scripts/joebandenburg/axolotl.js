@@ -47,7 +47,7 @@
             'use strict';
             var $__src_47_Axolotl__, $__axolotl_45_crypto__;
             var Axolotl = ($__src_47_Axolotl__ = _require(2), $__src_47_Axolotl__ && $__src_47_Axolotl__.__esModule && $__src_47_Axolotl__ || { default: $__src_47_Axolotl__ }).default;
-            var axolotlCrypto = ($__axolotl_45_crypto__ = _require(17), $__axolotl_45_crypto__ && $__axolotl_45_crypto__.__esModule && $__axolotl_45_crypto__ || { default: $__axolotl_45_crypto__ }).default;
+            var axolotlCrypto = ($__axolotl_45_crypto__ = _require(23), $__axolotl_45_crypto__ && $__axolotl_45_crypto__.__esModule && $__axolotl_45_crypto__ || { default: $__axolotl_45_crypto__ }).default;
             module.exports = function (store) {
                 return new Axolotl(axolotlCrypto, store);
             };
@@ -129,24 +129,28 @@
                 },
                 __esModule: { value: true }
             });
-            var $__SessionFactory__, $__SessionCipher__, $__Exceptions__, $__Store__, $__Crypto__, $__co__, $__axolotl_45_crypto__;
-            var SessionFactory = ($__SessionFactory__ = _require(13), $__SessionFactory__ && $__SessionFactory__.__esModule && $__SessionFactory__ || { default: $__SessionFactory__ }).default;
-            var SessionCipher = ($__SessionCipher__ = _require(12), $__SessionCipher__ && $__SessionCipher__.__esModule && $__SessionCipher__ || { default: $__SessionCipher__ }).default;
+            var $__SessionFactory__, $__SessionCipher__, $__GroupSessionFactory__, $__GroupCipher__, $__Exceptions__, $__Store__, $__Crypto__, $__co__, $__axolotl_45_crypto__;
+            var SessionFactory = ($__SessionFactory__ = _require(19), $__SessionFactory__ && $__SessionFactory__.__esModule && $__SessionFactory__ || { default: $__SessionFactory__ }).default;
+            var SessionCipher = ($__SessionCipher__ = _require(18), $__SessionCipher__ && $__SessionCipher__.__esModule && $__SessionCipher__ || { default: $__SessionCipher__ }).default;
+            var GroupSessionFactory = ($__GroupSessionFactory__ = _require(9), $__GroupSessionFactory__ && $__GroupSessionFactory__.__esModule && $__GroupSessionFactory__ || { default: $__GroupSessionFactory__ }).default;
+            var GroupCipher = ($__GroupCipher__ = _require(6), $__GroupCipher__ && $__GroupCipher__.__esModule && $__GroupCipher__ || { default: $__GroupCipher__ }).default;
             var InvalidMessageException = ($__Exceptions__ = _require(5), $__Exceptions__ && $__Exceptions__.__esModule && $__Exceptions__ || { default: $__Exceptions__ }).InvalidMessageException;
-            var Store = ($__Store__ = _require(15), $__Store__ && $__Store__.__esModule && $__Store__ || { default: $__Store__ }).default;
+            var Store = ($__Store__ = _require(21), $__Store__ && $__Store__.__esModule && $__Store__ || { default: $__Store__ }).default;
             var Crypto = ($__Crypto__ = _require(4), $__Crypto__ && $__Crypto__.__esModule && $__Crypto__ || { default: $__Crypto__ }).default;
-            var co = ($__co__ = _require(18), $__co__ && $__co__.__esModule && $__co__ || { default: $__co__ }).default;
-            var axolotlCrypto = ($__axolotl_45_crypto__ = _require(17), $__axolotl_45_crypto__ && $__axolotl_45_crypto__.__esModule && $__axolotl_45_crypto__ || { default: $__axolotl_45_crypto__ }).default;
+            var co = ($__co__ = _require(24), $__co__ && $__co__.__esModule && $__co__ || { default: $__co__ }).default;
+            var axolotlCrypto = ($__axolotl_45_crypto__ = _require(23), $__axolotl_45_crypto__ && $__axolotl_45_crypto__.__esModule && $__axolotl_45_crypto__ || { default: $__axolotl_45_crypto__ }).default;
             function Axolotl(crypto, store) {
                 var self = this;
                 var wrappedStore = new Store(store);
                 var wrappedCrypto = new Crypto(crypto);
                 var sessionFactory = new SessionFactory(wrappedCrypto, wrappedStore);
                 var sessionCipher = new SessionCipher(wrappedCrypto);
+                var groupSessionFactory = new GroupSessionFactory(wrappedCrypto, wrappedStore);
+                var groupCipher = new GroupCipher(wrappedCrypto);
                 this.generateIdentityKeyPair = function () {
                     return wrappedCrypto.generateKeyPair();
                 };
-                this.generateRegistrationId = co.wrap($traceurRuntime.initGeneratorFunction(function $__9(extendedRange) {
+                this.generateRegistrationId = co.wrap($traceurRuntime.initGeneratorFunction(function $__11(extendedRange) {
                     var upperLimit, bytes, number;
                     return $traceurRuntime.createGeneratorInstance(function ($ctx) {
                         while (true)
@@ -173,10 +177,10 @@
                             default:
                                 return $ctx.end();
                             }
-                    }, $__9, this);
+                    }, $__11, this);
                 }));
-                this.generatePreKeys = co.wrap($traceurRuntime.initGeneratorFunction(function $__10(start, count) {
-                    var results, i, $__11, $__12, $__13, $__14, $__15, $__16;
+                this.generatePreKeys = co.wrap($traceurRuntime.initGeneratorFunction(function $__12(start, count) {
+                    var results, i, $__13, $__14, $__15, $__16, $__17, $__18;
                     return $traceurRuntime.createGeneratorInstance(function ($ctx) {
                         while (true)
                             switch ($ctx.state) {
@@ -197,24 +201,24 @@
                                 $ctx.state = 11;
                                 break;
                             case 5:
-                                $__11 = results.push;
-                                $__12 = wrappedCrypto.generateKeyPair;
-                                $__13 = $__12.call(wrappedCrypto);
+                                $__13 = results.push;
+                                $__14 = wrappedCrypto.generateKeyPair;
+                                $__15 = $__14.call(wrappedCrypto);
                                 $ctx.state = 6;
                                 break;
                             case 6:
                                 $ctx.state = 2;
-                                return $__13;
+                                return $__15;
                             case 2:
-                                $__14 = $ctx.sent;
+                                $__16 = $ctx.sent;
                                 $ctx.state = 4;
                                 break;
                             case 4:
-                                $__15 = {
+                                $__17 = {
                                     id: (start + i) % 16777214 + 1,
-                                    keyPair: $__14
+                                    keyPair: $__16
                                 };
-                                $__16 = $__11.call(results, $__15);
+                                $__18 = $__13.call(results, $__17);
                                 $ctx.state = 8;
                                 break;
                             case 9:
@@ -224,42 +228,42 @@
                             default:
                                 return $ctx.end();
                             }
-                    }, $__10, this);
+                    }, $__12, this);
                 }));
-                this.generateLastResortPreKey = co.wrap($traceurRuntime.initGeneratorFunction(function $__17() {
-                    var $__18, $__19, $__20, $__21;
+                this.generateLastResortPreKey = co.wrap($traceurRuntime.initGeneratorFunction(function $__19() {
+                    var $__20, $__21, $__22, $__23;
                     return $traceurRuntime.createGeneratorInstance(function ($ctx) {
                         while (true)
                             switch ($ctx.state) {
                             case 0:
-                                $__18 = wrappedCrypto.generateKeyPair;
-                                $__19 = $__18.call(wrappedCrypto);
+                                $__20 = wrappedCrypto.generateKeyPair;
+                                $__21 = $__20.call(wrappedCrypto);
                                 $ctx.state = 6;
                                 break;
                             case 6:
                                 $ctx.state = 2;
-                                return $__19;
+                                return $__21;
                             case 2:
-                                $__20 = $ctx.sent;
+                                $__22 = $ctx.sent;
                                 $ctx.state = 4;
                                 break;
                             case 4:
-                                $__21 = {
+                                $__23 = {
                                     id: 16777215,
-                                    keyPair: $__20
+                                    keyPair: $__22
                                 };
                                 $ctx.state = 8;
                                 break;
                             case 8:
-                                $ctx.returnValue = $__21;
+                                $ctx.returnValue = $__23;
                                 $ctx.state = -2;
                                 break;
                             default:
                                 return $ctx.end();
                             }
-                    }, $__17, this);
+                    }, $__19, this);
                 }));
-                this.generateSignedPreKey = co.wrap($traceurRuntime.initGeneratorFunction(function $__22(identityKeyPair, signedPreKeyId) {
+                this.generateSignedPreKey = co.wrap($traceurRuntime.initGeneratorFunction(function $__24(identityKeyPair, signedPreKeyId) {
                     var keyPair, signature;
                     return $traceurRuntime.createGeneratorInstance(function ($ctx) {
                         while (true)
@@ -289,56 +293,56 @@
                             default:
                                 return $ctx.end();
                             }
-                    }, $__22, this);
+                    }, $__24, this);
                 }));
                 this.createSessionFromPreKeyBundle = sessionFactory.createSessionFromPreKeyBundle;
                 this.encryptMessage = sessionCipher.encryptMessage;
                 this.decryptWhisperMessage = sessionCipher.decryptWhisperMessage;
-                this.decryptPreKeyWhisperMessage = co.wrap($traceurRuntime.initGeneratorFunction(function $__23(session, preKeyWhisperMessageBytes) {
-                    var $__7, newSession, identityKey, registrationId, $__8, finalSession, message, $__24, $__25, $__26, $__27, $__28, $__29, $__30, $__31, $__32, $__33, $__34;
+                this.decryptPreKeyWhisperMessage = co.wrap($traceurRuntime.initGeneratorFunction(function $__25(session, preKeyWhisperMessageBytes) {
+                    var $__9, newSession, identityKey, registrationId, $__10, finalSession, message, $__26, $__27, $__28, $__29, $__30, $__31, $__32, $__33, $__34, $__35, $__36;
                     return $traceurRuntime.createGeneratorInstance(function ($ctx) {
                         while (true)
                             switch ($ctx.state) {
                             case 0:
-                                $__24 = sessionFactory.createSessionFromPreKeyWhisperMessage;
-                                $__25 = $__24.call(sessionFactory, session, preKeyWhisperMessageBytes);
+                                $__26 = sessionFactory.createSessionFromPreKeyWhisperMessage;
+                                $__27 = $__26.call(sessionFactory, session, preKeyWhisperMessageBytes);
                                 $ctx.state = 6;
                                 break;
                             case 6:
                                 $ctx.state = 2;
-                                return $__25;
+                                return $__27;
                             case 2:
-                                $__26 = $ctx.sent;
+                                $__28 = $ctx.sent;
                                 $ctx.state = 4;
                                 break;
                             case 4:
-                                $__7 = $__26;
-                                $__27 = $__7.session;
-                                newSession = $__27;
-                                $__28 = $__7.identityKey;
-                                identityKey = $__28;
-                                $__29 = $__7.registrationId;
-                                registrationId = $__29;
+                                $__9 = $__28;
+                                $__29 = $__9.session;
+                                newSession = $__29;
+                                $__30 = $__9.identityKey;
+                                identityKey = $__30;
+                                $__31 = $__9.registrationId;
+                                registrationId = $__31;
                                 $ctx.state = 8;
                                 break;
                             case 8:
-                                $__30 = sessionCipher.decryptPreKeyWhisperMessage;
-                                $__31 = $__30.call(sessionCipher, newSession, preKeyWhisperMessageBytes);
+                                $__32 = sessionCipher.decryptPreKeyWhisperMessage;
+                                $__33 = $__32.call(sessionCipher, newSession, preKeyWhisperMessageBytes);
                                 $ctx.state = 14;
                                 break;
                             case 14:
                                 $ctx.state = 10;
-                                return $__31;
+                                return $__33;
                             case 10:
-                                $__32 = $ctx.sent;
+                                $__34 = $ctx.sent;
                                 $ctx.state = 12;
                                 break;
                             case 12:
-                                $__8 = $__32;
-                                $__33 = $__8.session;
-                                finalSession = $__33;
-                                $__34 = $__8.message;
-                                message = $__34;
+                                $__10 = $__34;
+                                $__35 = $__10.session;
+                                finalSession = $__35;
+                                $__36 = $__10.message;
+                                message = $__36;
                                 $ctx.state = 16;
                                 break;
                             case 16:
@@ -353,8 +357,10 @@
                             default:
                                 return $ctx.end();
                             }
-                    }, $__23, this);
+                    }, $__25, this);
                 }));
+                this.decryptSenderKeyMessage = groupCipher.decryptSenderKeyMessage;
+                this.processSenderKeyDistributionMessage = groupSessionFactory.processSenderKeyDistributionMessage;
                 Object.freeze(self);
             }
             var $__default = Axolotl;
@@ -389,7 +395,7 @@
                 __esModule: { value: true }
             });
             var $__PromiseInterfaceDecorator__;
-            var PromiseInterfaceDecorator = ($__PromiseInterfaceDecorator__ = _require(8), $__PromiseInterfaceDecorator__ && $__PromiseInterfaceDecorator__.__esModule && $__PromiseInterfaceDecorator__ || { default: $__PromiseInterfaceDecorator__ }).default;
+            var PromiseInterfaceDecorator = ($__PromiseInterfaceDecorator__ = _require(12), $__PromiseInterfaceDecorator__ && $__PromiseInterfaceDecorator__.__esModule && $__PromiseInterfaceDecorator__ || { default: $__PromiseInterfaceDecorator__ }).default;
             var methodNames = [
                     'generateKeyPair',
                     'calculateAgreement',
@@ -473,9 +479,453 @@
                 },
                 __esModule: { value: true }
             });
+            var $__ArrayBufferUtils__, $__ProtocolConstants__, $__Messages__, $__SenderKeyState__, $__GroupSession__, $__GroupRatchet__, $__Exceptions__, $__co__;
+            var ArrayBufferUtils = ($__ArrayBufferUtils__ = _require(1), $__ArrayBufferUtils__ && $__ArrayBufferUtils__.__esModule && $__ArrayBufferUtils__ || { default: $__ArrayBufferUtils__ }).default;
+            var ProtocolConstants = ($__ProtocolConstants__ = _require(13), $__ProtocolConstants__ && $__ProtocolConstants__.__esModule && $__ProtocolConstants__ || { default: $__ProtocolConstants__ }).default;
+            var Messages = ($__Messages__ = _require(11), $__Messages__ && $__Messages__.__esModule && $__Messages__ || { default: $__Messages__ }).default;
+            var SenderKeyState = ($__SenderKeyState__ = _require(16), $__SenderKeyState__ && $__SenderKeyState__.__esModule && $__SenderKeyState__ || { default: $__SenderKeyState__ }).default;
+            var GroupSession = ($__GroupSession__ = _require(8), $__GroupSession__ && $__GroupSession__.__esModule && $__GroupSession__ || { default: $__GroupSession__ }).default;
+            var GroupRatchet = ($__GroupRatchet__ = _require(7), $__GroupRatchet__ && $__GroupRatchet__.__esModule && $__GroupRatchet__ || { default: $__GroupRatchet__ }).default;
+            var $__6 = ($__Exceptions__ = _require(5), $__Exceptions__ && $__Exceptions__.__esModule && $__Exceptions__ || { default: $__Exceptions__ }), DuplicateMessageException = $__6.DuplicateMessageException, InvalidMessageException = $__6.InvalidMessageException, UnsupportedProtocolVersionException = $__6.UnsupportedProtocolVersionException;
+            var co = ($__co__ = _require(24), $__co__ && $__co__.__esModule && $__co__ || { default: $__co__ }).default;
+            function GroupCipher(crypto, store) {
+                var self = this;
+                var ratchet = new GroupRatchet(crypto);
+                self.decryptSenderKeyMessage = co.wrap($traceurRuntime.initGeneratorFunction(function $__10(session, senderKeyMessageBytes) {
+                    var senderKeyMessage, newSession, exceptions, $__8, $__9, state, clonedSessionState, message, signature, promise, result, messages;
+                    return $traceurRuntime.createGeneratorInstance(function ($ctx) {
+                        while (true)
+                            switch ($ctx.state) {
+                            case 0:
+                                senderKeyMessage = Messages.decodeSenderKeyMessage(senderKeyMessageBytes);
+                                if (senderKeyMessage.version.current !== 3) {
+                                    throw new UnsupportedProtocolVersionException('Protocol version ' + senderKeyMessage.version.current + ' is not supported');
+                                }
+                                newSession = new GroupSession(session);
+                                exceptions = [];
+                                $ctx.state = 18;
+                                break;
+                            case 18:
+                                $__8 = newSession.states[$traceurRuntime.toProperty(Symbol.iterator)](), $__9 = void 0;
+                                $ctx.state = 6;
+                                break;
+                            case 6:
+                                $ctx.state = !($__9 = $__8.next()).done ? 13 : 15;
+                                break;
+                            case 13:
+                                state = $__9.value;
+                                $ctx.state = 14;
+                                break;
+                            case 14:
+                                $ctx.state = state.id === senderKeyMessage.message.id ? 10 : 6;
+                                break;
+                            case 10:
+                                clonedSessionState = new SenderKeyState(state);
+                                message = senderKeyMessage.message;
+                                signature = senderKeyMessage.signature;
+                                promise = decryptSenderKeyMessageWithSessionState(clonedSessionState, message, signature);
+                                $ctx.state = 11;
+                                break;
+                            case 11:
+                                $ctx.state = 2;
+                                return promise.catch(function (e) {
+                                    exceptions.push(e);
+                                });
+                            case 2:
+                                result = $ctx.sent;
+                                $ctx.state = 4;
+                                break;
+                            case 4:
+                                $ctx.state = result !== undefined ? 7 : 6;
+                                break;
+                            case 7:
+                                newSession.removeState(state);
+                                newSession.addState(clonedSessionState);
+                                $ctx.state = 8;
+                                break;
+                            case 8:
+                                $ctx.returnValue = {
+                                    message: result,
+                                    session: newSession
+                                };
+                                $ctx.state = -2;
+                                break;
+                            case 15:
+                                messages = exceptions.map(function (e) {
+                                    return e.toString();
+                                });
+                                throw new InvalidMessageException('Unable to decrypt message: ' + messages);
+                                $ctx.state = -2;
+                                break;
+                            default:
+                                return $ctx.end();
+                            }
+                    }, $__10, this);
+                }));
+                var decryptSenderKeyMessageWithSessionState = co.wrap($traceurRuntime.initGeneratorFunction(function $__11(sessionState, message, signature) {
+                        var messageKeys, plaintext;
+                        return $traceurRuntime.createGeneratorInstance(function ($ctx) {
+                            while (true)
+                                switch ($ctx.state) {
+                                case 0:
+                                    $ctx.state = 2;
+                                    return getOrCreateMessageKeys(sessionState.chain, message.iteration);
+                                case 2:
+                                    messageKeys = $ctx.sent;
+                                    $ctx.state = 4;
+                                    break;
+                                case 4:
+                                    $ctx.state = 6;
+                                    return crypto.decrypt(messageKeys.cipherKey, message.ciphertext, messageKeys.iv);
+                                case 6:
+                                    plaintext = $ctx.sent;
+                                    $ctx.state = 8;
+                                    break;
+                                case 8:
+                                    $ctx.returnValue = plaintext;
+                                    $ctx.state = -2;
+                                    break;
+                                default:
+                                    return $ctx.end();
+                                }
+                        }, $__11, this);
+                    }));
+                var getOrCreateMessageKeys = co.wrap($traceurRuntime.initGeneratorFunction(function $__12(chain, counter) {
+                        var cachedMessageKeys, messageKeys;
+                        return $traceurRuntime.createGeneratorInstance(function ($ctx) {
+                            while (true)
+                                switch ($ctx.state) {
+                                case 0:
+                                    $ctx.state = chain.index > counter ? 3 : 24;
+                                    break;
+                                case 3:
+                                    cachedMessageKeys = chain.messageKeys[counter];
+                                    if (!cachedMessageKeys) {
+                                        throw new DuplicateMessageException('Received message with old counter');
+                                    }
+                                    delete chain.messageKeys[counter];
+                                    $ctx.state = 4;
+                                    break;
+                                case 4:
+                                    $ctx.returnValue = cachedMessageKeys;
+                                    $ctx.state = -2;
+                                    break;
+                                case 24:
+                                    if (counter - chain.index > ProtocolConstants.maximumMissedMessages) {
+                                        throw new InvalidMessageException('Too many skipped messages');
+                                    }
+                                    $ctx.state = 25;
+                                    break;
+                                case 25:
+                                    $ctx.state = chain.index < counter ? 5 : 13;
+                                    break;
+                                case 5:
+                                    $ctx.state = 6;
+                                    return ratchet.deriveMessageKeys(chain.key);
+                                case 6:
+                                    chain.messageKeys[chain.index] = $ctx.sent;
+                                    $ctx.state = 8;
+                                    break;
+                                case 8:
+                                    $ctx.state = 10;
+                                    return ratchet.clickSubRatchet(chain);
+                                case 10:
+                                    $ctx.maybeThrow();
+                                    $ctx.state = 25;
+                                    break;
+                                case 13:
+                                    $ctx.state = 15;
+                                    return ratchet.deriveMessageKeys(chain.key);
+                                case 15:
+                                    messageKeys = $ctx.sent;
+                                    $ctx.state = 17;
+                                    break;
+                                case 17:
+                                    $ctx.state = 19;
+                                    return ratchet.clickSubRatchet(chain);
+                                case 19:
+                                    $ctx.maybeThrow();
+                                    $ctx.state = 21;
+                                    break;
+                                case 21:
+                                    $ctx.returnValue = messageKeys;
+                                    $ctx.state = -2;
+                                    break;
+                                default:
+                                    return $ctx.end();
+                                }
+                        }, $__12, this);
+                    }));
+                Object.freeze(self);
+            }
+            var $__default = GroupCipher;
+        },
+        function (module, exports) {
+            'use strict';
+            Object.defineProperties(module.exports, {
+                default: {
+                    get: function () {
+                        return $__default;
+                    }
+                },
+                __esModule: { value: true }
+            });
+            var $__HKDF__, $__Chain__, $__ArrayBufferUtils__, $__ProtocolConstants__, $__co__;
+            var HKDF = ($__HKDF__ = _require(10), $__HKDF__ && $__HKDF__.__esModule && $__HKDF__ || { default: $__HKDF__ }).default;
+            var Chain = ($__Chain__ = _require(3), $__Chain__ && $__Chain__.__esModule && $__Chain__ || { default: $__Chain__ }).default;
+            var ArrayBufferUtils = ($__ArrayBufferUtils__ = _require(1), $__ArrayBufferUtils__ && $__ArrayBufferUtils__.__esModule && $__ArrayBufferUtils__ || { default: $__ArrayBufferUtils__ }).default;
+            var ProtocolConstants = ($__ProtocolConstants__ = _require(13), $__ProtocolConstants__ && $__ProtocolConstants__.__esModule && $__ProtocolConstants__ || { default: $__ProtocolConstants__ }).default;
+            var co = ($__co__ = _require(24), $__co__ && $__co__.__esModule && $__co__ || { default: $__co__ }).default;
+            var messageKeySeed = 1;
+            var chainKeySeed = 2;
+            var whisperGroup = new Uint8Array([
+                    87,
+                    104,
+                    105,
+                    115,
+                    112,
+                    101,
+                    114,
+                    71,
+                    114,
+                    111,
+                    117,
+                    112
+                ]).buffer;
+            function GroupRatchet(crypto) {
+                var self = this;
+                var hkdf = new HKDF(crypto);
+                this.clickSubRatchet = co.wrap($traceurRuntime.initGeneratorFunction(function $__5(chain) {
+                    return $traceurRuntime.createGeneratorInstance(function ($ctx) {
+                        while (true)
+                            switch ($ctx.state) {
+                            case 0:
+                                chain.index++;
+                                $ctx.state = 6;
+                                break;
+                            case 6:
+                                $ctx.state = 2;
+                                return deriveNextChainKey(chain.key);
+                            case 2:
+                                chain.key = $ctx.sent;
+                                $ctx.state = -2;
+                                break;
+                            default:
+                                return $ctx.end();
+                            }
+                    }, $__5, this);
+                }));
+                this.deriveMessageKeys = co.wrap($traceurRuntime.initGeneratorFunction(function $__6(chainKey) {
+                    var messageKey, keyMaterialBytes, ivBytes, cipherKeyBytes;
+                    return $traceurRuntime.createGeneratorInstance(function ($ctx) {
+                        while (true)
+                            switch ($ctx.state) {
+                            case 0:
+                                $ctx.state = 2;
+                                return deriveMessageKey(chainKey);
+                            case 2:
+                                messageKey = $ctx.sent;
+                                $ctx.state = 4;
+                                break;
+                            case 4:
+                                $ctx.state = 6;
+                                return hkdf.deriveSecrets(messageKey, whisperGroup, ProtocolConstants.cipherKeyByteCount + ProtocolConstants.ivByteCount);
+                            case 6:
+                                keyMaterialBytes = $ctx.sent;
+                                $ctx.state = 8;
+                                break;
+                            case 8:
+                                ivBytes = keyMaterialBytes.slice(0, ProtocolConstants.ivByteCount);
+                                cipherKeyBytes = keyMaterialBytes.slice(ProtocolConstants.ivByteCount);
+                                $ctx.state = 12;
+                                break;
+                            case 12:
+                                $ctx.returnValue = {
+                                    iv: ivBytes,
+                                    cipherKey: cipherKeyBytes
+                                };
+                                $ctx.state = -2;
+                                break;
+                            default:
+                                return $ctx.end();
+                            }
+                    }, $__6, this);
+                }));
+                var hmacByte = co.wrap($traceurRuntime.initGeneratorFunction(function $__7(key, byte) {
+                        var $__8, $__9, $__10, $__11, $__12;
+                        return $traceurRuntime.createGeneratorInstance(function ($ctx) {
+                            while (true)
+                                switch ($ctx.state) {
+                                case 0:
+                                    $__8 = crypto.hmac;
+                                    $__9 = ArrayBufferUtils.fromByte;
+                                    $__10 = $__9.call(ArrayBufferUtils, byte);
+                                    $__11 = $__8.call(crypto, key, $__10);
+                                    $ctx.state = 6;
+                                    break;
+                                case 6:
+                                    $ctx.state = 2;
+                                    return $__11;
+                                case 2:
+                                    $__12 = $ctx.sent;
+                                    $ctx.state = 4;
+                                    break;
+                                case 4:
+                                    $ctx.returnValue = $__12;
+                                    $ctx.state = -2;
+                                    break;
+                                default:
+                                    return $ctx.end();
+                                }
+                        }, $__7, this);
+                    }));
+                var deriveMessageKey = co.wrap($traceurRuntime.initGeneratorFunction(function $__13(chainKey) {
+                        var $__14, $__15;
+                        return $traceurRuntime.createGeneratorInstance(function ($ctx) {
+                            while (true)
+                                switch ($ctx.state) {
+                                case 0:
+                                    $__14 = hmacByte(chainKey, messageKeySeed);
+                                    $ctx.state = 6;
+                                    break;
+                                case 6:
+                                    $ctx.state = 2;
+                                    return $__14;
+                                case 2:
+                                    $__15 = $ctx.sent;
+                                    $ctx.state = 4;
+                                    break;
+                                case 4:
+                                    $ctx.returnValue = $__15;
+                                    $ctx.state = -2;
+                                    break;
+                                default:
+                                    return $ctx.end();
+                                }
+                        }, $__13, this);
+                    }));
+                var deriveNextChainKey = co.wrap($traceurRuntime.initGeneratorFunction(function $__16(chainKey) {
+                        var $__17, $__18;
+                        return $traceurRuntime.createGeneratorInstance(function ($ctx) {
+                            while (true)
+                                switch ($ctx.state) {
+                                case 0:
+                                    $__17 = hmacByte(chainKey, chainKeySeed);
+                                    $ctx.state = 6;
+                                    break;
+                                case 6:
+                                    $ctx.state = 2;
+                                    return $__17;
+                                case 2:
+                                    $__18 = $ctx.sent;
+                                    $ctx.state = 4;
+                                    break;
+                                case 4:
+                                    $ctx.returnValue = $__18;
+                                    $ctx.state = -2;
+                                    break;
+                                default:
+                                    return $ctx.end();
+                                }
+                        }, $__16, this);
+                    }));
+            }
+            var $__default = GroupRatchet;
+        },
+        function (module, exports) {
+            'use strict';
+            Object.defineProperties(module.exports, {
+                default: {
+                    get: function () {
+                        return $__default;
+                    }
+                },
+                __esModule: { value: true }
+            });
+            var $__ProtocolConstants__, $__ArrayBufferUtils__, $__SenderKeyState__;
+            var ProtocolConstants = ($__ProtocolConstants__ = _require(13), $__ProtocolConstants__ && $__ProtocolConstants__.__esModule && $__ProtocolConstants__ || { default: $__ProtocolConstants__ }).default;
+            var ArrayBufferUtils = ($__ArrayBufferUtils__ = _require(1), $__ArrayBufferUtils__ && $__ArrayBufferUtils__.__esModule && $__ArrayBufferUtils__ || { default: $__ArrayBufferUtils__ }).default;
+            var SenderKeyState = ($__SenderKeyState__ = _require(16), $__SenderKeyState__ && $__SenderKeyState__.__esModule && $__SenderKeyState__ || { default: $__SenderKeyState__ }).default;
+            var GroupSession = function GroupSession(session) {
+                this.states = [];
+                if (session) {
+                    for (var $__4 = session.states[$traceurRuntime.toProperty(Symbol.iterator)](), $__5 = void 0; !($__5 = $__4.next()).done;) {
+                        var state = $__5.value;
+                        {
+                            this.states.push(new SenderKeyState(state));
+                        }
+                    }
+                }
+                Object.seal(this);
+            };
+            $traceurRuntime.createClass(GroupSession, {
+                mostRecentState: function () {
+                    return this.states[0];
+                },
+                addState: function (state) {
+                    this.states.unshift(state);
+                    if (this.states.length > ProtocolConstants.maximumSessionStatesPerIdentity) {
+                        this.states.pop();
+                    }
+                },
+                removeState: function (state) {
+                    var index = this.states.indexOf(state);
+                    this.states.splice(index, 1);
+                }
+            }, {});
+            var $__default = GroupSession;
+        },
+        function (module, exports) {
+            'use strict';
+            Object.defineProperties(module.exports, {
+                default: {
+                    get: function () {
+                        return $__default;
+                    }
+                },
+                __esModule: { value: true }
+            });
+            var $__ArrayBufferUtils__, $__Messages__, $__GroupSession__, $__SenderKeyChain__, $__SenderKeyState__, $__Exceptions__, $__co__;
+            var ArrayBufferUtils = ($__ArrayBufferUtils__ = _require(1), $__ArrayBufferUtils__ && $__ArrayBufferUtils__.__esModule && $__ArrayBufferUtils__ || { default: $__ArrayBufferUtils__ }).default;
+            var Messages = ($__Messages__ = _require(11), $__Messages__ && $__Messages__.__esModule && $__Messages__ || { default: $__Messages__ }).default;
+            var GroupSession = ($__GroupSession__ = _require(8), $__GroupSession__ && $__GroupSession__.__esModule && $__GroupSession__ || { default: $__GroupSession__ }).default;
+            var SenderKeyChain = ($__SenderKeyChain__ = _require(15), $__SenderKeyChain__ && $__SenderKeyChain__.__esModule && $__SenderKeyChain__ || { default: $__SenderKeyChain__ }).default;
+            var SenderKeyState = ($__SenderKeyState__ = _require(16), $__SenderKeyState__ && $__SenderKeyState__.__esModule && $__SenderKeyState__ || { default: $__SenderKeyState__ }).default;
+            var UnsupportedProtocolVersionException = ($__Exceptions__ = _require(5), $__Exceptions__ && $__Exceptions__.__esModule && $__Exceptions__ || { default: $__Exceptions__ }).default;
+            var co = ($__co__ = _require(24), $__co__ && $__co__.__esModule && $__co__ || { default: $__co__ }).default;
+            function GroupSessionFactory(crypto, store) {
+                var self = this;
+                self.processSenderKeyDistributionMessage = function (session, senderKeyDistributionMessageBytes) {
+                    var senderKeyDistributionMessage = Messages.decodeSenderKeyDistributionMessage(senderKeyDistributionMessageBytes);
+                    if (senderKeyDistributionMessage.version.current !== 3) {
+                        throw new UnsupportedProtocolVersionException('Protocol version ' + senderKeyDistributionMessage.version.current + ' is not supported');
+                    }
+                    var message = senderKeyDistributionMessage.message;
+                    session = new GroupSession(session);
+                    session.addState(new SenderKeyState({
+                        id: message.getId(),
+                        chain: new SenderKeyChain(message.getChainKey(), message.getIteration()),
+                        signatureKey: message.getSigningKey()
+                    }));
+                    return session;
+                };
+                Object.freeze(self);
+            }
+            var $__default = GroupSessionFactory;
+        },
+        function (module, exports) {
+            'use strict';
+            Object.defineProperties(module.exports, {
+                default: {
+                    get: function () {
+                        return $__default;
+                    }
+                },
+                __esModule: { value: true }
+            });
             var $__ArrayBufferUtils__, $__co__;
             var ArrayBufferUtils = ($__ArrayBufferUtils__ = _require(1), $__ArrayBufferUtils__ && $__ArrayBufferUtils__.__esModule && $__ArrayBufferUtils__ || { default: $__ArrayBufferUtils__ }).default;
-            var co = ($__co__ = _require(18), $__co__ && $__co__.__esModule && $__co__ || { default: $__co__ }).default;
+            var co = ($__co__ = _require(24), $__co__ && $__co__.__esModule && $__co__ || { default: $__co__ }).default;
             var hashOutputSize = 32;
             var iterationStartOffset = 1;
             function HKDF(crypto) {
@@ -585,8 +1035,8 @@
                 __esModule: { value: true }
             });
             var $__WhisperProtos__, $__ProtocolConstants__, $__ArrayBufferUtils__;
-            var WhisperProtos = ($__WhisperProtos__ = _require(16), $__WhisperProtos__ && $__WhisperProtos__.__esModule && $__WhisperProtos__ || { default: $__WhisperProtos__ }).default;
-            var ProtocolConstants = ($__ProtocolConstants__ = _require(9), $__ProtocolConstants__ && $__ProtocolConstants__.__esModule && $__ProtocolConstants__ || { default: $__ProtocolConstants__ }).default;
+            var WhisperProtos = ($__WhisperProtos__ = _require(22), $__WhisperProtos__ && $__WhisperProtos__.__esModule && $__WhisperProtos__ || { default: $__WhisperProtos__ }).default;
+            var ProtocolConstants = ($__ProtocolConstants__ = _require(13), $__ProtocolConstants__ && $__ProtocolConstants__.__esModule && $__ProtocolConstants__ || { default: $__ProtocolConstants__ }).default;
             var ArrayBufferUtils = ($__ArrayBufferUtils__ = _require(1), $__ArrayBufferUtils__ && $__ArrayBufferUtils__.__esModule && $__ArrayBufferUtils__ || { default: $__ArrayBufferUtils__ }).default;
             var getVersionField = function (version) {
                 return ArrayBufferUtils.fromByte((version.current << 4 | version.max) & 255);
@@ -642,6 +1092,37 @@
                         var messageBytes = new WhisperProtos.PreKeyWhisperMessage(message).encode().toArrayBuffer();
                         var versionField = getVersionField(preKeyWhisperMessage.version);
                         return ArrayBufferUtils.concat(versionField, messageBytes);
+                    },
+                    decodeSenderKeyMessage: function (senderKeyMessageBytes) {
+                        var pbMessageBytes = senderKeyMessageBytes.slice(1, -ProtocolConstants.signatureByteCount);
+                        var message = WhisperProtos.SenderKeyMessage.decode(pbMessageBytes);
+                        toArrayBuffer(message, 'ciphertext');
+                        return {
+                            version: extractMessageVersion(senderKeyMessageBytes.slice(0, 1)),
+                            message: message,
+                            signature: senderKeyMessageBytes.slice(-ProtocolConstants.signatureByteCount)
+                        };
+                    },
+                    encodeSenderKeyMessage: function (senderKeyMessage) {
+                        var message = senderKeyMessage.message;
+                        var messageBytes = new WhisperProtos.SenderKeyMessage(message).encode().toArrayBuffer();
+                        var versionField = getVersionField(senderKeyMessage.version);
+                        return ArrayBufferUtils.concat(versionField, messageBytes);
+                    },
+                    decodeSenderKeyDistributionMessage: function (senderKeyDistributionMessageBytes) {
+                        var message = WhisperProtos.SenderKeyDistributionMessage.decode(senderKeyDistributionMessageBytes.slice(1));
+                        toArrayBuffer(message, 'chainKey');
+                        toArrayBuffer(message, 'signingKey');
+                        return {
+                            version: extractMessageVersion(senderKeyDistributionMessageBytes.slice(0, 1)),
+                            message: message
+                        };
+                    },
+                    encodeSenderKeyDistributionMessage: function (senderKeyDistributionMessage) {
+                        var message = senderKeyDistributionMessage.message;
+                        var messageBytes = new WhisperProtos.SenderKeyDistributionMessage(message).encode().toArrayBuffer();
+                        var versionField = getVersionField(senderKeyDistributionMessage.version);
+                        return ArrayBufferUtils.concat(versionField, messageBytes);
                     }
                 };
         },
@@ -692,6 +1173,7 @@
                     dhKeyByteCount: 32,
                     rootKeyByteCount: 32,
                     chainKeyByteCount: 32,
+                    signatureByteCount: 64,
                     maximumRetainedReceivedChainKeys: 5,
                     maximumMissedMessages: 2000,
                     maximumSessionStatesPerIdentity: 40
@@ -708,11 +1190,11 @@
                 __esModule: { value: true }
             });
             var $__HKDF__, $__Chain__, $__ArrayBufferUtils__, $__ProtocolConstants__, $__co__;
-            var HKDF = ($__HKDF__ = _require(6), $__HKDF__ && $__HKDF__.__esModule && $__HKDF__ || { default: $__HKDF__ }).default;
+            var HKDF = ($__HKDF__ = _require(10), $__HKDF__ && $__HKDF__.__esModule && $__HKDF__ || { default: $__HKDF__ }).default;
             var Chain = ($__Chain__ = _require(3), $__Chain__ && $__Chain__.__esModule && $__Chain__ || { default: $__Chain__ }).default;
             var ArrayBufferUtils = ($__ArrayBufferUtils__ = _require(1), $__ArrayBufferUtils__ && $__ArrayBufferUtils__.__esModule && $__ArrayBufferUtils__ || { default: $__ArrayBufferUtils__ }).default;
-            var ProtocolConstants = ($__ProtocolConstants__ = _require(9), $__ProtocolConstants__ && $__ProtocolConstants__.__esModule && $__ProtocolConstants__ || { default: $__ProtocolConstants__ }).default;
-            var co = ($__co__ = _require(18), $__co__ && $__co__.__esModule && $__co__ || { default: $__co__ }).default;
+            var ProtocolConstants = ($__ProtocolConstants__ = _require(13), $__ProtocolConstants__ && $__ProtocolConstants__.__esModule && $__ProtocolConstants__ || { default: $__ProtocolConstants__ }).default;
+            var co = ($__co__ = _require(24), $__co__ && $__co__.__esModule && $__co__ || { default: $__co__ }).default;
             var messageKeySeed = 1;
             var chainKeySeed = 2;
             var whisperMessageKeys = new Uint8Array([
@@ -1014,10 +1496,53 @@
                 },
                 __esModule: { value: true }
             });
-            var $__ProtocolConstants__, $__ArrayBufferUtils__, $__SessionState__;
-            var ProtocolConstants = ($__ProtocolConstants__ = _require(9), $__ProtocolConstants__ && $__ProtocolConstants__.__esModule && $__ProtocolConstants__ || { default: $__ProtocolConstants__ }).default;
+            var SenderKeyChain = function SenderKeyChain(key, index) {
+                this.key = key;
+                this.index = index;
+                this.messageKeys = [];
+                Object.seal(this);
+            };
+            $traceurRuntime.createClass(SenderKeyChain, {}, {});
+            var $__default = SenderKeyChain;
+        },
+        function (module, exports) {
+            'use strict';
+            Object.defineProperties(module.exports, {
+                default: {
+                    get: function () {
+                        return $__default;
+                    }
+                },
+                __esModule: { value: true }
+            });
+            var $__ArrayBufferUtils__, $__ProtocolConstants__;
             var ArrayBufferUtils = ($__ArrayBufferUtils__ = _require(1), $__ArrayBufferUtils__ && $__ArrayBufferUtils__.__esModule && $__ArrayBufferUtils__ || { default: $__ArrayBufferUtils__ }).default;
-            var SessionState = ($__SessionState__ = _require(14), $__SessionState__ && $__SessionState__.__esModule && $__SessionState__ || { default: $__SessionState__ }).default;
+            var ProtocolConstants = ($__ProtocolConstants__ = _require(13), $__ProtocolConstants__ && $__ProtocolConstants__.__esModule && $__ProtocolConstants__ || { default: $__ProtocolConstants__ }).default;
+            var SenderKeyState = function SenderKeyState(parameters) {
+                Object.assign(this, {
+                    id: 0,
+                    chain: null,
+                    signatureKey: null
+                }, parameters);
+                Object.seal(this);
+            };
+            $traceurRuntime.createClass(SenderKeyState, {}, {});
+            var $__default = SenderKeyState;
+        },
+        function (module, exports) {
+            'use strict';
+            Object.defineProperties(module.exports, {
+                default: {
+                    get: function () {
+                        return $__default;
+                    }
+                },
+                __esModule: { value: true }
+            });
+            var $__ProtocolConstants__, $__ArrayBufferUtils__, $__SessionState__;
+            var ProtocolConstants = ($__ProtocolConstants__ = _require(13), $__ProtocolConstants__ && $__ProtocolConstants__.__esModule && $__ProtocolConstants__ || { default: $__ProtocolConstants__ }).default;
+            var ArrayBufferUtils = ($__ArrayBufferUtils__ = _require(1), $__ArrayBufferUtils__ && $__ArrayBufferUtils__.__esModule && $__ArrayBufferUtils__ || { default: $__ArrayBufferUtils__ }).default;
+            var SessionState = ($__SessionState__ = _require(20), $__SessionState__ && $__SessionState__.__esModule && $__SessionState__ || { default: $__SessionState__ }).default;
             var Session = function Session(session) {
                 this.states = [];
                 if (session) {
@@ -1059,13 +1584,13 @@
             });
             var $__ArrayBufferUtils__, $__ProtocolConstants__, $__Messages__, $__SessionState__, $__Session__, $__Ratchet__, $__Exceptions__, $__co__;
             var ArrayBufferUtils = ($__ArrayBufferUtils__ = _require(1), $__ArrayBufferUtils__ && $__ArrayBufferUtils__.__esModule && $__ArrayBufferUtils__ || { default: $__ArrayBufferUtils__ }).default;
-            var ProtocolConstants = ($__ProtocolConstants__ = _require(9), $__ProtocolConstants__ && $__ProtocolConstants__.__esModule && $__ProtocolConstants__ || { default: $__ProtocolConstants__ }).default;
-            var Messages = ($__Messages__ = _require(7), $__Messages__ && $__Messages__.__esModule && $__Messages__ || { default: $__Messages__ }).default;
-            var SessionState = ($__SessionState__ = _require(14), $__SessionState__ && $__SessionState__.__esModule && $__SessionState__ || { default: $__SessionState__ }).default;
-            var Session = ($__Session__ = _require(11), $__Session__ && $__Session__.__esModule && $__Session__ || { default: $__Session__ }).default;
-            var Ratchet = ($__Ratchet__ = _require(10), $__Ratchet__ && $__Ratchet__.__esModule && $__Ratchet__ || { default: $__Ratchet__ }).default;
+            var ProtocolConstants = ($__ProtocolConstants__ = _require(13), $__ProtocolConstants__ && $__ProtocolConstants__.__esModule && $__ProtocolConstants__ || { default: $__ProtocolConstants__ }).default;
+            var Messages = ($__Messages__ = _require(11), $__Messages__ && $__Messages__.__esModule && $__Messages__ || { default: $__Messages__ }).default;
+            var SessionState = ($__SessionState__ = _require(20), $__SessionState__ && $__SessionState__.__esModule && $__SessionState__ || { default: $__SessionState__ }).default;
+            var Session = ($__Session__ = _require(17), $__Session__ && $__Session__.__esModule && $__Session__ || { default: $__Session__ }).default;
+            var Ratchet = ($__Ratchet__ = _require(14), $__Ratchet__ && $__Ratchet__.__esModule && $__Ratchet__ || { default: $__Ratchet__ }).default;
             var $__6 = ($__Exceptions__ = _require(5), $__Exceptions__ && $__Exceptions__.__esModule && $__Exceptions__ || { default: $__Exceptions__ }), InvalidMessageException = $__6.InvalidMessageException, DuplicateMessageException = $__6.DuplicateMessageException;
-            var co = ($__co__ = _require(18), $__co__ && $__co__.__esModule && $__co__ || { default: $__co__ }).default;
+            var co = ($__co__ = _require(24), $__co__ && $__co__.__esModule && $__co__ || { default: $__co__ }).default;
             function SessionCipher(crypto) {
                 var self = this;
                 var ratchet = new Ratchet(crypto);
@@ -1577,14 +2102,14 @@
                 __esModule: { value: true }
             });
             var $__WhisperProtos__, $__ArrayBufferUtils__, $__Messages__, $__Ratchet__, $__SessionState__, $__Session__, $__Exceptions__, $__co__;
-            var WhisperProtos = ($__WhisperProtos__ = _require(16), $__WhisperProtos__ && $__WhisperProtos__.__esModule && $__WhisperProtos__ || { default: $__WhisperProtos__ }).default;
+            var WhisperProtos = ($__WhisperProtos__ = _require(22), $__WhisperProtos__ && $__WhisperProtos__.__esModule && $__WhisperProtos__ || { default: $__WhisperProtos__ }).default;
             var ArrayBufferUtils = ($__ArrayBufferUtils__ = _require(1), $__ArrayBufferUtils__ && $__ArrayBufferUtils__.__esModule && $__ArrayBufferUtils__ || { default: $__ArrayBufferUtils__ }).default;
-            var Messages = ($__Messages__ = _require(7), $__Messages__ && $__Messages__.__esModule && $__Messages__ || { default: $__Messages__ }).default;
-            var Ratchet = ($__Ratchet__ = _require(10), $__Ratchet__ && $__Ratchet__.__esModule && $__Ratchet__ || { default: $__Ratchet__ }).default;
-            var SessionState = ($__SessionState__ = _require(14), $__SessionState__ && $__SessionState__.__esModule && $__SessionState__ || { default: $__SessionState__ }).default;
-            var Session = ($__Session__ = _require(11), $__Session__ && $__Session__.__esModule && $__Session__ || { default: $__Session__ }).default;
+            var Messages = ($__Messages__ = _require(11), $__Messages__ && $__Messages__.__esModule && $__Messages__ || { default: $__Messages__ }).default;
+            var Ratchet = ($__Ratchet__ = _require(14), $__Ratchet__ && $__Ratchet__.__esModule && $__Ratchet__ || { default: $__Ratchet__ }).default;
+            var SessionState = ($__SessionState__ = _require(20), $__SessionState__ && $__SessionState__.__esModule && $__SessionState__ || { default: $__SessionState__ }).default;
+            var Session = ($__Session__ = _require(17), $__Session__ && $__Session__.__esModule && $__Session__ || { default: $__Session__ }).default;
             var $__6 = ($__Exceptions__ = _require(5), $__Exceptions__ && $__Exceptions__.__esModule && $__Exceptions__ || { default: $__Exceptions__ }), InvalidKeyException = $__6.InvalidKeyException, UnsupportedProtocolVersionException = $__6.UnsupportedProtocolVersionException, UntrustedIdentityException = $__6.UntrustedIdentityException;
-            var co = ($__co__ = _require(18), $__co__ && $__co__.__esModule && $__co__ || { default: $__co__ }).default;
+            var co = ($__co__ = _require(24), $__co__ && $__co__.__esModule && $__co__ || { default: $__co__ }).default;
             function SessionFactory(crypto, store) {
                 var self = this;
                 var ratchet = new Ratchet(crypto);
@@ -1981,7 +2506,7 @@
             });
             var $__ArrayBufferUtils__, $__ProtocolConstants__;
             var ArrayBufferUtils = ($__ArrayBufferUtils__ = _require(1), $__ArrayBufferUtils__ && $__ArrayBufferUtils__.__esModule && $__ArrayBufferUtils__ || { default: $__ArrayBufferUtils__ }).default;
-            var ProtocolConstants = ($__ProtocolConstants__ = _require(9), $__ProtocolConstants__ && $__ProtocolConstants__.__esModule && $__ProtocolConstants__ || { default: $__ProtocolConstants__ }).default;
+            var ProtocolConstants = ($__ProtocolConstants__ = _require(13), $__ProtocolConstants__ && $__ProtocolConstants__.__esModule && $__ProtocolConstants__ || { default: $__ProtocolConstants__ }).default;
             var makeReadonly = function (obj, key) {
                 Object.defineProperty(obj, key, { writable: false });
             };
@@ -2037,7 +2562,7 @@
                 __esModule: { value: true }
             });
             var $__PromiseInterfaceDecorator__;
-            var PromiseInterfaceDecorator = ($__PromiseInterfaceDecorator__ = _require(8), $__PromiseInterfaceDecorator__ && $__PromiseInterfaceDecorator__.__esModule && $__PromiseInterfaceDecorator__ || { default: $__PromiseInterfaceDecorator__ }).default;
+            var PromiseInterfaceDecorator = ($__PromiseInterfaceDecorator__ = _require(12), $__PromiseInterfaceDecorator__ && $__PromiseInterfaceDecorator__.__esModule && $__PromiseInterfaceDecorator__ || { default: $__PromiseInterfaceDecorator__ }).default;
             var methodNames = [
                     'getLocalIdentityKeyPair',
                     'getLocalRegistrationId',
@@ -2053,7 +2578,7 @@
         },
         function (module, exports) {
             'use strict';
-            module.exports = _require(19).newBuilder({})['import']({
+            module.exports = _require(25).newBuilder({})['import']({
                 'package': 'textsecure',
                 'messages': [
                     {
@@ -2272,15 +2797,20 @@
             var slice = Array.prototype.slice;
             module.exports = co['default'] = co.co = co;
             co.wrap = function (fn) {
-                return function () {
+                createPromise.__generatorFunction__ = fn;
+                return createPromise;
+                function createPromise() {
                     return co.call(this, fn.apply(this, arguments));
-                };
+                }
             };
             function co(gen) {
                 var ctx = this;
-                if (typeof gen === 'function')
-                    gen = gen.call(this);
+                var args = slice.call(arguments, 1);
                 return new Promise(function (resolve, reject) {
+                    if (typeof gen === 'function')
+                        gen = gen.apply(ctx, args);
+                    if (!gen || typeof gen.next !== 'function')
+                        return resolve(gen);
                     onFulfilled();
                     function onFulfilled(res) {
                         var ret;
@@ -2370,11 +2900,11 @@
             }
             function isGeneratorFunction(obj) {
                 var constructor = obj.constructor;
-                var proto = constructor.prototype;
-                var name = constructor.displayName || constructor.name;
-                var nameLooksRight = 'GeneratorFunction' == name;
-                var methodsLooksRight = 'function' == typeof proto.next && 'function' == typeof proto.throw;
-                return nameLooksRight || methodsLooksRight;
+                if (!constructor)
+                    return false;
+                if ('GeneratorFunction' === constructor.name || 'GeneratorFunction' === constructor.displayName)
+                    return true;
+                return isGenerator(constructor.prototype);
             }
             function isObject(val) {
                 return Object == val.constructor;
