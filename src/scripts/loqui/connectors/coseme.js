@@ -54,7 +54,7 @@ var CosemeConnectorHelper = {
             CoSeMe.config.tokenData[key] = (value !== null) ? value : CoSeMe.config.tokenData[key];
           }
 
-          var req = window.indexedDB.open('AxolotlStore', 1);
+          var req = window.indexedDB.open('AxolotlStore', 2);
           req.onerror = function(e) {
             Tools.log('init onerror', e);
           };
@@ -81,6 +81,10 @@ var CosemeConnectorHelper = {
             if (!db.objectStoreNames.contains('session'))
             {
               db.createObjectStore('session', { keyPath : [ 'jid', 'remoteJid' ] });
+            }
+            if (!db.objectStoreNames.contains('sksession'))
+            {
+              db.createObjectStore('sksession', { keyPath : [ 'jid', 'groupJid', 'remoteJid' ] });
             }
           };
         });
@@ -328,15 +332,67 @@ App.connectors.coseme = function (account) {
   }
 
   function handleEncryptedMessage (self, msg, callback) {
+    function onMessage(text) {
+      if (msg.groupJid) {
+        self.events.onGroupMessage.bind(self)(msg.msgId, msg.groupJid, msg.remoteJid, text, msg.timeStamp, true, msg.pushName);
+      } else {
+        self.events.onMessage.bind(self)(msg.msgId, msg.remoteJid, text, msg.timeStamp, true, msg.pushName, false);
+      }
+    }
+
+    function onVCard(displayName, vCard) {
+      if (msg.groupJid) {
+        self.events.onGroupVCardReceived.bind(self)(msg.msgId, msg.groupJid, msg.remoteJid, displayName, vCard, true, msg.pushName, msg.timeStamp);
+      } else {
+        self.events.onVCardReceived.bind(self)(msg.msgId, msg.remoteJid, displayName, vCard, true, false, msg.pushName, msg.timeStamp);
+      }
+    }
+
+    function onLocation(locName, locThumb, locUrl, locLat, locLong) {
+      if (msg.groupJid) {
+        self.events.onGroupLocationReceived.bind(self)(msg.msgId, msg.groupJid, msg.remoteJid, locName, locThumb, locLat, locLong, true, msg.pushName, msg.timeStamp);
+      } else {
+        self.events.onLocationReceived.bind(self)(msg.msgId, msg.remoteJid, locName, locThumb, locLat, locLong, true, false, msg.pushName, msg.timeStamp);
+      }
+    }
+
+    function onImage(imgThumb, imgUrl, imgFileLength, imgMimeType, encKey) {
+      if (msg.groupJid) {
+        self.events.onGroupImageReceived.bind(self)(msg.msgId, msg.groupJid, msg.remoteJid, imgThumb, imgUrl, imgFileLength, true, msg.pushName, msg.timeStamp, imgMimeType, encKey);
+      } else {
+        self.events.onImageReceived.bind(self)(msg.msgId, msg.remoteJid, imgThumb, imgUrl, imgFileLength, true, false, msg.pushName, msg.timeStamp, imgMimeType, encKey);
+      }
+    }
+
+    function onVideo(videoThumb, videoUrl, videoFileLength, videoMimeType, encKey) {
+      if (msg.groupJid) {
+        self.events.onGroupImageReceived.bind(self)(msg.msgId, msg.groupJid, msg.remoteJid, videoThumb, videoUrl, videoFileLength, true, msg.pushName, msg.timeStamp, videoMimeType, encKey);
+      } else {
+        self.events.onImageReceived.bind(self)(msg.msgId, msg.remoteJid, videoThumb, videoUrl, videoFileLength, true, false, msg.pushName, msg.timeStamp, videoMimeType, encKey);
+      }
+    }
+
+    function onAudio(audioUrl, audioFileLength, audioMimeType, encKey) {
+      if (msg.groupJid) {
+        self.events.onGroupImageReceived.bind(self)(msg.msgId, msg.groupJid, msg.remoteJid, audioUrl, audioFileLength, true, msg.pushName, msg.timeStamp, audioMimeType, encKey);
+      } else {
+        self.events.onImageReceived.bind(self)(msg.msgId, msg.remoteJid, audioUrl, audioFileLength, true, false, msg.pushName, msg.timeStamp, audioMimeType, encKey);
+      }
+    }
+
     function onDecryptError(e) {
       Tools.log('ERROR', e);
 
-      if (axolLocalReg && (!msg.count || Number(msg.count) < 1))  {
+      if (axolLocalReg && !msg.groupJid &&
+          (!msg.count || Number(msg.count) < 5))  {
+        var count = msg.count ? Number(msg.count) + 1 : 1;
         MI.call('message_retry', [msg.remoteJid, msg.msgId,
-                                  axolLocalReg.registrationId, '1', '1',
-                                  msg.author]);
-      } else {
-        MI.call('message_error', [msg.remoteJid, msg.msgId, 'plaintext-only']);
+                                  axolLocalReg.registrationId, count.toString(),
+                                  msg.v]);
+      } else if (!msg.groupJid || msg.type == 'skmsg') {
+        MI.call('message_error', [msg.groupJid ? msg.groupJid : msg.remoteJid,
+                                  msg.msgId, 'plaintext-only',
+                                  msg.groupJid ? msg.remoteJid : null]);
       }
 
       callback(e);
@@ -344,70 +400,133 @@ App.connectors.coseme = function (account) {
 
     function onDecrypted(v2msg, session) {
       Tools.log('DECODED MESSAGE', v2msg, session);
+      var allDone = [];
 
       if (v2msg.conversation) {
-        self.events.onMessage.bind(self)(msg.msgId, msg.remoteJid, v2msg.conversation, msg.timeStamp, true, msg.pushName, false);
+        onMessage(v2msg.conversation);
+      } else if (v2msg.url_message) {
+        var url_msg = v2msg.url_message;
+        var lines = [];
+        ['title', 'description', 'canonical_url', 'text'].forEach(function (e) {
+          if (url_msg[e]) {
+            lines.push(url_msg[e]);
+          }
+        });
+        onMessage(lines.join('\n'));
       } else if (v2msg.contact_message) {
         var contact_msg = v2msg.contact_message;
-        self.events.onVCardReceived.bind(self)(msg.msgId, msg.remoteJid, contact_msg.display_name, contact_msg.vcard, true, false, msg.pushName, msg.timeStamp);
+        onVCard(contact_msg.display_name, contact_msg.vcard);
       } else if (v2msg.image_message) {
         var img_msg = v2msg.image_message;
         var imgThumb = new Uint8Array(img_msg.jpeg_thumbnail.toArrayBuffer());
         var imgEncKey = new Uint8Array(img_msg.media_key.toArrayBuffer());
-        axolotlCrypto.deriveHKDFv3Secrets(imgEncKey, CoSeMe.utils.bytesFromHex('576861747341707020496d616765204b657973'), 112).then(function (deriv) {
+
+        allDone.push(axolotlCrypto.deriveHKDFv3Secrets(imgEncKey, CoSeMe.utils.bytesFromHex('576861747341707020496d616765204b657973'), 112).then(function (deriv) {
           var iv = deriv.subarray(0, 16);
           var key = deriv.subarray(16, 48);
           Tools.log('MEDIA ENCRYPTION KEYS', CoSeMe.utils.hex(iv), CoSeMe.utils.hex(key));
-          self.events.onImageReceived.bind(self)(msg.msgId, msg.remoteJid, imgThumb, img_msg.url, img_msg.file_length.toNumber(), true, false, msg.pushName, msg.timeStamp, img_msg.mime_type, { iv: CoSeMe.utils.latin1FromBytes(iv), key: CoSeMe.utils.latin1FromBytes(key) });
-        });
+          onImage(imgThumb, img_msg.url, img_msg.file_length.toNumber(), img_msg.mime_type, { iv: CoSeMe.utils.latin1FromBytes(iv), key: CoSeMe.utils.latin1FromBytes(key) });
+        }));
       } else if (v2msg.location_message) {
         var loc_msg = v2msg.location_message;
         var locThumb = new Uint8Array(loc_msg.jpeg_thumbnail.toArrayBuffer());
-        self.events.onLocationReceived.bind(self)(msg.msgId, msg.remoteJid, loc_msg.nsme, locThumb, loc_msg.degrees_latitude, loc_msg.degrees_longitude, true, false, msg.pushName, msg.timeStamp);
+        onLocation(loc_msg.name, locThumb, loc_msg.degrees_latitude, loc_msg.degrees_longitude);
       } else if (v2msg.document_message) {
         var doc_msg = v2msg.document_message;
         var docThumb = new Uint8Array(doc_msg.jpeg_thumbnail.toArrayBuffer());
         var docEncKey = new Uint8Array(doc_msg.media_key.toArrayBuffer());
-        axolotlCrypto.deriveHKDFv3Secrets(docEncKey, CoSeMe.utils.bytesFromHex('576861747341707020446f63756d656e74204b657973'), 112).then(function (deriv) {
+
+        allDone.push(axolotlCrypto.deriveHKDFv3Secrets(docEncKey, CoSeMe.utils.bytesFromHex('576861747341707020446f63756d656e74204b657973'), 112).then(function (deriv) {
           var iv = deriv.subarray(0, 16);
           var key = deriv.subarray(16, 48);
           Tools.log('MEDIA ENCRYPTION KEYS', CoSeMe.utils.hex(iv), CoSeMe.utils.hex(key));
-          self.events.onImageReceived.bind(self)(msg.msgId, msg.remoteJid, docThumb, doc_msg.url, doc_msg.file_length.toNumber(), true, false, msg.pushName, msg.timeStamp, doc_msg.mime_type, { iv: CoSeMe.utils.latin1FromBytes(iv), key: CoSeMe.utils.latin1FromBytes(key) });
-        });
+          onImage(docThumb, doc_msg.url, doc_msg.file_length.toNumber(), doc_msg.mime_type, { iv: CoSeMe.utils.latin1FromBytes(iv), key: CoSeMe.utils.latin1FromBytes(key) });
+        }));
       } else if (v2msg.audio_message) {
         var audio_msg = v2msg.audio_message;
         var audioEncKey = new Uint8Array(audio_msg.media_key.toArrayBuffer());
-        axolotlCrypto.deriveHKDFv3Secrets(audioEncKey, CoSeMe.utils.bytesFromHex('576861747341707020417564696f204b657973'), 112).then(function (deriv) {
+
+        allDone.push(axolotlCrypto.deriveHKDFv3Secrets(audioEncKey, CoSeMe.utils.bytesFromHex('576861747341707020417564696f204b657973'), 112).then(function (deriv) {
           var iv = deriv.subarray(0, 16);
           var key = deriv.subarray(16, 48);
           Tools.log('MEDIA ENCRYPTION KEYS', CoSeMe.utils.hex(iv), CoSeMe.utils.hex(key));
-          self.events.onAudioReceived.bind(self)(msg.msgId, msg.remoteJid, audio_msg.url, audio_msg.file_length.toNumber(), true, false, msg.pushName, msg.timeStamp, audio_msg.mime_type, { iv: CoSeMe.utils.latin1FromBytes(iv), key: CoSeMe.utils.latin1FromBytes(key) });
-        });
+          onAudio(audio_msg.url, audio_msg.file_length.toNumber(), audio_msg.mime_type, { iv: CoSeMe.utils.latin1FromBytes(iv), key: CoSeMe.utils.latin1FromBytes(key) });
+        }));
       } else if (v2msg.video_message) {
         var video_msg = v2msg.video_message;
         var videoThumb = new Uint8Array(video_msg.jpeg_thumbnail.toArrayBuffer());
         var videoEncKey = new Uint8Array(video_msg.media_key.toArrayBuffer());
-        axolotlCrypto.deriveHKDFv3Secrets(videoEncKey, CoSeMe.utils.bytesFromHex('576861747341707020566964656f204b657973'), 112).then(function (deriv) {
+
+        allDone.push(axolotlCrypto.deriveHKDFv3Secrets(videoEncKey, CoSeMe.utils.bytesFromHex('576861747341707020566964656f204b657973'), 112).then(function (deriv) {
           var iv = deriv.subarray(0, 16);
           var key = deriv.subarray(16, 48);
           Tools.log('MEDIA ENCRYPTION KEYS', CoSeMe.utils.hex(iv), CoSeMe.utils.hex(key));
-          self.events.onVideoReceived.bind(self)(msg.msgId, msg.remoteJid, videoThumb, video_msg.url, video_msg.file_length.toNumber(), true, false, msg.pushName, msg.timeStamp, video_msg.mime_type, { iv: CoSeMe.utils.latin1FromBytes(iv), key: CoSeMe.utils.latin1FromBytes(key) });
-        });
+          onVideo(videoThumb, video_msg.url, video_msg.file_length.toNumber(), video_msg.mime_type, { iv: CoSeMe.utils.latin1FromBytes(iv), key: CoSeMe.utils.latin1FromBytes(key) });
+        }));
+      } else if (v2msg.sender_key_distribution_message) {
+        var skdm_msg = v2msg.sender_key_distribution_message;
+        var skdm_axolotl = new Uint8Array(skdm_msg.axolotl_sender_key_distribution_message.toArrayBuffer());
+        Tools.log('SKDM', skdm_msg.group_id, CoSeMe.utils.hex(skdm_axolotl));
+
+        allDone.push(new Promise(function (resolve, reject) {
+          var skreq = axolDb.transaction(['sksession'])
+              .objectStore('sksession').get([ msg.jid, msg.groupJid, msg.remoteJid]);
+          skreq.onsuccess = function (e) {
+            var sksession = skreq.result ? skreq.result.session : null;
+
+            sksession = axol.processSenderKeyDistributionMessage(sksession, skdm_axolotl.buffer);
+            Tools.log('new sender key session', sksession);
+
+            var req = axolDb.transaction(['sksession'], 'readwrite')
+                .objectStore('sksession').put({ jid : msg.jid,
+                                                groupJid : msg.groupJid,
+                                                remoteJid : msg.remoteJid,
+                                                session : sksession });
+            req.onsuccess = resolve;
+            req.onerror = reject;
+          };
+          skreq.onerror = function (e) {
+            Tools.log('error getting sksession from db', msg.groupJid, msg.remoteJid);
+            reject(e);
+          };
+        }));
       } else {
         Tools.log('UNHANDLED v2msg');
       }
 
-      var tx = axolDb.transaction(['session'], 'readwrite');
-      var req = tx.objectStore('session').put({ jid : msg.jid,
-                                                remoteJid : msg.remoteJid,
-                                                session : session });
+      if (msg.type == 'skmsg') {
+        allDone.push(new Promise(function (resolve, reject) {
+          var skreq = axolDb.transaction(['sksession'], 'readwrite')
+              .objectStore('sksession').put({ jid : msg.jid,
+                                              groupJid : msg.groupJid,
+                                              remoteJid : msg.remoteJid,
+                                              session : session });
+          skreq.onsuccess = resolve;
+          skreq.onerror = reject;
+        }));
+      } else {
+        allDone.push(new Promise(function (resolve, reject) {
+          var req = axolDb.transaction(['session'], 'readwrite')
+              .objectStore('session').put({ jid : msg.jid,
+                                            remoteJid : msg.remoteJid,
+                                            session : session });
+          req.onsuccess = resolve;
+          req.onerror = reject;
+        }));
+      }
 
-      callback();
+      Promise.all(allDone).then(function (v) {
+        Tools.log('DONE onDecrypted', v);
+        callback();
+      }, function (e) {
+        Tools.log('ERROR onDecrypted', e);
+        callback();
+      });
     }
 
     if (axolLocalReg && (msg.type == 'pkmsg' || msg.type == 'msg')) {
-      var tx = axolDb.transaction(['session']);
-      var req = tx.objectStore('session').get([ msg.jid, msg.remoteJid ]);
+      var req = axolDb.transaction(['session'])
+          .objectStore('session').get([ msg.jid, msg.remoteJid ]);
       req.onsuccess = function (e) {
         var session = req.result ? req.result.session : null;
         var decryptFn = (msg.type == 'pkmsg') ? axol.decryptPreKeyWhisperMessage : axol.decryptWhisperMessage;
@@ -431,6 +550,31 @@ App.connectors.coseme = function (account) {
       };
       req.onerror = function(e) {
         Tools.log('error getting session from db', msg.remoteJid);
+      };
+    } else if (axolLocalReg && (msg.type == 'skmsg')) {
+      var skreq = axolDb.transaction(['sksession'])
+          .objectStore('sksession').get([ msg.jid, msg.groupJid, msg.remoteJid ]);
+      skreq.onsuccess = function (e) {
+        var session = skreq.result ? skreq.result.session : null;
+        if (session) {
+          axol.decryptSenderKeyMessage(session, msg.msgData).then(function (m) {
+            var data = new Uint8Array(m.message);
+            Tools.log('DECRYPTED MESSAGE', CoSeMe.utils.hex(data));
+
+            try {
+              var v2msg = _root.com.whatsapp.proto.Message.decode(data.subarray(0, -data[data.length - 1]));
+
+              onDecrypted(v2msg, m.session);
+            } catch (e) {
+              onDecryptError(e);
+            }
+          }, onDecryptError);
+        } else {
+          onDecryptError(null);
+        }
+      };
+      skreq.onerror = function(e) {
+        Tools.log('error getting sksession from db', msg.groupJid, msg.remoteJid);
       };
     } else {
       onDecryptError(msg.type);
@@ -1054,7 +1198,7 @@ App.connectors.coseme = function (account) {
     };
 
     this.events.onEncryptMessageReceived = function (msgId, from, msgData, type, v, count, timeStamp, pushName) {
-      Tools.log('ENCRYPTED MESSAGE', msgData);
+      Tools.log('ENCRYPTED MESSAGE', type, v, count);
 
       var self = this;
       var msg = { jid : this.account.core.fullJid,
@@ -1073,7 +1217,23 @@ App.connectors.coseme = function (account) {
     };
 
     this.events.onEncryptGroupMessageReceived = function (msgId, from, author, msgData, type, v, count, timeStamp, pushName) {
-      MI.call('message_error', [from, msgId, 'plaintext-only', author]);
+      Tools.log('ENCRYPTED GROUP MESSAGE', type, v, count);
+
+      var self = this;
+      var msg = { jid : this.account.core.fullJid,
+                  remoteJid : author,
+                  groupJid : from,
+                  msgId : msgId,
+                  msgData : msgData.buffer,
+                  type : type,
+                  v : v,
+                  count : count,
+                  timeStamp : timeStamp,
+                  pushName : pushName };
+
+      var cpuLock = navigator.requestWakeLock('cpu');
+      axolDecryptQueue.push({ self : self, msg : msg },
+                            function () { cpuLock.unlock(); });
     };
 
     this.events.onMessage = function (msgId, from, msgData, timeStamp, wantsReceipt, pushName, isBroadcast) {
@@ -1248,32 +1408,36 @@ App.connectors.coseme = function (account) {
     this.events.onMessageRetry = function (from, msgId, participant, count, regId) {
       var cpuLock = navigator.requestWakeLock('cpu');
       var myJid = account.core.fullJid;
-      Tools.log('RETRY', from, msgId);
+      Tools.log('RETRY', from, participant, msgId, count, regId);
       account.findMessage(from, msgId, function (msg) {
-        var q = axolEncryptQueues[from];
-        if (!q || !q.paused) {
-          if (!q) {
-            q = async.queue(encryptMessageWorker);
-            axolEncryptQueues[from] = q;
+        if (Number(count) >= 5) {
+          MI.call('message_send', [msg.id, from, msg.text]);
+        } else {
+          var q = axolEncryptQueues[from];
+          if (!q || !q.paused) {
+            if (!q) {
+              q = async.queue(encryptMessageWorker);
+              axolEncryptQueues[from] = q;
+            }
+
+            q.pause();
+
+            var id = MI.call('encrypt_getKeys', [ [ from ] ]);
+            requestData[id] = [ from ];
           }
 
-          q.pause();
-
-          var id = MI.call('encrypt_getKeys', [ [ from ] ]);
-          requestData[id] = [ from ];
+          q.push({ remoteJid : from,
+                   plaintext : msg.text,
+                   ready : function (m) {
+                     MI.call('encrypt_sendMessage',
+                             [msg.id, from, m.body,
+                              (m.isPreKeyWhisperMessage ? 'pkmsg' : 'msg'),
+                              '1', count || '1']);
+                   },
+                   reject : function (e) {
+                     MI.call('message_send', [msg.id, from, msg.text]);
+                   } });
         }
-
-        q.push({ remoteJid : from,
-                 plaintext : msg.text,
-                 ready : function (m) {
-                   var msgId = MI.call('encrypt_sendMessage',
-                                       [msg.id, from, m.body,
-                                        (m.isPreKeyWhisperMessage ? 'pkmsg' : 'msg'),
-                                        '1', '1']);
-                 },
-                 reject : function (e) {
-                   var msgId = MI.call('message_send', [msg.id, from, msg.text]);
-                 } });
 
         cpuLock.unlock();
       }.bind(this));

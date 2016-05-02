@@ -66,7 +66,7 @@ var _root = dcodeIO.ProtoBuf.newBuilder({})['import']({
                 {
                     "rule": "required",
                     "type": "string",
-                    "name": "groupId",
+                    "name": "group_id",
                     "id": 1
                 },
                 {
@@ -234,7 +234,7 @@ var _root = dcodeIO.ProtoBuf.newBuilder({})['import']({
             "name": "UrlMessage",
             "fields": [
                 {
-                    "rule": "required",
+                    "rule": "optional",
                     "type": "string",
                     "name": "text",
                     "id": 1
@@ -265,7 +265,7 @@ var _root = dcodeIO.ProtoBuf.newBuilder({})['import']({
                 },
                 {
                     "rule": "optional",
-                    "type": "string",
+                    "type": "bytes",
                     "name": "jpeg_thumbnail",
                     "id": 16
                 }
