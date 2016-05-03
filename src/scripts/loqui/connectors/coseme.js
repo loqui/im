@@ -195,6 +195,19 @@ App.connectors.coseme = function (account) {
     return (jid.indexOf('@g.us') < 0);
   }
 
+  function encodeV2Text (text) {
+    var buffer = _root.com.whatsapp.proto.Message.encode({ conversation: text });
+    var maxPadding = (buffer.remaining() > 192) ? 31 : (256 - buffer.remaining()) / 2;
+    var padding = Math.floor(Math.random() * maxPadding) + 1;
+
+    buffer.resize(buffer.limit + padding);
+    buffer.skip(buffer.remaining());
+    buffer.limit += padding;
+    buffer.fill(padding);
+    buffer.flip();
+    return buffer.toArrayBuffer();
+  }
+
   function sendSetKeys (jid) {
     axolSendKeys = true;
     axol.generatePreKeys(Math.floor(Math.random() * 0xfffffe), 50).then(function (preKeys) {
@@ -262,8 +275,7 @@ App.connectors.coseme = function (account) {
     var req = tx.objectStore('session').get([ myJid, task.remoteJid ]);
     req.onsuccess = function (e) {
       if (req.result) {
-        var buffer = CoSeMe.utils.bytesFromLatin1(CoSeMe.utils.utf8FromString(task.plaintext));
-        axol.encryptMessage(req.result.session, buffer).then(function (m) {
+        axol.encryptMessage(req.result.session, task.plaintext).then(function (m) {
           Tools.log('ENCRYPTED MESSAGE', m, CoSeMe.utils.hex(m.body));
 
           var tx = axolDb.transaction(['session'], 'readwrite');
@@ -381,18 +393,22 @@ App.connectors.coseme = function (account) {
     }
 
     function onDecryptError(e) {
-      Tools.log('ERROR', e);
+      Tools.log('DECRYPT ERROR', e);
 
-      if (axolLocalReg && !msg.groupJid &&
-          (!msg.count || Number(msg.count) < 5))  {
-        var count = msg.count ? Number(msg.count) + 1 : 1;
-        MI.call('message_retry', [msg.remoteJid, msg.msgId,
-                                  axolLocalReg.registrationId, count.toString(),
-                                  msg.v]);
-      } else if (!msg.groupJid || msg.type == 'skmsg') {
-        MI.call('message_error', [msg.groupJid ? msg.groupJid : msg.remoteJid,
-                                  msg.msgId, 'plaintext-only',
-                                  msg.groupJid ? msg.remoteJid : null]);
+      if (msg.groupJid && msg.type != 'skmsg') {
+        // ignore decryption error for non-skmsg group messages, we'll
+        // handle these on the skmsg
+      } else {
+        if (axolLocalReg && (!msg.count || Number(msg.count) < 5)) {
+          var count = msg.count ? Number(msg.count) + 1 : 1;
+          MI.call('message_retry', [msg.remoteJid, msg.msgId,
+                                    axolLocalReg.registrationId,
+                                    count.toString(), msg.v]);
+        } else {
+          MI.call('message_error', [msg.groupJid ? msg.groupJid : msg.remoteJid,
+                                    msg.msgId, 'plaintext-only',
+                                    msg.groupJid ? msg.remoteJid : null]);
+        }
       }
 
       callback(e);
@@ -872,11 +888,11 @@ App.connectors.coseme = function (account) {
         if (options.isBroadcast) {
           ready(MI.call('message_broadcast', [null, to, text]));
         } else {
-          encryptMessage(to, text).then(function (m) {
+          encryptMessage(to, encodeV2Text(text)).then(function (m) {
             ready(MI.call('encrypt_sendMessage',
                           [null, to, m.body,
                            (m.isPreKeyWhisperMessage ? 'pkmsg' : 'msg'),
-                           '1']));
+                           '2']));
           }, function (e) {
             Tools.log('PLAINTEXT FALLBACK', e);
             ready(MI.call('message_send', [null, to, text]));
@@ -1394,9 +1410,9 @@ App.connectors.coseme = function (account) {
 
     this.events.onMessageError = function (from, msgId, participant, errorType) {
       var cpuLock = navigator.requestWakeLock('cpu');
-      Tools.log('ERROR', from, msgId);
+      Tools.log('MESSAGE ERROR', from, msgId);
       account.findMessage(from, msgId, function (msg) {
-        if (errorType == 'plaintext-only') {
+        if ((errorType == 'plaintext-only') || (errorType == 'enc-v1')) {
           MI.call('message_send', [msg.id, from, msg.text]);
         }
         cpuLock.unlock();
@@ -1427,12 +1443,12 @@ App.connectors.coseme = function (account) {
           }
 
           q.push({ remoteJid : from,
-                   plaintext : msg.text,
+                   plaintext : encodeV2Text(msg.text),
                    ready : function (m) {
                      MI.call('encrypt_sendMessage',
                              [msg.id, from, m.body,
                               (m.isPreKeyWhisperMessage ? 'pkmsg' : 'msg'),
-                              '1', count || '1']);
+                              '2', count || '1']);
                    },
                    reject : function (e) {
                      MI.call('message_send', [msg.id, from, msg.text]);
