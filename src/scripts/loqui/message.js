@@ -261,7 +261,6 @@ var Message = {
           account.avatarsRender();
         }
         $('section#chat #typing').hide();
-		    ul[0].scrollTop = ul[0].scrollHeight;
         chat.core.lastRead = Tools.localize(Tools.stamp());
         if (!$('section#chat').hasClass('show')) {
           chat.unread++;
@@ -270,6 +269,10 @@ var Message = {
         }else if(document.hidden){
           chat.unreadList.push(message);
         }else{
+          $('section#chat span.title').addClass('new-message');
+          setTimeout(function() {
+            $('section#chat span.title').removeClass('new-message');
+          }, 2000);
           message.read();
         }
       } else {

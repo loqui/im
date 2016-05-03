@@ -743,6 +743,17 @@ section nav {
             display: block;
         }
 
+        .new-message:before {
+            font-family: 'Material Icons';
+            content: "message";
+            color: yellow;
+            font-size: 1.6rem;
+            height: 1.1em;
+            letter-spacing: normal;
+            vertical-align: middle;
+            padding-right: 1em;
+        }
+        
         .show {
             position: absolute;
             right: 5rem;
