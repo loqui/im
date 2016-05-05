@@ -297,11 +297,12 @@ App.connectors.XMPP = function (account) {
   }.bind(this);
 
   this.muc.init = function () {
-    for (let [i, chat] in Iterator(this.account.core.chats)) {
+    let self = this;
+    this.account.core.chats.forEach(function (chat) {
       if (chat.muc) {
-        this.muc._join(chat.jid);
+        self.muc._join(chat.jid);
       }
-    }
+    });
   }.bind(this);
 
   this.muc.explore = function (server, resolve, reject) {
@@ -370,7 +371,8 @@ App.connectors.XMPP = function (account) {
       function (e) {
         Tools.log('MUC ROSTER', e);
         var participants = [];
-        for (var [key, value] in Iterator(e)) {
+        for (var key in e) {
+          var value = e[key];
           participants.push({"jid": value.nick, "affiliation": value.affiliation, "role": value.role, "owner":(value.affiliation == 'owner')});
           if (value.affiliation == 'owner') {
             chat.core.info.owner = Strophe.getBareJidFromJid(value.jid);
@@ -529,7 +531,8 @@ App.connectors.XMPP = function (account) {
         var i = 0;
         var map = function (entry, cb) {
           var name, show, status, photo, caps, priority = null;
-          for (var [key, resource] in Iterator(entry.resources)) {
+          for (var key in entry.resources) {
+            var resource = entry.resources[key];
             if (resource.priority >= priority) {
               name = key;
               show = resource.show || 'a';

@@ -438,8 +438,7 @@ var Menu = {
    */
   show: function (which, attr, delay) {
     Tools.log('SHOW', which, attr, delay);
-    var map = this.map;
-    setTimeout(function () { map[which](attr); }, delay );
+    setTimeout(this.map[which], delay, attr);
   }
 
 };
