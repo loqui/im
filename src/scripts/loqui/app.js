@@ -308,8 +308,9 @@ var App = {
     return this._settings.get();
   },
   set settings (val) {
-    for (var [key, value] in Iterator(val)) {
-      if (!value.type || value.type == 'switch') {
+    for (var key in val) {
+      var value = val[key];
+      if (!value.type || value.type == 'switch') {
         $('body')[value ? 'addClass' : 'removeClass'](key);
       }
     }
@@ -332,7 +333,8 @@ var App = {
   * @memberof App
   */
   set devsettings (val) {
-    for (var [key, value] in Iterator(val)) {
+    for (var key in val) {
+      var value = val[key];
       $('body')[value ? 'addClass' : 'removeClass'](key);
     }
     Store.put('devsettings', val);
@@ -410,16 +412,16 @@ var App = {
           if (cores && cores.length) {
             var accounts = App.accounts;
             // Inflate accounts
-            for (let [i, core] in Iterator(cores)) {
+            cores.forEach(function (core) {
               var account = Make(Account)(core);
 
-              for (let [i, chcore] in Iterator(core.chats)) {
+              core.chats.forEach(function (chcore, i) {
                 core.chats[i] = chcore = Make(chcore, ChatCore)();
                 let chat = Make(Chat)(chcore, account);
                 account.chats.push(chat);
-              }
+              });
               accounts.push(account);
-            }
+            });
             App.accounts = accounts;
           }
           callback(null);

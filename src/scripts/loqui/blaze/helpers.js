@@ -5,7 +5,8 @@
 Template.settings_features.helpers({
   settings: function () {
     var settings = [];
-    for (var [key, value] in Iterator(App.settings)) {
+    for (var key in App.settings) {
+      var value = App.settings[key];
       if (!value.type || value.type == 'switch') {
         settings.push({
           key: key,
@@ -21,7 +22,8 @@ Template.settings_features.helpers({
 Template.settings_selects.helpers({
   settings: function () {
     var settings = [];
-    for (var [key, value] in Iterator(App.settings)) {
+    for (var key in App.settings) {
+      var value = App.settings[key];
       if (value.type == 'select') {
         settings.push({
           key: key,
@@ -116,7 +118,8 @@ UI.registerHelper('account', function () {
 
 UI.registerHelper('providers', function () {
   var providers = [];
-  for (var [key, value] in Iterator(Providers.data)) {
+  for (var key in Providers.data) {
+    var value = Providers.data[key];
     providers.push({
       key: key,
       value: value

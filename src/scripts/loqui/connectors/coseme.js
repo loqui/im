@@ -1484,9 +1484,10 @@ App.connectors.coseme = function (account) {
     };
 
     this.events.onGroupGotParticipating = function (groups, id) {
-      for (let [i, group] in Iterator(groups)) {
-        this.events.onGroupGotInfo.bind(this)(group.gid + '@g.us', group.owner, group.subject, group.subjectOwner, group.subjectT, group.creation, group.participants);
-      }
+      var self = this;
+      groups.forEach(function (group) {
+        self.events.onGroupGotInfo.bind(self)(group.gid + '@g.us', group.owner, group.subject, group.subjectOwner, group.subjectT, group.creation, group.participants);
+      });
     };
 
     this.events.onGroupGotInfo = function (jid, owner, subject, subjectOwner, subjectTime, creation, participants) {
@@ -1692,8 +1693,8 @@ App.connectors.coseme = function (account) {
     };
 
     this.events.onContactsGotStatus = function (id, statuses) {
-      var i = Iterator(statuses);
-      for (let [jid, status] in i) {
+      for (let jid in statuses) {
+        let status = statuses[jid];
         this.events.onPresenceUpdated(jid, undefined, status);
       }
     };

@@ -21,7 +21,7 @@ var System = Make({
 
   _make : function(){
 
-    this.isGecko34 = this.getGeckoVersion() > 34;
+    this.isGecko34 = this.getGeckoVersion() >= 34;
 
     // this alows us to enable CSS features only if the platform supports it.
     var configClasses = {
@@ -42,7 +42,8 @@ var System = Make({
    * @return {number}
    */
   getGeckoVersion : function(){
-    return parseFloat(navigator.userAgent.match(/firefox\/([0-9\.]+)$/i)[1]);
+    var mo = navigator.userAgent.match(/firefox\/([0-9\.]+)$/i);
+    return mo ? parseFloat(mo[1]) : 0;
   }
 
 })();

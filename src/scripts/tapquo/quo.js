@@ -810,12 +810,10 @@
       return _listenTouches();
     });
     _getSwipeMin = function() {
-        var orientation = screen.mozOrientation;
-        if (orientation === "portrait") {
+        if (screen.width < screen.height) {
           SWIPE_MIN_X = screen.width / 4;
           SWIPE_MIN_Y = screen.height / 5;
-        }
-        if (orientation === "landscape") {
+        } else {
           SWIPE_MIN_X = screen.width / 5;
           SWIPE_MIN_Y = screen.height / 4;
         }
@@ -827,7 +825,9 @@
       environment.bind("touchstart", _onTouchStart);
       environment.bind("touchmove", _onTouchMove);
       environment.bind("touchend", _onTouchEnd);
-      screen.addEventListener('mozorientationchange', _getSwipeMin);
+      if (screen.addEventListener) {
+        screen.addEventListener('mozorientationchange', _getSwipeMin);
+      }
       
       return environment.bind("touchcancel", _cleanGesture);
     };
