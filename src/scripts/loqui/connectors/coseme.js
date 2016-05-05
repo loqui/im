@@ -403,7 +403,8 @@ App.connectors.coseme = function (account) {
           var count = msg.count ? Number(msg.count) + 1 : 1;
           MI.call('message_retry', [msg.groupJid ? msg.groupJid : msg.remoteJid,
                                     msg.msgId, axolLocalReg.registrationId,
-                                    count.toString(), msg.v,
+                                    count.toString(),
+                                    msg.groupJid ? '1' : msg.v,
                                     msg.groupJid ? msg.remoteJid : null]);
         } else {
           MI.call('message_error', [msg.groupJid ? msg.groupJid : msg.remoteJid,
