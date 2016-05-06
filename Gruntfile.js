@@ -35,6 +35,23 @@ module.exports = function(grunt) {
         flatten: true,
         filter: 'isFile'
       },
+      srcToChrome: {
+        expand: true,
+        cwd: 'src/',
+        src: '**',
+        dest: '<%= meta.build %>/chrome/',
+        filter: function(src) {
+          return src.indexOf('.scss') < 0;
+        }
+      },
+      chromeToDist: {
+        expand: true,
+        cwd: 'platform/chrome/',
+        src: '**',
+        dest: '<%= meta.build %>/chrome/',
+        flatten: false,
+        filter: 'isFile'
+      },
       srcToUbuntuTouch: {
         expand: true,
         cwd: 'src/',
@@ -136,6 +153,18 @@ module.exports = function(grunt) {
         src: ['renderersCompiler.js']
       }
     },
+    sed: {
+      manifest: {
+        path: '<%= meta.build %>/chrome/index.html',
+        pattern: '</head>',
+        replacement: '    <link rel="manifest" href="manifest.json" />\n</head>'
+      },
+      jsversion: {
+        path: '<%= meta.build %>/chrome/index.html',
+        pattern: ';version=1[.]7',
+        replacement: ''
+      }
+    },
     sass: {
         compile: {
             files: {
@@ -151,9 +180,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-node-webkit-builder');
   grunt.loadNpmTasks('grunt-sass');
+  grunt.loadNpmTasks('grunt-sed');
   grunt.loadNpmTasks('grunt-execute');
-  grunt.registerTask('default', ['clean:build', 'execute', 'sass', 'copy', 'clean:css', 'compress']);
-  grunt.registerTask('with-desktop', ['clean', 'execute', 'sass', 'copy', 'clean:css', 'compress', 'nodewebkit']);
+  grunt.registerTask('default', ['clean:build', 'execute', 'sass', 'copy', 'sed', 'clean:css', 'compress']);
+  grunt.registerTask('with-desktop', ['clean', 'execute', 'sass', 'copy', 'sed', 'clean:css', 'compress', 'nodewebkit']);
   grunt.registerTask('devel', ['connect', 'watch']);
   grunt.registerTask('docstrap', ['copy:importDocstrapTemplate', 'copy:importJsdocConfig', 'copy:logoToDocstrap']);
 };

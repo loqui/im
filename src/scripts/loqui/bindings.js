@@ -13,45 +13,27 @@
 
 'use strict';
 
-Lungo.init({
-  name: 'Loqui'
-});
-
-$('document').ready(function(){
-  document.addEventListener('localized', function(e) {
-    $('section#welcome article#main h1').removeClass('hidden');
+document.addEventListener('localized', function(e) {
+  $("script[type='text/spacebars']").each(function(index, script) {
+    var name = script.getAttribute('name');
+    UI.insert(UI.render(Template[name]), script.parentNode, script);
   });
 
-  setTimeout(function(){
+  setTimeout(function () {
     $('input[data-l10n-placeholder]').each(function () {
       var original = this.dataset.l10nPlaceholder;
       var local = _(original);
       $(this).attr('placeholder', local);
     });
-    $('[data-menu-onclick]').each(function () {
-      var menu = this.dataset.menuOnclick;
-      $(this).on('click', function (e) {
-        Menu.show(menu, this);
-      });
+
+    App.init().then(function () {
+      bindings();
+      Lungo.init({ name: 'Loqui' });
+
+      setTimeout(function () {
+        App.run();
+      }, 100);
     });
-
-    App.defaults.Connector.presence.status = _('DefaultStatus', {
-      app: App.name,
-      platform: (Lungo.Core.environment().os ? Lungo.Core.environment().os.name : 'PC')
-    });
-
-    App.defaults.Selects.language[0] = { caption : _('Default'), value : 'default' };
-
-
-//  wakelock shim
-    navigator.requestWakeLock = navigator.requestWakeLock || function(){
-      return {
-        unlock : function(){}
-      };
-    };
-
-    bindings();
-    App.run();
   });
 });
 
@@ -280,6 +262,13 @@ Strophe.Connection.rawOutput = function (data) {
 };
 
 var bindings = function () {
+  $('[data-menu-onclick]').each(function () {
+    var menu = this.dataset.menuOnclick;
+    $(this).on('click', function (e) {
+      Menu.show(menu, this);
+    });
+  });
+
   $('section#success button.start').on('click', function() {
     App.start(true);
   });
@@ -289,7 +278,7 @@ var bindings = function () {
   });
 
   $('section#welcome').on('click', function() {
-     Menu.show('providers');
+    Menu.show('providers');
   });
   
   $('section#chat').on('swipeRight', function() {
@@ -355,15 +344,12 @@ var bindings = function () {
     }
     else {
       option = select.find('[data-reveal]');
-      select.siblings('[name="' + option[0].dataset.reveal + '"]').addClass('hidden').val('');
+      if (option[0]) {
+        select.siblings('[name="' + option[0].dataset.reveal + '"]').addClass('hidden').val('');
+      }
     }
   });
   
-  $("script[type='text/spacebars']").each(function(index, script) {
-    var name = script.getAttribute('name');
-    UI.insert(UI.render(Template[name]), script.parentNode, script);
-  });
-
   window.addEventListener('touchend', function() {
     VoiceRecorder.stop(duration => {
       if (duration < 1) {

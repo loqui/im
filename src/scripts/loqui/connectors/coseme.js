@@ -31,7 +31,7 @@ var CosemeConnectorHelper = {
     }
 
     return loadScript('scripts/joebandenburg/curve25519.js').then(function () {
-      return (window.crypto.subtle ? new Promise(function (resolve, reject) { resolve(); }) : loadScript('scripts/vibornoff/asmcrypto.js')).then(function () {
+      return (window.crypto.subtle ? Promise.resolve(null) : loadScript('scripts/vibornoff/asmcrypto.js')).then(function () {
         return loadScript('scripts/joebandenburg/axolotl-crypto.js').then(function () {
           return loadScript('scripts/joebandenburg/axolotl.js');
         });
@@ -45,22 +45,24 @@ var CosemeConnectorHelper = {
     if (!this._initPromise) {
       var self = this;
       this._initPromise = this._axolLoaded.then(function () {
-        return new Promise(function (ready) {
-          CoSeMe.config.customLogger = Tools;
+        CoSeMe.config.customLogger = Tools;
+        CoSeMe.config.customStorage = Store.Config;
 
-          for (var i in self.tokenDataKeys) {
-            var key = self.tokenDataKeys[i];
-            var value = window.localStorage.getItem('CoSeMe.tokenData.' + key);
-            CoSeMe.config.tokenData[key] = (value !== null) ? value : CoSeMe.config.tokenData[key];
-          }
-
+        return Promise.all(self.tokenDataKeys.map(function (key) {
+          return Store.Config.get('CoSeMe.tokenData.' + key)
+            .then(function (value) {
+              CoSeMe.config.tokenData[key] = (value !== null) ? value : CoSeMe.config.tokenData[key];
+            });
+        }));
+      }).then(function () {
+        return new Promise(function (resolve, reject) {
           var req = window.indexedDB.open('AxolotlStore', 2);
           req.onerror = function(e) {
             Tools.log('init onerror', e);
           };
           req.onsuccess = function(e) {
             Tools.log('init onsuccess');
-            ready(req.result);
+            resolve(req.result);
           };
           req.onupgradeneeded = function(e) {
             var db = req.result;
@@ -68,23 +70,28 @@ var CosemeConnectorHelper = {
 
             if (!db.objectStoreNames.contains('localReg'))
             {
-              db.createObjectStore('localReg', { keyPath : 'jid' });
+              db.createObjectStore('localReg',
+                                   { keyPath : 'jid' });
             }
             if (!db.objectStoreNames.contains('localKeys'))
             {
-              db.createObjectStore('localKeys', { keyPath : [ 'jid', 'id' ] });
+              db.createObjectStore('localKeys',
+                                   { keyPath : [ 'jid', 'id' ] });
             }
             if (!db.objectStoreNames.contains('localSKeys'))
             {
-              db.createObjectStore('localSKeys', { keyPath : [ 'jid', 'id' ] });
+              db.createObjectStore('localSKeys',
+                                   { keyPath : [ 'jid', 'id' ] });
             }
             if (!db.objectStoreNames.contains('session'))
             {
-              db.createObjectStore('session', { keyPath : [ 'jid', 'remoteJid' ] });
+              db.createObjectStore('session',
+                                   { keyPath : [ 'jid', 'remoteJid' ] });
             }
             if (!db.objectStoreNames.contains('sksession'))
             {
-              db.createObjectStore('sksession', { keyPath : [ 'jid', 'groupJid', 'remoteJid' ] });
+              db.createObjectStore('sksession',
+                                   { keyPath : [ 'jid', 'groupJid', 'remoteJid' ] });
             }
           };
         });
@@ -95,59 +102,54 @@ var CosemeConnectorHelper = {
   },
 
   resetTokenData : function () {
-    for (var i in this.tokenDataKeys) {
-      var key = this.tokenDataKeys[i];
-      window.localStorage.removeItem('CoSeMe.tokenData.' + key);
-    }
+    return Promise.all(this.tokenDataKeys.map(function (key) {
+      return Store.Config.remove('CoSeMe.tokenData.' + key);
+    }));
   },
 
   updateTokenData : function (cb, cbUpdated) {
     var self = this;
     var ts = (new Date()).getTime() / 1000;
-    if (ts - 3600 > Number(window.localStorage.getItem('CoSeMe.dataUpdated'))) {
-      Tools.log("UPDATING token data");
-      var xhr = new XMLHttpRequest({mozSystem: true});
-      xhr.onload = function() {
-        var updated = false;
-        window.localStorage.setItem('CoSeMe.dataUpdated', ts);
 
-        if (this.response) {
-          Tools.log(this.response);
-          for (var i in self.tokenDataKeys) {
-            var key = self.tokenDataKeys[i];
-            var value = this.response[key];
-            if (value) {
-              if (CoSeMe.config.tokenData[key] != value) {
-                updated = true;
-              }
-              CoSeMe.config.tokenData[key] = value;
-              window.localStorage.setItem('CoSeMe.tokenData.' + key, value);
+    Store.Config.get('CoSeMe.dataUpdated').then(function (dataUpdated) {
+      if (ts - 3600 > Number(dataUpdated)) {
+        Tools.log("UPDATING token data");
+        Tools.loadJson('https://raw.githubusercontent.com/loqui/im/dev/tokenData.json')
+          .then(function (response) {
+            var updated = false;
+            Store.Config.put('CoSeMe.dataUpdated', ts);
+
+            if (response) {
+              Tools.log(response);
+              self.tokenDataKeys.forEach(function (key) {
+                var value = response[key];
+                if (value) {
+                  if (CoSeMe.config.tokenData[key] != value) {
+                    updated = true;
+                  }
+                  CoSeMe.config.tokenData[key] = value;
+                  Store.Config.put('CoSeMe.tokenData.' + key, value);
+                }
+              });
             }
-          }
-        }
 
-        Tools.log('Token data ' + (updated ? '' : 'NOT ') + 'updated');
+            Tools.log('Token data ' + (updated ? '' : 'NOT ') + 'updated');
 
-        if (updated && cbUpdated) {
-          cbUpdated();
-        } else if (cb) {
-          cb();
-        }
-      };
-      xhr.onerror = function() {
-        window.localStorage.setItem('CoSeMe.dataUpdated', ts);
-        if (cb) {
-          cb();
-        }
-      };
-      xhr.open('GET', 'https://raw.githubusercontent.com/loqui/im/dev/tokenData.json');
-      xhr.overrideMimeType('json');
-      xhr.responseType = 'json';
-      xhr.setRequestHeader('Accept', 'text/json');
-      xhr.send();
-    } else if (cb) {
-      cb();
-    }
+            if (updated && cbUpdated) {
+              cbUpdated();
+            } else if (cb) {
+              cb();
+            }
+          }, function () {
+            Store.Config.put('CoSeMe.dataUpdated', ts);
+            if (cb) {
+              cb();
+            }
+          });
+      } else if (cb) {
+        cb();
+      }
+    });
   }
 };
 
@@ -1915,12 +1917,11 @@ App.connectors.coseme = function (account) {
           .append($('<p/>').text(_('ProviderSMS', { provider: data.longName })))
           .append($('<label/>').attr('for', 'countrySelect').text(_(data.terms.country)));
           var countrySelect = $('<select/>').attr('name', 'countrySelect');
-          var countries = Tools.countries();
+          var countries = Tools.countries;
           countrySelect.append($('<option/>').attr('value', '').text('-- ' + _('YourCountry')));
-          for (var i in countries) {
-            country = countries[i];
+          countries.forEach(function (country) {
             countrySelect.append($('<option/>').attr('value', country.dial).text(country.name));
-          }
+          });
           sms
           .append(countrySelect)
           .append($('<label/>').attr('for', 'user').text(_(data.terms.user)))
@@ -1963,12 +1964,11 @@ App.connectors.coseme = function (account) {
     .append($('<p/>').text(_('recodeSMS', { provider: data.longName })))
     .append($('<label/>').attr('for', 'countrySelect').text(_(data.terms.country)));
     countrySelect = $('<select/>').attr('name', 'countrySelect');
-    countries = Tools.countries();
+    countries = Tools.countries;
     countrySelect.append($('<option/>').attr('value', '').text('-- ' + _('YourCountry')));
-    for (i in countries) {
-      country = countries[i];
+    countries.forEach(function (country) {
       countrySelect.append($('<option/>').attr('value', country.dial).text(country.name));
-    }
+    });
     recode
     .append(countrySelect)
     .append($('<label/>').attr('for', 'user').text(_(data.terms.user)))
