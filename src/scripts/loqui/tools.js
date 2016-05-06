@@ -11,6 +11,14 @@
 'use strict';
 
 var Tools = {
+  init: function () {
+    return this.loadJson('scripts/goles/countries.json')
+      .then(function (response) {
+        Tools.countries = response;
+      }, function (e) {
+        console.log('Tools.init error', e);
+      });
+  },
 
   log: function (...args) {
     if (App.devsettings.debug) {
@@ -26,7 +34,7 @@ var Tools = {
         console.groupEnd();
       }
 
-	  Plus.log(args);
+      Plus.log(args);
     }
   },
 
@@ -153,14 +161,26 @@ var Tools = {
     return formatE164(country, num).replace(/[\s\-\+]/g, '');
   },
 
-  countries: function () {
-    var xhr = new XMLHttpRequest();
-    xhr.overrideMimeType('application/json');
-    xhr.open('GET', 'scripts/goles/countries.json', false);
-    xhr.send();
-    var countries = JSON.parse(xhr.responseText) || {};
-    return countries;
+  loadJson: function (url) {
+    return new Promise(function (resolve, reject) {
+      var xhr = new XMLHttpRequest({mozSystem: true});
+
+      xhr.onload = function() {
+        resolve(this.response);
+      };
+      xhr.onerror = function() {
+        reject();
+      };
+
+      xhr.open('GET', url);
+      xhr.overrideMimeType('application/json');
+      xhr.responseType = 'json';
+      xhr.setRequestHeader('Accept', 'application/json');
+      xhr.send();
+    });
   },
+
+  countries: [ ],
 
   textBlob: function (text) {
     return new Blob([text], {type: 'text/plain'});

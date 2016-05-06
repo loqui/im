@@ -3358,6 +3358,20 @@ CoSeMe.namespace('config', (function(){
 
     customLogger: null,
 
+    customStorage: {
+      put: function (key, value) {
+        return Promise.resolve(window.localStorage.setItem(key, value));
+      },
+
+      get: function (key) {
+        return Promise.resolve(window.localStorage.getItem(key));
+      },
+
+      remove: function (key) {
+        return Promise.resolve(window.localStorage.removeItem(key));
+      }
+    },
+
     domain: 's.whatsapp.net',
 
     groupDomain: 'g.us',
@@ -6428,31 +6442,34 @@ CoSeMe.namespace('auth', (function() {
     var domain = CoSeMe.config.domain;
     var resource = CoSeMe.config.tokenData.r;
 
-    logger.log('Sending stream start, features & authentication');
+    logger.log('Sending stream start, features & authentication', resource);
     connection.writer.streamStart(domain, resource);
     connection.writer.write(getFeatures());
-    connection.writer.write(getAuth(getNextChallenge()));
 
-    waitForAnswer(function _onAnwser(loggingError) {
-      if (loggingError) {
-        switch (loggingError) {
+    getNextChallenge().then(function (challenge) {
+      connection.writer.write(getAuth(challenge));
 
-          // Retry with no challenge
+      waitForAnswer(function _onAnwser(loggingError) {
+        if (loggingError) {
+          switch (loggingError) {
+
+            // Retry with no challenge
           case 'one-shot-rejected':
-          // Authentication failed
+            // Authentication failed
           case 'auth-failed':
           case 'expired':
             return callback(loggingError);
-          break;
+            break;
 
-          // Other stream errors
+            // Other stream errors
           default:
             logger.error('<stream:error>', loggingError);
             return callback(loggingError);
+          }
         }
-      }
 
-      callback(null);
+        callback(null);
+      });
     });
   }
 
@@ -6515,14 +6532,17 @@ CoSeMe.namespace('auth', (function() {
       }
 
       function retryOrFail() {
-        if (getNextChallenge() !== null) {
-          logger.log('Looks like the one-shot challenge failed.' +
-                     'Trying with no-challenge.');
-          setNextChallenge(null);
-          return callback('one-shot-rejected');
-        }
-        logger.log('Authentication failed!');
-        callback('auth-failed');
+        getNextChallenge().then(function (challenge) {
+          if (challenge !== null) {
+            logger.log('Looks like the one-shot challenge failed.' +
+                       'Trying with no-challenge.');
+            setNextChallenge(null).then(function () {
+              return callback('one-shot-rejected');
+            });
+          }
+          logger.log('Authentication failed!');
+          callback('auth-failed');
+        });
       }
 
       function readSuccess(successTree) {
@@ -6536,8 +6556,9 @@ CoSeMe.namespace('auth', (function() {
         if (!isNaN(expiration)) {
           connection.expiration = new Date(expiration * 1000);
         }
-        setNextChallenge(successTree.data);
-        callback(null);
+        setNextChallenge(successTree.data).then(function () {
+          callback(null);
+        });
       }
     }
   }
@@ -6603,15 +6624,15 @@ CoSeMe.namespace('auth', (function() {
   var nextChallengeSetting = '__cosemeNextChallenge';
 
   function getNextChallenge() {
-    return localStorage.getItem(nextChallengeSetting);
+    return CoSeMe.config.customStorage.get(nextChallengeSetting);
   }
 
   function setNextChallenge(value) {
     if (value === null) {
-      localStorage.removeItem(nextChallengeSetting);
+      return CoSeMe.config.customStorage.remove(nextChallengeSetting);
     }
     else {
-      localStorage.setItem(nextChallengeSetting, value);
+      return CoSeMe.config.customStorage.put(nextChallengeSetting, value);
     }
   }
 

@@ -17,81 +17,66 @@ var Chungo = {
   DEVICE: null,
 
   init: function (data) {
-
-    $$('document').ready(function() {
-      var sections = $$('section');
-      sections.first().addClass('show');
-      sections.each(function () {
-        $$(this).children('article').first().addClass('show');
-      });
-
-      Chungo.Router._stack = [$$('section').first().attr('id')];
-
-      setTimeout(function() {
-        var sections = $$('section');
-        sections.each(function () {
-          $$(this).children('article').first().addClass('show');
-        });
-        $$('[data-view-section]').each(function () {
-          $$(this).on('click', function (e) {
-            Chungo.Router.section(e.target.dataset.viewSection);
-          });
-        });
-        $$('[data-view-article]').each(function () {
-          $$(this).on('click', function (e) {
-            Chungo.Router.article($$(e.target).closest('section').attr('id'), e.target.dataset.viewArticle);
-          });
-        });
-        $$('[data-view-aside]').each(function () {
-          $$(this).on('click', function (e) {
-            Chungo.Aside.toggle(e.target.dataset.viewAside);
-          });
-        });
-        $$('[data-icon]').each(function () {
-          var icon = this.dataset.icon;
-          $$(this).addClass('icon').addClass(icon);
-        });
-        $$('[data-image]').each(function () {
-          var image = this.dataset.image;
-          $$(this).prepend($$('<img/>').attr('src', image).addClass('icon'));
-        });
-        $$('[data-control="groupbar"]').each(function () {
-          var links = $$(this).children('[data-view-article]');
-          links.first().addClass('selected').siblings().removeClass('selected');
-          links.each(function () {
-            $$(this).on('click', function (e) {
-              $$(this).addClass('selected').siblings().removeClass('selected');
-            });
-          });
-        });
-        $$('.chungo .notifier').swipeUp(Chungo.Notification.hide.bind(Chungo.Notification));
-      });
-
-      setTimeout(function () {
-        $$('header[data-title]').each(function () {
-          var title = $$(this).data('l10n-title') && '_' in window ? _($$(this).data('l10n-title')) : $$(this).data('title');
-          $$(this).append(
-            $$('<h1/>').text(title)
-          );
-        });
-      }, 1000);
-
-      $$('body').append(
-        $$('<div>').addClass('chungo').append(
-          $$('<div>').addClass('shader')
-        ).append(
-          $$('<div>').addClass('notifier').append(
-            $$('<span>').addClass('icon')
-          ).append(
-            $$('<span>').addClass('title')
-          ).append(
-            $$('<span>').addClass('caption')
-          )
-        )
-      );
-
+    $$('section').each(function () {
+      $$(this).children('article').first().addClass('show');
     });
 
+    Chungo.Router._stack = [$$('section').first().attr('id')];
+
+    $$('[data-view-section]').each(function () {
+      $$(this).on('click', function (e) {
+        Chungo.Router.section(e.target.dataset.viewSection);
+      });
+    });
+    $$('[data-view-article]').each(function () {
+      $$(this).on('click', function (e) {
+        Chungo.Router.article($$(e.target).closest('section').attr('id'), e.target.dataset.viewArticle);
+      });
+    });
+    $$('[data-view-aside]').each(function () {
+      $$(this).on('click', function (e) {
+        Chungo.Aside.toggle(e.target.dataset.viewAside);
+      });
+    });
+    $$('[data-icon]').each(function () {
+      var icon = this.dataset.icon;
+      $$(this).addClass('icon').addClass(icon);
+    });
+    $$('[data-image]').each(function () {
+      var image = this.dataset.image;
+      $$(this).prepend($$('<img/>').attr('src', image).addClass('icon'));
+    });
+    $$('[data-control="groupbar"]').each(function () {
+      var links = $$(this).children('[data-view-article]');
+      links.first().addClass('selected').siblings().removeClass('selected');
+      links.each(function () {
+        $$(this).on('click', function (e) {
+          $$(this).addClass('selected').siblings().removeClass('selected');
+        });
+      });
+    });
+    $$('.chungo .notifier').swipeUp(Chungo.Notification.hide.bind(Chungo.Notification));
+
+    $$('header[data-title]').each(function () {
+      var title = $$(this).data('l10n-title') && '_' in window ? _($$(this).data('l10n-title')) : $$(this).data('title');
+      $$(this).append(
+        $$('<h1/>').text(title)
+      );
+    });
+
+    $$('body').append(
+      $$('<div>').addClass('chungo').append(
+        $$('<div>').addClass('shader')
+      ).append(
+        $$('<div>').addClass('notifier').append(
+          $$('<span>').addClass('icon')
+        ).append(
+          $$('<span>').addClass('title')
+        ).append(
+          $$('<span>').addClass('caption')
+        )
+      )
+    );
   },
 
   Core: {

@@ -1,4 +1,4 @@
-/* global Tools, Lungo, App */
+/* global Tools, Lungo, App, chrome */
 
 /**
 * @file Holds {@link Store}
@@ -39,10 +39,12 @@ var Store = {
    * Initializes the IndexedDB
    */
   init: function (){
-    Store.recover(0, function (key, size, free) {
-      Store.size = size || 0;
-
-      free();
+    return new Promise(function (resolve, reject) {
+      Store.recover(0, function (key, size, free) {
+        Store.size = size || 0;
+        free();
+        resolve();
+      });
     });
   },
 
@@ -231,6 +233,47 @@ var Store = {
       callback(JSON.parse(value));
     });
   },
+
+  /**
+   * @namespace
+   */
+  Config: (window.chrome && chrome.storage && chrome.storage.local) ?
+    {
+      put: function (key, value) {
+        return new Promise(function (resolve, reject) {
+          var items = {};
+          items[key] = value;
+          chrome.storage.local.set(items, function () { resolve(); });
+        });
+      },
+
+      get: function (key) {
+        return new Promise(function (resolve, reject) {
+          chrome.storage.local.get(key, function (items) {
+            var value = items[key];
+            resolve((value === undefined) ? null : value);
+          });
+        });
+      },
+
+      remove: function (key) {
+        return new Promise(function (resolve, reject) {
+          chrome.storage.local.remove(key, function () { resolve(); });
+        });
+      }
+    } : {
+      put: function (key, value) {
+        return Promise.resolve(window.localStorage.setItem(key, value));
+      },
+
+      get: function (key) {
+        return Promise.resolve(window.localStorage.getItem(key));
+      },
+
+      remove: function (key) {
+        return Promise.resolve(window.localStorage.removeItem(key));
+      }
+    },
 
   /**
    * @namespace

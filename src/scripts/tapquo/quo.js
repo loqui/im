@@ -810,12 +810,12 @@
       return _listenTouches();
     });
     _getSwipeMin = function() {
-        if (screen.width < screen.height) {
-          SWIPE_MIN_X = screen.width / 4;
-          SWIPE_MIN_Y = screen.height / 5;
+        if (window.innerWidth < window.innerHeight) {
+          SWIPE_MIN_X = window.innerWidth / 4;
+          SWIPE_MIN_Y = window.innerHeight / 5;
         } else {
-          SWIPE_MIN_X = screen.width / 5;
-          SWIPE_MIN_Y = screen.height / 4;
+          SWIPE_MIN_X = window.innerWidth / 5;
+          SWIPE_MIN_Y = window.innerHeight / 4;
         }
     };
     _listenTouches = function() {

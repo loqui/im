@@ -260,8 +260,9 @@ var App = {
     * @memberof App
     */
     language : function(value) {
-      localStorage.setItem('language', value);
-      window.location.reload();
+      Store.Config.put('language', value).then(function () {
+        window.location.reload();
+      });
     }
   },
 
@@ -388,18 +389,34 @@ var App = {
     return this.accounts.reduce(function (prev, cur) {return prev + cur.unread;}, 0);
   },
 
+  init: function () {
+    App.defaults.Connector.presence.status = _('DefaultStatus', {
+      app: App.name,
+      platform: (Lungo.Core.environment().os ? Lungo.Core.environment().os.name : 'PC')
+    });
+
+    App.defaults.Selects.language[0] = { caption : _('Default'), value : 'default' };
+
+    // Initialize Tools class
+    return Tools.init()
+      .then(function () {
+        // Initialize Store class
+        return Store.init();
+      }).then(function () {
+        // Load settings and data from storage
+        return App.load();
+      });
+  },
+
   /**
   * This is the main procedure.
   */
   run: function () {
-    // Initialize Store class
-    Store.init();
-    // Load settings and data from storage
-    App.load().then(function () {
-      // Log in or show wizard
-      App.upgrade();
-      App.start();
-    });
+    return App.upgrade()
+      .then(function () {
+        // Log in or show wizard
+        App.start();
+      });
   },
 
   /**
@@ -458,89 +475,90 @@ var App = {
   * Perform special processes if upgrading from older version
   */
   upgrade: function () {
-    var last = localStorage.getItem('version');
-    var from = {
-      'v0.2.5': function () {
-        for (var key in App.accounts) {
-          var account = App.accounts[key];
-          account.core.roster = [];
-          account.save();
-        }
-        from['v0.2.6']();
-      },
-      'v0.2.6': function () {
-        Object.keys(App.avatars).map(function (key, i) { App.avatars[key] = {chunk: App.avatars[key]}; });
-        App.accountsCores.forEach(function (account) {
-          account.enabled = App.defaults.Account.core.enabled;
-        });
-        App.smartupdate('avatars');
-        App.smartupdate('accountsCores');
-        from['v0.3.0']();
-      },
-      'v0.3.0': function () {
-        App.accountsCores.forEach(function (account) {
-          var i = 0;
-          account.chats.forEach(function (chat) {
-            if (chat.muc) {
-              Messenger.chatRemove(chat.jid, App.accounts[Accounts.find(account.fullJid)], true);
-            }
-            i++;
+    return Store.Config.get('version').then(function (last) {
+      var from = {
+        'v0.2.5': function () {
+          for (var key in App.accounts) {
+            var account = App.accounts[key];
+            account.core.roster = [];
+            account.save();
+          }
+          from['v0.2.6']();
+        },
+        'v0.2.6': function () {
+          Object.keys(App.avatars).map(function (key, i) { App.avatars[key] = {chunk: App.avatars[key]}; });
+          App.accountsCores.forEach(function (account) {
+            account.enabled = App.defaults.Account.core.enabled;
           });
-        });
-        App.smartupdate('accountsCores');
-        from['v0.3.1']();
-      },
-      'v0.3.1': function () {
-        from['v0.3.2']();
-      },
-      'v0.3.2': function () {
-        from['v0.3.3']();
-      },
-      'v0.3.3': function () {
-        for (var ai in App.accounts) {
-          var account = App.accounts[ai];
-          for (var ci in account.chats) {
-            var chat = account.chats[ci];
-            var muted = chat.core.settings.muted;
-            chat.core.settings.muted[0] = muted instanceof Array ? muted[0] : muted;
+          App.smartupdate('avatars');
+          App.smartupdate('accountsCores');
+          from['v0.3.0']();
+        },
+        'v0.3.0': function () {
+          App.accountsCores.forEach(function (account) {
+            var i = 0;
+            account.chats.forEach(function (chat) {
+              if (chat.muc) {
+                Messenger.chatRemove(chat.jid, App.accounts[Accounts.find(account.fullJid)], true);
+              }
+              i++;
+            });
+          });
+          App.smartupdate('accountsCores');
+          from['v0.3.1']();
+        },
+        'v0.3.1': function () {
+          from['v0.3.2']();
+        },
+        'v0.3.2': function () {
+          from['v0.3.3']();
+        },
+        'v0.3.3': function () {
+          for (var ai in App.accounts) {
+            var account = App.accounts[ai];
+            for (var ci in account.chats) {
+              var chat = account.chats[ci];
+              var muted = chat.core.settings.muted;
+              chat.core.settings.muted[0] = muted instanceof Array ? muted[0] : muted;
+            }
+            account.save();
           }
-          account.save();
-        }
-        from['v0.3.4']();
-      },
-      'v0.3.4': function(){
-        for (var ai in App.accounts) {
-          var account = App.accounts[ai];
-          for (var ci in account.chats) {
-            var chat = account.chats[ci];
-            var muted = chat.core.settings.muted;
+          from['v0.3.4']();
+        },
+        'v0.3.4': function(){
+          for (var ai in App.accounts) {
+            var account = App.accounts[ai];
+            for (var ci in account.chats) {
+              var chat = account.chats[ci];
+              var muted = chat.core.settings.muted;
+            }
+            account.save();
           }
-          account.save();
+          from['v0.4.0']();
+        },
+        'v0.4.0': function(){
+          from['v0.4.1']();
+        },
+        'v0.4.1': function(){
+          var settings = App.settings;
+          if (!('lockOrientation' in App.settings)) {
+            settings.lockOrientation = true;
+          }
+          if (!('readReceipts' in App.settings)) {
+            settings.readReceipts = true;
+          }
+          App.settings = settings;
         }
-        from['v0.4.0']();
-      },
-      'v0.4.0': function(){
-        from['v0.4.1']();
-      },
-      'v0.4.1': function(){
-        var settings = App.settings;
-        if (!('lockOrientation' in App.settings)) {
-          settings.lockOrientation = true;
-        }
-        if (!('readReceipts' in App.settings)) {
-          settings.readReceipts = true;
-        }
-        App.settings = settings;
+      };
+      if (last < App.version && last in from) {
+        Lungo.Notification.show('forward', _('Upgrading'), 5);
+        from[last]();
       }
-    };
-    if (last < App.version && last in from) {
-      Lungo.Notification.show('forward', _('Upgrading'), 5);
-      from[last]();
-    }
-    if (last != App.version) {
-      CosemeConnectorHelper.resetTokenData();
-    }
-    localStorage.setItem('version', App.version);
+
+      ((last != App.version) ? CosemeConnectorHelper.resetTokenData() : Promise.resolve(null)).then(function () {
+        return Store.Config.put('version', App.version);
+      });
+    });
   },
 
   /**

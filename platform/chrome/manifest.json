@@ -1,0 +1,28 @@
+{
+    "manifest_version": 2,
+    "version": "0.5.5",
+    "name": "LoquiIM",
+    "description": "Loqui Instant Messenger unifies all your chat accounts in just one app.",
+    "app": {
+	"background": {
+	    "scripts": [ "/scripts/loqui/chromeApp.js" ]
+	}
+    },
+    "icons":
+    {
+        "32": "/img/icon-32.png",
+        "60": "/img/icon-60.png",
+        "84": "/img/icon-84.png",
+        "128": "/img/icon-128.png",
+        "256": "/img/icon-256.png",
+        "284": "/img/icon-284.png"
+    },
+    "permissions":
+    [
+      "geolocation", "notifications", "storage", "unlimitedStorage"
+    ],
+    "sockets":
+    {
+      "tcp": { "connect": "*:*" }
+    }
+}
