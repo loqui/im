@@ -1,6 +1,6 @@
 {
     "manifest_version": 2,
-    "version": "0.5.5",
+    "version": "$(Loqui.Version)",
     "name": "LoquiIM",
     "description": "Loqui Instant Messenger unifies all your chat accounts in just one app.",
     "app": {
