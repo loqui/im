@@ -32,7 +32,7 @@ module.exports = function(grunt) {
         cwd: 'platform/firefoxos/',
         src: '**',
         dest: '<%= meta.build %>/firefoxos/',
-        flatten: true,
+        flatten: false,
         filter: 'isFile'
       },
       srcToChrome: {
@@ -58,7 +58,9 @@ module.exports = function(grunt) {
         src: '**',
         dest: '<%= meta.build %>/ubuntu-touch/www',
         flatten: false,
-        filter: 'isFile'
+        filter: function(src) {
+          return src.indexOf('.scss') < 0;
+        }
       },
       ubuntutouchToDist: {
         expand: true,
@@ -73,15 +75,17 @@ module.exports = function(grunt) {
         cwd: 'src/',
         src: '**',
         dest: '<%= meta.build %>/desktop/',
-        flatten: true,
-        filter: 'isFile'
+        flatten: false,
+        filter: function(src) {
+          return src.indexOf('.scss') < 0;
+        }
       },
       desktopToDist: {
         expand: true,
         cwd: 'platform/desktop/',
         src: '**',
         dest: '<%= meta.build %>/desktop/',
-        flatten: true,
+        flatten: false,
         filter: 'isFile'
       }
     },
@@ -154,13 +158,29 @@ module.exports = function(grunt) {
       }
     },
     sed: {
+      appversion: {
+        path: '<%= meta.build %>/',
+        pattern: '[$][(]Loqui[.]Version[)]',
+        replacement: '<%= pkg.version %>',
+        recursive: true
+      },
       manifest: {
         path: '<%= meta.build %>/chrome/index.html',
         pattern: '</head>',
         replacement: '    <link rel="manifest" href="manifest.json" />\n</head>'
       },
-      jsversion: {
+      chromeversion: {
+        path: '<%= meta.build %>/chrome/manifest.json',
+        pattern: '"version": "v',
+        replacement: '"version": "'
+      },
+      chromejsversion: {
         path: '<%= meta.build %>/chrome/index.html',
+        pattern: ';version=1[.]7',
+        replacement: ''
+      },
+      ubuntujsversion: {
+        path: '<%= meta.build %>/ubuntu-touch/www/index.html',
         pattern: ';version=1[.]7',
         replacement: ''
       }

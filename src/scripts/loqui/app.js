@@ -32,7 +32,7 @@ var App = {
   * @type {string}
   * @const
   */
-  version: 'v0.5.5',
+  version: '$(Loqui.Version)',
 
   /**
   * @type {String}
