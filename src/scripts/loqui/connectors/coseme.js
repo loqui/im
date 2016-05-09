@@ -380,17 +380,17 @@ App.connectors.coseme = function (account) {
 
     function onVideo(videoThumb, videoUrl, videoFileLength, videoMimeType, encKey) {
       if (msg.groupJid) {
-        self.events.onGroupImageReceived.bind(self)(msg.msgId, msg.groupJid, msg.remoteJid, videoThumb, videoUrl, videoFileLength, true, msg.pushName, msg.timeStamp, videoMimeType, encKey);
+        self.events.onGroupVideoReceived.bind(self)(msg.msgId, msg.groupJid, msg.remoteJid, videoThumb, videoUrl, videoFileLength, true, msg.pushName, msg.timeStamp, videoMimeType, encKey);
       } else {
-        self.events.onImageReceived.bind(self)(msg.msgId, msg.remoteJid, videoThumb, videoUrl, videoFileLength, true, false, msg.pushName, msg.timeStamp, videoMimeType, encKey);
+        self.events.onVideoReceived.bind(self)(msg.msgId, msg.remoteJid, videoThumb, videoUrl, videoFileLength, true, false, msg.pushName, msg.timeStamp, videoMimeType, encKey);
       }
     }
 
     function onAudio(audioUrl, audioFileLength, audioMimeType, encKey) {
       if (msg.groupJid) {
-        self.events.onGroupImageReceived.bind(self)(msg.msgId, msg.groupJid, msg.remoteJid, audioUrl, audioFileLength, true, msg.pushName, msg.timeStamp, audioMimeType, encKey);
+        self.events.onGroupAudioReceived.bind(self)(msg.msgId, msg.groupJid, msg.remoteJid, audioUrl, audioFileLength, true, msg.pushName, msg.timeStamp, audioMimeType, encKey);
       } else {
-        self.events.onImageReceived.bind(self)(msg.msgId, msg.remoteJid, audioUrl, audioFileLength, true, false, msg.pushName, msg.timeStamp, audioMimeType, encKey);
+        self.events.onAudioReceived.bind(self)(msg.msgId, msg.remoteJid, audioUrl, audioFileLength, true, false, msg.pushName, msg.timeStamp, audioMimeType, encKey);
       }
     }
 
