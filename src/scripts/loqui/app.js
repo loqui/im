@@ -660,7 +660,7 @@ var App = {
     if (force || document.hidden) {
       var notification= null;
       if ('Notification' in window) {
-        notification = new window.Notification(core.subject, {body: core.text, icon: core.pic, tag: core.from});
+        notification = new window.Notification(core.subject, {body: core.text, icon: core.pic, tag: core.from, mozbehavior: { noscreen: true }});
         notification.onclick = function () {
           core.callback();
           App.notifications.length = 0;
