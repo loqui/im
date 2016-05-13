@@ -172,7 +172,7 @@ var Plus = {
     chat.OTR = new OTR({
       priv: account.OTR.key
     });
-    chat.OTR.on('ui', function (text) {
+    chat.OTR.on('ui', function (text, meta) {
       var msg = Make(Message)(account, {
         to: account.core.user,
         from: chat.core.jid,
@@ -184,13 +184,13 @@ var Plus = {
       });
       msg.postReceive();
     });
-    chat.OTR.on('io', function (id, text) {
+    chat.OTR.on('io', function (text, meta) {
       var msg = Make(Message)(account, {
         from: account.core.user,
         to: chat.core.jid,
         text: text,
-        stamp: Tools.localize(Tools.stamp()),
-        original: id
+        original: meta,
+        stamp: Tools.localize(Tools.stamp())
       }, {
         otr: true,
         logging: account.OTR.logging,

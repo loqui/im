@@ -50,53 +50,6 @@ var Message = {
   },
 
   /**
-   * @private
-   */
-  _replace : function() {
-    var msg = this;
-    var receipts = this.account.supports('receipts');
-
-    var afterRecover = function(key, block, message, chunk, free){
-      var old_id = message.id;
-
-      if (receipts) {
-        message.ack = 'sending';
-        message.id = msg.core.id;
-        msg.core.id = 0;
-        msg.setSendTimeout(block, index);
-      } else {
-        message.ack = '';
-      }
-
-      Store.update(key, block, chunk, free);
-
-      message = Make(Message)(msg.account, message);
-      message.reRender(block, old_id);
-
-      message.chat.core.last = message.core;
-      message.chat.save();
-    };
-
-    if(Array.isArray(this.core.original)){
-      var block = this.core.original[0];
-      var index = this.core.original[1];
-
-      Store.recover(block, function(key, chunk, free){
-        var message = chunk[index];
-
-        afterRecover(key, block, message, chunk, free);
-      });
-
-    } else {
-      this.chat.findMessage(this.core.original, null).then(function(result){
-        afterRecover(result.key, result.result.chunkIndex, result.result.message, result.result.chunk, result.free);
-      }, function(result){
-        Tools.log('HOW SHOULD WE REPLACE A MESSAGE WE CAN\'T FIND?', result);
-      });
-    }
-  },
-
-  /**
    * @alias chat/get
    * @return {Chat}
    * @memberof Message.prototype
@@ -160,10 +113,7 @@ var Message = {
   send : function (delay) {
     if (this.chat.OTR) {
       this.options.otr = true;
-      this.core.id = Date.now() + 'OTR';
-
-      this._sent();
-      this.chat.OTR.sendMsg(this.core.id, this.core.text);
+      this.chat.OTR.sendMsg(this.core.text, this.core.text);
     } else {
       this.postSend();
     }
@@ -182,20 +132,22 @@ var Message = {
    */
   postSend : function () {
     if (this.account.connector.isConnected()) {
-      return this.account.connector.sendAsync(this.core.to, this.core.text, {delay: (this.options && 'delay' in this.options) ? this.core.stamp : this.options.delay, muc: this.options.muc}).then(function (msgId) {
-        this.core.id = msgId;
+      var options = { delay: (this.options && 'delay' in this.options) ? this.core.stamp : this.options.delay,
+                      muc: this.options.muc,
+                      wantsReceipt : ! this.options.otr || this.core.original };
+      this.account.connector.sendAsync(this.core.to, this.core.text, options)
+        .then(function (msgId) {
+          this.core.id = msgId;
 
-        if (this.core.original) {
-          this._replace();
-        }
+          if (this.core.original) {
+            this.core.text = this.core.original;
+            this.options.render = true;
+          }
 
-        this._sent();
-      }.bind(this));
+          this._sent();
+        }.bind(this));
     } else {
-      return new Promise(function (ready) {
-        this._sent();
-        ready();
-      }.bind(this));
+      this._sent();
     }
   },
 
@@ -287,34 +239,34 @@ var Message = {
    * @param {number} index
    */
   setSendTimeout : function(block, index){
-	  var message= this.core;
-	  var account= this.account;
-      var msg= null;
-	  setTimeout(function(){
-		  Store.recover(block, function(key, chunk, free){
-			if(index !== null){
-				msg= chunk[index];
-			}else{
-				for(var i in chunk){
-					if(chunk[i].id == message.id){
-						msg= chunk[i];
-					}
-				}
-			}
-			if(msg){
-				if(msg.ack == 'sending'){
-					msg.ack = 'failed';
-					msg= Make(Message)(account, msg);
-					Store.update(key, block, chunk, free);
-					msg.reRender(block);
-				} else {
-                  free();
-                }
-			} else {
-              free();
-            }
-		  });
-	  }, 30000);
+    var message= this.core;
+    var account= this.account;
+    var msg= null;
+    setTimeout(function(){
+      Store.recover(block, function(key, chunk, free){
+	if (index !== null) {
+	  msg= chunk[index];
+	} else {
+	  for(var i in chunk) {
+	    if(chunk[i].id == message.id) {
+	      msg= chunk[i];
+	    }
+	  }
+	}
+	if (msg) {
+	  if (msg.ack == 'sending') {
+	    msg.ack = 'failed';
+	    msg= Make(Message)(account, msg);
+	    Store.update(key, block, chunk, free);
+	    msg.reRender(block);
+	  } else {
+            free();
+          }
+	} else {
+          free();
+        }
+      });
+    }, 30000);
   },
 
   /**
