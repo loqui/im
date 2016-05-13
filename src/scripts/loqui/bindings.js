@@ -14,26 +14,26 @@
 'use strict';
 
 document.addEventListener('localized', function(e) {
-  $("script[type='text/spacebars']").each(function(index, script) {
-    var name = script.getAttribute('name');
-    UI.insert(UI.render(Template[name]), script.parentNode, script);
-  });
-
-  setTimeout(function () {
-    $('input[data-l10n-placeholder]').each(function () {
-      var original = this.dataset.l10nPlaceholder;
-      var local = _(original);
-      $(this).attr('placeholder', local);
+  App.init().then(function () {
+    $("script[type='text/spacebars']").each(function(index, script) {
+      var name = script.getAttribute('name');
+      UI.insert(UI.render(Template[name]), script.parentNode, script);
     });
 
-    App.init().then(function () {
+    setTimeout(function () {
+      $('input[data-l10n-placeholder]').each(function () {
+        var original = this.dataset.l10nPlaceholder;
+        var local = _(original);
+        $(this).attr('placeholder', local);
+      });
+
       bindings();
       Lungo.init({ name: 'Loqui' });
 
       setTimeout(function () {
         App.run();
-      }, 100);
-    });
+      });
+    }, 100);
   });
 });
 
@@ -41,29 +41,17 @@ if (navigator.mozAlarms) {
   navigator.mozSetMessageHandler('alarm', function (message) {
     App.alarmSet(message.data);
   });
-}
 
-setInterval(function () {
-  $('time[datetime].ago').each(function () {
-    var ts = $(this).attr('datetime');
-    var now = new Date();
-    var then = Tools.unstamp(ts);
-    var diff = now - then;
-    var string;
-    if (diff < 60000) {
-      string = 'right now';
-    } else if (diff < 3600000) {
-      string = Math.floor(diff / 60000) + ' min.';
-    } else if (diff < 7200000) {
-      string = '1 hour';
-    } else if (now.toLocaleDateString() == then.toLocaleDateString()) {
-      string = Math.floor(diff / 3600000) + ' hours';
-    } else {
-      string = then.toLocaleDateString() + '@' + then.toLocaleTimeString().split(':').slice(0, 2).join(':');
-    }
-    $(this).text(string);
+  navigator.mozSetMessageHandler('notification', function(notification){
+    var accountJid = notification.tag.split('#')[0];
+    var chatJid    = notification.tag.split('#')[1];
+    var chat       = Accounts.find(accountJid).chatGet(chatJid);
+
+    chat.account.show();
+    chat.show();
+    App.toForground();
   });
-}, 60000);
+}
 
 // Reconnect on new WiFi / 3G connection
 document.body.addEventListener('online', function () {
@@ -236,22 +224,6 @@ $('[data-var]').each(function () {
   var value = App[key];
   $(this).text(value);
 });
-
-if (navigator.mozAlarms) {
-  navigator.mozSetMessageHandler("alarm", function (message) {
-    App.alarmSet(message.data);
-  });
-
-  navigator.mozSetMessageHandler('notification', function(notification){
-    var accountJid = notification.tag.split('#')[0];
-    var chatJid    = notification.tag.split('#')[1];
-    var chat       = Accounts.find(accountJid).chatGet(chatJid);
-
-    chat.account.show();
-    chat.show();
-    App.toForground();
-  });
-}
 
 Strophe.Connection.rawInput = function (data) {
   Tools.log(data);

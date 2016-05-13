@@ -398,22 +398,21 @@ var App = {
     App.defaults.Selects.language[0] = { caption : _('Default'), value : 'default' };
 
     // Initialize Tools class
-    return Tools.init()
-      .then(function () {
-        // Initialize Store class
-        return Store.init();
-      }).then(function () {
-        // Load settings and data from storage
-        return App.load();
-      });
+    return Tools.init();
   },
 
   /**
   * This is the main procedure.
   */
   run: function () {
-    return App.upgrade()
+    // Initialize Store class
+    return Store.init()
       .then(function () {
+        // Load settings and data from storage
+        return App.load();
+      }).then(function () {
+        return App.upgrade();
+      }).then(function () {
         // Log in or show wizard
         App.start();
       });
