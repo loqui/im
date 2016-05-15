@@ -8097,8 +8097,9 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
     },
 
     sendPong: function(aIdx) {
-      var iqNode =
-        newProtocolTreeNode('iq', {type: 'result', to: self.domain, id: aIdx});
+      var attributes = { type: 'result', to: self.domain };
+      aIdx && (attributes.id = aIdx);
+      var iqNode = newProtocolTreeNode('iq', attributes);
       self._writeNode(iqNode);
     }
   };
