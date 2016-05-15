@@ -937,8 +937,33 @@ var Account = {
 		  accounts[index] = this;
 		  App.accounts = accounts;
 	  }
-  }
+  },
 
+  setVisible : function (status) {
+    if (status) {
+      this.connector.presence.set('a');
+
+      if (this === Accounts.current) {
+        var section = $('section#chat');
+        if (section.hasClass('show')) {
+          var chat = this.chatFind(section[0].dataset.jid);
+          if (chat) {
+            if (chat.notification && 'close' in chat.notification) {
+              chat.notification.close();
+              chat.notification = null;
+            }
+
+            chat.unreadList.forEach(function (item) {
+              item.read();
+            });
+            chat.unreadList= [];
+          }
+        }
+      }
+    } else {
+      this.connector.presence.set('away');
+    }
+  }
 };
 
 /**
