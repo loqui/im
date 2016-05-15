@@ -74,34 +74,15 @@ $(window).on('beforeunload', function () {
 
 // Go "away" when app is hidden
 document.addEventListener("visibilitychange", function() {
-  var chat= null;
-  for (var i in App.accounts) {
-    var account = App.accounts[i];
-    if (document.hidden) {
-      account.connector.presence.set('away');
-    } else {
-      App.lastActive = new Date();
-      account.connector.presence.set('a');
+  if (!document.hidden) {
+    App.lastActive = new Date();
+  }
 
-      var section = $('section#chat');
-      if(section.hasClass('show')){
-        var current = section[0].dataset.jid;
-        chat = account.chatGet(current);
-        if(chat.notification && 'close' in chat.notification){
-            chat.notification.close();
-            chat.notification= null;
-        }
-      }
+  App.accounts.forEach(function (account) {
+    if (account === Accounts.current) {
+      account.setVisible(!document.hidden);
     }
-  }
-  if(!document.hidden){
-    var jid = $('section#chat')[0].dataset.jid;
-    chat = Accounts.current.chatGet(jid);
-    chat.unreadList.forEach(function(item){
-        item.read();
-    });
-    chat.unreadList= [];
-  }
+  });
 });
 
 // Tap my avatar
