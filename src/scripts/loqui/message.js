@@ -386,7 +386,7 @@ var Message = {
             var url = message.core.media.url;
             var ext = url.split('.').pop();
             if (message.core.media.mimeType) {
-              ext = message.core.media.mimeType.split('/').pop();
+              ext = message.core.media.mimeType.split('/').pop().split(';').shift();
             } else if (ext == 'aac') {
               ext = 'mp3';
             }
