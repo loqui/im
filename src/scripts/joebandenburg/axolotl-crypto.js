@@ -66,12 +66,11 @@
                     hash: "SHA-256"
                 };
                 return window.crypto.subtle.importKey("raw", key, keyOptions, false, ["sign"]).then(function(key) {
-                    return window.crypto.subtle.sign(signOptions, key, data);
+                    return window.crypto.subtle.sign(signOptions, key, data)
+                        .then(function (o) { return o.buffer ? o.buffer : o; });
                 });
             } else {
-                return new Promise(function (resolve, reject) {
-                    resolve(asmCrypto.HMAC_SHA256.bytes(data, key).buffer);
-                });
+                return Promise.resolve(asmCrypto.HMAC_SHA256.bytes(data, key).buffer);
             }
         },
         deriveHKDFv3Secrets: function(refKey, cryptKeys, size) {
@@ -105,12 +104,11 @@
                     iv: new Uint8Array(iv)
                 };
                 return window.crypto.subtle.importKey("raw", key, keyOptions, false, ["encrypt"]).then(function(key) {
-                    return window.crypto.subtle.encrypt(encryptOptions, key, message);
+                    return window.crypto.subtle.encrypt(encryptOptions, key, message)
+                        .then(function (o) { return o.buffer ? o.buffer : o; });
                 });
             } else {
-                return new Promise(function (resolve, reject) {
-                    resolve(asmCrypto.AES_CBC.encrypt(message, key, true, iv).buffer);
-                });
+                return Promise.resolve(asmCrypto.AES_CBC.encrypt(message, key, true, iv).buffer);
             }
         },
         decrypt: function(key, ciphertext, iv) {
@@ -123,12 +121,11 @@
                     iv: new Uint8Array(iv)
                 };
                 return window.crypto.subtle.importKey("raw", key, keyOptions, false, ["decrypt"]).then(function(key) {
-                    return window.crypto.subtle.decrypt(decryptOptions, key, ciphertext);
+                    return window.crypto.subtle.decrypt(decryptOptions, key, ciphertext)
+                        .then(function (o) { return o.buffer ? o.buffer : o; });
                 });
             } else {
-                return new Promise(function (resolve, reject) {
-                    resolve(asmCrypto.AES_CBC.decrypt(ciphertext, key, true, iv).buffer);
-                });
+                return Promise.resolve(asmCrypto.AES_CBC.decrypt(ciphertext, key, true, iv).buffer);
             }
         }
     };
