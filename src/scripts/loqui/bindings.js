@@ -79,9 +79,7 @@ document.addEventListener("visibilitychange", function() {
   }
 
   App.accounts.forEach(function (account) {
-    if (account === Accounts.current) {
-      account.setVisible(!document.hidden);
-    }
+    account.setVisible(!document.hidden);
   });
 });
 
