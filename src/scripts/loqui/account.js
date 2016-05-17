@@ -785,10 +785,11 @@ var Account = {
           from: content.from,
           to: content.to,
           text: content.text,
-          stamp: content.stamp,
-		  original : sendQ[0]
+          original: content.original,
+          stamp: content.stamp
         }, {
-          render: false
+          render: false,
+          msgId: content.id
         });
 
         free();

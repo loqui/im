@@ -62,6 +62,16 @@ var Chat = {
   unreadList : null,
 
   /**
+  * Seed for message ids.
+  */
+  seed : String(Date.now()),
+
+  /**
+  * Counter for message ids.
+  */
+  nextId : 1,
+
+  /**
   * @constructs
   * @param {ChatCore} core
   * @param {Account} account
@@ -471,6 +481,13 @@ var Chat = {
         Store.recover(chat.chunks[currentChunk], afterRecover);
       }
     });
+  },
+
+  /**
+  * Get a unique message id.
+  */
+  getNextId : function () {
+    return MD5.hexdigest(this.seed + ' ' + this.account.core.fullJid + ' ' + this.core.jid).substr(0, 16) + '-' + String(this.nextId++);
   },
 
   /**

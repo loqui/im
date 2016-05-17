@@ -131,8 +131,11 @@ var Message = {
    * Pushes the message to the network interface to actually send it.
    */
   postSend : function () {
+    var msgId = this.options.msgId || this.chat.getNextId();
+
     if (this.account.connector.isConnected()) {
-      var options = { delay: (this.options && 'delay' in this.options) ? this.core.stamp : this.options.delay,
+      var options = { msgId: msgId,
+                      delay: (this.options && 'delay' in this.options) ? this.core.stamp : this.options.delay,
                       muc: this.options.muc,
                       wantsReceipt : ! this.options.otr || this.core.original };
       this.account.connector.sendAsync(this.core.to, this.core.text, options)
@@ -147,6 +150,7 @@ var Message = {
           this._sent();
         }.bind(this));
     } else {
+      this.core.id = msgId;
       this._sent();
     }
   },

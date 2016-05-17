@@ -11,11 +11,9 @@
 Strophe.addConnectionPlugin('Messaging', {
 
 	_connection: null,
-	_idSuffix: null,
 
 	init: function(conn){
 		this._connection = conn;
-		this._idSuffix = Math.floor(Date.now() / 1000);
 		Strophe.addNamespace('XHTML_IM', 'http://jabber.org/protocol/xhtml-im');
 		Strophe.addNamespace('XHTML', 'http://www.w3.org/1999/xhtml');
 		Strophe.addNamespace('XEP0085', 'http://jabber.org/protocol/chatstates');
@@ -30,8 +28,8 @@ Strophe.addConnectionPlugin('Messaging', {
 		}
 	},
 
-	send: function(to, body, stamp, wantsReceipt){
-		var msg = $msg({to: to, type: 'chat', id: this._connection.getUniqueId(this._idSuffix)});
+	send: function(to, body, msgId, stamp, wantsReceipt){
+		var msg = $msg({to: to, type: 'chat', id: msgId});
 		if (body) {
 			msg.c('body', {}, body);
 			if (stamp) {

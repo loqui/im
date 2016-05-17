@@ -170,16 +170,15 @@
     Returns:
     msgiq - the unique id used to send the message
      */
-    message: function(room, nick, message, html_message, type) {
-      var msg, msgid, parent, room_nick;
+    message: function(room, nick, message, msgId, html_message, type) {
+      var msg, parent, room_nick;
       room_nick = this.test_append_nick(room, nick);
       type = type || (nick != null ? "chat" : "groupchat");
-      msgid = this._connection.getUniqueId();
       msg = $msg({
         to: room,
         from: this._connection.jid,
         type: type,
-        id: msgid
+        id: msgId
       }).c("body", {
         /*xmlns: Strophe.NS.CLIENT*/
       }).t(message);
@@ -202,7 +201,7 @@
         xmlns: "jabber:x:event"
       }).c("composing");*/
       this._connection.send(msg);
-      return msgid;
+      return msgId;
     },
 
     /*Function

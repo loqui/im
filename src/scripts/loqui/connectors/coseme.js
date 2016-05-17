@@ -894,12 +894,12 @@ App.connectors.coseme = function (account) {
         } else {
           encryptMessage(to, encodeV2Text(text)).then(function (m) {
             ready(MI.call('encrypt_sendMessage',
-                          [null, to, m.body,
+                          [options.msgId, to, m.body,
                            (m.isPreKeyWhisperMessage ? 'pkmsg' : 'msg'),
                            '2']));
           }, function (e) {
             Tools.log('PLAINTEXT FALLBACK', e);
-            ready(MI.call('message_send', [null, to, text]));
+            ready(MI.call('message_send', [options.msgId, to, text]));
           });
         }
       });
