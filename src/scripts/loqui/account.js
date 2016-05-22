@@ -947,8 +947,9 @@ var Account = {
       if (this === Accounts.current) {
         var section = $('section#chat');
         if (section.hasClass('show')) {
-          var chat = this.chatFind(section[0].dataset.jid);
-          if (chat) {
+          var ci = this.chatFind(section[0].dataset.jid);
+          if (ci >= 0) {
+            var chat = this.chats[ci];
             if (chat.notification && 'close' in chat.notification) {
               chat.notification.close();
               chat.notification = null;
