@@ -927,17 +927,12 @@ var Account = {
    */
   save : function () {
     var index = Accounts.find(this.core.fullJid || this.core.user);
-      this.core.chats.sort(function(a, b){
-        a = new Date((a.last && a.last.stamp) ? a.last.stamp : 0);
-        b = new Date((b.last && b.last.stamp) ? b.last.stamp : 0);
-        return a.getTime() > b.getTime();
-      });
 
-      if (index > -1) {
-		  var accounts = App.accounts;
-		  accounts[index] = this;
-		  App.accounts = accounts;
-	  }
+    if (index > -1) {
+      var accounts = App.accounts;
+      accounts[index] = this;
+      App.accounts = accounts;
+    }
   },
 
   setVisible : function (status) {
