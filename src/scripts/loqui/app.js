@@ -431,6 +431,12 @@ var App = {
             cores.forEach(function (core) {
               var account = Make(Account)(core);
 
+              core.chats.sort(function(a, b){
+                a = new Date((a.last && a.last.stamp) ? a.last.stamp : 0);
+                b = new Date((b.last && b.last.stamp) ? b.last.stamp : 0);
+                return a.getTime() > b.getTime();
+              });
+
               core.chats.forEach(function (chcore, i) {
                 core.chats[i] = chcore = Make(chcore, ChatCore)();
                 let chat = Make(Chat)(chcore, account);

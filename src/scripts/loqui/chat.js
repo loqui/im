@@ -496,6 +496,32 @@ var Chat = {
   * @param {boolean} up
   */
   save : function (up) {
+    if (up) {
+      var ci = this.account.chatFind(this.core.jid);
+      if (ci >= 0) {
+        // find the index to move the chat to
+        var myStamp = new Date((this.core.last && this.core.last.stamp) ? this.core.last.stamp : 0).getTime();
+        var chats = this.account.chats;
+        var newIdx = chats.findIndex(function (chat) {
+          return (myStamp < new Date((chat.core.last && chat.core.last.stamp) ? chat.core.stamp : 0).getTime());
+        });
+
+        if (newIdx < 0) {
+          newIdx = chats.length - 1;
+        } else if (newIdx > ci) {
+          newIdx--;
+        }
+
+        if (newIdx != ci) {
+          // chat has changed position, so move it
+          var coreChats = this.account.core.chats;
+          chats.splice(newIdx, 0, chats.splice(ci, 1)[0]);
+          coreChats.splice(newIdx, 0, coreChats.splice(ci, 1)[0]);
+          this.account.chats = chats;
+        }
+      }
+    }
+
     this.account.save();
     this.account.singleRender(this, up);
   }
