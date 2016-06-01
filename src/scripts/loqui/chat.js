@@ -500,10 +500,10 @@ var Chat = {
       var ci = this.account.chatFind(this.core.jid);
       if (ci >= 0) {
         // find the index to move the chat to
-        var myStamp = new Date((this.core.last && this.core.last.stamp) ? this.core.last.stamp : 0).getTime();
+        var myStamp = new Date((this.core.last && this.core.last.stamp) || 0).getTime();
         var chats = this.account.chats;
         var newIdx = chats.findIndex(function (chat) {
-          return (myStamp < new Date((chat.core.last && chat.core.last.stamp) ? chat.core.stamp : 0).getTime());
+          return (myStamp < new Date((chat.core.last && chat.core.last.stamp) || 0).getTime());
         });
 
         if (newIdx < 0) {
