@@ -417,10 +417,9 @@ App.connectors.XMPP = function (account) {
   }.bind(this);
 
   this.muc.invite = function (gid, members, title) {
-    for (let i in members) {
-      let jid = members[i];
+    members.forEach(function (jid) {
       this.connection.muc.directInvite(gid, jid, _('MucInvitationText', {title: title}));
-    }
+    }.bind(this));
   }.bind(this);
 
   this.handlers.init = function () {
