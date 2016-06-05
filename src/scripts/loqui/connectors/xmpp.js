@@ -367,6 +367,14 @@ App.connectors.XMPP = function (account) {
       },
       function (e) {
         Tools.log('MUC PRES', e);
+        var statusNodes = e.getElementsByTagName('status');
+        for (var idx = 0; idx < statusNodes.length; ++idx) {
+          if (statusNodes[idx].getAttribute('code') == '201') {
+            connector.connection.muc.createInstantRoom(jid,
+                                                       function (e) { return true; },
+                                                       function (e) { return true; });
+          }
+        }
         return true;
       },
       function (e) {
