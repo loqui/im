@@ -201,7 +201,7 @@
         xmlns: "jabber:x:event"
       }).c("composing");*/
       this._connection.send(msg);
-      return msgId;
+      return msg.tree();
     },
 
     /*Function
