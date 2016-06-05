@@ -3377,11 +3377,11 @@ CoSeMe.namespace('config', (function(){
     groupDomain: 'g.us',
 
     tokenData: {
-      "v": "2.16.4",
+      "v": "2.16.7",
       // XXX: it is tokenData[d] + - + tokenData[v] + - + port
-      "r": "S40-2.16.4",
-      "u": "WhatsApp/2.16.4 S40Version/14.26 Device/Nokia302",
-      "t": "1459919543356",
+      "r": "S40-2.16.7",
+      "u": "WhatsApp/2.16.7 S40Version/14.26 Device/Nokia302",
+      "t": "1462212194694",
       "d": "S40"
     },
 
