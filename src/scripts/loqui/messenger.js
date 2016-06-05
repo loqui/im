@@ -333,6 +333,7 @@ var Messenger = {
               Store.blockDrop(chunk);
             }
             account.chats.splice(ci, 1);
+            account.core.chats.splice(ci, 1);
           }
           account.core.roster.splice(ri, 1);
           account.save();
