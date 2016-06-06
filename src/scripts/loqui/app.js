@@ -764,9 +764,9 @@ var App = {
 
         });
 
-        avatars[account.fullJid]= App.avatars[account.fullJid];
+        if (App.avatars[account.fullJid]) {
+          avatars[account.fullJid]= App.avatars[account.fullJid];
 
-        if (avatars[account.fullJid]) {
           jobs.push(new Promise(function(done){
             Store.recover(avatars[account.fullJid].chunk, function(key, chunk, free){
               avatarChunks[avatars[account.fullJid].chunk.toString()]= chunk;
@@ -786,15 +786,17 @@ var App = {
           }
         }
 
-        jobs.push(new Promise(function(done){
-          Store.recover(account.background, function(key, url, free) {
-            if (url) {
-              backgroundImages[account.fullJid.toString()] = url;
-            }
-            done();
-            free();
-          });
-        }));
+        if (account.background) {
+          jobs.push(new Promise(function(done){
+            Store.recover(account.background, function(key, url, free) {
+              if (url) {
+                backgroundImages[account.fullJid.toString()] = url;
+              }
+              done();
+              free();
+            });
+          }));
+        }
       });
 
       Promise.all(jobs).then(function(){
@@ -860,9 +862,13 @@ var App = {
             });
 
             Object.keys(backup.avatars).forEach(function(key){
-              var avatar= backup.avatars[key];
+              var avatar= CryptoJS.AES.decrypt(backup.avatars[key], password).toString(CryptoJS.enc.Utf8);
 
-              backup.avatars[key]= JSON.parse(CryptoJS.AES.decrypt(avatar, password).toString(CryptoJS.enc.Utf8));
+              if (avatar) {
+                backup.avatars[key]= JSON.parse(avatar);
+              } else {
+                delete backup.avatars[key];
+              }
             });
 
             Object.keys(backup.avatarChunks).forEach(function(key){
@@ -966,6 +972,7 @@ var App = {
               });
             }
           }catch(e){
+            Tools.log('DECRYPT FAILED', e);
             Lungo.Notification.error(_('DecryptionFailed'), _('DecryptionFailedLong'), 'info-sign', 4, restore.bind(null, [backupPack]));
           }
         }, 100);
