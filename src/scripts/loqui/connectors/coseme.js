@@ -415,6 +415,7 @@ App.connectors.coseme = function (account) {
         }
       }
 
+      onMessage("ERROR DECRYPTING MESSAGE FROM " + msg.remoteJid);
       callback(e);
     }
 
