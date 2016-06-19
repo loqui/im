@@ -369,12 +369,7 @@ var Chat = {
       }
       setTimeout(function () {
         if (this.core.muc) {
-          if (this.core.participants) {
-            header.children('.status').text(_('NumParticipants', {number: this.core.participants.length}));
-          } else {
-            this.account.connector.muc.participantsGet(this.core.jid);
-            header.children('.status').text(' ');
-          }
+          header.children('.status').text(_('NumParticipants', {number: this.core.participants.length}));
         } else {
           if (contact && this.account.connector.presence.subscribe) {
             this.account.connector.presence.subscribe(this.core.jid);
