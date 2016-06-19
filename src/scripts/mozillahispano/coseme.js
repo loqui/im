@@ -6909,6 +6909,19 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
     _signalInterface.send('disconnected', [reason]);
   }
 
+  function parseGroupNode(node) {
+    return { gid: node.getAttributeValue('id'),
+             owner: node.getAttributeValue('creator'),
+             subject: stringFromUtf8(node.getAttributeValue('subject')),
+             subjectT: node.getAttributeValue('s_t'),
+             subjectOwner: node.getAttributeValue('s_o'),
+             creation: node.getAttributeValue('creation'),
+             participants: node.children.map(function(child) {
+               return { 'jid': child.getAttributeValue('jid'),
+                        'admin': (child.getAttributeValue('type')==='admin')};
+             }) };
+  }
+
   /**
    * This is attached to reader.onTree when authenticate success.
    */
@@ -7031,27 +7044,40 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
           var action = node.getChild(0).tag;
 
           if (action === 'add') {
-            notification += 'ParticipantAdded';
+            notification += 'ParticipantsAdded';
+            var participantNodes = node.getChild(0).getAllChildren('participant');
+            var participants = [];
+            participantNodes.forEach(function (node) {
+              participants.push({ 'jid': node.getAttributeValue('jid'),
+                                  'admin': (node.getAttributeValue('type')==='admin') });
+            });
+
             var jid = node.getChild(0).getChild(0).getAttributeValue('jid');
             _signalInterface
-              .send(notification, [from, jid, null, timestamp, msgId, null]);
+              .send(notification, [from, timestamp, msgId, participants]);
 
           } else if (action === 'create') {
             notification += 'Created';
+            var info = parseGroupNode(node.getChild(0).getChild(0));
             var displayName = node.getAttributeValue('notify');
             var author = node.getAttributeValue('participant');
             var bodyNode = node.getChild(0).getChild(0);
             var subject = stringFromUtf8(bodyNode.getAttributeValue('subject'));
 
             _signalInterface
-              .send(notification, [from, timestamp, msgId, subject, displayName,
-                                   author]);
+              .send(notification, [from, timestamp, msgId, info.owner, info.subject, info.subjectOwner, info.subjectT, info.creation, info.participants]);
 
           } else if (action === 'remove') {
-            notification += 'ParticipantRemoved';
+            notification += 'ParticipantsRemoved';
+            var participantNodes = node.getChild(0).getAllChildren('participant');
+            var participants = [];
+            participantNodes.forEach(function (node) {
+              participants.push(node.getAttributeValue('jid'));
+            });
+
             var jid = node.getChild(0).getChild(0).getAttributeValue('jid');
             _signalInterface
-              .send(notification, [from, jid, null, timestamp, msgId, null]);
+              .send(notification, [from, timestamp, msgId, participants]);
 
           } else if (action === 'subject') {
             notification += 'SubjectUpdated';
@@ -7416,17 +7442,8 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
       _signalInterface.send("group_infoError",[0]); // @@TODO replace with real error code
     } else {
       ProtocolTreeNode.require(groupNode,"group");
-      //gid = groupNode.getAttributeValue("id");
-      var owner = groupNode.getAttributeValue("owner");
-      var subject = stringFromUtf8(groupNode.getAttributeValue("subject"));
-      var subjectT = groupNode.getAttributeValue("s_t");
-      var subjectOwner = groupNode.getAttributeValue("s_o");
-      var creation = groupNode.getAttributeValue("creation");
-      var participants = groupNode.children.map(function(child){
-        return child.getAttributeValue('jid');
-      });
-
-      _signalInterface.send("group_gotInfo",[jid, owner, subject, subjectOwner, subjectT, creation, participants]);
+      var info = parseGroupNode(groupNode);
+      _signalInterface.send("group_gotInfo",[jid, info.owner, info.subject, info.subjectOwner, info.subjectT, info.creation, info.participants]);
     }
   }
 
@@ -7434,17 +7451,7 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
     var groups = [];
     var id = node.getAttributeValue('id');
     node.children[0].children.forEach(function (groupNode) {
-      groups.push({
-        gid: groupNode.getAttributeValue('id'),
-        owner: groupNode.getAttributeValue('creator'),
-        subject: stringFromUtf8(groupNode.getAttributeValue('subject')),
-        subjectT: groupNode.getAttributeValue('s_t'),
-        subjectOwner: groupNode.getAttributeValue('s_o'),
-        creation: groupNode.getAttributeValue('creation'),
-        participants : groupNode.children.map(function(child){
-          return {"jid":child.getAttributeValue('jid'), "admin":(child.getAttributeValue('type')==='admin')};
-        })
-      });
+      groups.push(parseGroupNode(groupNode));
     });
     _signalInterface.send('group_gotParticipating', [groups, id]);
   }
@@ -7546,27 +7553,19 @@ CoSeMe.namespace('yowsup.readerThread', (function() {
   }
 
   function parseGroups(node) {
-    var groupNode, children = node.getAllChildren("group");
-    var jabberId, owner, subject, subjectT, subjectOwner, creation;
+    var children = node.getAllChildren("group");
 
-    for (var i = 0, l = children.length; i < l; i++) {
-      groupNode = children[i];
-
-      jabberId = groupNode.getAttributeValue("id") + "@g.us";
-      owner = groupNode.getAttributeValue("owner");
-      subject = groupNode.getAttributeValue("subject")
-      subjectT = groupNode.getAttributeValue("s_t")
-      subjectOwner = groupNode.getAttributeValue("s_o")
-      creation = groupNode.getAttributeValue("creation")
+    children.forEach(function (groupNode) {
+      var info = parseGroupNode(groupNode);
 
       _signalInterface.send(
         "group_gotInfo",
         [
-          jabberId, owner, subject,
-          subjectOwner, parseInt(subjectT, 10), parseInt(creation)
+          info.gid + '@g.us', info.owner, info.subject, info.subjectOwner,
+          parseInt(info.subjectT, 10), parseInt(info.creation)
         ]
       );
-    }
+    });
   }
 
   function parseParticipants(node) {
@@ -7855,8 +7854,8 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
       notification_groupSubjectUpdated: [],
       notification_groupPictureUpdated: [],
       notification_groupPictureRemoved: [],
-      notification_groupParticipantAdded: [],
-      notification_groupParticipantRemoved: [],
+      notification_groupParticipantsAdded: [],
+      notification_groupParticipantsRemoved: [],
       notification_status: [],
       notification_encrypt: [],
 

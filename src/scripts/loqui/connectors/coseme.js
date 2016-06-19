@@ -1072,8 +1072,8 @@ App.connectors.coseme = function (account) {
         notification_contactProfilePictureRemoved: this.events.onContactProfilePictureRemoved,
         notification_groupPictureUpdated: this.events.onGroupPictureUpdated,
         notification_groupPictureRemoved: this.events.onGroupPictureRemoved,
-        notification_groupParticipantAdded: this.events.onGroupParticipantAdded,
-        notification_groupParticipantRemoved: this.events.onGroupParticipantRemoved,
+        notification_groupParticipantsAdded: this.events.onGroupParticipantsAdded,
+        notification_groupParticipantsRemoved: this.events.onGroupParticipantsRemoved,
         notification_groupCreated: this.events.onGroupCreated,
         notification_groupSubjectUpdated: this.events.onGroupSubjectUpdated,
         notification_status: this.events.onContactStatusUpdated,
@@ -1591,7 +1591,9 @@ App.connectors.coseme = function (account) {
       Lungo.Notification.show('download', _('Synchronizing'), 5);
       Lungo.Router.section('back');
       var members = this.muc.membersCache[idx];
-      MI.call('group_addParticipants', [gid, members]);
+      if (members.length) {
+        MI.call('group_addParticipants', [gid, members]);
+      }
       delete this.muc.membersCache[idx];
     };
 
@@ -1648,30 +1650,80 @@ App.connectors.coseme = function (account) {
       this.events.onAvatar(from, pictureId);
     };
 
-    this.events.onGroupParticipantAdded = function (from, jid, _, stamp, msgId) {
+    this.events.onGroupParticipantsAdded = function (jid, stamp, msgId, participants) {
       var method = 'notification_ack';
-      MI.call(method, [from, msgId]);
-      this.muc.participantsGet(from);
-    };
+      MI.call(method, [jid, msgId]);
 
-    this.events.onGroupParticipantRemoved = function (from, jid, _, stamp, msgId) {
-      var method = 'notification_ack';
-      MI.call(method, [from, msgId]);
-      if (jid != this.account.core.fullJid) {
-        this.muc.participantsGet(from);
+      var ci = account.chatFind(jid);
+      if (ci >= 0) {
+        var chat = account.chats[ci];
+        chat.core.participants = chat.core.participants.concat(participants);
+        chat.save();
       }
     };
 
-    this.events.onGroupCreated = function (from, stamp, msgId, subject, displayName, author) {
+    this.events.onGroupParticipantsRemoved = function (jid, stamp, msgId, participants) {
       var method = 'notification_ack';
-      MI.call(method, [from, msgId]);
-      this.muc.participantsGet(from);
+      MI.call(method, [jid, msgId]);
+
+      var ci = account.chatFind(jid);
+      if (ci >= 0) {
+        var chat = account.chats[ci];
+        chat.core.participants = chat.core.participants.filter(function (elem) {
+          return participants.indexOf(elem.jid) == -1;
+        });
+        chat.save();
+      }
     };
 
-    this.events.onGroupSubjectUpdated = function (from, stamp, msgId, subject, displayName, author) {
+    this.events.onGroupCreated = function (jid, stamp, msgId, owner, subject, subjectOwner, subjectTime, creation, participants) {
       var method = 'notification_ack';
-      MI.call(method, [from, msgId]);
-      this.muc.participantsGet(from);
+      MI.call(method, [jid, msgId]);
+
+      var info = {
+        owner: owner,
+        subjectOwner: subjectOwner,
+        subjectTime: subjectTime,
+        creation: creation
+      };
+      var account = this.account;
+      var ci = account.chatFind(jid);
+      var chat = null;
+      if (ci >= 0) {
+        chat = account.chats[ci];
+        var newTitle = decodeURIComponent(subject);
+        chat.core.title = newTitle;
+        chat.core.info = info;
+        chat.core.participants = participants;
+        chat.save();
+      } else {
+        chat = Make(Chat)({
+          jid: jid,
+          title: decodeURIComponent(subject),
+          muc: true,
+          creation: creation,
+          owner: owner,
+          participants: participants,
+          chunks: [],
+          info: info
+        }, account);
+        account.chats.push(chat);
+        account.core.chats.push(chat.core);
+        chat.save(true);
+      }
+    };
+
+    this.events.onGroupSubjectUpdated = function (jid, stamp, msgId, subject, displayName, author) {
+      var method = 'notification_ack';
+      MI.call(method, [jid, msgId]);
+
+      var ci = account.chatFind(jid);
+      if (ci >= 0) {
+        var chat = account.chats[ci];
+        var newTitle = decodeURIComponent(subject);
+        chat.core.title = newTitle;
+        chat.save();
+      }
     };
 
     this.events.onGroupImageReceived = function (msgId, group, author, mediaPreview, mediaUrl, mediaSize, wantsReceipt, notifyName, timeStamp, mimeType, encKey) {
