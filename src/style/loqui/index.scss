@@ -1147,11 +1147,6 @@ section nav {
             word-wrap: break-word;
             border-radius: .3rem;
             white-space: pre-wrap;
-
-            img {
-                vertical-align: middle;
-                height: 1.2em;
-            }
         }
 
         &:last-child {
@@ -1278,35 +1273,28 @@ section nav {
         .audio,
         .maps,
         .video {
-            width: calc(100%);
             height: calc(100%);
+            &[data-downloaded='true'] {
+				background-image: url('../../img/play.png');
+				background-repeat: no-repeat;
+				background-attachment: scroll;
+				background-position: left center;
+				padding-left: 48px;
+            }
+            &[data-downloaded='false'] {
+				background-image: url('../../img/download.png');
+				background-repeat: no-repeat;
+				background-attachment: scroll;
+				background-position: left center;
+				padding-left: 48px;
+            }
         }
 
-        .image,
-        .video {
-            &[data-downloaded='false'] {
+        .image {
+            &[data-downloaded='true'] {
                 opacity: .4;
             }
         }
-    }
-
-    div[data-media-type='video'] {
-        width: calc(100% - 3.5rem);
-
-        :after {
-            content: url('../../img/play.png');
-            position: absolute;
-            width: 4rem;
-            left: calc(50% - 2rem);
-            top: calc(50% - 2rem);
-        }
-    }
-
-    div[data-media-type='video']
-    div[data-media-type='audio'],
-    div[data-media-type='vCard'],
-    div[data-media-type='url'] {
-        width: calc(100% - 3.5rem);
     }
 
     .extended .avatar img {
@@ -1328,7 +1316,7 @@ section nav {
 
         &:before,
         &:after {
-            content: '↓';
+            content: 'â†“';
             margin: 0 .5rem;
             font-style: normal;
         }
