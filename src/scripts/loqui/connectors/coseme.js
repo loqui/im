@@ -354,6 +354,14 @@ App.connectors.coseme = function (account) {
       }
     }
 
+    function onMessageError(text) {
+      if (msg.groupJid) {
+        self.events.onGroupMessage.bind(self)(msg.msgId, msg.groupJid, msg.remoteJid, text, msg.timeStamp, false, msg.pushName);
+      } else {
+        self.events.onMessage.bind(self)(msg.msgId, msg.remoteJid, text, msg.timeStamp, false, msg.pushName, false);
+      }
+    }
+
     function onVCard(displayName, vCard) {
       if (msg.groupJid) {
         self.events.onGroupVCardReceived.bind(self)(msg.msgId, msg.groupJid, msg.remoteJid, displayName, vCard, true, msg.pushName, msg.timeStamp);
@@ -415,6 +423,7 @@ App.connectors.coseme = function (account) {
         }
       }
 
+      onMessageError('DECRYPT ERROR');
       callback(e);
     }
 
@@ -1271,6 +1280,7 @@ App.connectors.coseme = function (account) {
           to: to,
           text: body,
           stamp: stamp,
+          viewed: !wantsReceipt,
           pushName: (pushName && pushName != fromUser) ? (fromUser + ': ' + pushName) : pushName
         });
 
@@ -1611,6 +1621,7 @@ App.connectors.coseme = function (account) {
           to: from,
           text: body,
           stamp: stamp,
+          viewed: !wantsReceipt,
           id : msgId,
           pushName: (pushName && pushName != fromUser) ? (fromUser + ': ' + pushName) : pushName
         }, {

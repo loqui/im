@@ -195,6 +195,9 @@ var Message = {
       if ($('section#chat')[0].dataset.jid == chat.core.jid) {
         var ul = $('section#chat ul#messages');
         var li = ul.children('li[data-chunk="' + blockIndex + '"]');
+        if (message.core.id && account.supports('receipts')) {
+          li.children('div[data-id="' + message.core.id + '"]').remove();
+        }
         var last = ul.children('li[data-chunk]').last().children('div').last();
         var avatarize = !last.length || last[0].dataset.from != message.core.from;
         var timeDiff = !last.length || (Tools.unstamp(message.core.stamp) - Tools.unstamp(last[0].dataset.stamp) > 300000);
@@ -203,14 +206,14 @@ var Message = {
           if (timeDiff) {
             li.append($('<time/>').attr('datetime', message.core.stamp).text(_('DateTimeFormat', {date: conv[0], time: conv[1]}))[0]);
           }
-          li.append(message.preRender(false, avatarize));
+          li.append(message.preRender(avatarize));
         } else {
           li = $('<li/>').addClass('chunk');
           li[0].dataset.chunk= blockIndex;
           if (timeDiff) {
             li.append($('<time/>').attr('datetime', message.core.stamp).text(_('DateTimeFormat', {date: conv[0], time: conv[1]}))[0]);
           }
-          li.append(message.preRender(false, avatarize));
+          li.append(message.preRender(avatarize));
           ul.append(li);
         }
         if (avatarize) {
@@ -242,22 +245,14 @@ var Message = {
    * @param {number} block
    * @param {number} index
    */
-  setSendTimeout : function(block, index){
+  setSendTimeout : function(block) {
     var message= this.core;
     var account= this.account;
-    var msg= null;
     setTimeout(function(){
       Store.recover(block, function(key, chunk, free){
-	if (index !== null) {
-	  msg= chunk[index];
-	} else {
-	  for(var i in chunk) {
-	    if(chunk[i].id == message.id) {
-	      msg= chunk[i];
-	    }
-	  }
-	}
-	if (msg) {
+        var pos = chunk.findIndex(function (elem) { return elem.id == message.id; });
+        if (pos >= 0) {
+	  var msg = chunk[pos];
 	  if (msg.ack == 'sending') {
 	    msg.ack = 'failed';
 	    msg= Make(Message)(account, msg);
@@ -292,7 +287,7 @@ var Message = {
       delay: !account.connector.isConnected()
     }, function (blockIndex) {
       if (receipts) {
-	message.setSendTimeout(blockIndex, null);
+	message.setSendTimeout(blockIndex);
       }
       if ($('section#chat')[0].dataset.jid == to && $('section#chat').hasClass('show')) {
         var ul = $('section#chat ul#messages');
@@ -327,7 +322,7 @@ var Message = {
   reRender : function(blockIndex, old_id){
     if($('section#chat')[0].dataset.jid == this.core.to){
       var element= $('section#chat ul#messages li[data-chunk="' + blockIndex + '"] div[data-id="' + (old_id || this.core.id) + '"]');
-      element.replaceWith(this.preRender(element[0].dataset.index));
+      element.replaceWith(this.preRender());
     }
   },
 
@@ -336,7 +331,7 @@ var Message = {
    * @param {number} index
    * @param {boolean} avatarize
    */
-  preRender : function (index, avatarize) {
+  preRender : function (avatarize) {
     var message = this;
     var account = this.account;
     var html= null;
@@ -404,15 +399,20 @@ var Message = {
                 function saveBlob(blob) {
                   Store.SD.save(localUrl, blob, function () {
                     open(blob);
-                    var index = [$(img).closest('li[data-chunk]')[0].dataset.chunk, $(img).closest('div[data-index]')[0].dataset.index];
-                    Store.recover(index[0], function (key, chunk, free) {
+                    var index = $(img).closest('li[data-chunk]')[0].dataset.chunk;
+                    Store.recover(index, function (key, chunk, free) {
                       Tools.log(chunk, index);
-                      chunk[index[1]].media.downloaded = true;
-                      Store.update(key, index[0], chunk, function () {
-                        img.dataset.downloaded = true;
+                      var pos = chunk.findIndex(function (elem) { return elem.id == message.core.id; });
+                      if (pos >= 0) {
+                        chunk[pos].media.downloaded = true;
+                        Store.update(key, index, chunk, function () {
+                          img.dataset.downloaded = true;
+                          free();
+                          Tools.log('SUCCESS');
+                        });
+                      } else {
                         free();
-                        Tools.log('SUCCESS');
-                      });
+                      }
                     });
                   }, function (error) {
                     Tools.log('SAVE ERROR', error);
@@ -460,9 +460,6 @@ var Message = {
     var div = $('<div/>');
     var last = $('section#chat ul#messages li > div').last();
     div[0].dataset.type = type;
-    index = index || (last.length ? parseInt(last[0].dataset.index) + 1 : 0);
-    index = index >= App.defaults.Chat.chunkSize ? 0 : index;
-    div[0].dataset.index = index;
     div[0].dataset.stamp = this.core.stamp;
     div[0].dataset.from = this.core.from;
 
