@@ -221,7 +221,7 @@ var Store = {
    * @param {function} callback
    */
   put: function (key, value, callback) {
-  	asyncStorage.setItem(key, JSON.stringify(value), callback);
+    asyncStorage.setItem(key, JSON.stringify(value), callback);
   },
 
   /**
