@@ -962,8 +962,11 @@ var App = {
                   App.accountsCores= backup.accounts;
                   App.avatars= backup.avatars;
 
+                  // Make sure we are not updating accountsCores again
+                  App.__defineSetter__('accountsCores', function (val) { });
+
                   Store.update(key, 0, Store.size, function(){
-                    Store.unlock(0);
+                    Store.unlock(0, key);
 
                     window.location.reload();
                   });
