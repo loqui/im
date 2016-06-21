@@ -218,7 +218,23 @@ var Chat = {
 
     if (chunkListSize > 0) {
       Store.recover(blockIndex, function (key, chunk, free) {
-        if (!chunk || chunk.length >= App.defaults.Chat.chunkSize) {
+        var msgPos = (chunk && msg.id)
+            ? chunk.findIndex(function (a) { return a.id == msg.id; })
+            : -1;
+
+        if (msgPos >= 0) {
+          Tools.log('UPDATE EXISTING MESSAGE');
+          chunk.splice(msgPos, 1, msg);
+
+          blockIndex = chat.core.chunks[chunkListSize - 1];
+          Tools.log('PUSHING', blockIndex, chunk);
+          Store.update(key, blockIndex, chunk, function(index){
+            free();
+            callback(index);
+          });
+          storageIndex = [blockIndex, chunk.length-1];
+
+        } else if (!chunk || chunk.length >= App.defaults.Chat.chunkSize) {
           Tools.log('FULL OR NULL');
           chunk = [msg];
           blockIndex = Store.save(chunk);
@@ -231,10 +247,13 @@ var Chat = {
 
         } else {
           Tools.log('FITS');
-          chunk.push(msg);
-          chunk.sort(function (a, b) {
-            return Tools.unstamp(a.stamp) > Tools.unstamp(b.stamp);
-          });
+
+          msgPos = chunk.findIndex(function (a) { return Tools.unstamp(a.stamp) > Tools.unstamp(msg.stamp); });
+          if (msgPos >= 0) {
+            chunk.splice(msgPos, 0, msg);
+          } else {
+            chunk.push(msg);
+          }
 
           blockIndex = chat.core.chunks[chunkListSize - 1];
           Tools.log('PUSHING', blockIndex, chunk);
