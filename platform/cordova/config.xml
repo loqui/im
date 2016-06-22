@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="loqui.im" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+  <name>LoquiIM</name>
+  <description>
+    Loqui Instant Messenger unifies all your chat accounts in just one app.
+  </description>
+  <author email="support@loqui.im" href="https://loqui.im">
+    LoquiIM Team
+  </author>
+  <icon src="www/img/icon-256.png" />
+  <content src="index.html" />
+  <access origin="*" />
+</widget>

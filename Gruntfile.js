@@ -70,6 +70,24 @@ module.exports = function(grunt) {
         flatten: false,
         filter: 'isFile'
       },
+      srcToCordova: {
+        expand: true,
+        cwd: 'src/',
+        src: '**',
+        dest: '<%= meta.build %>/cordova/www',
+        flatten: false,
+        filter: function(src) {
+          return src.indexOf('.scss') < 0;
+        }
+      },
+      cordovaToDist: {
+        expand: true,
+        cwd: 'platform/cordova/',
+        src: '**',
+        dest: '<%= meta.build %>/cordova/',
+        flatten: false,
+        filter: 'isFile'
+      },
       srcToDesktop: {
         expand: true,
         cwd: 'src/',
@@ -181,6 +199,11 @@ module.exports = function(grunt) {
       },
       ubuntujsversion: {
         path: '<%= meta.build %>/ubuntu-touch/www/index.html',
+        pattern: ';version=1[.]7',
+        replacement: ''
+      },
+      cordovajsversion: {
+        path: '<%= meta.build %>/cordova/www/index.html',
         pattern: ';version=1[.]7',
         replacement: ''
       }
