@@ -1,6 +1,6 @@
 [Desktop Entry]
-Name=loqui
-Exec=ubuntu-html5-app-launcher $@ --www=www
+Name=LoquiIM
+Exec=webapp-container www/index.html
 Icon=loqui.png
 Terminal=false
 Type=Application
