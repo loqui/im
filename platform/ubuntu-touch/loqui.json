@@ -1,6 +1,13 @@
 {
-    "policy_groups": [
-        "networking"
-    ],
-    "policy_version": 1.1
+  "policy_groups": [
+    "audio",
+    "contacts",
+    "location",
+    "microphone",
+    "music_files",
+    "networking",
+    "picture_files",
+    "video_files"
+  ],
+  "policy_version": 1.1
 }
