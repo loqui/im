@@ -57,6 +57,7 @@ LICENSING
  * protobuf.js → Apache License v2.0
  * bytebuffer.js → Apache License v2.0
  * asmcrypto.js → MIT
+ * curve25519.js → MIT
 
 DISCLAIMER
 ===

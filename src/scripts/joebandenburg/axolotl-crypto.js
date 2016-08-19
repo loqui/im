@@ -18,11 +18,11 @@
 (function (root, factory) {
     "use strict";
     if (typeof define === "function" && define.amd) {
-        define("axolotl-crypto", ["axoltol-crypto-curve25519"], factory);
+        define("axolotl-crypto", ["axlsign"], factory);
     } else if (typeof exports === "object") {
-        module.exports = factory(require("axoltol-crypto-curve25519"));
+        module.exports = factory(require("axlsign"));
     } else {
-        root.axolotlCrypto = factory(root.axolotlCryptoCurve25519);
+        root.axolotlCrypto = factory(root.axlsign);
     }
 }(this, function(curve25519) {
     "use strict";
@@ -31,27 +31,27 @@
 
     var crypto = {
         generateKeyPair: function() {
-            var privateKey = window.crypto.getRandomValues(new Uint8Array(32)).buffer;
+            var privateKey = window.crypto.getRandomValues(new Uint8Array(32));
             var pair = curve25519.generateKeyPair(privateKey);
             var publicKey = new Uint8Array(33);
             publicKey[0] = 0x05;
-            publicKey.set(new Uint8Array(pair.public), 1);
+            publicKey.set(pair.public, 1);
             return {
                 public: publicKey.buffer,
-                private: pair.private
+                private: pair.private.buffer
             };
         },
         calculateAgreement: function(publicKey, privateKey) {
-            return curve25519.calculateAgreement(publicKey.slice(1), privateKey);
+            return curve25519.sharedKey(new Uint8Array(privateKey), new Uint8Array(publicKey.slice(1)));
         },
         randomBytes: function(byteCount) {
             return window.crypto.getRandomValues(new Uint8Array(byteCount)).buffer;
         },
         sign: function(privateKey, dataToSign) {
-            return curve25519.sign(privateKey, dataToSign);
+            return curve25519.sign(new Uint8Array(privateKey), new Uint8Array(dataToSign)).buffer;
         },
         verifySignature: function(signerPublicKey, dataToSign, purportedSignature) {
-            return curve25519.verifySignature(signerPublicKey.slice(1), dataToSign, purportedSignature);
+            return curve25519.verify(new Uint8Array(signerPublicKey.slice(1)), new Uint8Array(dataToSign), new Uint8Array(purportedSignature));
         },
         hmac: function(key, data) {
             if (window.crypto.subtle) {
