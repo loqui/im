@@ -30,7 +30,7 @@ var CosemeConnectorHelper = {
       });
     }
 
-    return loadScript('scripts/joebandenburg/curve25519.js').then(function () {
+    return loadScript('scripts/curve25519-js/axlsign.js').then(function () {
       return (window.crypto.subtle ? Promise.resolve(null) : loadScript('scripts/vibornoff/asmcrypto.js')).then(function () {
         return loadScript('scripts/joebandenburg/axolotl-crypto.js').then(function () {
           return loadScript('scripts/joebandenburg/axolotl.js');
