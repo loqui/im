@@ -4672,7 +4672,9 @@ CoSeMe.namespace('protocol.dictionary', (function(){
       'rtt',
       'token',
       'priority',
-      'p2p',
+      'p2p'
+    ],
+    [
       'rate',
       'amr',
       'ptt',
@@ -4717,25 +4719,17 @@ CoSeMe.namespace('protocol.dictionary', (function(){
     return result;
   }
 
-  // Return an object {token, submap}. Due to the particular form of encoding
-  // tokens, you should try to call this function with no submap. Then, if
-  // `token` key is null, read the next byte and call code2Token() again passing
-  // the read value as token and the value of submap key from the former call as
-  // submap.
+  // Return a token.
   function code2Token(code, submap) {
-    var array, result = { token: null, submap: null };
+    var array, result = null;
 
     // Called with only code
     if (arguments.length === 1) {
-      if (code >= secondaryStringStart && code < secondaryStringEnd) {
-        result.submap = code - secondaryStringStart;
-      } else {
-        array = primaryStrings;
-      }
+      array = primaryStrings;
 
     // Called with code and submap
     } else {
-      if (submap > secondaryStrings.length) {
+      if (submap >= secondaryStrings.length) {
         throw new Error('Invalid subdictionary: ' + submap);
       }
       array = secondaryStrings[submap];
@@ -4748,7 +4742,7 @@ CoSeMe.namespace('protocol.dictionary', (function(){
       } else if (!array[code]) {
         throw new Error('Invalid token or length');
       }
-      result.token = array[code];
+      result = array[code];
     }
 
     return result;
@@ -5947,20 +5941,14 @@ CoSeMe.namespace('protocol', (function(){
    * Get the string representation for the given token code.
    */
   BinaryReader.prototype.getToken = function(code) {
-    var result = code2Token(code);
-    if (result.token === null) {
-      code = this.readInt8();
-      result = code2Token(code, result.submap);
-    }
-    return result.token;
+    return code2Token(code);
   };
 
   /**
    * Get the string representation for the given token code.
    */
   BinaryReader.prototype.getTokenDouble = function(code, code2) {
-    var result = code2Token(code2, code);
-    return result.token;
+    return code2Token(code2, code);
   };
 
   /**
