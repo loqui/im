@@ -174,6 +174,7 @@ App.connectors.coseme = function (account) {
     handleEncryptedMessage(task.self, task.msg, callback);
   });
   var requestData = {};
+  var pendingAvatars = {};
   var lastKeepalive = new Date();
   var init = CosemeConnectorHelper.init();
 
@@ -619,6 +620,7 @@ App.connectors.coseme = function (account) {
       Tools.log('init');
 
       requestData = {};
+      pendingAvatars = {};
       axolDb = db;
       axolSendKeys = false;
       axolDecryptQueue.pause();
@@ -1326,11 +1328,28 @@ App.connectors.coseme = function (account) {
     };
 
     this.events.onAvatar = function (jid, picId, blob) {
+      function gotAvatar (saved) {
+        var pendingInfo = (jid in pendingAvatars) && pendingAvatars[jid];
+        if (pendingInfo && pendingInfo.id != picId && pendingInfo.refetch) {
+          pendingInfo.refetch = false;
+          MI.call('contact_getProfilePicture', [jid]);
+          return true;
+        } else if (saved) {
+          delete pendingAvatars[jid];
+        }
+
+        return false;
+      }
+
       var account = this.account;
       var avatars= App.avatars;
 
       Tools.log(jid, picId, blob);
       if (blob) {
+        if (gotAvatar (false)) {
+          return;
+        }
+
         if (jid == this.account.core.fullJid) {
           Tools.picThumb(blob, 96, 96, function (url) {
             $('section#main[data-jid="' + jid + '"] footer span.avatar img').attr('src', url);
@@ -1340,7 +1359,8 @@ App.connectors.coseme = function (account) {
             }
             Store.save(url, function (index) {
               avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
-              App.avatars= avatars;
+              App.avatars = avatars;
+              gotAvatar (true);
             });
           });
         } else {
@@ -1354,7 +1374,7 @@ App.connectors.coseme = function (account) {
 
             var cb = function (values) {
               avatars[jid] = (new Avatar({id: picId, chunk: values[0], original : values[1]})).data;
-              App.avatars= avatars;
+              gotAvatar (true);
             };
 
             $('ul[data-jid="' + account.core.fullJid + '"] [data-jid="' + jid + '"] span.avatar img').attr('src', tumb);
@@ -1393,11 +1413,15 @@ App.connectors.coseme = function (account) {
         }
       } else if (picId) {
         if (!(jid in App.avatars) || App.avatars[jid].id != picId) {
-          var method = 'contact_getProfilePicture';
-          var params = [jid];
-          MI.call(method, params);
+          if (!(jid in pendingAvatars)) {
+            pendingAvatars[jid] = { id: picId, refetch: true };
+            MI.call('contact_getProfilePicture', [jid]);
+          } else {
+            pendingAvatars[jid] = { id: picId, refetch: true };
+          }
         }
       } else {
+        delete pendingAvatars[jid];
         if (jid in avatars) {
           delete avatars[jid];
           App.avatars = avatars;
@@ -1648,17 +1672,19 @@ App.connectors.coseme = function (account) {
     this.events.onContactProfilePictureRemoved = function (from, stamp, msgId, pictureId, jid) {
       var method = 'notification_ack';
       MI.call(method, [from, msgId]);
+      this.events.onAvatar(from);
     };
 
     this.events.onGroupPictureUpdated = function (from, stamp, msgId, pictureId, jid) {
       var method = 'notification_ack';
       MI.call(method, [from, msgId]);
+      this.events.onAvatar(from, pictureId);
     };
 
     this.events.onGroupPictureRemoved = function (from, stamp, msgId, pictureId, jid) {
       var method = 'notification_ack';
       MI.call(method, [from, msgId]);
-      this.events.onAvatar(from, pictureId);
+      this.events.onAvatar(from);
     };
 
     this.events.onGroupParticipantsAdded = function (jid, stamp, msgId, participants) {
