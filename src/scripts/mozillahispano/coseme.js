@@ -3377,11 +3377,11 @@ CoSeMe.namespace('config', (function(){
     groupDomain: 'g.us',
 
     tokenData: {
-      "v": "2.16.8",
+      "v": "2.16.9", // whatsapp_scratch: e
       // XXX: it is tokenData[d] + - + tokenData[v] + - + port
-      "r": "S40-2.16.8",
-      "u": "WhatsApp/2.16.8 S40Version/14.26 Device/Nokia302",
-      "t": "1466028612906",
+      "r": "S40-2.16.9",
+      "u": "WhatsApp/2.16.9 S40Version/14.26 Device/Nokia302",
+      "t": "1471306597093", // whatsapp_scratch: h
       "d": "S40"
     },
 
@@ -6044,6 +6044,22 @@ CoSeMe.namespace('registration', (function(){
     return output.toString();
   }
 
+  function getTokenAndroid(phone) {
+    var signature = 'MIIDMjCCAvCgAwIBAgIETCU2pDALBgcqhkjOOAQDBQAwfDELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFDASBgNVBAcTC1NhbnRhIENsYXJhMRYwFAYDVQQKEw1XaGF0c0FwcCBJbmMuMRQwEgYDVQQLEwtFbmdpbmVlcmluZzEUMBIGA1UEAxMLQnJpYW4gQWN0b24wHhcNMTAwNjI1MjMwNzE2WhcNNDQwMjE1MjMwNzE2WjB8MQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEUMBIGA1UEBxMLU2FudGEgQ2xhcmExFjAUBgNVBAoTDVdoYXRzQXBwIEluYy4xFDASBgNVBAsTC0VuZ2luZWVyaW5nMRQwEgYDVQQDEwtCcmlhbiBBY3RvbjCCAbgwggEsBgcqhkjOOAQBMIIBHwKBgQD9f1OBHXUSKVLfSpwu7OTn9hG3UjzvRADDHj+AtlEmaUVdQCJR+1k9jVj6v8X1ujD2y5tVbNeBO4AdNG/yZmC3a5lQpaSfn+gEexAiwk+7qdf+t8Yb+DtX58aophUPBPuD9tPFHsMCNVQTWhaRMvZ1864rYdcq7/IiAxmd0UgBxwIVAJdgUI8VIwvMspK5gqLrhAvwWBz1AoGBAPfhoIXWmz3ey7yrXDa4V7l5lK+7+jrqgvlXTAs9B4JnUVlXjrrUWU/mcQcQgYC0SRZxI+hMKBYTt88JMozIpuE8FnqLVHyNKOCjrh4rs6Z1kW6jfwv6ITVi8ftiegEkO8yk8b6oUZCJqIPf4VrlnwaSi2ZegHtVJWQBTDv+z0kqA4GFAAKBgQDRGYtLgWh7zyRtQainJfCpiaUbzjJuhMgo4fVWZIvXHaSHBU1t5w//S0lDK2hiqkj8KpMWGywVov9eZxZy37V26dEqr/c2m5qZ0E+ynSu7sqUD7kGx/zeIcGT0H+KAVgkGNQCo5Uc0koLRWYHNtYoIvt5R3X6YZylbPftF/8ayWTALBgcqhkjOOAQDBQADLwAwLAIUAKYCp0d6z4QQdyN74JDfQ2WCyi8CFDUM4CaNB+ceVXdKtOrNTQcc0e+t';
+    var key = 'eQV5aq/Cg63Gsq1sshN9T3gh+UUp0wIw0xgHYT1bnCjEqOJQKCRrWxdAe2yvsDeCJL+Y4G3PRD2HUF7oUgiGo8vGlNJOaux26k+A2F3hj8A=';
+
+    var data = CryptoJS.enc.Base64.parse(signature).concat(CryptoJS.enc.Base64.parse(CoSeMe.config.tokenData['m'])).concat(CryptoJS.enc.Latin1.parse(phone));
+
+    var keyData = CryptoJS.enc.Base64.parse(key);
+    var opad = new CryptoJS.lib.WordArray.init(keyData.words.map(function (e, i) { return e ^ 0x5c5c5c5c; }), 64);
+    var ipad = new CryptoJS.lib.WordArray.init(keyData.words.map(function (e, i) { return e ^ 0x36363636; }), 64);
+
+    var subHash = CryptoJS.SHA1(ipad.concat(data));
+    var hash = CryptoJS.SHA1(opad.concat(subHash));
+
+    return CryptoJS.enc.Base64.stringify(hash);
+  }
+
   function getRealDeviceId(aSeed) {
     var seed = aSeed || (Math.random() * 1e16).toString(36).substring(2, 10);
     var id = CryptoJS.SHA1(seed).toString(CryptoJS.enc.Latin1).substring(0, 20);
@@ -6069,6 +6085,7 @@ CoSeMe.namespace('registration', (function(){
       params['sim_mcc'] = pad(mcc, 3);
       params['sim_mnc'] = pad(mnc, 3);
       params['method'] = method in {'sms': 1, 'voice': 1} ? method : 'sms';
+      params['reason'] = '';
       params['token'] = getToken(phone);
 
       var seedAndId = getRealDeviceId(deviceId);
