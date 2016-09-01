@@ -4117,19 +4117,6 @@ CoSeMe.namespace('protocol', (function(){
     return child;
   };
 
-  Object.defineProperty(Tree.prototype, "tag", {
-    get: function() {
-      var value = this._tag;
-      if (value && value.hexdata) {
-        value = CryptoJS.enc.Latin1.stringify(CryptoJS.enc.Hex.parse(value.hexdata));
-      };
-      return value;
-    },
-    set: function(tag) {
-      this._tag = tag;
-    }
-  });
-
   Object.defineProperty(Tree.prototype, "data", {
     get: function() {
       var value = this._data;
@@ -5671,7 +5658,7 @@ CoSeMe.namespace('protocol', (function(){
     }
 
     // Read tag.
-    var tag = this.readString(stringMark);
+    var tag = this.readString(stringMark, true);
     if (listSize === 0 || tag === null)
       throw new SyntaxError('0 list or null tag!');
 
@@ -5849,7 +5836,7 @@ CoSeMe.namespace('protocol', (function(){
   BinaryReader.prototype.readAttributes = function(attributeCount) {
     var key, value, attributes = {};
     while (attributeCount > 0) {
-      key = this.readString(this.message.read());
+      key = this.readString(this.message.read(), true);
       value = this.readString(this.message.read());
       attributes[key] = value;
       attributeCount--;
