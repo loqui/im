@@ -1776,6 +1776,13 @@ App.connectors.coseme = function (account) {
           return;
         }
 
+        var savedAvatar = function (values) {
+          avatars[jid] = (new Avatar({ id: picId, chunk: values[0],
+                                       original : values[1] })).data;
+          App.avatars = avatars;
+          gotAvatar (true);
+        };
+
         if (jid == this.account.core.fullJid) {
           Tools.picThumb(blob, 96, 96, function (url) {
             $('section#main[data-jid="' + jid + '"] footer span.avatar img').attr('src', url);
@@ -1783,11 +1790,7 @@ App.connectors.coseme = function (account) {
             if (Accounts.current === account) {
               $('section#me .avatar img').attr('src', url);
             }
-            Store.save(url, function (index) {
-              avatars[jid] = (new Avatar({id: picId, chunk: index})).data;
-              App.avatars = avatars;
-              gotAvatar (true);
-            });
+            Store.save(url, function (index) { savedAvatar([index, null]); });
           });
         } else {
 
@@ -1797,11 +1800,6 @@ App.connectors.coseme = function (account) {
           ]).then(function(values){
             var original= values[0];
             var tumb= values[1];
-
-            var cb = function (values) {
-              avatars[jid] = (new Avatar({id: picId, chunk: values[0], original : values[1]})).data;
-              gotAvatar (true);
-            };
 
             $('ul[data-jid="' + account.core.fullJid + '"] [data-jid="' + jid + '"] span.avatar img').attr('src', tumb);
             $('section#chat[data-jid="' + jid + '"] span.avatar img').attr('src', tumb);
@@ -1828,12 +1826,12 @@ App.connectors.coseme = function (account) {
                   }
 
                 })
-              ]).then(cb);
+              ]).then(savedAvatar);
             } else {
               Promise.all([
                 new Promise(function(done){ Store.save(tumb, done); }),
                 new Promise(function(done){ Store.save(original, done); })
-              ]).then(cb);
+              ]).then(savedAvatar);
             }
           });
         }
