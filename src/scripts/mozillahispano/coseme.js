@@ -7930,9 +7930,19 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
 
       var msgId = aMsgId ? aMsgId : (Math.floor(Date.now() / 1000)  + '-' + self.currKeyId);
 
+      var msgType;
+      if (aChild.tag === 'media') {
+        msgType = 'media';
+      } else if ((aChild.tag === 'enc')
+                 && (aChild.getAttributeValue('mediatype'))) {
+        msgType = 'media';
+      } else {
+        msgType = 'text';
+      }
+
       var messageNode = newProtocolTreeNode('message', {
         to: aJid,
-        type: aChild.tag === 'media' ? 'media' : 'text', // TODO: See for vcard
+        type: msgType,
         id: msgId
       }, messageChildren);
 
@@ -8687,9 +8697,10 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
 
     // Encrypt
 
-    encrypt_sendMessage: self.sendMessage.bind(self, function(aJid, buffer, type, v, count) {
+    encrypt_sendMessage: self.sendMessage.bind(self, function(aJid, buffer, mediatype, type, v, count) {
       var attrs = { type : type, v : v };
       count && (attrs.count = count);
+      mediatype && (attrs.mediatype = mediatype);
       return newProtocolTreeNode('enc', attrs, undefined, buffer);
     }),
 

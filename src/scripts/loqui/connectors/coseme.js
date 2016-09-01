@@ -608,6 +608,19 @@ App.connectors.coseme = function (account) {
     return padV2(proto.Message.encode({ conversation: text })).toArrayBuffer();
   }
 
+  function encodeV2Contact (name, vcard) {
+    return padV2(proto.Message.encode({
+      contact_message: { display_name: name,
+                         vcard: vcard } })).toArrayBuffer();
+  }
+
+  function encodeV2Location (lat, lng, url) {
+    return padV2(proto.Message.encode({
+      location_message: { degrees_latitude: lat,
+                          degrees_longitude: lng,
+                          url: url } })).toArrayBuffer();
+  }
+
   function sendSetKeys (jid) {
     axolSendKeys = true;
     axol.generatePreKeys(Math.floor(Math.random() * 0xfffffe), 50).then(function (preKeys) {
@@ -1302,7 +1315,7 @@ App.connectors.coseme = function (account) {
         } else {
           encryptMessage(to, encodeV2Text(text)).then(function (m) {
             ready(MI.call('encrypt_sendMessage',
-                          [options.msgId, to, m.body,
+                          [options.msgId, to, m.body, null,
                            (m.isPreKeyWhisperMessage ? 'pkmsg' : 'msg'),
                            '2']));
           }, function (e) {
@@ -1394,20 +1407,36 @@ App.connectors.coseme = function (account) {
 
     this.locationSend = function (jid, loc) {
       var self = this;
+      var url = 'https://maps.google.com/maps?q=' + loc.lat + ',' + loc.long;
       Tools.locThumb(loc, 120, 120, function (thumb) {
-        var method = 'message_locationSend';
-        MI.call(method, [jid, loc.lat, loc.long, thumb]);
-        self.addMediaMessageToChat('url', thumb, 'https://maps.google.com/maps?q=' + loc.lat + ',' + loc.long, [ loc.lat, loc.long ], account.core.user, jid, Math.floor((new Date()).getTime() / 1000) + '-1');
-        App.audio('sent');
+        encryptMessage(jid, encodeV2Location(loc.lat, loc.long, url)).then(function (m) {
+          return MI.call('encrypt_sendMessage',
+                         [null, jid, m.body, 'location',
+                         (m.isPreKeyWhisperMessage ? 'pkmsg' : 'msg'),
+                         '2']);
+        }, function (e) {
+          Tools.log('PLAINTEXT FALLBACK', e);
+          return MI.call('message_locationSend', [jid, loc.lat, loc.long, thumb]);
+        }).then(function (msgId) {
+          self.addMediaMessageToChat('url', thumb, url, [ loc.lat, loc.long ], account.core.user, jid, msgId);
+        });
       });
     };
 
     this.vcardSend = function (jid, name, vcard) {
       var self = this;
       Tools.vcardThumb(null, 120, 120, function (thumb) {
-        var method = 'message_vcardSend';
-        MI.call(method, [jid, vcard, name]);
-        self.addMediaMessageToChat('vCard', thumb, null, [ name, vcard ], account.core.user, jid, Math.floor((new Date()).getTime() / 1000) + '-1');
+        encryptMessage(jid, encodeV2Contact(name, vcard)).then(function (m) {
+          return MI.call('encrypt_sendMessage',
+                         [null, jid, m.body, 'contact',
+                         (m.isPreKeyWhisperMessage ? 'pkmsg' : 'msg'),
+                         '2']);
+        }, function (e) {
+          Tools.log('PLAINTEXT FALLBACK', e);
+          return MI.call('message_vcardSend', [jid, vcard, name]);
+        }).then(function (msgId) {
+          self.addMediaMessageToChat('vCard', thumb, null, [ name, vcard ], account.core.user, jid, msgId);
+        });
       });
     };
 
