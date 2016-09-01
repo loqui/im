@@ -1,4 +1,4 @@
-/* global IDBKeyRange, App, CoSeMe, Providers, Tools, Avatar, Store, Message, Chat, Account, Accounts, Lungo, Make, async, axolotl, axolotlCrypto, emojione, _root */
+/* global IDBKeyRange, App, CoSeMe, Providers, Tools, Avatar, Store, Message, Chat, Account, Accounts, Lungo, Make, async, axolotl, axolotlCrypto, dcodeIO, emojione */
 
 /**
  * @file Holds {@link Connector/Coseme}
@@ -17,6 +17,399 @@
  */
 var CosemeConnectorHelper = {
   tokenDataKeys : [ 'v', 'r', 'u', 't', 'd' ],
+
+  proto : dcodeIO.ProtoBuf.newBuilder({})['import']({
+    "package": "com.whatsapp.proto",
+    "messages": [
+        {
+            "name": "Message",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "conversation",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "SenderKeyDistributionMessage",
+                    "name": "sender_key_distribution_message",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "ImageMessage",
+                    "name": "image_message",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "ContactMessage",
+                    "name": "contact_message",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "LocationMessage",
+                    "name": "location_message",
+                    "id": 5
+                },
+                {
+                    "rule": "optional",
+                    "type": "UrlMessage",
+                    "name": "url_message",
+                    "id": 6
+                },
+                {
+                    "rule": "optional",
+                    "type": "DocumentMessage",
+                    "name": "document_message",
+                    "id": 7
+                },
+                {
+                    "rule": "optional",
+                    "type": "AudioMessage",
+                    "name": "audio_message",
+                    "id": 8
+                },
+                {
+                    "rule": "optional",
+                    "type": "VideoMessage",
+                    "name": "video_message",
+                    "id": 9
+                }
+            ]
+        },
+        {
+            "name": "SenderKeyDistributionMessage",
+            "fields": [
+                {
+                    "rule": "required",
+                    "type": "string",
+                    "name": "group_id",
+                    "id": 1
+                },
+                {
+                    "rule": "required",
+                    "type": "bytes",
+                    "name": "axolotl_sender_key_distribution_message",
+                    "id": 2
+                }
+            ]
+        },
+        {
+            "name": "ImageMessage",
+            "fields": [
+                {
+                    "rule": "required",
+                    "type": "string",
+                    "name": "url",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "mime_type",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "caption",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
+                    "name": "file_sha256",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint64",
+                    "name": "file_length",
+                    "id": 5
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "height",
+                    "id": 6
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "width",
+                    "id": 7
+                },
+                {
+                    "rule": "required",
+                    "type": "bytes",
+                    "name": "media_key",
+                    "id": 8
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
+                    "name": "jpeg_thumbnail",
+                    "id": 16
+                }
+            ]
+        },
+        {
+            "name": "LocationMessage",
+            "fields": [
+                {
+                    "rule": "required",
+                    "type": "double",
+                    "name": "degrees_latitude",
+                    "id": 1
+                },
+                {
+                    "rule": "required",
+                    "type": "double",
+                    "name": "degrees_longitude",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "name",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "address",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "url",
+                    "id": 5
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
+                    "name": "jpeg_thumbnail",
+                    "id": 16
+                }
+            ]
+        },
+        {
+            "name": "DocumentMessage",
+            "fields": [
+                {
+                    "rule": "required",
+                    "type": "string",
+                    "name": "url",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "mime_type",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "title",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
+                    "name": "file_sha256",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint64",
+                    "name": "file_length",
+                    "id": 5
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "page_count",
+                    "id": 6
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
+                    "name": "media_key",
+                    "id": 7
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
+                    "name": "jpeg_thumbnail",
+                    "id": 16
+                }
+            ]
+        },
+        {
+            "name": "UrlMessage",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "text",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "matched_text",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "canonical_url",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "description",
+                    "id": 5
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "title",
+                    "id": 6
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
+                    "name": "jpeg_thumbnail",
+                    "id": 16
+                }
+            ]
+        },
+        {
+            "name": "AudioMessage",
+            "fields": [
+                {
+                    "rule": "required",
+                    "type": "string",
+                    "name": "url",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "mime_type",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
+                    "name": "file_sha256",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint64",
+                    "name": "file_length",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint64",
+                    "name": "duration",
+                    "id": 5
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "unk",
+                    "id": 6
+                },
+                {
+                    "rule": "required",
+                    "type": "bytes",
+                    "name": "media_key",
+                    "id": 7
+                }
+            ]
+        },
+        {
+            "name": "VideoMessage",
+            "fields": [
+                {
+                    "rule": "required",
+                    "type": "string",
+                    "name": "url",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "mime_type",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
+                    "name": "file_sha256",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint64",
+                    "name": "file_length",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint64",
+                    "name": "duration",
+                    "id": 5
+                },
+                {
+                    "rule": "required",
+                    "type": "bytes",
+                    "name": "media_key",
+                    "id": 6
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "caption",
+                    "id": 7
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
+                    "name": "jpeg_thumbnail",
+                    "id": 16
+                }
+            ]
+        },
+        {
+            "name": "ContactMessage",
+            "fields": [
+                {
+                    "rule": "required",
+                    "type": "string",
+                    "name": "display_name",
+                    "id": 1
+                },
+                {
+                    "rule": "required",
+                    "type": "string",
+                    "name": "vcard",
+                    "id": 16
+                }
+            ]
+        }
+    ]
+  }).build(),
 
   _axolLoaded : function () {
     function loadScript (src) {
@@ -177,6 +570,7 @@ App.connectors.coseme = function (account) {
   var pendingAvatars = {};
   var lastKeepalive = new Date();
   var init = CosemeConnectorHelper.init();
+  var proto = CosemeConnectorHelper.proto.com.whatsapp.proto;
 
   this.account = account;
   this.provider = Providers.data[account.core.provider];
@@ -198,8 +592,7 @@ App.connectors.coseme = function (account) {
     return (jid.indexOf('@g.us') < 0);
   }
 
-  function encodeV2Text (text) {
-    var buffer = _root.com.whatsapp.proto.Message.encode({ conversation: text });
+  function padV2 (buffer) {
     var maxPadding = (buffer.remaining() > 192) ? 31 : (256 - buffer.remaining()) / 2;
     var padding = Math.floor(Math.random() * maxPadding) + 1;
 
@@ -208,7 +601,11 @@ App.connectors.coseme = function (account) {
     buffer.limit += padding;
     buffer.fill(padding);
     buffer.flip();
-    return buffer.toArrayBuffer();
+    return buffer;
+  }
+
+  function encodeV2Text (text) {
+    return padV2(proto.Message.encode({ conversation: text })).toArrayBuffer();
   }
 
   function sendSetKeys (jid) {
@@ -567,7 +964,7 @@ App.connectors.coseme = function (account) {
           try {
             var v2msg;
             if (msg.v == '2') {
-              v2msg = _root.com.whatsapp.proto.Message.decode(data.subarray(0, -data[data.length - 1]));
+              v2msg = proto.Message.decode(data.subarray(0, -data[data.length - 1]));
             } else {
               v2msg = { conversation : CoSeMe.utils.stringFromUtf8(CoSeMe.utils.latin1FromBytes(data)) };
             }
@@ -592,7 +989,7 @@ App.connectors.coseme = function (account) {
             Tools.log('DECRYPTED MESSAGE', CoSeMe.utils.hex(data));
 
             try {
-              var v2msg = _root.com.whatsapp.proto.Message.decode(data.subarray(0, -data[data.length - 1]));
+              var v2msg = proto.Message.decode(data.subarray(0, -data[data.length - 1]));
 
               onDecrypted(v2msg, m.session);
             } catch (e) {
