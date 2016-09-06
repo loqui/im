@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=LoquiIM
-Exec=webapp-container www/index.html
+Exec=webapp-container --inspector ./www/index.html
 Icon=loqui.png
 Terminal=false
 Type=Application
