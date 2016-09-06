@@ -1,0 +1,20 @@
+{
+    "template": "ubuntu-webapp",
+    "policy_groups": [
+        "networking",
+        "audio",
+        "content_exchange",
+        "video",
+        "webview",
+        "location",
+        "keep-display-on",
+        "microphone",
+        "camera",
+        "connectivity",
+        "content_exchange_source",
+		    "music_files",
+		    "picture_files",
+		    "video_files"
+    ],
+    "policy_version": 1.3
+}
