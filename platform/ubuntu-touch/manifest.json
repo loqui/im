@@ -4,12 +4,12 @@
     "framework": "ubuntu-sdk-15.04-html",
     "hooks": {
         "loqui": {
-            "apparmor": "loqui.json",
+            "apparmor": "loqui.apparmor",
             "desktop": "loqui.desktop"
         }
     },
     "maintainer": "LoquiIM Community",
     "name": "com.ubuntu.loqui.im.loqui",
     "title": "LoquiIM",
-    "version": "$(Loqui.Version)"
+    "version": "0.5.8"
 }
