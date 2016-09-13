@@ -4,7 +4,7 @@
     "framework": "ubuntu-sdk-15.04-html",
     "hooks": {
         "loqui": {
-            "apparmor": "loqui.json",
+            "apparmor": "loqui.apparmor",
             "desktop": "loqui.desktop"
         }
     },
