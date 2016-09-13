@@ -19,7 +19,7 @@ if (!navigator.requestWakeLock) {
 }
 
 // emulate mozTCPSocket using chrome.sockets
-if (!navigator.mozTCPSocket && chrome && chrome.sockets && chrome.sockets.tcp) {
+if (!navigator.mozTCPSocket && window.chrome && chrome.sockets && chrome.sockets.tcp) {
   (function () {
     function TCPSocket(host, port, options) {
       options = options || {};
@@ -150,4 +150,97 @@ if (!navigator.mozTCPSocket && chrome && chrome.sockets && chrome.sockets.tcp) {
       }
     };
   })();
+} else if (!navigator.mozTCPSocket) {
+  // emulate mozTCPSocket using local WebSocket connector
+  (function () {
+    function TCPSocket(host, port, options) {
+      options = options || {};
+
+      var self = this;
+      this._socket = new WebSocket('ws://localhost:8080/' + host, "tcp");
+      this._socket.binaryType = 'arraybuffer';
+      this._socket.onopen = function () {
+        self.readyState = 'open';
+        if (self.onopen) {
+          self.onopen();
+        }
+      };
+      this._socket.onerror = function () {
+        self.readyState = 'disconnected';
+        if (self.onerror) {
+          self.onerror();
+        }
+      };
+      this._socket.onclose = function () {
+        self.readyState = 'disconnected';
+        if (self.onclose) {
+          self.onclose();
+        }
+      };
+      this._socket.onmessage = function (msg) {
+        console.log('onmessage', msg);
+        if (self.ondata) {
+          var data = msg.data;
+          if (self._binaryType === 'string') {
+            data = CoSeMe.utils.latin1FromBytes(new Uint8Array(data));
+          }
+          self.ondata({ data: data });
+        }
+      };
+
+      this.onclose = null;
+      this.ondata = null;
+      this.onerror = null;
+      this.onopen = null;
+      this.readyState = 'disconnected';
+      this._binaryType = options.binaryType || 'string';
+    }
+
+    TCPSocket.prototype.close = function () {
+      this._socket.close();
+    };
+
+    TCPSocket.prototype.send = function (data, offset, len) {
+      console.log('send', data);
+
+      if (this._binaryType === 'string') {
+        data = CoSeMe.utils.bytesFromLatin1(data).buffer;
+      }
+
+      if (offset !== undefined || len !== undefined) {
+        data = data.slice(offset, (len !== undefined) ? offset + len : data.byteLength);
+      }
+
+      this._socket.send(data);
+    };
+
+    TCPSocket.prototype.suspend = function () {
+      console.log('TODO: suspend');
+    };
+
+    TCPSocket.prototype.resume = function () {
+      console.log('TODO: resume');
+    };
+
+    TCPSocket.prototype.upgradeToSecure = function () {
+      console.log('TODO: upgradeToSecure');
+    };
+
+    navigator.mozTCPSocket = {
+      open : function (host, port, options) {
+        return new TCPSocket(host, port, options);
+      }
+    };
+  })();
+}
+
+if (!navigator.mozContacts) {
+  navigator.mozContacts = {
+    getAll : function () {
+      var result = { onsuccess : function () { },
+                     onerror : function () { } };
+      setTimeout(function () { result.onerror(); }, 0);
+      return result;
+    }
+  };
 }
