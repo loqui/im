@@ -1473,7 +1473,7 @@ App.connectors.coseme = function (account) {
         video_received: this.events.onVideoReceived,
         audio_received: this.events.onAudioReceived,
         location_received: this.events.onLocationReceived,
-        message_error: this.events.onMessageError,
+        message_error: this.events.onErrorMessage,
         receipt_messageSent: this.events.onMessageSent,
         receipt_messageError: this.events.onMessageError,
         receipt_messageRetry: this.events.onMessageRetry,
@@ -1709,6 +1709,7 @@ App.connectors.coseme = function (account) {
           text: body,
           stamp: stamp,
           viewed: !wantsReceipt,
+          volatile: !wantsReceipt,
           pushName: (pushName && pushName != fromUser) ? (fromUser + ': ' + pushName) : pushName
         });
 
@@ -1724,7 +1725,7 @@ App.connectors.coseme = function (account) {
       return true;
     };
 
-    this.events.onMessageError = function (id, from, body, stamp, e, nick, g) {
+    this.events.onErrorMessage = function (id, from, body, stamp, e, nick, g) {
       Tools.log('MESSAGE NOT RECEIVED', id, from, body, stamp, e, nick, g);
     };
 
@@ -2070,6 +2071,7 @@ App.connectors.coseme = function (account) {
           text: body,
           stamp: stamp,
           viewed: !wantsReceipt,
+          volatile: !wantsReceipt,
           id : msgId,
           pushName: (pushName && pushName != fromUser) ? (fromUser + ': ' + pushName) : pushName
         }, {
@@ -2388,8 +2390,9 @@ App.connectors.coseme = function (account) {
         msg = Make(Message)(this.account, msg, {
           muc: isGroup && !to.endsWith('@broadcast')
         });
-        msg.receive();
-        this.ack(msgId, isGroup ? to : from, null, isGroup ? from : null);
+        msg.receive(function(){
+          this.ack(msgId, isGroup ? to : from, null, isGroup ? from : null);
+        }.bind(this));
         Tools.log('Finished processing file of type', fileType);
       }.bind(this);
       switch (fileType) {

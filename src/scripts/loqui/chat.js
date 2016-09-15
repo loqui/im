@@ -223,15 +223,22 @@ var Chat = {
             : -1;
 
         if (msgPos >= 0) {
-          Tools.log('UPDATE EXISTING MESSAGE');
-          chunk.splice(msgPos, 1, msg);
-
           blockIndex = chat.core.chunks[chunkListSize - 1];
-          Tools.log('PUSHING', blockIndex, chunk);
-          Store.update(key, blockIndex, chunk, function(index){
+
+          if (msg.volatile) {
+            Tools.log('IGNORING VOLATILE MESSAGE');
             free();
-            callback(index);
-          });
+            callback(undefined);
+          } else {
+            Tools.log('UPDATE EXISTING MESSAGE');
+            chunk.splice(msgPos, 1, msg);
+
+            Tools.log('PUSHING', blockIndex, chunk);
+            Store.update(key, blockIndex, chunk, function(index){
+              free();
+              callback(index);
+            });
+          }
           storageIndex = [blockIndex, chunk.length-1];
 
         } else if (!chunk || chunk.length >= App.defaults.Chat.chunkSize) {
