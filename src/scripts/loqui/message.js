@@ -192,51 +192,53 @@ var Message = {
       if (callback) callback();
       lock.unlock();
 
-      if ($('section#chat')[0].dataset.jid == chat.core.jid) {
-        var ul = $('section#chat ul#messages');
-        var li = ul.children('li[data-chunk="' + blockIndex + '"]');
-        if (message.core.id && account.supports('receipts')) {
-          li.children('div[data-id="' + message.core.id + '"]').remove();
-        }
-        var last = ul.children('li[data-chunk]').last().children('div').last();
-        var avatarize = !last.length || last[0].dataset.from != message.core.from;
-        var timeDiff = !last.length || (Tools.unstamp(message.core.stamp) - Tools.unstamp(last[0].dataset.stamp) > 300000);
-        var conv = Tools.convenientDate(message.core.stamp);
-        if (li.length) {
-          if (timeDiff) {
-            li.append($('<time/>').attr('datetime', message.core.stamp).text(_('DateTimeFormat', {date: conv[0], time: conv[1]}))[0]);
+      if (blockIndex !== undefined) {
+        if ($('section#chat')[0].dataset.jid == chat.core.jid) {
+          var ul = $('section#chat ul#messages');
+          var li = ul.children('li[data-chunk="' + blockIndex + '"]');
+          if (message.core.id && account.supports('receipts')) {
+            li.children('div[data-id="' + message.core.id + '"]').remove();
           }
-          li.append(message.preRender(avatarize));
+          var last = ul.children('li[data-chunk]').last().children('div').last();
+          var avatarize = !last.length || last[0].dataset.from != message.core.from;
+          var timeDiff = !last.length || (Tools.unstamp(message.core.stamp) - Tools.unstamp(last[0].dataset.stamp) > 300000);
+          var conv = Tools.convenientDate(message.core.stamp);
+          if (li.length) {
+            if (timeDiff) {
+              li.append($('<time/>').attr('datetime', message.core.stamp).text(_('DateTimeFormat', {date: conv[0], time: conv[1]}))[0]);
+            }
+            li.append(message.preRender(avatarize));
+          } else {
+            li = $('<li/>').addClass('chunk');
+            li[0].dataset.chunk= blockIndex;
+            if (timeDiff) {
+              li.append($('<time/>').attr('datetime', message.core.stamp).text(_('DateTimeFormat', {date: conv[0], time: conv[1]}))[0]);
+            }
+            li.append(message.preRender(avatarize));
+            ul.append(li);
+          }
+          if (avatarize) {
+            account.avatarsRender();
+          }
+          $('section#chat #typing').hide();
+          chat.core.lastRead = Tools.localize(Tools.stamp());
+          if (!$('section#chat').hasClass('show')) {
+            chat.unread++;
+            chat.core.unread++;
+            chat.unreadList.push(message);
+          }else if(document.hidden){
+            chat.unreadList.push(message);
+          }else{
+            $('section#chat span.title').addClass('new-message');
+            setTimeout(function() {
+              $('section#chat span.title').removeClass('new-message');
+            }, 2000);
+            message.read();
+          }
         } else {
-          li = $('<li/>').addClass('chunk');
-          li[0].dataset.chunk= blockIndex;
-          if (timeDiff) {
-            li.append($('<time/>').attr('datetime', message.core.stamp).text(_('DateTimeFormat', {date: conv[0], time: conv[1]}))[0]);
-          }
-          li.append(message.preRender(avatarize));
-          ul.append(li);
-        }
-        if (avatarize) {
-          account.avatarsRender();
-        }
-        $('section#chat #typing').hide();
-        chat.core.lastRead = Tools.localize(Tools.stamp());
-        if (!$('section#chat').hasClass('show')) {
           chat.unread++;
           chat.core.unread++;
-          chat.unreadList.push(message);
-        }else if(document.hidden){
-          chat.unreadList.push(message);
-        }else{
-          $('section#chat span.title').addClass('new-message');
-          setTimeout(function() {
-            $('section#chat span.title').removeClass('new-message');
-          }, 2000);
-          message.read();
         }
-      } else {
-        chat.unread++;
-        chat.core.unread++;
       }
     });
   },
