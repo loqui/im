@@ -3386,7 +3386,7 @@ CoSeMe.namespace('config', (function(){
     },
 
     auth: {
-      host: 'c2.whatsapp.net',
+      host: 'e1.whatsapp.net',
       port: 443,
 //      host: 'localhost',
 //      port: 8080,
