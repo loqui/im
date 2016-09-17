@@ -1,7 +1,3 @@
-About this fork
-=====
-This is a lifted up attempt to create a Loqui IM Edition for Ubuntu Touch Devices. I only tested it for using it for Whatsapp. Actually the Registration process is working. Not more, not less. For now it's not possible to get over the code checking process. This is an issue of the Ubuntu Touch OS itself you can read here https://github.com/loqui/im/pull/1135 (thanks to cmeerw). So you won't be able to use Whatsapp yet. I can't change it. You should try the other Messengers listed up below, which I don't and also won't use. Thanks for understanding and happy using Loqui IM on Ubuntu Touch!
-
 LOQUI Instant Messenger
 =====
 Loqui Instant Messenger unifies all your chat accounts in just one Firefox OS app
