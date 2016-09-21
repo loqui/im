@@ -1909,7 +1909,7 @@ App.connectors.coseme = function (account) {
                    plaintext : encodeV2Text(msg.text),
                    ready : function (m) {
                      MI.call('encrypt_sendMessage',
-                             [msg.id, from, m.body,
+                             [msg.id, from, m.body, null,
                               (m.isPreKeyWhisperMessage ? 'pkmsg' : 'msg'),
                               '2', count || '1']);
                    },
