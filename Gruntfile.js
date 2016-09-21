@@ -202,6 +202,11 @@ module.exports = function(grunt) {
         pattern: ';version=1[.]7',
         replacement: ''
       },
+      ubuntumanifestversion: {
+        path: '<%= meta.build %>/ubuntu-touch/manifest.json',
+        pattern: '"version": "v',
+        replacement: '"version": "'
+      },
       cordovajsversion: {
         path: '<%= meta.build %>/cordova/www/index.html',
         pattern: ';version=1[.]7',
