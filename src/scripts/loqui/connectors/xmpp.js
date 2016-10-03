@@ -908,3 +908,23 @@ App.emoji.GTALK = {
   }
 
 };
+
+// monkey-patch strope.js to add wake-locks
+(function () {
+  [ [ Strophe.Bosh.prototype, '_onRequestStateChange' ],
+    [ Strophe.Websocket.prototype, '_onMessage' ],
+    [ Strophe.Tcpsocket.prototype, '_onReceive' ] ].forEach(function (elem) {
+      var obj = elem[0];
+      var idx = elem[1];
+
+      var fn = obj[idx];
+      obj[idx] = function () {
+        var cpuLock = navigator.requestWakeLock('cpu');
+        try {
+          return fn.apply(this, arguments);
+        } finally {
+          cpuLock.unlock();
+        }
+      };
+  });
+}) ();
