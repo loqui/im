@@ -816,7 +816,7 @@ App.connectors.coseme = function (account) {
     function onDecryptError(e) {
       Tools.log('DECRYPT ERROR', e);
 
-      if (msg.groupJid && msg.type != 'skmsg') {
+      if (msg.groupJid && msg.type != 'skmsg' && !msg.count) {
         // ignore decryption error for non-skmsg group messages, we'll
         // handle these on the skmsg
       } else {
@@ -825,7 +825,8 @@ App.connectors.coseme = function (account) {
           MI.call('message_retry', [msg.groupJid ? msg.groupJid : msg.remoteJid,
                                     msg.msgId, axolLocalReg.registrationId,
                                     count.toString(),
-                                    msg.groupJid ? '1' : msg.v,
+                                    '1',
+                                    msg.timeStamp,
                                     msg.groupJid ? msg.remoteJid : null]);
         } else {
           MI.call('message_error', [msg.groupJid ? msg.groupJid : msg.remoteJid,
@@ -903,7 +904,11 @@ App.connectors.coseme = function (account) {
           Tools.log('MEDIA ENCRYPTION KEYS', CoSeMe.utils.hex(iv), CoSeMe.utils.hex(key));
           onVideo(videoThumb, video_msg.url, video_msg.file_length.toNumber(), video_msg.mime_type, { iv: CoSeMe.utils.latin1FromBytes(iv), key: CoSeMe.utils.latin1FromBytes(key) });
         }));
-      } else if (v2msg.sender_key_distribution_message) {
+      } else if (!v2msg.sender_key_distribution_message) {
+        Tools.log('UNHANDLED v2msg');
+      }
+
+      if (v2msg.sender_key_distribution_message) {
         var skdm_msg = v2msg.sender_key_distribution_message;
         var skdm_axolotl = new Uint8Array(skdm_msg.axolotl_sender_key_distribution_message.toArrayBuffer());
         Tools.log('SKDM', skdm_msg.group_id, CoSeMe.utils.hex(skdm_axolotl));
@@ -930,8 +935,6 @@ App.connectors.coseme = function (account) {
             reject(e);
           };
         }));
-      } else {
-        Tools.log('UNHANDLED v2msg');
       }
 
       if (msg.type == 'skmsg') {
