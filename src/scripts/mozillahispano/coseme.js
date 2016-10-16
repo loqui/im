@@ -8030,16 +8030,20 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
       self._writeNode(newProtocolTreeNode('ack', attributes));
     },
 
-    sendReceiptRetry: function(jid, mid, regId, count, vers, participant) {
+    sendReceiptRetry: function(jid, mid, regId, count, vers, t, participant) {
       attributes = {
         to: jid,
         id: mid,
         type: 'retry'
       };
       participant && (attributes.participant = participant);
+
+      var retryAttributes = { count : count, id : mid, v : vers };
+      t && (retryAttributes.t = t);
+
       self._writeNode(newProtocolTreeNode('receipt', attributes,
-          [ newProtocolTreeNode('registration', null, null, CoSeMe.utils.adjustId(regId)),
-            newProtocolTreeNode('retry', { count : count, id : mid, v : vers }) ]));
+          [ newProtocolTreeNode('retry', retryAttributes),
+            newProtocolTreeNode('registration', null, null, CoSeMe.utils.adjustId(regId)) ]));
     },
 
     sendReceiptError: function(to, id, type, participant) {
@@ -8410,8 +8414,8 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
         self.getReceiptAck(aTo, aMsgId, type, participant, from)
       );
     },
-    message_retry: function(aJid, aMsgId, regId, count, vers, participant) {
-      self.sendReceiptRetry(aJid, aMsgId, regId, count, vers, participant);
+    message_retry: function(aJid, aMsgId, regId, count, vers, t, participant) {
+      self.sendReceiptRetry(aJid, aMsgId, regId, count, vers, t, participant);
     },
     message_error: function(aJid, aMsgId, type, participant) {
       self.sendReceiptError(aJid, aMsgId, type, participant);
