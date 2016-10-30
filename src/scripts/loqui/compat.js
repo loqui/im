@@ -1,4 +1,4 @@
-/* global CoSeMe, chrome */
+/* global dcodeIO */
 
 /**
 * @file Contains compatibility helpers
@@ -19,8 +19,11 @@ if (!navigator.requestWakeLock) {
 }
 
 // emulate mozTCPSocket using chrome.sockets
-if (!navigator.mozTCPSocket && window.chrome && chrome.sockets && chrome.sockets.tcp) {
+if (!navigator.mozTCPSocket &&
+    window.chrome && window.chrome.sockets && window.chrome.sockets.tcp) {
   (function () {
+    var chromeTcpSockets = window.chrome.sockets.tcp;
+
     function TCPSocket(host, port, options) {
       options = options || {};
 
@@ -41,7 +44,7 @@ if (!navigator.mozTCPSocket && window.chrome && chrome.sockets && chrome.sockets
             if (self.onclose) { self.onclose(); }
           } else if (self.ondata) {
             if (self._binaryType === 'string') {
-              data = CoSeMe.utils.latin1FromBytes(new Uint8Array(data));
+              data = dcodeIO.ByteBuffer.wrap(data).toBinary();
             }
 
             self.ondata({ data: data });
@@ -54,9 +57,9 @@ if (!navigator.mozTCPSocket && window.chrome && chrome.sockets && chrome.sockets
         }
       };
 
-      chrome.sockets.tcp.create({}, function (createInfo) {
+      chromeTcpSockets.create({}, function (createInfo) {
         self._socketId = createInfo.socketId;
-        chrome.sockets.tcp.connect(self._socketId, host, Number(port), function (result) {
+        chromeTcpSockets.connect(self._socketId, host, Number(port), function (result) {
           if (result < 0) {
             self.readyState = 'disconnected';
             if (self.onerror) { self.onerror(result); }
@@ -64,8 +67,8 @@ if (!navigator.mozTCPSocket && window.chrome && chrome.sockets && chrome.sockets
             self.readyState = 'open';
             self._processSendQueue();
             if (self.onopen) { self.onopen(); }
-            chrome.sockets.tcp.onReceive.addListener(self._onReceive);
-            chrome.sockets.tcp.onReceiveError.addListener(self._onReceiveError);
+            chromeTcpSockets.onReceive.addListener(self._onReceive);
+            chromeTcpSockets.onReceiveError.addListener(self._onReceiveError);
           }
         });
       });
@@ -81,7 +84,7 @@ if (!navigator.mozTCPSocket && window.chrome && chrome.sockets && chrome.sockets
         }
       }
       if (data !== null) {
-        chrome.sockets.tcp.send(self._socketId, data, function (sendInfo) {
+        chromeTcpSockets.send(self._socketId, data, function (sendInfo) {
           if (sendInfo.resultCode < 0) {
             self._sendQueue.splice(0);
             self.readyState = 'disconnected';
@@ -96,17 +99,17 @@ if (!navigator.mozTCPSocket && window.chrome && chrome.sockets && chrome.sockets
 
     TCPSocket.prototype.close = function () {
       var self = this;
-      chrome.sockets.tcp.close(self._socketId, function (result) {
+      chromeTcpSockets.close(self._socketId, function (result) {
         self.readyState = 'closed';
-        chrome.sockets.tcp.onReceive.removeListener(self._onReceive);
-        chrome.sockets.tcp.onReceiveError.removeListener(self._onReceiveError);
+        chromeTcpSockets.onReceive.removeListener(self._onReceive);
+        chromeTcpSockets.onReceiveError.removeListener(self._onReceiveError);
         if (self.onclose) { self.onclose(); }
       });
     };
 
     TCPSocket.prototype.send = function (data, offset, len) {
       if (this._binaryType === 'string') {
-        data = CoSeMe.utils.bytesFromLatin1(data).buffer;
+        data = dcodeIO.ByteBuffer.fromBinary(data).toArrayBuffer();
       }
 
       if (offset !== undefined || len !== undefined) {
@@ -120,23 +123,23 @@ if (!navigator.mozTCPSocket && window.chrome && chrome.sockets && chrome.sockets
     };
 
     TCPSocket.prototype.suspend = function () {
-      chrome.sockets.tcp.setPaused(this._socketId, true);
+      chromeTcpSockets.setPaused(this._socketId, true);
     };
 
     TCPSocket.prototype.resume = function () {
-      chrome.sockets.tcp.setPaused(this._socketId, false);
+      chromeTcpSockets.setPaused(this._socketId, false);
     };
 
     TCPSocket.prototype.upgradeToSecure = function () {
       var self = this;
       this._sendQueue.push(null);
-      chrome.sockets.tcp.setPaused(self._socketId, true, function () {
-        chrome.sockets.tcp.secure(self._socketId, { }, function (result) {
+      chromeTcpSockets.setPaused(self._socketId, true, function () {
+        chromeTcpSockets.secure(self._socketId, { }, function (result) {
           if (result < 0) {
             self.readyState = 'disconnected';
             if (self.onerror) { self.onerror(); }
           } else {
-            chrome.sockets.tcp.setPaused(self._socketId, false, function () {
+            chromeTcpSockets.setPaused(self._socketId, false, function () {
               self._processSendQueue();
             });
           }
@@ -156,8 +159,21 @@ if (!navigator.mozTCPSocket && window.chrome && chrome.sockets && chrome.sockets
     function TCPSocket(host, port, options) {
       options = options || {};
 
+      var authToken = null;
+      var wsPort = '8080';
+
+      window.location.hash.substring(1).split(',').forEach(function (s) {
+        if (s.startsWith('port:')) {
+          wsPort = s.substring(5);
+        } else if (s.startsWith('auth:')) {
+          authToken = s.substring(5);
+        }
+      });
+
       var self = this;
-      this._socket = new WebSocket('ws://localhost:8080/' + host, "tcp");
+      this._socket = new WebSocket('ws://localhost:' + wsPort + '/' + host +
+                                   (authToken ? ('?' + authToken) : ''),
+                                   'tcp');
       this._socket.binaryType = 'arraybuffer';
       this._socket.onopen = function () {
         self.readyState = 'open';
@@ -182,7 +198,7 @@ if (!navigator.mozTCPSocket && window.chrome && chrome.sockets && chrome.sockets
         if (self.ondata) {
           var data = msg.data;
           if (self._binaryType === 'string') {
-            data = CoSeMe.utils.latin1FromBytes(new Uint8Array(data));
+            data = dcodeIO.ByteBuffer(data).toBinary();
           }
           self.ondata({ data: data });
         }
@@ -204,7 +220,7 @@ if (!navigator.mozTCPSocket && window.chrome && chrome.sockets && chrome.sockets
       console.log('send', data);
 
       if (this._binaryType === 'string') {
-        data = CoSeMe.utils.bytesFromLatin1(data).buffer;
+        data = dcodeIO.ByteBuffer.fromBinary(data).toArrayBuffer();
       }
 
       if (offset !== undefined || len !== undefined) {
