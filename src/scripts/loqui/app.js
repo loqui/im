@@ -392,7 +392,7 @@ var App = {
   init: function () {
     App.defaults.Connector.presence.status = _('DefaultStatus', {
       app: App.name,
-      platform: (Lungo.Core.environment().os ? Lungo.Core.environment().os.name : 'PC')
+      platform: (Lungo.Core.environment().os ? Lungo.Core.environment().os.name : 'Ubuntu')
     });
 
     App.defaults.Selects.language[0] = { caption : _('Default'), value : 'default' };
