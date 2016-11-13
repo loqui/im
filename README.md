@@ -3,6 +3,8 @@ LOQUI Instant Messenger
 Loqui Instant Messenger unifies all your chat accounts in just one Firefox OS app
 https://loqui.im
 
+Telegram Group: https://telegram.me/joinchat/BlpqfQk1L0l0PJTnM02yxQ
+
 Providers support
 ===
 At the moment it supports accounts from:
