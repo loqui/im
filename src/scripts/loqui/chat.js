@@ -137,8 +137,8 @@ var Chat = {
           var li = $('<li/>');
           var frag = document.createDocumentFragment();
           li.addClass('chunk');
-          li[0].dataset.chunk= stIndex;
-          li[0].dataset.index= index;
+          li[0].dataset.chunk = stIndex;
+          li[0].dataset.index = index;
           var prevType, prevTime, prevAck;
           var prevRead = true;
           var lastRead = Tools.unstamp(chat.lastRead || chat.core.lastRead);
