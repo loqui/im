@@ -753,7 +753,7 @@ section nav {
             vertical-align: middle;
             padding-right: 1em;
         }
-        
+
         .show {
             position: absolute;
             right: 5rem;
@@ -1400,7 +1400,7 @@ section nav {
             height: 10vw;
             cursor: pointer;
         }
-        
+
         li:last-of-type {
             background-color: #FF9500;
             color: gainsboro;
@@ -1419,7 +1419,7 @@ section nav {
         padding: 2px 1px;
         background-color: silver;
         overflow: auto;
-		
+
         img {
             width: 10vw;
             height: 10vw;
@@ -1433,7 +1433,7 @@ section nav {
         font-size: 62.5vw;
       }
     }
-    
+
     button {
         width: 100%;
     }
@@ -1503,26 +1503,12 @@ section nav {
     }
 }
 
-#chat[data-otr=true] #messages:after {
-    content: '\f023';
-    position: fixed;
-    font-family: lungojsicon;
-    font-weight: 700;
-    font-size: 12rem;
-    color: #E95644;
-    top: calc(50vh - 6rem);
-    left: calc(50vw - 4rem);
-    transform: rotate(-20deg);
-    opacity: .2;
-    pointer-events: none;
-}
-
 .profile #card {
     padding: 2rem;
     min-height: 8rem;
     color: #333;
     background-size: cover;
-    
+
     .avatar {
         position: absolute;
         display: block;
@@ -1558,7 +1544,7 @@ section nav {
       font-size: smaller;
       line-height: 1;
     }
-        
+
     .cdate {
       float: left;
     }
@@ -1718,7 +1704,7 @@ input[type='password'] {
         font-weight: 300;
         font-size: .9em;
         color: $primary-text-color;
-        
+
         i,span {
           float: right;
         }
@@ -1834,7 +1820,7 @@ aside .menu {
         position: relative;
         font-size: 1.6rem;
         font-weight: 100;
-        padding: 1.2rem 3.6rem 1.2rem 4.8rem;
+        padding: 1.2rem 3.6rem 1.2rem 1rem;
         color: #444;
 
         &[data-unread]:not([data-unread='0']):after {
@@ -1853,7 +1839,7 @@ aside .menu {
     }
 
     span {
-        display: block;
+        display: inline-block;
         max-width: calc(100% - 6rem);
         overflow: hidden;
         white-space: nowrap;
@@ -1882,7 +1868,7 @@ aside .menu {
     }
 
     .provider {
-        position: absolute;
+        display: inline-block;
         bottom: 1.3rem;
         height: 2rem;
         left: 1.6rem;
@@ -2200,6 +2186,8 @@ ul:not([data-enabled='true']) .avatar:after {
     height: 5.6rem;
     box-shadow: 0 0 3px rgba(0, 0, 0, .3), 0 5px 5px rgba(0, 0, 0, .4);
     transition: all .2s ease;
+    text-align: center;
+    line-height: 5.0rem;
 
     &:before {
         color: #fff;
