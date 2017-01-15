@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=LoquiIM
-Exec=wssrv-tcp -d -b 127.0.0.1 -- webapp-container --app-id=loqui.im --user-agent-string='WhatsApp/2.16.10 S40Version/14.26 Device/Nokia302' ./www/index.html
+Exec=wssrv-tcp -d -b 127.0.0.1 -- webapp-container --app-id=loqui.im --user-agent-string='WhatsApp/2.16.11 S40Version/14.26 Device/Nokia302' ./www/index.html
 Icon=loqui.png
 Terminal=false
 Type=Application
