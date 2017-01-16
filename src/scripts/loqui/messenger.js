@@ -175,7 +175,7 @@ var Messenger = {
       var chat = account.chats[ci];
       var cdate = new Date(chat.core.info.creation * 1000);
       var sdate = new Date(chat.core.info.subjectTime * 1000);
-      
+
       section[0].dataset.jid= jid;
       section[0].dataset.mine= (chat.core.info && chat.core.info.owner == account.core.fullJid);
       section.find('#card span.cdate').html(cdate.toDateString());
@@ -205,7 +205,7 @@ var Messenger = {
               participantLabel.append($('<i/>', {class:"material-icons"}).text("supervisor_account"));
             }
             if (participantJid === chat.core.info.subjectOwner) {
-              participantLabel.append($('<i/>', {class:"material-icons"}).text("title"));
+              participantLabel.append($('<i/>', {class:"material-icons"}).text("label"));
             }
             if (participantJid === chat.core.info.owner) {
               participantLabel.append($('<i/>', {class:"material-icons"}).text("star"));
