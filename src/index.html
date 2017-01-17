@@ -13,6 +13,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="format-detection" content="telephone=no">
     <meta http-equiv="cleartype" content="on">
+    <link rel="stylesheet" href="style/tapquo/lungo.icon.css">
     <link rel="stylesheet" href="style/google/material-icons.css">
     <link rel="stylesheet" href="style/loqui/chungo.css">
     <link rel="stylesheet" href="style/loqui/index.css">
@@ -71,7 +72,7 @@
         </select>
       </script>
       <nav class="on-left discreet">
-        <button data-view-aside="accounts"><i class="material-icons">menu</i></button>
+        <button data-view-aside="accounts" data-icon="menu"></button>
       </nav>
     </header>
     <article id="chats" class="scroll">
@@ -79,14 +80,14 @@
       {{#each accounts}}
         <ul data-jid="{{data.core.fullJid}}"></ul>
       {{/each}}
-      <a class="floater"><i class="material-icons md-36 md-light">create</i></a>
+      <a class="floater" data-icon="pencil"></a>
     </script>
     </article>
   </section>
   <section id="settings" data-transition="vertical" class="fix head extended">
     <header data-title="Settings" data-l10n-title="Settings" class="extended">
       <nav class="on-left">
-        <button data-view-section="back" class="up"><i class="material-icons">expand_less</i></button>
+        <button data-view-section="back" data-icon="angle-up" class="up"></button>
       </nav>
       <nav data-control="groupbar">
         <a data-l10n-id="Features" data-view-article="features">Features</a>
@@ -142,7 +143,7 @@
   <section id="me" data-transition="vertical" class="fix head profile">
     <header data-title="My account" data-l10n-title="MyAccount">
       <nav class="on-left">
-        <button data-view-section="back" class="up"><i class="material-icons">expand_less</i></button>
+        <button data-view-section="back" data-icon="angle-up" class="up"></button>
       </nav>
     </header>
     <article id="main" class="scroll">
@@ -151,8 +152,8 @@
         <span class="name"></span>
         <span class="user"></span>
         <span class="provider"></span>
-        <button class="background change"><i class="material-icons">image</i></button>
-        <button class="background delete"><i class="material-icons">clear</i></button>
+        <button class="background change" data-icon="picture"></button>
+        <button class="background delete" data-icon="remove"></button>
       </div>
       <div id="nick">
         <h2 data-l10n-id="Nick">Nick</h2>
@@ -175,7 +176,7 @@
   <section id="contact" data-transition="vertical" class="fix head profile">
     <header data-title="Contact profile" data-l10n-title="ContactProfile">
       <nav class="on-left">
-        <button data-view-section="back" class="up"><i class="material-icons">expand_less</i></button>
+        <button data-view-section="back" data-icon="angle-up" class="up"></button>
       </nav>
     </header>
     <article id="main" class="scroll">
@@ -206,7 +207,7 @@
   <section id="muc" data-transition="vertical" class="fix head profile">
     <header data-title="Group Info" data-l10n-title="GroupInfo">
       <nav class="on-left">
-        <button data-view-section="back" class="up"><i class="material-icons">expand_less</i></button>
+        <button data-view-section="back" data-icon="angle-up" class="up"></button>
       </nav>
       </header>
     <article id="main" class="scroll">
@@ -242,7 +243,7 @@
   <section id="contactAdd" data-transition="vertical" class="fix head">
     <header data-title="New Contact" data-l10n-title="NewContact">
       <nav class="on-left">
-        <button data-view-section="back" class="up"><i class="material-icons">expand_less</i></button>
+        <button data-view-section="back" data-icon="angle-up" class="up"></button>
       </nav>
     </header>
     <article id="main" class="simple form scroll">
@@ -258,7 +259,7 @@
   <section id="chat" data-transition="horizontal" class="fix head">
     <header>
       <nav class="on-left discreet">
-        <button data-view-section="back" data-menu-onclick="emojiHide" class="tab"><i class="material-icons">chevron_left</i></button>
+        <button data-view-section="back" data-icon="chevron-left" data-menu-onclick="emojiHide" class="tab"></button>
       </nav>
       <span class="totalUnread"></span>
       <span class="title"></span>
@@ -346,10 +347,10 @@
     <header>
       <h1></h1>
       <nav class="on-left">
-        <button data-view-section="back" class="up"><i class="material-icons">close</i></button>
+        <button data-view-section="back" data-icon="remove" class="up"></button>
       </nav>
       <nav class="on-right discreet">
-        <button data-menu-onclick="doSearch" class="hidden" class="up"><i class="material-icons">search</i></button>
+        <button data-menu-onclick="doSearch" class="hidden" data-icon="search" class="up"></button>
       </nav>
       <nav data-control="groupbar">
         <a data-l10n-id="Chats" data-view-article="chats">Chats</a>
@@ -362,7 +363,7 @@
   <section class="extended" id="backupPassword" data-transition="vertical">
     <header data-title="Password" data-l10n-title="Password">
       <nav class="on-left">
-        <button data-view-section="back" class="up"><i class="material-icons">close</i></button>
+        <button data-view-section="back" data-icon="remove" class="up"></button>
       </nav>
     </header>
     <article class="scroll simple">
@@ -376,7 +377,7 @@
   <section class="extended" id="pickBackup" data-transition="vertical">
       <header data-title="Select Backup" data-l10n-title="SelectBackup">
           <nav class="on-left">
-            <button class="up" data-view-section="back"><i class="material-icons">close</i></button>
+            <button class="up" data-view-section="back" data-icon="remove"></button>
           </nav>
       </header>
       <article class="scroll">
@@ -386,7 +387,7 @@
   <section id="attachment" data-transition="vertical">
       <header data-title="Attachment" data-l10n-title="Attachment">
           <nav class="on-left">
-            <button class="up" data-view-section="back"><i class="material-icons">close</i></button>
+            <button class="up" data-view-section="back" data-icon="remove"></button>
           </nav>
       </header>
       <article class="scroll">
@@ -407,15 +408,15 @@
               <i class="material-icons">flash_on</i>
               <span data-l10n-id="MediaType_bolt">Bolt</span>
             </li>
-        <!--<li class="call" data-menu-onclick="call" data-l10n-id="Call"><i class="material-icons">smartphone</i>Call</li>
-            <li class="videocall" data-menu-onclick="videocall" data-l10n-id="VideoCall"><i class="material-icons">videocam</i>VideoCall</li>-->
+        <!--<li class="call" data-menu-onclick="call" data-icon="mobile-phone" data-l10n-id="Call">Call</li>
+            <li class="videocall" data-menu-onclick="videocall" data-icon="video" data-l10n-id="VideoCall">VideoCall</li>-->
           </ul>
       </article>
   </section>
   <section id="otrMenu" data-transition="vertical">
     <header data-title="OTR Settings" data-l10n-title="OTRMenu">
       <nav class="on-left">
-        <button data-view-section="back" class="up"><i class="material-icons">close</i></button>
+        <button data-view-section="back" data-icon="remove" class="up"></button>
       </nav>
     </header>
     <article id="otrSetup" class="scroll simple">
@@ -436,7 +437,7 @@
   <section id="mucCreateForm" data-transition="vertical">
     <header data-title="New Group" data-l10n-title="MucCreate">
       <nav class="on-left">
-        <button data-view-section="back" class="up"><i class="material-icons">expand_less</i></button>
+        <button data-view-section="back" data-icon="angle-up" class="up"></button>
       </nav>
     </header>
     <article id="main" class="simple form scroll">
@@ -458,7 +459,7 @@
       <input type="text" name="title" data-l10n-placeholder="MucTitlePH" placeholder="Old friends"/>
       <label for="members" data-l10n-id="Participants">Participants</label>
       <ul class="members listBox">
-        <li class="add" data-l10n-id="Actioninvite" data-menu-onclick="mucInvite"><i class="material-icons">add</i>Invite</li>
+        <li class="add" data-l10n-id="Actioninvite" data-icon="plus" data-menu-onclick="mucInvite">Invite</li>
       </ul>
       <div class="buttongroup">
         <button class="create" data-l10n-id="Create" data-menu-onclick="mucCreate" >Create</button>
@@ -468,7 +469,7 @@
   <section id="mucSearchForm" data-transition="vertical">
     <header data-title="Join Group" data-l10n-title="MucJoin">
       <nav class="on-left">
-        <button data-view-section="back" class="up"><i class="material-icons">expand_less</i></button>
+        <button data-view-section="back" data-icon="angle-up" class="up"></button>
       </nav>
     </header>
     <article id="main" class="simple form scroll">
@@ -498,7 +499,7 @@
             <span class="avatar"><img/></span>
             <span class="provider">{{connector.provider.longName}}</span>
             <span class="jid">{{core.user}}</span>
-            <a class="settings"><i class="material-icons">settings</i></a>
+            <a class="settings icon cog"></a>
           </div>
           {{/with}}
         </script>
@@ -512,10 +513,10 @@
             </li>
           {{/each}}
         </script>
-        <li data-l10n-id="Providers" data-view-section="providers"><i class="material-icons">add</i>Add account</li>
+        <li data-l10n-id="Providers" data-view-section="providers" data-image="img/providers/squares/add.svg">Add account</li>
         <hr />
-        <li data-l10n-id="Settings" data-view-section="settings"><i class="material-icons">settings</i>Settings</li>
-        <li data-l10n-id="Quit" data-menu-onclick="powerOff"><i class="material-icons">power_settings_new</i>Quit</li>
+        <li data-l10n-id="Settings" data-view-section="settings" data-image="img/providers/squares/settings.svg">Settings</li>
+        <li data-l10n-id="Quit" data-menu-onclick="powerOff" data-image="img/providers/squares/close.svg">Quit</li>
       </ul>
     </article>
   </aside>
