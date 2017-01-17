@@ -260,7 +260,7 @@ var Menu = {
 
       $('section#chat article#main').css("bottom", "75vw"); // reduce height for emoji div
       $('section#chat article#emoji').addClass('show');
-
+      
       if (emojiDiv.length === 0) {
         // Emojis for this provider are not loaded yet
         $('section#chat article#emoji div#emoji-loading').show();
@@ -288,7 +288,7 @@ var Menu = {
                 var img = account.connector.emojiRender(emoji);
                 img.load(function() {
                   if ((App.emoji[provider].emojis[index][1].length - eIndex) === 1) {
-                    // when the last image is loaded, hide the loading symbol and show the category
+                    // when the last image is loaded, hide the loading symbol and how the category
                     $('section#chat article#emoji div#emoji-loading').hide();
                     $('div#' + provider + ' div#' + active).show();
                   }
