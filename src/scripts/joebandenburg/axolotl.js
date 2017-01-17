@@ -145,7 +145,7 @@
                 var wrappedCrypto = new Crypto(crypto);
                 var sessionFactory = new SessionFactory(wrappedCrypto, wrappedStore);
                 var sessionCipher = new SessionCipher(wrappedCrypto);
-                var groupSessionFactory = new GroupSessionFactory(wrappedCrypto, wrappedStore);
+                var groupSessionFactory = new GroupSessionFactory(wrappedCrypto);
                 var groupCipher = new GroupCipher(wrappedCrypto);
                 this.generateIdentityKeyPair = function () {
                     return wrappedCrypto.generateKeyPair();
@@ -359,8 +359,11 @@
                             }
                     }, $__25, this);
                 }));
+                this.encryptSenderKeyMessage = groupCipher.encryptSenderKeyMessage;
                 this.decryptSenderKeyMessage = groupCipher.decryptSenderKeyMessage;
                 this.processSenderKeyDistributionMessage = groupSessionFactory.processSenderKeyDistributionMessage;
+                this.createGroupState = groupSessionFactory.createState;
+                this.createSenderKeyDistributionMessage = groupSessionFactory.createSenderKeyDistributionMessage;
                 Object.freeze(self);
             }
             var $__default = Axolotl;
@@ -488,11 +491,85 @@
             var GroupRatchet = ($__GroupRatchet__ = _require(7), $__GroupRatchet__ && $__GroupRatchet__.__esModule && $__GroupRatchet__ || { default: $__GroupRatchet__ }).default;
             var $__6 = ($__Exceptions__ = _require(5), $__Exceptions__ && $__Exceptions__.__esModule && $__Exceptions__ || { default: $__Exceptions__ }), DuplicateMessageException = $__6.DuplicateMessageException, InvalidMessageException = $__6.InvalidMessageException, UnsupportedProtocolVersionException = $__6.UnsupportedProtocolVersionException;
             var co = ($__co__ = _require(24), $__co__ && $__co__.__esModule && $__co__ || { default: $__co__ }).default;
-            function GroupCipher(crypto, store) {
+            function GroupCipher(crypto) {
                 var self = this;
                 var ratchet = new GroupRatchet(crypto);
-                self.decryptSenderKeyMessage = co.wrap($traceurRuntime.initGeneratorFunction(function $__10(session, senderKeyMessageBytes) {
-                    var senderKeyMessage, newSession, exceptions, $__8, $__9, state, clonedSessionState, message, signature, promise, result, messages;
+                self.encryptSenderKeyMessage = co.wrap($traceurRuntime.initGeneratorFunction(function $__10(state, plaintext) {
+                    var newState, chain, version, messageKeys, ciphertext, message, signatureInput, signature, messageBytes;
+                    return $traceurRuntime.createGeneratorInstance(function ($ctx) {
+                        while (true)
+                            switch ($ctx.state) {
+                            case 0:
+                                newState = new SenderKeyState(state);
+                                chain = newState.chain;
+                                version = {
+                                    current: ProtocolConstants.currentVersion,
+                                    max: ProtocolConstants.currentVersion
+                                };
+                                $ctx.state = 20;
+                                break;
+                            case 20:
+                                $ctx.state = 2;
+                                return ratchet.deriveMessageKeys(chain.key);
+                            case 2:
+                                messageKeys = $ctx.sent;
+                                $ctx.state = 4;
+                                break;
+                            case 4:
+                                $ctx.state = 6;
+                                return crypto.encrypt(messageKeys.cipherKey, plaintext, messageKeys.iv);
+                            case 6:
+                                ciphertext = $ctx.sent;
+                                $ctx.state = 8;
+                                break;
+                            case 8:
+                                message = {
+                                    id: newState.id,
+                                    iteration: chain.index,
+                                    ciphertext: ciphertext
+                                };
+                                signatureInput = Messages.encodeSenderKeyMessageSignatureInput({
+                                    version: version,
+                                    message: message
+                                });
+                                $ctx.state = 22;
+                                break;
+                            case 22:
+                                $ctx.state = 10;
+                                return crypto.sign(newState.signatureKey.private, signatureInput);
+                            case 10:
+                                signature = $ctx.sent;
+                                $ctx.state = 12;
+                                break;
+                            case 12:
+                                messageBytes = Messages.encodeSenderKeyMessage({
+                                    version: version,
+                                    message: message,
+                                    signature: signature
+                                });
+                                $ctx.state = 24;
+                                break;
+                            case 24:
+                                $ctx.state = 14;
+                                return ratchet.clickSubRatchet(newState.chain);
+                            case 14:
+                                $ctx.maybeThrow();
+                                $ctx.state = 16;
+                                break;
+                            case 16:
+                                $ctx.returnValue = {
+                                    body: messageBytes,
+                                    state: newState
+                                };
+                                $ctx.state = -2;
+                                break;
+                            default:
+                                return $ctx.end();
+                            }
+                    }, $__10, this);
+                }));
+                self.decryptSenderKeyMessage = co.wrap($traceurRuntime.initGeneratorFunction(function $__11(session, senderKeyMessageBytes) {
+                    var senderKeyMessage, message, signatureInput, signature, newSession, exceptions, $__8, $__9, state, clonedSessionState, isValid, promise, result, messages;
                     return $traceurRuntime.createGeneratorInstance(function ($ctx) {
                         while (true)
                             switch ($ctx.state) {
@@ -501,56 +578,74 @@
                                 if (senderKeyMessage.version.current !== 3) {
                                     throw new UnsupportedProtocolVersionException('Protocol version ' + senderKeyMessage.version.current + ' is not supported');
                                 }
+                                message = senderKeyMessage.message;
+                                signatureInput = senderKeyMessage.signatureInput;
+                                signature = senderKeyMessage.signature;
                                 newSession = new GroupSession(session);
                                 exceptions = [];
-                                $ctx.state = 18;
+                                $ctx.state = 29;
                                 break;
-                            case 18:
+                            case 29:
                                 $__8 = newSession.states[$traceurRuntime.toProperty(Symbol.iterator)](), $__9 = void 0;
-                                $ctx.state = 6;
+                                $ctx.state = 15;
                                 break;
-                            case 6:
-                                $ctx.state = !($__9 = $__8.next()).done ? 13 : 15;
+                            case 15:
+                                $ctx.state = !($__9 = $__8.next()).done ? 24 : 26;
                                 break;
-                            case 13:
+                            case 24:
                                 state = $__9.value;
-                                $ctx.state = 14;
+                                $ctx.state = 25;
                                 break;
-                            case 14:
-                                $ctx.state = state.id === senderKeyMessage.message.id ? 10 : 6;
+                            case 25:
+                                $ctx.state = state.id === message.id ? 19 : 15;
                                 break;
-                            case 10:
+                            case 19:
                                 clonedSessionState = new SenderKeyState(state);
-                                message = senderKeyMessage.message;
-                                signature = senderKeyMessage.signature;
-                                promise = decryptSenderKeyMessageWithSessionState(clonedSessionState, message, signature);
-                                $ctx.state = 11;
+                                $ctx.state = 20;
                                 break;
-                            case 11:
+                            case 20:
                                 $ctx.state = 2;
-                                return promise.catch(function (e) {
-                                    exceptions.push(e);
-                                });
+                                return crypto.verifySignature(state.signatureKey, signatureInput, signature);
                             case 2:
-                                result = $ctx.sent;
+                                isValid = $ctx.sent;
                                 $ctx.state = 4;
                                 break;
                             case 4:
-                                $ctx.state = result !== undefined ? 7 : 6;
+                                $ctx.state = !isValid ? 7 : 6;
                                 break;
                             case 7:
+                                exceptions.push(new InvalidMessageException('Bad signature'));
+                                $ctx.state = 15;
+                                break;
+                            case 6:
+                                promise = decryptSenderKeyMessageWithSessionState(clonedSessionState, message, signature);
+                                $ctx.state = 22;
+                                break;
+                            case 22:
+                                $ctx.state = 11;
+                                return promise.catch(function (e) {
+                                    exceptions.push(e);
+                                });
+                            case 11:
+                                result = $ctx.sent;
+                                $ctx.state = 13;
+                                break;
+                            case 13:
+                                $ctx.state = result !== undefined ? 16 : 15;
+                                break;
+                            case 16:
                                 newSession.removeState(state);
                                 newSession.addState(clonedSessionState);
-                                $ctx.state = 8;
+                                $ctx.state = 17;
                                 break;
-                            case 8:
+                            case 17:
                                 $ctx.returnValue = {
                                     message: result,
                                     session: newSession
                                 };
                                 $ctx.state = -2;
                                 break;
-                            case 15:
+                            case 26:
                                 messages = exceptions.map(function (e) {
                                     return e.toString();
                                 });
@@ -560,9 +655,9 @@
                             default:
                                 return $ctx.end();
                             }
-                    }, $__10, this);
+                    }, $__11, this);
                 }));
-                var decryptSenderKeyMessageWithSessionState = co.wrap($traceurRuntime.initGeneratorFunction(function $__11(sessionState, message, signature) {
+                var decryptSenderKeyMessageWithSessionState = co.wrap($traceurRuntime.initGeneratorFunction(function $__12(sessionState, message, signature) {
                         var messageKeys, plaintext;
                         return $traceurRuntime.createGeneratorInstance(function ($ctx) {
                             while (true)
@@ -588,9 +683,9 @@
                                 default:
                                     return $ctx.end();
                                 }
-                        }, $__11, this);
+                        }, $__12, this);
                     }));
-                var getOrCreateMessageKeys = co.wrap($traceurRuntime.initGeneratorFunction(function $__12(chain, counter) {
+                var getOrCreateMessageKeys = co.wrap($traceurRuntime.initGeneratorFunction(function $__13(chain, counter) {
                         var cachedMessageKeys, messageKeys;
                         return $traceurRuntime.createGeneratorInstance(function ($ctx) {
                             while (true)
@@ -654,7 +749,7 @@
                                 default:
                                     return $ctx.end();
                                 }
-                        }, $__12, this);
+                        }, $__13, this);
                     }));
                 Object.freeze(self);
             }
@@ -885,15 +980,16 @@
                 },
                 __esModule: { value: true }
             });
-            var $__ArrayBufferUtils__, $__Messages__, $__GroupSession__, $__SenderKeyChain__, $__SenderKeyState__, $__Exceptions__, $__co__;
+            var $__ArrayBufferUtils__, $__ProtocolConstants__, $__Messages__, $__GroupSession__, $__SenderKeyChain__, $__SenderKeyState__, $__Exceptions__, $__co__;
             var ArrayBufferUtils = ($__ArrayBufferUtils__ = _require(1), $__ArrayBufferUtils__ && $__ArrayBufferUtils__.__esModule && $__ArrayBufferUtils__ || { default: $__ArrayBufferUtils__ }).default;
+            var ProtocolConstants = ($__ProtocolConstants__ = _require(13), $__ProtocolConstants__ && $__ProtocolConstants__.__esModule && $__ProtocolConstants__ || { default: $__ProtocolConstants__ }).default;
             var Messages = ($__Messages__ = _require(11), $__Messages__ && $__Messages__.__esModule && $__Messages__ || { default: $__Messages__ }).default;
             var GroupSession = ($__GroupSession__ = _require(8), $__GroupSession__ && $__GroupSession__.__esModule && $__GroupSession__ || { default: $__GroupSession__ }).default;
             var SenderKeyChain = ($__SenderKeyChain__ = _require(15), $__SenderKeyChain__ && $__SenderKeyChain__.__esModule && $__SenderKeyChain__ || { default: $__SenderKeyChain__ }).default;
             var SenderKeyState = ($__SenderKeyState__ = _require(16), $__SenderKeyState__ && $__SenderKeyState__.__esModule && $__SenderKeyState__ || { default: $__SenderKeyState__ }).default;
             var UnsupportedProtocolVersionException = ($__Exceptions__ = _require(5), $__Exceptions__ && $__Exceptions__.__esModule && $__Exceptions__ || { default: $__Exceptions__ }).default;
             var co = ($__co__ = _require(24), $__co__ && $__co__.__esModule && $__co__ || { default: $__co__ }).default;
-            function GroupSessionFactory(crypto, store) {
+            function GroupSessionFactory(crypto) {
                 var self = this;
                 self.processSenderKeyDistributionMessage = function (session, senderKeyDistributionMessageBytes) {
                     var senderKeyDistributionMessage = Messages.decodeSenderKeyDistributionMessage(senderKeyDistributionMessageBytes);
@@ -909,6 +1005,111 @@
                     }));
                     return session;
                 };
+                self.createState = co.wrap($traceurRuntime.initGeneratorFunction(function $__8() {
+                    var keyId, chainKey, signatureKey, state;
+                    return $traceurRuntime.createGeneratorInstance(function ($ctx) {
+                        while (true)
+                            switch ($ctx.state) {
+                            case 0:
+                                $ctx.state = 2;
+                                return generateSenderKeyId();
+                            case 2:
+                                keyId = $ctx.sent;
+                                $ctx.state = 4;
+                                break;
+                            case 4:
+                                $ctx.state = 6;
+                                return generateSenderKey();
+                            case 6:
+                                chainKey = $ctx.sent;
+                                $ctx.state = 8;
+                                break;
+                            case 8:
+                                $ctx.state = 10;
+                                return crypto.generateKeyPair();
+                            case 10:
+                                signatureKey = $ctx.sent;
+                                $ctx.state = 12;
+                                break;
+                            case 12:
+                                state = new SenderKeyState({
+                                    id: keyId,
+                                    chain: new SenderKeyChain(chainKey, 0),
+                                    signatureKey: signatureKey
+                                });
+                                $ctx.state = 16;
+                                break;
+                            case 16:
+                                $ctx.returnValue = state;
+                                $ctx.state = -2;
+                                break;
+                            default:
+                                return $ctx.end();
+                            }
+                    }, $__8, this);
+                }));
+                self.createSenderKeyDistributionMessage = function (state) {
+                    var version = {
+                            current: ProtocolConstants.currentVersion,
+                            max: ProtocolConstants.currentVersion
+                        };
+                    var message = {
+                            id: state.id,
+                            iteration: state.chain.index,
+                            chainKey: state.chain.key,
+                            signingKey: state.signatureKey.public
+                        };
+                    return Messages.encodeSenderKeyDistributionMessage({
+                        version: version,
+                        message: message
+                    });
+                };
+                var generateSenderKeyId = co.wrap($traceurRuntime.initGeneratorFunction(function $__9() {
+                        var bytes, number;
+                        return $traceurRuntime.createGeneratorInstance(function ($ctx) {
+                            while (true)
+                                switch ($ctx.state) {
+                                case 0:
+                                    $ctx.state = 2;
+                                    return crypto.randomBytes(4);
+                                case 2:
+                                    bytes = $ctx.sent;
+                                    $ctx.state = 4;
+                                    break;
+                                case 4:
+                                    number = new Uint32Array(bytes)[0];
+                                    $ctx.state = 8;
+                                    break;
+                                case 8:
+                                    $ctx.returnValue = number & 2147483647;
+                                    $ctx.state = -2;
+                                    break;
+                                default:
+                                    return $ctx.end();
+                                }
+                        }, $__9, this);
+                    }));
+                var generateSenderKey = co.wrap($traceurRuntime.initGeneratorFunction(function $__10() {
+                        var bytes;
+                        return $traceurRuntime.createGeneratorInstance(function ($ctx) {
+                            while (true)
+                                switch ($ctx.state) {
+                                case 0:
+                                    $ctx.state = 2;
+                                    return crypto.randomBytes(32);
+                                case 2:
+                                    bytes = $ctx.sent;
+                                    $ctx.state = 4;
+                                    break;
+                                case 4:
+                                    $ctx.returnValue = bytes;
+                                    $ctx.state = -2;
+                                    break;
+                                default:
+                                    return $ctx.end();
+                                }
+                        }, $__10, this);
+                    }));
                 Object.freeze(self);
             }
             var $__default = GroupSessionFactory;
@@ -1058,6 +1259,11 @@
                 var messageBytes = new WhisperProtos.WhisperMessage(whisperMessage.message).encode().toArrayBuffer();
                 return ArrayBufferUtils.concat(versionByte, messageBytes);
             };
+            var encodeSenderKeyMessageSignatureInput = function (senderKeyMessage) {
+                var messageBytes = new WhisperProtos.SenderKeyMessage(senderKeyMessage.message).encode().toArrayBuffer();
+                var versionField = getVersionField(senderKeyMessage.version);
+                return ArrayBufferUtils.concat(versionField, messageBytes);
+            };
             var $__default = {
                     decodeWhisperMessage: function (whisperMessageBytes) {
                         var messageBytes = whisperMessageBytes.slice(1, -ProtocolConstants.macByteCount);
@@ -1100,14 +1306,13 @@
                         return {
                             version: extractMessageVersion(senderKeyMessageBytes.slice(0, 1)),
                             message: message,
+                            signatureInput: senderKeyMessageBytes.slice(0, -ProtocolConstants.signatureByteCount),
                             signature: senderKeyMessageBytes.slice(-ProtocolConstants.signatureByteCount)
                         };
                     },
+                    encodeSenderKeyMessageSignatureInput: encodeSenderKeyMessageSignatureInput,
                     encodeSenderKeyMessage: function (senderKeyMessage) {
-                        var message = senderKeyMessage.message;
-                        var messageBytes = new WhisperProtos.SenderKeyMessage(message).encode().toArrayBuffer();
-                        var versionField = getVersionField(senderKeyMessage.version);
-                        return ArrayBufferUtils.concat(versionField, messageBytes);
+                        return ArrayBufferUtils.concat(encodeSenderKeyMessageSignatureInput(senderKeyMessage), senderKeyMessage.signature);
                     },
                     decodeSenderKeyDistributionMessage: function (senderKeyDistributionMessageBytes) {
                         var message = WhisperProtos.SenderKeyDistributionMessage.decode(senderKeyDistributionMessageBytes.slice(1));
