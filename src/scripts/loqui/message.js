@@ -84,7 +84,7 @@ var Message = {
     var account = this.account;
     var readReceipts = App.settings.readReceipts;
 
-    chat = chat || this.chat;
+    chat= chat || this.chat;
 
     if(hasId && isIncoming && account.supports('readReceipts') && readReceipts && isUnread) {
       chat.findMessage(this.core.id, null, true).then(function(values){
@@ -92,7 +92,7 @@ var Message = {
         var free = values.free;
         var key = values.key;
 
-        message.viewed = true;
+        message.viewed= true;
 
         Store.update(key, values.result.chunkIndex, values.result.chunk, free);
 
@@ -289,7 +289,7 @@ var Message = {
       delay: !account.connector.isConnected()
     }, function (blockIndex) {
       if (receipts) {
-	      message.setSendTimeout(blockIndex);
+	message.setSendTimeout(blockIndex);
       }
       if ($('section#chat')[0].dataset.jid == to && $('section#chat').hasClass('show')) {
         var ul = $('section#chat ul#messages');
@@ -336,26 +336,10 @@ var Message = {
   preRender : function (avatarize) {
     var message = this;
     var account = this.account;
-    var chat = this.chat;
-    var html = null;
-    var onDivClick = null;
-    if (message.core.text) {
-      var foundParticipants = message.core.text.match(/@\d+(\s|:)/g);
-      if (Array.isArray(foundParticipants)) {
-        /*
-         * Replace each found @\d+(\s:): with contact name
-         */
-        foundParticipants.forEach(function (participant, index) {
-          var participantNumber = participant.slice(1,-1);
-          var participantDomain = account.core.fullJid;
-          participantDomain = participantDomain.slice(participantDomain.lastIndexOf("@"));
-          var contact = Lungo.Core.findByProperty(account.core.roster, 'jid', participantNumber + participantDomain);
-          if (typeof contact === "object") {
-            message.core.text = message.core.text.replace(participantNumber, contact.name);
-          }
-        });
-      }
-      html = App.emoji[Providers.data[this.account.core.provider].emoji].fy(Tools.urlHL(Tools.HTMLescape(message.core.text)));
+    var html= null;
+    var onDivClick= null;
+    if (this.core.text) {
+      html = App.emoji[Providers.data[this.account.core.provider].emoji].fy(Tools.urlHL(Tools.HTMLescape(this.core.text)));
     } else if (this.core.media) {
       html = $('<img/>').attr('src', this.core.media.thumb);
       html[0].dataset.downloaded = this.core.media.downloaded || false;
