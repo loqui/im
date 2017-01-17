@@ -38,6 +38,14 @@ var Chungo = {
         Chungo.Aside.toggle(e.target.dataset.viewAside);
       });
     });
+    $$('[data-icon]').each(function () {
+      var icon = this.dataset.icon;
+      $$(this).addClass('icon').addClass(icon);
+    });
+    $$('[data-image]').each(function () {
+      var image = this.dataset.image;
+      $$(this).prepend($$('<img/>').attr('src', image).addClass('icon'));
+    });
     $$('[data-control="groupbar"]').each(function () {
       var links = $$(this).children('[data-view-article]');
       links.first().addClass('selected').siblings().removeClass('selected');
