@@ -842,6 +842,7 @@ App.connectors.coseme = function (account) {
     function onDecrypted(v2msg, session) {
       Tools.log('DECODED MESSAGE', v2msg, session);
       var allDone = [];
+      var msgCaption = null;
 
       if (v2msg.conversation) {
         onMessage(v2msg.conversation);
@@ -861,6 +862,7 @@ App.connectors.coseme = function (account) {
         var img_msg = v2msg.image_message;
         var imgThumb = new Uint8Array(img_msg.jpeg_thumbnail.toArrayBuffer());
         var imgEncKey = new Uint8Array(img_msg.media_key.toArrayBuffer());
+        msgCaption = v2msg.image_message.caption;
 
         allDone.push(axolotlCrypto.deriveHKDFv3Secrets(imgEncKey, CoSeMe.utils.bytesFromHex('576861747341707020496d616765204b657973'), 112).then(function (deriv) {
           var iv = deriv.subarray(0, 16);
@@ -876,6 +878,7 @@ App.connectors.coseme = function (account) {
         var doc_msg = v2msg.document_message;
         var docThumb = new Uint8Array(doc_msg.jpeg_thumbnail.toArrayBuffer());
         var docEncKey = new Uint8Array(doc_msg.media_key.toArrayBuffer());
+        msgCaption = v2msg.document_message.caption;
 
         allDone.push(axolotlCrypto.deriveHKDFv3Secrets(docEncKey, CoSeMe.utils.bytesFromHex('576861747341707020446f63756d656e74204b657973'), 112).then(function (deriv) {
           var iv = deriv.subarray(0, 16);
@@ -897,6 +900,7 @@ App.connectors.coseme = function (account) {
         var video_msg = v2msg.video_message;
         var videoThumb = new Uint8Array(video_msg.jpeg_thumbnail.toArrayBuffer());
         var videoEncKey = new Uint8Array(video_msg.media_key.toArrayBuffer());
+        msgCaption = v2msg.video_message.caption;
 
         allDone.push(axolotlCrypto.deriveHKDFv3Secrets(videoEncKey, CoSeMe.utils.bytesFromHex('576861747341707020566964656f204b657973'), 112).then(function (deriv) {
           var iv = deriv.subarray(0, 16);
@@ -960,6 +964,9 @@ App.connectors.coseme = function (account) {
 
       Promise.all(allDone).then(function (v) {
         Tools.log('DONE onDecrypted', v);
+        if (msgCaption !== null) {
+          self.events.onMessage.bind(self)(msg.msgId+"c", msg.remoteJid, msgCaption, (msg.timeStamp+1), false, msg.pushName, false);
+        }
         callback();
       }, function (e) {
         Tools.log('ERROR onDecrypted', e);
