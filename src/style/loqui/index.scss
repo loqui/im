@@ -753,7 +753,7 @@ section nav {
             vertical-align: middle;
             padding-right: 1em;
         }
-        
+
         .show {
             position: absolute;
             right: 5rem;
@@ -1356,8 +1356,8 @@ section nav {
                 background-image: url('../../img/emoji/category_icons/nature.svg');
             }
 
-            .icon-foods {
-                background-image: url('../../img/emoji/category_icons/foods.svg');
+            .icon-food {
+                background-image: url('../../img/emoji/category_icons/food.svg');
             }
 
             .icon-activity {
@@ -1400,7 +1400,7 @@ section nav {
             height: 10vw;
             cursor: pointer;
         }
-        
+
         li:last-of-type {
             background-color: #FF9500;
             color: gainsboro;
@@ -1419,7 +1419,7 @@ section nav {
         padding: 2px 1px;
         background-color: silver;
         overflow: auto;
-		
+
         img {
             width: 10vw;
             height: 10vw;
@@ -1433,7 +1433,7 @@ section nav {
         font-size: 62.5vw;
       }
     }
-    
+
     button {
         width: 100%;
     }
@@ -1522,7 +1522,7 @@ section nav {
     min-height: 8rem;
     color: #333;
     background-size: cover;
-    
+
     .avatar {
         position: absolute;
         display: block;
@@ -1558,7 +1558,7 @@ section nav {
       font-size: smaller;
       line-height: 1;
     }
-        
+
     .cdate {
       float: left;
     }
@@ -1718,7 +1718,7 @@ input[type='password'] {
         font-weight: 300;
         font-size: .9em;
         color: $primary-text-color;
-        
+
         i,span {
           float: right;
         }
