@@ -61,6 +61,9 @@
   </section>
   <section id="main" data-transition="horizontal" class="main fix head foot">
     <header>
+      <nav class="on-left discreet">
+        <button data-view-aside="accounts" data-icon="menu"></button>
+      </nav>
       <script type="text/spacebars" name="account_header">
         {{#with account}}
         <span class="jid" data-unread="{{othersUnread}}">{{core.user}}</span>
@@ -71,9 +74,6 @@
         {{/each}}
         </select>
       </script>
-      <nav class="on-left discreet">
-        <button data-view-aside="accounts" data-icon="menu"></button>
-      </nav>
     </header>
     <article id="chats" class="scroll">
     <script type="text/spacebars" name="chats">
