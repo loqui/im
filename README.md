@@ -3,6 +3,8 @@ LOQUI Instant Messenger
 Loqui Instant Messenger unifies all your chat accounts in just one Firefox OS app
 https://loqui.im
 
+We are also working hard in getting this working for Ubuntu Touch due to Firefox OS is discontinued.
+
 Telegram Group: https://telegram.me/joinchat/BlpqfQk1L0l0PJTnM02yxQ
 
 Providers support
