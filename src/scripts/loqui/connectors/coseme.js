@@ -1221,43 +1221,88 @@ App.connectors.coseme = function (account) {
       var account = this.account;
       var contacts = this.contacts;
       contacts._pre = [];
-      var allContacts = navigator.mozContacts.getAll({sortBy: 'givenName', sortOrder: 'ascending'});
-      allContacts.onsuccess = function (event) {
-        if (this.result) {
-          try {
-            var result = this.result;
-            var fullname = (result.givenName
-              ? result.givenName[0] + ' ' + (result.familyName
-                ? (result.familyName[0] || '') :
-                ''
-              )
-              : (result.familyName ?
-                result.familyName[0]
-                : (result.tel
-                  ? result.tel[0]
-                  : ''
-                )
-              )).trim();
-              if (result.tel) {
-                for (var i = 0; i < result.tel.length; i++) {
-                  contacts._pre[result.tel[i].value] = fullname;
-                }
-              }
-            } catch (e) {
-              Tools.log('CONTACT NORMALIZATION ERROR:', e);
-            }
-            this.continue();
-          } else if (cb){
-            Tools.log('CONTACT ACQUIRE ERROR');
-            MI.call('contacts_sync', [Object.keys(contacts._pre)]);
-            contacts._cb = cb;
-          }
-        };
-        allContacts.onerror = function (event) {
-          Tools.log('CONTACTS ERROR:', event);
-          Lungo.Notification.error(_('ContactsGetError'), _('ContactsGetErrorExp'), 'exclamation-sign', 5);
-          cb();
-        };
+      console.log('------------aaaaaaaaaaaaaaaaaaa----------');
+      if(typeof MozActivity != 'undefined') {
+    	  // FirefoxOS
+	      var allContacts = navigator.mozContacts.getAll({sortBy: 'givenName', sortOrder: 'ascending'});
+	      allContacts.onsuccess = function (event) {
+	        if (this.result) {
+	          try {
+	            var result = this.result;
+	            var fullname = (result.givenName
+	              ? result.givenName[0] + ' ' + (result.familyName
+	                ? (result.familyName[0] || '') :
+	                ''
+	              )
+	              : (result.familyName ?
+	                result.familyName[0]
+	                : (result.tel
+	                  ? result.tel[0]
+	                  : ''
+	                )
+	              )).trim();
+	              if (result.tel) {
+	                for (var i = 0; i < result.tel.length; i++) {
+	                  contacts._pre[result.tel[i].value] = fullname;
+	                }
+	              }
+	            } catch (e) {
+	              Tools.log('CONTACT NORMALIZATION ERROR:', e);
+	            }
+	            this.continue();
+	          } else if (cb){
+	            Tools.log('CONTACT ACQUIRE ERROR');
+	            MI.call('contacts_sync', [Object.keys(contacts._pre)]);
+	            contacts._cb = cb;
+	          }
+	        };
+	        allContacts.onerror = function (event) {
+	          Tools.log('CONTACTS ERROR:', event);
+	          Lungo.Notification.error(_('ContactsGetError'), _('ContactsGetErrorExp'), 'exclamation-sign', 5);
+	          cb();
+	        };
+      	} else if(external && external.getUnityObject) {
+    	  // Ubuntu Touch
+    	  console.log('--------------------OK');
+    	  if(!($.data( $('#contacts_input').get(0), 'events' ).change)) {
+			  $('#contacts_input').change(function() {
+	    		console.log('-----------change');
+			    var contacts = document.getElementById('contacts_input').files;
+			    var covertedContact = {};
+			    contacts._pre = {};
+			    for(var c in contacts) {
+			    	if(contacts[c].name && contacts[c].name.lastIndexOf('.vcf') > -1){
+			    		console.log('-----------' + contacts[c].name);
+				    	covertedContact.givenName = [contacts[c].name.substring(0, contacts[c].name.lastIndexOf('.vcf'))];
+				    	covertedContact.tel = ['+393394561221'];
+//    				    	if (contacts already imported and is not a forced sync) {
+//    				          try {
+				            var fullname = covertedContact.givenName[0].trim();
+				            console.log(fullname);
+				            if(covertedContact.tel) {
+				              for(var i = 0; i < covertedContact.tel.length; i++) {
+				                contacts._pre[covertedContact.tel[i]] = fullname;
+				              }
+				            }
+//    				          } catch (e) {
+//    				            Tools.log('CONTACT NORMALIZATION ERROR:', e);
+//    				          }
+				          covertedContact = {};
+			    	}
+//    		          } else if (cb){
+//    		            Tools.log('CONTACT ACQUIRE ERROR');
+//    		            MI.call('contacts_sync', [Object.keys(contacts._pre)]);
+//    		            contacts._cb = cb;
+//    		          }
+			    }
+			    for(var cc in contacts._pre){
+			    	console.log('------' + contacts._pre[cc]);
+			    }
+	    	  });
+    	  }
+    	  console.log('-----------go');
+    	  $('#contacts_input').trigger('click');
+      	}
       } else {
         Lungo.Notification.error(_('ContactsGetError'), _('NoWhenOffline'), 'exclamation-sign', 5);
       }

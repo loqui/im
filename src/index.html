@@ -22,6 +22,7 @@
     <link rel="shortcut icon" href="img/icon-32.png" type="image/png" />
 </head>
 <body class="app" data-online="false">
+  <input type="file" class="ubuntu-touch-content-hub-input" id="contacts_input" accept="text/vcard" multiple/>
   <section id="welcome" class="show" data-transition="horizontal">
     <article id="main" class="scroll show">
       <script type="text/spacebars" name="welcome">
@@ -148,6 +149,9 @@
     </header>
     <article id="main" class="scroll">
       <div id="card">
+      	<!-- background_input is displayed outside the window, the click on this element is triggered
+      		and for security reason it could not be hidden -->
+      	<input type="file" class="ubuntu-touch-content-hub-input" id="background_input" accept="image/*" />
         <span class="avatar"><img/></span>
         <span class="name"></span>
         <span class="user"></span>
@@ -181,6 +185,9 @@
     </header>
     <article id="main" class="scroll">
       <div id="card">
+      	<!-- avatar_input is displayed outside the window, the click on this element is triggered
+      		and for security reason it could not be hidden -->
+      	<input type="file" class="ubuntu-touch-content-hub-input" id="avatar_input" accept="image/*" />
         <span class="avatar"><img/></span>
         <span class="name"></span>
         <span class="user"></span>
@@ -392,6 +399,7 @@
       </header>
       <article class="scroll">
           <ul class="itemList">
+          	<input type="file" class="ubuntu-touch-content-hub-input" id="filesend_input" accept="" />
             <li class="file" data-menu-onclick="fileSend">
               <i class="material-icons">insert_drive_file</i>
               <span  data-l10n-id="MediaType_file">File</span>

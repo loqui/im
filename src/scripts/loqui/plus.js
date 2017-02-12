@@ -25,6 +25,7 @@ var Plus = {
     if (to && App.online && account.connector.connection.connected){
       if (account.supports('attention')) {
         account.connector.attentionSend(to);
+        //TODO make this works for UT
         window.navigator.vibrate([100,30,100,30,100,200,200,30,200,30,200,200,100,30,100,30,100]);
         App.audio('thunder');
         Tools.log('Sent a bolt to', to);
@@ -42,7 +43,7 @@ var Plus = {
   emoji: function (emoji) {
     Messenger.add(emoji);
   },
-
+  
   /**
    * Triggers a file pick [{MozActivity}]{@link external:System.MozActivity}
    */
@@ -64,17 +65,29 @@ var Plus = {
       fileTypes = fileTypes.concat(['audio/mpeg', 'audio/ogg', 'audio/mp4']);
     }
 
-    var e = new MozActivity({
-      name: 'pick',
-      data: {
-        type: fileTypes
-      }
-    });
+    if (typeof MozActivity != 'undefined') {
+    	//FirefoxOS
+    	var e = new MozActivity({
+	      name: 'pick',
+	      data: {
+	        type: fileTypes
+	      }
+	    });
 
-    e.onsuccess = function () {
-      var blob = this.result.blob;
-      account.connector.fileSend(to, blob);
-    };
+	    e.onsuccess = function () {
+	      var blob = this.result.blob;
+	      account.connector.fileSend(to, blob);
+	    };
+    } else if(external && external.getUnityObject) {
+    	//Ubuntu Touch
+    	$('#filesend_input').attr('accept', fileTypes);
+    	//File send handling for non FirefoxOS
+    	$('#filesend_input').change(function() {
+    	    var image = document.getElementById('filesend_input').files[0];
+    	    account.connector.fileSend(to, image);
+    	});
+    	$('#filesend_input').trigger('click');
+    }
   },
 
   vcardSend: function () {

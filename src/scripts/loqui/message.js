@@ -348,13 +348,19 @@ var Message = {
           html.addClass('maps');
           var onClick = function(e){
             e.preventDefault();
-            return new MozActivity({
-              name: "view",
-              data: {
-                type: "url",
-                url: message.core.media.url
-              }
-            });
+            if (typeof MozActivity != 'undefined') {
+            	//FirefoxOS
+	            return new MozActivity({
+	              name: "view",
+	              data: {
+	                type: "url",
+	                url: message.core.media.url
+	              }
+	            });
+            } else if(external && external.getUnityObject) {
+            	//Ubuntu Touch
+            	
+            }
           };
           break;
         case 'vCard':
