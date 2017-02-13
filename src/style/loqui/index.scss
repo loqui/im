@@ -1517,6 +1517,11 @@ section nav {
     pointer-events: none;
 }
 
+.ubuntu-touch-content-hub-input {
+	position: absolute;
+	top: -100px;
+}
+
 .profile #card {
     padding: 2rem;
     min-height: 8rem;
