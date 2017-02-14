@@ -152,7 +152,11 @@
     ns.imagePathSVGSprites = './../assets/sprites/emojione.sprites.svg';
     ns.imageType = 'png'; // or svg
     ns.imageTitleTag = true; //set to false to remove title attribute from img tag
-    ns.sprites = false; // if this is true then sprite markup will be used (if SVG image type is set then you must include the SVG sprite file locally)
+	if(typeof MozActivity != 'undefined') { // if this is true then sprite markup will be used (if SVG image type is set then you must include the SVG sprite file locally)
+		ns.sprites = false;
+	} else {
+		ns.sprites = true;
+	}
     ns.unicodeAlt = true; // use the unicode char as the alt attribute (makes copy and pasting the resulting text better)
     ns.ascii = false; // change to true to convert ascii smileys
     ns.cacheBustParam = '?v=2.2.7'; // you can [optionally] modify this to force browsers to refresh their cache. it will be appended to the send of the filenames
