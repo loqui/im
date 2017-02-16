@@ -565,6 +565,12 @@ var App = {
   * @param {string} last
   */
   start: function (last) {
+	if(typeof MozActivity != 'undefined') {
+	emojione.sprites = false;
+	}
+	else {
+	emojione.sprites = true;
+	}
     App.online = App.online;
     emojione.imagePathPNG = '/img/emoji/emojione/';
     // If there is already a configured account
