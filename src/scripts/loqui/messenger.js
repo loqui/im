@@ -222,11 +222,13 @@ var Messenger = {
           default:
             break;
         }
-        participantLabel.bind('click', {jid: participantJid}, function(event) {
-          Chungo.Router.section('back');
-          Chungo.Router.section('back');
-          account.chatGet(event.data.jid).show();
-        });
+        if (label != _('Me')) {
+          participantLabel.bind('click', {jid: participantJid}, function(event) {
+            Chungo.Router.section('back');
+            Chungo.Router.section('back');
+            account.chatGet(event.data.jid).show();
+          });
+        }
         partUl.append(participantLabel);
       }
 
