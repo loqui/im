@@ -175,7 +175,7 @@ var Messenger = {
       var chat = account.chats[ci];
       var cdate = new Date(chat.core.info.creation * 1000);
       var sdate = new Date(chat.core.info.subjectTime * 1000);
-      
+
       section[0].dataset.jid= jid;
       section[0].dataset.mine= (chat.core.info && chat.core.info.owner == account.core.fullJid);
       section.find('#card span.cdate').html(cdate.toDateString());
@@ -222,6 +222,11 @@ var Messenger = {
           default:
             break;
         }
+        participantLabel.bind('click', {jid: participantJid}, function(event) {
+          Chungo.Router.section('back');
+          Chungo.Router.section('back');
+          account.chatGet(event.data.jid).show();
+        });
         partUl.append(participantLabel);
       }
 
