@@ -8599,6 +8599,10 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
     // Contacts
 
     contacts_sync: function (numbers) {
+    	console.log('---------------------contacts_sync');
+    	for (var uti = 0; uti < numbers.length; uti++ ) {
+    		console.log('-------- n: ' + numbers[uti]);
+    	}
       var id = self.makeId('sync_');
       var jid = self.jid;
       var syncNode = newProtocolTreeNode('sync', {
@@ -8618,6 +8622,7 @@ CoSeMe.namespace('yowsup.connectionmanager', (function() {
       }, [syncNode]);
       self.readerThread.requests[id] = self.readerThread.parseContactsSync;
       self._writeNode(iqNode);
+      console.log('---------------id: '+ id);
       return id;
     },
 

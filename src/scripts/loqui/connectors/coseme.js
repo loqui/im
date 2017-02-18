@@ -587,6 +587,7 @@ App.connectors.coseme = function (account) {
     membersCache: []
   };
   this.connected = false;
+  this.UTSyncRegistered = false;
 
   function isNotGroupJid (jid) {
     return (jid.indexOf('@g.us') < 0);
@@ -1221,7 +1222,6 @@ App.connectors.coseme = function (account) {
       var account = this.account;
       var contacts = this.contacts;
       contacts._pre = [];
-      console.log('------------aaaaaaaaaaaaaaaaaaa----------');
       if(typeof MozActivity != 'undefined') {
     	  // FirefoxOS
 	      var allContacts = navigator.mozContacts.getAll({sortBy: 'givenName', sortOrder: 'ascending'});
@@ -1262,52 +1262,66 @@ App.connectors.coseme = function (account) {
 	          cb();
 	        };
       	} else if(external && external.getUnityObject) {
-    	  // Ubuntu Touch
-    	  console.log('--------------------OK');
-    	  if(!($.data( $('#contacts_input').get(0), 'events' ).change)) {
-			  $('#contacts_input').change(function() {
-	    		console.log('-----------change');
-			    var contacts = document.getElementById('contacts_input').files;
-			    var covertedContact = {};
-			    contacts._pre = {};
-			    for(var c in contacts) {
-			    	if(contacts[c].name && contacts[c].name.lastIndexOf('.vcf') > -1){
-			    		console.log('-----------' + contacts[c].name);
-				    	covertedContact.givenName = [contacts[c].name.substring(0, contacts[c].name.lastIndexOf('.vcf'))];
-				    	covertedContact.tel = ['+393394561221'];
-//    				    	if (contacts already imported and is not a forced sync) {
-//    				          try {
-				            var fullname = covertedContact.givenName[0].trim();
-				            console.log(fullname);
-				            if(covertedContact.tel) {
-				              for(var i = 0; i < covertedContact.tel.length; i++) {
-				                contacts._pre[covertedContact.tel[i]] = fullname;
-				              }
-				            }
-//    				          } catch (e) {
-//    				            Tools.log('CONTACT NORMALIZATION ERROR:', e);
-//    				          }
-				          covertedContact = {};
-			    	}
-//    		          } else if (cb){
-//    		            Tools.log('CONTACT ACQUIRE ERROR');
-//    		            MI.call('contacts_sync', [Object.keys(contacts._pre)]);
-//    		            contacts._cb = cb;
-//    		          }
-			    }
-			    for(var cc in contacts._pre){
-			    	console.log('------' + contacts._pre[cc]);
-			    }
-	    	  });
-    	  }
-    	  console.log('-----------go');
-    	  $('#contacts_input').trigger('click');
+			// Ubuntu Touch
+			console.log('trigger content hub for contacts import');
+			var UTcs = this.contacts.UTContactSync;
+			if(!this.UTSyncRegistered) {
+				$('#contacts_input').change(function() {
+					UTcs(cb);
+				});
+				this.UTSyncRegistered = true;
+			}
+			$('#contacts_input').trigger('click');
       	}
       } else {
         Lungo.Notification.error(_('ContactsGetError'), _('NoWhenOffline'), 'exclamation-sign', 5);
       }
     }.bind(this);
 
+	this.contacts.UTContactSync = function(cb) {
+		var account = this.account;
+		var contacts = this.contacts;
+		contacts._pre = [];
+		console.log('Contacts SYNC UT');
+		var contactsFile = document.getElementById('contacts_input').files[0];
+        var fileReader = new FileReader();
+        fileReader.onloadend = function() {
+        	VCF.parse(fileReader.result, function(vc) {
+        		var cs = JSON.parse(vc.toJSON());
+        		var fullname;
+        		for (var c in cs) {
+        			try {
+        				fullname = (c.givenName
+        			              ? c.givenName[0] + ' ' + (c.familyName
+        			                ? (c.familyName[0] || '') :
+        			                ''
+        			              )
+        			              : (c.familyName ?
+        			                c.familyName[0]
+        			                : (c.tel
+        			                  ? c.tel[0]
+        			                  : ''
+        			                )
+        			              )).trim();
+						if(c.tel) {
+							for(var i = 0; i < c.tel.length; i++) {
+								contacts._pre[c.tel[i].value] = fullname;
+							}
+						}
+	    			} catch (e) {
+	    				console.log(e);
+						Tools.log('CONTACT NORMALIZATION ERROR:', e);
+	    			}
+        		}
+        	});
+			if(cb) {
+        		MI.call('contacts_sync', [Object.keys(contacts._pre)]);
+                contacts._cb = cb;
+        	}
+        };
+        fileReader.readAsText(contactsFile);
+	}.bind(this);
+	
     this.contacts.order = function (cb) {
       this.account.core.roster.sort(function (a,b) {
         var aname = a.name ? a.name : a.jid;
@@ -2273,7 +2287,9 @@ App.connectors.coseme = function (account) {
 
     this.events.onContactsSync = function (id, positive, negative) {
       this.account.core.roster = [];
+      console.log('-----------------jjjjjjjjjjjjjjjjjjjjjjjj');
       for (var i in positive) {
+    	console.log('-----------------' + i);
         var contact = positive[i];
         this.account.core.roster.push({
           jid: contact.jid,
