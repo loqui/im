@@ -225,7 +225,10 @@ var Messenger = {
         if (label != _('Me')) {
           participantLabel.bind('click', {jid: participantJid}, function(event) {
             Chungo.Router.section('back');
-            Chungo.Router.section('back');
+	    if (typeof MozActivity != 'undefined')	// FirefoxOS needs the section back router twice!
+	    {
+	      Chungo.Router.section('back');
+	    }
             account.chatGet(event.data.jid).show();
           });
         }
