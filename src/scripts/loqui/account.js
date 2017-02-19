@@ -330,7 +330,7 @@ var Account = {
       }
       var lastMsg = chat.core.last.text ? App.emoji[Providers.data[this.core.provider].emoji].fy(Tools.HTMLescape(chat.core.last.text.replace(/\n/g, ' '))) : (chat.core.last.media ? _('SentYou', {type: _('MediaType_' + chat.core.last.media.type)}) : '');
       lastMsg = lastMsg.replace(/(\*)([A-Za-z0-9\s]+)(\*)/g, '<b>$2</b>');
-      lastMsg = lastMsg.replace(/(_)([A-Za-z0-9\s]+)(_)/g, '<i>$2</u>');
+      lastMsg = lastMsg.replace(/(_)([A-Za-z0-9\s]+)(_)/g, '<i>$2</i>');
       lastMsg = lastMsg.replace(/(~)([A-Za-z0-9\s]+)(~)/g, '<s>$2</s>');
       li.children('.lastMessage').html(lastMsg);
       li.children('.lastStamp').children('date').attr('datetime', chat.core.last.stamp).html(chat.core.last.stamp ? Tools.convenientDate(chat.core.last.stamp).join('<br />') : '');
@@ -383,7 +383,7 @@ var Account = {
         var title = App.emoji[Providers.data[this.core.provider].emoji].fy(name);
         var lastMsg = chat.last ? (chat.last.text ? App.emoji[Providers.data[this.core.provider].emoji].fy(Tools.HTMLescape(chat.last.text.replace(/\n/g, ' '))) : (chat.last.media ? _('SentYou', {type: _('MediaType_' + chat.last.media.type)}) : '')) : '';
         lastMsg = lastMsg.replace(/(\*)([A-Za-z0-9\s]+)(\*)/g, '<b>$2</b>');
-        lastMsg = lastMsg.replace(/(_)([A-Za-z0-9\s]+)(_)/g, '<i>$2</u>');
+        lastMsg = lastMsg.replace(/(_)([A-Za-z0-9\s]+)(_)/g, '<i>$2</i>');
         lastMsg = lastMsg.replace(/(~)([A-Za-z0-9\s]+)(~)/g, '<s>$2</s>');
         var lastStamp = chat.last.stamp ? Tools.convenientDate(chat.last.stamp).join('<br />') : '';
         var li = $('<li/>');
