@@ -15,7 +15,7 @@
   }
 }
 @font-face {
-  font-family:'FiraSans';
+  font-family:'FiraSansBold';
   src: url('../fonts/FiraSans-Bold.ttf');
   font-weight: 700;
 }
@@ -35,7 +35,7 @@
   font-weight: 100;
 }
 @font-face {
-  font-family:'FiraSans';
+  font-family:'FiraSansItalic';
   src: url('../fonts/FiraSans-LightItalic.ttf');
   font-weight: 100;
   font-style: italic;
@@ -326,6 +326,11 @@ section .hideable {
 }
 .fast .hideable {
   opacity: 0;
+}
+
+section#chat article#main ul#messages b,
+section#main article#chats ul b {
+  font-family: FiraSansBold;
 }
 
 @keyframes fadeIn {
