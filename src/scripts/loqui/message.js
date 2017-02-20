@@ -340,6 +340,9 @@ var Message = {
     var onDivClick= null;
     if (this.core.text) {
       html = App.emoji[Providers.data[this.account.core.provider].emoji].fy(Tools.urlHL(Tools.HTMLescape(this.core.text)));
+      html = html.replace(/(\*)([A-Za-z0-9\s]+)(\*)/g, '<b>$2</b>');
+      html = html.replace(/(_)([A-Za-z0-9\s]+)(_)/g, '<i>$2</i>');
+      html = html.replace(/(~)([A-Za-z0-9\s]+)(~)/g, '<s>$2</s>');
     } else if (this.core.media) {
       html = $('<img/>').attr('src', this.core.media.thumb);
       html[0].dataset.downloaded = this.core.media.downloaded || false;
@@ -359,7 +362,7 @@ var Message = {
 	            });
             } else if(external && external.getUnityObject) {
             	//Ubuntu Touch
-            	
+
             }
           };
           break;
