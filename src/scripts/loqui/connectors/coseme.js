@@ -1288,31 +1288,10 @@ App.connectors.coseme = function (account) {
         fileReader.onloadend = function() {
         	VCF.parse(fileReader.result, function(vc) {
         		var cs = JSON.parse(vc.toJSON());
-        		var fullname;
-        		for (var c in cs) {
-        			try {
-        				fullname = (c.givenName
-        			              ? c.givenName[0] + ' ' + (c.familyName
-        			                ? (c.familyName[0] || '') :
-        			                ''
-        			              )
-        			              : (c.familyName ?
-        			                c.familyName[0]
-        			                : (c.tel
-        			                  ? c.tel[0]
-        			                  : ''
-        			                )
-        			              )).trim();
-						if(c.tel) {
-							for(var i = 0; i < c.tel.length; i++) {
-								contacts._pre[c.tel[i].value] = fullname;
-							}
-						}
-	    			} catch (e) {
-	    				console.log(e);
-						Tools.log('CONTACT NORMALIZATION ERROR:', e);
-	    			}
-        		}
+        		var fullname = cs.fn;
+				for(var i = 0; i < cs.tel.length; i++) {
+					contacts._pre[cs.tel[i].value] = fullname;
+				}
         	});
 			if(cb) {
         		MI.call('contacts_sync', [Object.keys(contacts._pre)]);
