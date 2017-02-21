@@ -2151,9 +2151,9 @@ ul:not([data-enabled='true']) .avatar:after {
     position: absolute;
     z-index: 1001;
     opacity: .7;
-    background-color: #fff;
-    width: 100%;
-    height: 100%;
+    background-color: #000;
+    width: 300%;
+    height: 150%;
 }
 
 #bodyConsole {
@@ -2185,12 +2185,12 @@ ul:not([data-enabled='true']) .avatar:after {
     overflow-y: scroll;
     overflow-x: hidden;
     word-wrap: break-word;
-    font-size: .9rem;
+    font-size: 1.4rem;
     box-sizing: border-box;
 
     div {
         word-wrap: break-word;
-        font-size: .9rem;
+        font-size: 1.4rem;
     }
 }
 
