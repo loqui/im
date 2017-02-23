@@ -4014,7 +4014,7 @@ CoSeMe.namespace('utils', (function(){
     deAdjustId: function (s) {
       var id = 0;
       for (var idx in s) {
-        id = (id << 8) + String.charCodeAt(s[idx]);
+        id = (id << 8) + s.charCodeAt(s[idx]);
       }
 
       return id;
