@@ -587,7 +587,6 @@ App.connectors.coseme = function (account) {
     membersCache: []
   };
   this.connected = false;
-  this.UTSyncRegistered = false;
 
   function isNotGroupJid (jid) {
     return (jid.indexOf('@g.us') < 0);
@@ -1222,85 +1221,86 @@ App.connectors.coseme = function (account) {
       var account = this.account;
       var contacts = this.contacts;
       contacts._pre = [];
-      if(typeof MozActivity != 'undefined') {
-    	  // FirefoxOS
-	      var allContacts = navigator.mozContacts.getAll({sortBy: 'givenName', sortOrder: 'ascending'});
-	      allContacts.onsuccess = function (event) {
-	        if (this.result) {
-	          try {
-	            var result = this.result;
-	            var fullname = (result.givenName
-	              ? result.givenName[0] + ' ' + (result.familyName
-	                ? (result.familyName[0] || '') :
-	                ''
-	              )
-	              : (result.familyName ?
-	                result.familyName[0]
-	                : (result.tel
-	                  ? result.tel[0]
-	                  : ''
-	                )
-	              )).trim();
-	              if (result.tel) {
-	                for (var i = 0; i < result.tel.length; i++) {
-	                  contacts._pre[result.tel[i].value] = fullname;
-	                }
-	              }
-	            } catch (e) {
-	              Tools.log('CONTACT NORMALIZATION ERROR:', e);
-	            }
-	            this.continue();
-	          } else if (cb){
-	            Tools.log('CONTACT ACQUIRE ERROR');
-	            MI.call('contacts_sync', [Object.keys(contacts._pre)]);
-	            contacts._cb = cb;
-	          }
-	        };
-	        allContacts.onerror = function (event) {
-	          Tools.log('CONTACTS ERROR:', event);
-	          Lungo.Notification.error(_('ContactsGetError'), _('ContactsGetErrorExp'), 'exclamation-sign', 5);
-	          cb();
-	        };
-      	} else if(external && external.getUnityObject) {
+	  
+	  if(external && external.getUnityObject) {
 			// Ubuntu Touch
 			console.log('trigger content hub for contacts import');
-			var UTcs = this.contacts.UTContactSync;
-			if(!this.UTSyncRegistered) {
-				$('#contacts_input').change(function() {
-					UTcs(cb);
-				});
-				this.UTSyncRegistered = true;
-			}
+			$('#contacts_input').change(function() {
+				console.log('Contacts SYNC UT');
+				var cs;
+				function number(input) {
+					for(var i = 0; i < cs.tel.length; i++) {
+						var output = input[i].value;
+					}
+					output = output.replace('+', '');
+					output = output.replace(/ /g, '');
+					return output;
+				}
+				var contactsFile = document.getElementById('contacts_input').files[0];
+				var fileReader = new FileReader();
+				fileReader.onloadend = function() {
+					Lungo.Notification.show('download', _('Synchronizing'), 5);
+					VCF.parse(fileReader.result, function(vc) {
+						cs = JSON.parse(vc.toJSON());
+						var fullname = cs.fn;
+						if(cs.tel && number(cs.tel) != account.core.fullJid.split('@')[0]) {
+							for(var i = 0; i < cs.tel.length; i++) {
+								contacts._pre[cs.tel[i].value] = fullname;
+							}
+						}
+					});
+					if(cb) {
+						MI.call('contacts_sync', [Object.keys(contacts._pre)]);
+						contacts._cb = cb;
+					}
+				};
+				fileReader.readAsText(contactsFile);
+			});
 			$('#contacts_input').trigger('click');
       	}
+		
+      var allContacts = navigator.mozContacts.getAll({sortBy: 'givenName', sortOrder: 'ascending'});
+      allContacts.onsuccess = function (event) {
+        if (this.result) {
+          try {
+            var result = this.result;
+            var fullname = (result.givenName
+              ? result.givenName[0] + ' ' + (result.familyName
+                ? (result.familyName[0] || '') :
+                ''
+              )
+              : (result.familyName ?
+                result.familyName[0]
+                : (result.tel
+                  ? result.tel[0]
+                  : ''
+                )
+              )).trim();
+              if (result.tel) {
+                for (var i = 0; i < result.tel.length; i++) {
+                  contacts._pre[result.tel[i].value] = fullname;
+                }
+              }
+            } catch (e) {
+              Tools.log('CONTACT NORMALIZATION ERROR:', e);
+            }
+            this.continue();
+          } else if (cb){
+            Tools.log('CONTACT ACQUIRE ERROR');
+            MI.call('contacts_sync', [Object.keys(contacts._pre)]);
+            contacts._cb = cb;
+          }
+        };
+        allContacts.onerror = function (event) {
+          Tools.log('CONTACTS ERROR:', event);
+          Lungo.Notification.error(_('ContactsGetError'), _('ContactsGetErrorExp'), 'exclamation-sign', 5);
+          cb();
+        };
       } else {
         Lungo.Notification.error(_('ContactsGetError'), _('NoWhenOffline'), 'exclamation-sign', 5);
       }
     }.bind(this);
 
-	this.contacts.UTContactSync = function(cb) {
-		var account = this.account;
-		var contacts = this.contacts;
-		contacts._pre = [];
-		console.log('Contacts SYNC UT');
-		var contactsFile = document.getElementById('contacts_input').files[0];
-        var fileReader = new FileReader();
-        fileReader.onloadend = function() {
-        	VCF.parse(fileReader.result, function(vc) {
-        		var cs = JSON.parse(vc.toJSON());
-        		var fullname = cs.fn;
-				for(var i = 0; i < cs.tel.length; i++) {
-					contacts._pre[cs.tel[i].value] = fullname;
-				}
-        	});
-			if(cb) {
-        		MI.call('contacts_sync', [Object.keys(contacts._pre)]);
-                contacts._cb = cb;
-        	}
-        };
-        fileReader.readAsText(contactsFile);
-	}.bind(this);
-	
     this.contacts.order = function (cb) {
       this.account.core.roster.sort(function (a,b) {
         var aname = a.name ? a.name : a.jid;
@@ -2266,9 +2266,7 @@ App.connectors.coseme = function (account) {
 
     this.events.onContactsSync = function (id, positive, negative) {
       this.account.core.roster = [];
-      console.log('-----------------jjjjjjjjjjjjjjjjjjjjjjjj');
       for (var i in positive) {
-    	console.log('-----------------' + i);
         var contact = positive[i];
         this.account.core.roster.push({
           jid: contact.jid,
