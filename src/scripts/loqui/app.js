@@ -11,7 +11,7 @@
 
 'use strict';
 
-if(typeof MozActivity == 'undefined') {
+/* if(typeof MozActivity == 'undefined') {
 	window.onload = function() {
 		var trigger = 0;
 		var userSoundSet;
@@ -69,7 +69,7 @@ if(typeof MozActivity == 'undefined') {
 		
 		});
 	};
-}
+} */
 
 /**
  * @namespace App
