@@ -587,6 +587,7 @@ App.connectors.coseme = function (account) {
     membersCache: []
   };
   this.connected = false;
+  this.UTSyncRegistered = false;
 
   function isNotGroupJid (jid) {
     return (jid.indexOf('@g.us') < 0);
@@ -1221,44 +1222,6 @@ App.connectors.coseme = function (account) {
       var account = this.account;
       var contacts = this.contacts;
       contacts._pre = [];
-	  
-	  if(external && external.getUnityObject) {
-			// Ubuntu Touch
-			console.log('trigger content hub for contacts import');
-			$('#contacts_input').change(function() {
-				console.log('Contacts SYNC UT');
-				var cs;
-				function number(input) {
-					for(var i = 0; i < cs.tel.length; i++) {
-						var output = input[i].value;
-					}
-					output = output.replace('+', '');
-					output = output.replace(/ /g, '');
-					return output;
-				}
-				var contactsFile = document.getElementById('contacts_input').files[0];
-				var fileReader = new FileReader();
-				fileReader.onloadend = function() {
-					Lungo.Notification.show('download', _('Synchronizing'), 5);
-					VCF.parse(fileReader.result, function(vc) {
-						cs = JSON.parse(vc.toJSON());
-						var fullname = cs.fn;
-						if(cs.tel && number(cs.tel) != account.core.fullJid.split('@')[0]) {
-							for(var i = 0; i < cs.tel.length; i++) {
-								contacts._pre[cs.tel[i].value] = fullname;
-							}
-						}
-					});
-					if(cb) {
-						MI.call('contacts_sync', [Object.keys(contacts._pre)]);
-						contacts._cb = cb;
-					}
-				};
-				fileReader.readAsText(contactsFile);
-			});
-			$('#contacts_input').trigger('click');
-      	}
-		
       var allContacts = navigator.mozContacts.getAll({sortBy: 'givenName', sortOrder: 'ascending'});
       allContacts.onsuccess = function (event) {
         if (this.result) {
@@ -1296,11 +1259,60 @@ App.connectors.coseme = function (account) {
           Lungo.Notification.error(_('ContactsGetError'), _('ContactsGetErrorExp'), 'exclamation-sign', 5);
           cb();
         };
+        if(external && external.getUnityObject) {
+        	// Ubuntu Touch
+        	console.log('trigger content hub for contacts import');
+        	var UTcs = this.contacts.UTContactSync;
+        	if(!this.UTSyncRegistered) {
+        		$('#contacts_input').change(function() {
+        			UTcs(cb);
+        		});
+        		this.UTSyncRegistered = true;
+        	}
+        	$('#contacts_input').trigger('click');
+        }
       } else {
         Lungo.Notification.error(_('ContactsGetError'), _('NoWhenOffline'), 'exclamation-sign', 5);
       }
     }.bind(this);
 
+    this.contacts.UTContactSync = function(cb) {
+		var account = this.account;
+		var contacts = this.contacts;
+		contacts._pre = [];
+		var cif = document.getElementById('contacts_input').files;
+		if(cif.length > 0) {
+			var contactsFile = cif[0];
+			var fileReader = new FileReader();
+			fileReader.onloadend = function() {
+				VCF.parse(fileReader.result, function(vc) {
+					var c = JSON.parse(vc.toJSON());
+					try {
+						var fullname = c.fn ? c.fn : (c.givenName && c.givenName[0] ?
+										((c.familyName && c.familyName[0])
+										? c.givenName[0] + c.familyName[0] : c.givenName[0]) : ''
+										).trim();
+						if(c.tel) {
+							for(var i = 0; i < c.tel.length; i++) {
+								contacts._pre[c.tel[i].value] = fullname;
+							}
+						}
+					} catch (e) {
+						Tools.log('CONTACT NORMALIZATION ERROR:', e);
+					}
+				});
+				if(cb) {
+					MI.call('contacts_sync', [Object.keys(contacts._pre)]);
+					contacts._cb = cb;
+				}
+			};
+			fileReader.readAsText(contactsFile);
+		} else if(cb) {
+			MI.call('contacts_sync', [Object.keys(contacts._pre)]);
+			contacts._cb = cb;
+		}
+	}.bind(this);
+	
     this.contacts.order = function (cb) {
       this.account.core.roster.sort(function (a,b) {
         var aname = a.name ? a.name : a.jid;
