@@ -552,14 +552,14 @@ var Account = {
 
           var show =_('show' + (contact.presence.show || 'na'));
           var time = (contact.presence.show != 'a') && contact.presence.last && Tools.convenientDate(Tools.localize(Tools.stamp(contact.presence.last)));
-          var prefix = time
+		  var prefix = time
             ? _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})})
             : show;
 
-          var status = ((contact.presence.status || time) ? (prefix + ' - ') : '') +
-            (contact.presence.status
+          var status = ((time || show == _('showa')) ? prefix : '') + ((contact.presence.status && (time || show == _('showa')) && App.settings.showstat == true) ? (' - ') : '') +
+            ((contact.presence.status && App.settings.showstat == true)
              ? App.emoji[Providers.data[this.core.provider].emoji].fy(Tools.HTMLescape(contact.presence.status))
-             : show);
+             : '');
           header.find('.status').html(status);
         }
       } else {
