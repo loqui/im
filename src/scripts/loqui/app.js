@@ -11,70 +11,59 @@
 
 'use strict';
 
-/* if(typeof MozActivity == 'undefined') {
-	window.onload = function() {
-		var trigger = 0;
-		var userSoundSet;
-		
-		function setResult(message) {
-			var results = document.getElementById('results');
-			results.innerHTML += message + '<br>';
-		}
-			
-		function reconnectApp() {
-			App.settings.sound = false;
-			App.disconnect();
-			App.connect();
-			window.setTimeout(delaySound, 5000);
-			console.log('Reconnected App.');
-			
-			function delaySound() {
-				App.settings.sound = userSoundSet;
-			}
-		}
-		
-		var exec;
-		
-		var lastActive;
-		var nowActive;
-	
-	var api = external.getUnityObject('1.0');
-
-	api.RuntimeApi.getApplication(function(application) {
-		setResult('application name: ' + application.getApplicationName());
-		setResult('application info: ' + JSON.stringify(application.getPlatformInfo()));
-		
-		application.onDeactivated(function() {
-			setResult('Event: application deactivated');
-			console.log('Event: application deactivated');
-			if(trigger == 0 || userSoundSet != App.settings.sound) {
-				userSoundSet = App.settings.sound;
-				trigger = 1;
-			}
-			App.settings.sound = userSoundSet;
-			lastActive = (new Date()).getTime();
-			exec = window.setInterval(reconnectApp, 600000);
-		});
-
-		application.onActivated(function() {
-			setResult('Event: application activated');
-			console.log('Event: application activated');
-			App.settings.sound = userSoundSet;
-			clearInterval(exec);
-			nowActive = (new Date()).getTime();
-			if((nowActive - lastActive) > 100000) {
-				reconnectApp();
-			}
-		});
-		
-		});
-	};
-} */
-
 /**
  * @namespace App
  */
 var App = {
+
+runtimeApi : function() {	//Ubuntu Touch
+	var trigger = 0;
+	var userSoundSet;
+	
+	function reconnectApp() {
+		App.settings.sound = false;
+		App.disconnect();
+		App.connect();
+		window.setTimeout(delaySound, 5000);
+		console.log('Reconnected App.');
+		
+		function delaySound() {
+			App.settings.sound = userSoundSet;
+		}
+	}
+	
+	var exec;
+	
+	var lastActive;
+	var nowActive;
+
+var api = external.getUnityObject('1.0');
+
+api.RuntimeApi.getApplication(function(application) {
+	
+	application.onDeactivated(function() {
+		console.log('Event: application deactivated');
+		if(trigger == 0 || userSoundSet != App.settings.sound) {
+			userSoundSet = App.settings.sound;
+			trigger = 1;
+		}
+		App.settings.sound = userSoundSet;
+		lastActive = (new Date()).getTime();
+		exec = window.setInterval(reconnectApp, 600000);
+	});
+
+	application.onActivated(function() {
+		console.log('Event: application activated');
+		App.settings.sound = userSoundSet;
+		clearInterval(exec);
+		nowActive = (new Date()).getTime();
+		if((nowActive - lastActive) > 100000) {
+			reconnectApp();
+		}
+	});
+	
+	});
+},
 
   /**
   * @type {string}
@@ -230,6 +219,7 @@ var App = {
       settings: {
         reconnect: true,
         sound: true,
+		showstat: true,
         csn: true,
         boltGet: true,
         readReceipts: true,
@@ -450,6 +440,9 @@ var App = {
   },
 
   init: function () {
+	if(typeof MozActivity == 'undefined') {
+		App.runtimeApi();
+	}
     App.defaults.Connector.presence.status = _('DefaultStatus', {
       app: App.name,
       platform: (Lungo.Core.environment().os ? Lungo.Core.environment().os.name : 'PC')
