@@ -41,16 +41,13 @@ var Tools = {
   convenientDate: function (stamp) {
     var day = this.day(stamp);
     var today = this.day(this.localize(this.stamp()));
-	var yesterday = new Date(new Date().setDate(new Date().getDate()-1));
-	var yestString = yesterday.toISOString();
-	var yestStringConv = yestString.replace(/-/g, ',').split('T')[0];
-	console.log(day + '     ' + yestStringConv);
+	var yesterday = this.day(this.localize(this.stamp(((new Date().getTime()) / 1000) - 86400)));
     var dayString =
       day.toString() == today.toString()
       ?
         _('Today')
       :
-	  day == yestStringConv
+	  day.toString() == yesterday.toString()
 	  ?
 	   _('Yesterday')
 	  :
