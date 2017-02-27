@@ -452,6 +452,9 @@ var Account = {
     var frag = f;
     account = this;
     this.contacts = {};
+    if(this.core.roster == undefined && external && external.getUnityObject){
+    	this.core.roster = [];
+    }
     this.core.roster.forEach(function (contact, i, roster) {
       var name = contact.name || contact.jid;
       var nameParts = name.toLowerCase().split(' ');
