@@ -71,7 +71,7 @@
         {{/with}}
         <select>
         {{#each accounts}}
-          <option value="{{index}}">{{data.connector.provider.longName}} ({{data.unread}})</option>
+          <option value="{{index}}">{{data.core.user}} ({{data.unread}})</option>
         {{/each}}
         </select>
       </script>
@@ -516,7 +516,7 @@
           {{#each accounts}}
             <li data-account-index="{{index}}" data-value="{{enabled}}">
               <img class="provider" src="img/providers/{{data.core.provider}}.svg" />
-              <span>{{data.connector.provider.longName}}</span>
+              <span>{{data.core.user}}</span>
               <div class="switch"><div class="ball"></div><img class="tick" src="img/tick.svg"></div>
             </li>
           {{/each}}
