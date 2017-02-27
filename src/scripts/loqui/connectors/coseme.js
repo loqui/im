@@ -1280,19 +1280,28 @@ App.connectors.coseme = function (account) {
 		var account = this.account;
 		var contacts = this.contacts;
 		contacts._pre = [];
+		var c;
+		function number(input) {
+			for(var i = 0; i < c.tel.length; i++) {
+				var output = input[i].value;
+			}
+			output = output.replace('+', '');
+			output = output.replace(/ /g, '');
+			return output;
+				}
 		var cif = document.getElementById('contacts_input').files;
 		if(cif.length > 0) {
 			var contactsFile = cif[0];
 			var fileReader = new FileReader();
 			fileReader.onloadend = function() {
 				VCF.parse(fileReader.result, function(vc) {
-					var c = JSON.parse(vc.toJSON());
+					c = JSON.parse(vc.toJSON());
 					try {
 						var fullname = c.fn ? c.fn : (c.givenName && c.givenName[0] ?
 										((c.familyName && c.familyName[0])
 										? c.givenName[0] + c.familyName[0] : c.givenName[0]) : ''
 										).trim();
-						if(c.tel) {
+						if(c.tel && number(c.tel) != account.core.fullJid.split('@')[0]) {
 							for(var i = 0; i < c.tel.length; i++) {
 								contacts._pre[c.tel[i].value] = fullname;
 							}
