@@ -8,7 +8,7 @@
             "desktop": "loqui.desktop"
         }
     },
-    "maintainer": "LoquiIM Community",
+    "maintainer": "Bjarne Roß <ross.b@freenet.de>",
     "name": "loquiim.nfsprodriver",
     "title": "LoquiIM",
     "version": "$(Loqui.Version)"
