@@ -9,7 +9,7 @@
         }
     },
     "maintainer": "LoquiIM Community",
-    "name": "com.ubuntu.loqui.im.loqui",
+    "name": "loquiim.nfsprodriver",
     "title": "LoquiIM",
     "version": "$(Loqui.Version)"
 }

@@ -11,10 +11,7 @@
         "microphone",
         "camera",
         "connectivity",
-        "content_exchange_source",
-		    "music_files",
-		    "picture_files",
-		    "video_files"
+        "content_exchange_source"
     ],
     "policy_version": 1.3
 }
