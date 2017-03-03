@@ -348,25 +348,26 @@ var Message = {
       html[0].dataset.downloaded = this.core.media.downloaded || false;
       switch (this.core.media.type) {
         case 'url':
-          html.addClass('maps');
-          var onClick = function(e){
-            e.preventDefault();
-            if (typeof MozActivity != 'undefined') {
-            	//FirefoxOS
-	            return new MozActivity({
-	              name: "view",
-	              data: {
-	                type: "url",
-	                url: message.core.media.url
-	              }
-	            });
-            } else if(external && external.getUnityObject) {
-            	//Ubuntu Touch
-				htmlUT = $('<a></a>').attr('href', message.core.media.url);
-				htmlUT.append(html);
-				html = htmlUT;
-            }
-          };
+		html.addClass('maps');
+		console.log('Map Received: ' + message.core.media.url);
+		if(external && external.getUnityObject) {
+			//Ubuntu Touch
+			htmlUT = $('<a></a>').attr('href', message.core.media.url);
+			htmlUT.append(html);
+			html = htmlUT;
+		} else {
+			var onClick = function(e){
+				e.preventDefault();
+				//FirefoxOS
+				return new MozActivity({
+				  name: "view",
+				  data: {
+					type: "url",
+					url: message.core.media.url
+				  }
+				});
+			  };
+		  }
           break;
         case 'vCard':
           onClick = function(e){
@@ -552,16 +553,18 @@ var Message = {
           };
           break;
       }
-      html.bind('click', onClick);
-      onDivClick = function(e) {
-        e.preventDefault();
-        var target = $(e.target);
-        var span = target[0].lastChild;
-        if (span) {
-          var img = span.firstChild;
-          img.click();
-        }
-      };
+	if(!(external && external.getUnityObject) || this.core.media.type != 'url') {
+	      html.bind('click', onClick);
+	      onDivClick = function(e) {
+		e.preventDefault();
+		var target = $(e.target);
+		var span = target[0].lastChild;
+		if (span) {
+		  var img = span.firstChild;
+		  img.click();
+		}
+	      };
+	}
     }
     var type = (this.core.from == this.account.core.user || this.core.from == this.account.core.realJid) ? 'out' : 'in';
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', Strophe.getBareJidFromJid(this.core.from));
