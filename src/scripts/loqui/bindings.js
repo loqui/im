@@ -134,9 +134,6 @@ var listener= function(muc){
             	//Ubuntu Touch
 				var h = $(window).height();
 				var w = $(window).width();
-				document.getElementById('fileOutput').innerHTML = "";
-				Chungo.Router.section('view');
-				var res = document.getElementById('fileOutput');
 				var img = document.createElement('img');
 				var prop = new Image();
 				prop.src = url;
@@ -148,9 +145,19 @@ var listener= function(muc){
 				} else {
 					img.setAttribute('height', h);
 				}
-				res.appendChild(img);
-				/* var output = new Blob([blob], {type: blob.type});
-				return output; */
+				if(muc) {
+					var group = document.getElementById('muc');
+					group.appendChild(img);
+					group.addEventListener('click', function () {
+						group.removeChild(img);
+					});
+				} else {
+					var contact = document.getElementById('contact');
+					contact.appendChild(img);
+					contact.addEventListener('click', function () {
+						contact.removeChild(img);
+					});
+				}
             }
 
       free();

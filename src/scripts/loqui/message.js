@@ -407,10 +407,8 @@ var Message = {
 						var type = output.split('/')[0];
 						var h = $(window).height();
 						var w = $(window).width();
+						var chat = document.getElementById('chat');
 						if(type == 'data:image') {
-							document.getElementById('fileOutput').innerHTML = "";
-							Chungo.Router.section('view');
-							var res = document.getElementById('fileOutput');
 							var img = document.createElement('img');
 							var prop = new Image();
 							prop.src = output;
@@ -422,36 +420,43 @@ var Message = {
 							} else {
 								img.setAttribute('height', h);
 							}
-							res.appendChild(img);
+							chat.appendChild(img);
+							chat.addEventListener('click', function () {
+								chat.removeChild(img);
+							});
 						} else if(type == 'data:audio') {
-							document.getElementById('fileOutput').innerHTML = "";
-							Chungo.Router.section('view');
-							var res = document.getElementById('fileOutput');
 							var img = document.createElement('img');
 							img.setAttribute('src', "img/play.png");
-							res.appendChild(img);
-							var audio = document.createElement("audio");
-							audio.addEventListener("loadeddata", function() {
-								res.addEventListener('click', function () {
-									if (audio.paused == false) {
-										img.setAttribute('src', "img/play.png");
-										res.replaceChild(img, res.childNodes[0]);
-										audio.pause();
-										audio.firstChild.nodeValue = 'Play';
-									} else {
-										img.setAttribute('src', "img/audio.png");
-										res.replaceChild(img, res.childNodes[0]);
-										audio.play();
-										audio.firstChild.nodeValue = 'Pause';
-									}
-								});
-							});
+							var close = document.createElement('img');
+							close.setAttribute('src', "img/console-inactive.png");
+							var audio = document.createElement('audio');
 							audio.setAttribute("src", output);
-							audio.load();
+							chat.appendChild(img);
+							chat.appendChild(close);
+							chat.appendChild(audio);
+							close.addEventListener('click', function () {
+								audio.setAttribute("src", "");
+								audio.load();
+								chat.removeChild(audio);
+								chat.removeChild(img);
+								chat.removeChild(close);
+							});
+							img.addEventListener('click', function () {
+								if (audio.paused == false) {
+									img.setAttribute('src', "img/play.png");
+									chat.replaceChild(img, img);
+									audio.pause();
+									audio.firstChild.nodeValue = 'Play';
+								} else {
+									img.setAttribute('src', "img/audio.png");
+									chat.replaceChild(img, img);
+									audio.play();
+									audio.firstChild.nodeValue = 'Pause';
+								}
+							});
 						} else if(type == 'data:video') {
-							document.getElementById('fileOutput').innerHTML = "";
-							Chungo.Router.section('view');
-							var res = document.getElementById('fileOutput');
+							var close = document.createElement('img');
+							close.setAttribute('src', "img/console-inactive.png");
 							function addSourceToVideo(element, src, type) {
 								var source = document.createElement('source');
 								source.src = src;
@@ -463,9 +468,14 @@ var Message = {
 								video.setAttribute('height', h);
 							} else {
 								video.setAttribute('width', w);
-							}							
-							res.appendChild(video);
+							}
+							chat.appendChild(close);
+							chat.appendChild(video);		
 							addSourceToVideo(video, output, blob.type);
+							close.addEventListener('click', function () {
+								chat.removeChild(video);
+								chat.removeChild(close);
+							});
 							video.addEventListener('click', function () {
 								if (video.paused == false) {
 									video.pause();
