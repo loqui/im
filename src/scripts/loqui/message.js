@@ -362,34 +362,123 @@ var Message = {
 	            });
             } else if(external && external.getUnityObject) {
             	//Ubuntu Touch
-
+				htmlUT = $('<a></a>').attr('href', message.core.media.url);
+				htmlUT.append(html);
+				html = htmlUT;
             }
           };
           break;
         case 'vCard':
           onClick = function(e){
             e.preventDefault();
-            return new MozActivity({
-              name: 'open',
-              data: {
-                type: 'text/vcard',
-                blob: new Blob([ message.core.media.payload[1] ],
-                               { type : 'text/vcard' })
-              }
-            });
+            if (typeof MozActivity != 'undefined') {
+            	//FirefoxOS
+				return new MozActivity({
+				  name: 'open',
+				  data: {
+					type: 'text/vcard',
+					blob: new Blob([ message.core.media.payload[1] ],
+								   { type : 'text/vcard' })
+				  }
+				});
+			} else if(external && external.getUnityObject) {
+            	//Ubuntu Touch
+
+            }
           };
           break;
 
         default:
           html.addClass(this.core.media.type);
           var open = function (blob) {
-            return new MozActivity({
-              name: 'open',
-              data: {
-                type: blob.type,
-                blob: blob
-              }
-            });
+            if (typeof MozActivity != 'undefined') {
+            	//FirefoxOS
+				return new MozActivity({
+				  name: 'open',
+				  data: {
+					type: blob.type,
+					blob: blob
+				  }
+				});
+			} else if(external && external.getUnityObject) {
+            	//Ubuntu Touch
+				Tools.blobToBase64(blob, function (output) {
+					if(output) {
+						var type = output.split('/')[0];
+						var h = $(window).height();
+						var w = $(window).width();
+						if(type == 'data:image') {
+							document.getElementById('fileOutput').innerHTML = "";
+							Chungo.Router.section('view');
+							var res = document.getElementById('fileOutput');
+							var img = document.createElement('img');
+							var prop = new Image();
+							prop.src = output;
+							var propHeight = prop.height;
+							var propWidth = prop.width;
+							img.setAttribute('src', output);
+							if(propWidth/propHeight > w/h) {
+								img.setAttribute('width', w);
+							} else {
+								img.setAttribute('height', h);
+							}
+							res.appendChild(img);
+						} else if(type == 'data:audio') {
+							document.getElementById('fileOutput').innerHTML = "";
+							Chungo.Router.section('view');
+							var res = document.getElementById('fileOutput');
+							var img = document.createElement('img');
+							img.setAttribute('src', "img/play.png");
+							res.appendChild(img);
+							var audio = document.createElement("audio");
+							audio.addEventListener("loadeddata", function() {
+								res.addEventListener('click', function () {
+									if (audio.paused == false) {
+										img.setAttribute('src', "img/play.png");
+										res.replaceChild(img, res.childNodes[0]);
+										audio.pause();
+										audio.firstChild.nodeValue = 'Play';
+									} else {
+										img.setAttribute('src', "img/audio.png");
+										res.replaceChild(img, res.childNodes[0]);
+										audio.play();
+										audio.firstChild.nodeValue = 'Pause';
+									}
+								});
+							});
+							audio.setAttribute("src", output);
+							audio.load();
+						} else if(type == 'data:video') {
+							document.getElementById('fileOutput').innerHTML = "";
+							Chungo.Router.section('view');
+							var res = document.getElementById('fileOutput');
+							function addSourceToVideo(element, src, type) {
+								var source = document.createElement('source');
+								source.src = src;
+								source.type = type;
+								element.appendChild(source);
+							}
+							var video = document.createElement('video');
+							if(w > h) {
+								video.setAttribute('height', h);
+							} else {
+								video.setAttribute('width', w);
+							}							
+							res.appendChild(video);
+							addSourceToVideo(video, output, blob.type);
+							video.addEventListener('click', function () {
+								if (video.paused == false) {
+									video.pause();
+									video.firstChild.nodeValue = 'Play';
+								} else {
+									video.play();
+									video.firstChild.nodeValue = 'Pause';
+								}
+							});
+						}
+					}
+				});
+            }
           };
           onClick = function (e) {
             var img = e.target;
@@ -401,7 +490,7 @@ var Message = {
               ext = 'mp3';
             }
             var localUrl = App.pathFiles + $(e.target).closest('[data-stamp]')[0].dataset.stamp.replace(/[-:]/g, '') + url.split('/').pop().substring(0, 5).toUpperCase() + '.' + ext;
-            if (img.dataset.downloaded == 'true') {
+            if (img.dataset.downloaded == 'true' && typeof MozActivity != 'undefined') {
               Store.SD.recover(localUrl, function (blob) {
                 open(blob);
               });

@@ -135,7 +135,7 @@
     <article id="info" class="simple scroll">
       <h1><span data-var="name"></span> <span data-var="version"></span><span data-var="minorVersion"></span></h1>
       <p><a target="_external" href="https://github.com/loqui/im/releases"><em data-l10n-id="Changelog">Changelog</em></a></p>
-      <p data-l10n-id="Copyright">© 2013-2014 Loqui IM. Some rights reserved.</p>
+      <p data-l10n-id="Copyright">Â© 2013-2014 Loqui IM. Some rights reserved.</p>
       <p><a target="_external" href="http://loqui.im/"><em data-l10n-id="Website">Website</em></a></p>
       <p><a target="_external" href="https://github.com/loqui/im/issues?state=open"><em data-l10n-id="ReportIssue">Report an issue</em></a></p><br />
       <p><small data-l10n-id="FreeSoftware">This program is free software; you may redistribute and/or modify it under the terms of the GNU Affero General Public License (AGPL 3) as published by the Free Software Foundation.</small></p>
@@ -497,6 +497,16 @@
         <button class="search" data-l10n-id="MucSearch" data-menu-onclick="mucSearch">Search groups</button>
       </div>
       <output name="rooms"><ul></ul></output>
+    </article>
+  </section>
+  <section id="view" data-transition="vertical">
+	<header data-title="Attachment" data-l10n-title="Attachment">
+      <nav class="on-left">
+        <button data-view-section="back" data-icon="angle-up" class="up"></button>
+      </nav>
+    </header>
+    <article>	
+        <div id="fileOutput"></div>
     </article>
   </section>
   <aside id="accounts">

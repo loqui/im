@@ -121,13 +121,37 @@ var listener= function(muc){
   if(avatar){
     Store.recover((avatar.original || avatar.chunk), function(key, url, free){
       var blob = Tools.b64ToBlob(url.split(',').pop(), url.split(/[:;]/)[1]);
-      new MozActivity({
-        name: "open",
-        data: {
-          type: blob.type,
-          blob: blob
-        }
-      });
+      if (typeof MozActivity != 'undefined') {
+            	//FirefoxOS
+				return new MozActivity({
+				  name: 'open',
+				  data: {
+					type: blob.type,
+					blob: blob
+				  }
+				});
+			} else if(external && external.getUnityObject) {
+            	//Ubuntu Touch
+				var h = $(window).height();
+				var w = $(window).width();
+				document.getElementById('fileOutput').innerHTML = "";
+				Chungo.Router.section('view');
+				var res = document.getElementById('fileOutput');
+				var img = document.createElement('img');
+				var prop = new Image();
+				prop.src = url;
+				var propHeight = prop.height;
+				var propWidth = prop.width;
+				img.setAttribute('src', url);
+				if(propWidth/propHeight > w/h) {
+					img.setAttribute('width', w);
+				} else {
+					img.setAttribute('height', h);
+				}
+				res.appendChild(img);
+				/* var output = new Blob([blob], {type: blob.type});
+				return output; */
+            }
 
       free();
     });
