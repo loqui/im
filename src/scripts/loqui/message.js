@@ -465,14 +465,16 @@ var Message = {
 								element.appendChild(source);
 							}
 							var video = document.createElement('video');
-							if(w > h) {
-								video.setAttribute('height', h);
-							} else {
-								video.setAttribute('width', w);
-							}
 							chat.appendChild(close);
 							chat.appendChild(video);		
 							addSourceToVideo(video, output, blob.type);
+							var propHeight = video.videoHeight;
+							var propWidth = video.videoWidth;
+							if(propWidth/propHeight > w/h) {
+								video.setAttribute('width', w);
+							} else {
+								video.setAttribute('height', h);
+							}
 							close.addEventListener('click', function () {
 								chat.removeChild(video);
 								chat.removeChild(close);
