@@ -337,6 +337,7 @@ var Message = {
     var message = this;
     var account = this.account;
     var html= null;
+	  var htmlUT = null;
     var onDivClick= null;
     if (this.core.text) {
       html = App.emoji[Providers.data[this.account.core.provider].emoji].fy(Tools.urlHL(Tools.HTMLescape(this.core.text)));
