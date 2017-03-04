@@ -121,13 +121,44 @@ var listener= function(muc){
   if(avatar){
     Store.recover((avatar.original || avatar.chunk), function(key, url, free){
       var blob = Tools.b64ToBlob(url.split(',').pop(), url.split(/[:;]/)[1]);
-      new MozActivity({
-        name: "open",
-        data: {
-          type: blob.type,
-          blob: blob
-        }
-      });
+      if (typeof MozActivity != 'undefined') {
+            	//FirefoxOS
+				return new MozActivity({
+				  name: 'open',
+				  data: {
+					type: blob.type,
+					blob: blob
+				  }
+				});
+			} else if(external && external.getUnityObject) {
+            	//Ubuntu Touch
+				var h = $(window).height();
+				var w = $(window).width();
+				var img = document.createElement('img');
+				var prop = new Image();
+				prop.src = url;
+				var propHeight = prop.height;
+				var propWidth = prop.width;
+				img.setAttribute('src', url);
+				if(propWidth/propHeight > w/h) {
+					img.setAttribute('width', w);
+				} else {
+					img.setAttribute('height', h);
+				}
+				if(muc) {
+					var group = document.getElementById('muc');
+					group.appendChild(img);
+					group.addEventListener('click', function () {
+						group.removeChild(img);
+					});
+				} else {
+					var contact = document.getElementById('contact');
+					contact.appendChild(img);
+					contact.addEventListener('click', function () {
+						contact.removeChild(img);
+					});
+				}
+            }
 
       free();
     });
