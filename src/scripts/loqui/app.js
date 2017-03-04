@@ -24,7 +24,7 @@ runtimeApi : function() {	//Ubuntu Touch
 		App.settings.sound = false;
 		App.disconnect();
 		App.connect();
-		window.setTimeout(delaySound, 5000);
+		window.setTimeout(delaySound, 1500);
 		console.log('Reconnected App.');
 		
 		function delaySound() {
