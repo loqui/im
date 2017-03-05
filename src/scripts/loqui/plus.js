@@ -112,6 +112,9 @@ var Plus = {
 	      var contact = this.result;
 	      var name = Array.isArray(contact.name) ? contact.name[0] : contact.name;
 	      var str = '';
+	      for (var ob in contact) {
+	    	  console.log(ob + ': ' + contact[ob]);
+	      }
 	      ContactToVcard([contact], function (vcards, nCards) {
 	        str += vcards;
 	      }, function () {
