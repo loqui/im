@@ -44,6 +44,10 @@ var Plus = {
     Messenger.add(emoji);
   },
   
+  UTFileSendRegistered: false,
+  
+  UTVCardSendRegistered: false,
+  
   /**
    * Triggers a file pick [{MozActivity}]{@link external:System.MozActivity}
    */
@@ -81,11 +85,14 @@ var Plus = {
     } else if(external && external.getUnityObject) {
     	//Ubuntu Touch
     	$('#filesend_input').attr('accept', fileTypes);
-    	//File send handling for non FirefoxOS
-    	$('#filesend_input').change(function() {
-    	    var image = document.getElementById('filesend_input').files[0];
-    	    account.connector.fileSend(to, image);
-    	});
+	    if(!Plus.UTFileSendRegistered) {
+	    	//File send handling for non FirefoxOS
+	    	$('#filesend_input').change(function() {
+	    	    var image = document.getElementById('filesend_input').files[0];
+	    	    account.connector.fileSend(to, image);
+	    	});
+	    	Plus.UTFileSendRegistered = true;
+    	}
     	$('#filesend_input').trigger('click');
     }
   },
@@ -93,24 +100,54 @@ var Plus = {
   vcardSend: function () {
     var account = Accounts.current;
     var to = $('section#chat')[0].dataset.jid;
-
-    var e = new MozActivity({
-      name: 'pick',
-      data: {
-        type: 'webcontacts/tel'
-      }
-    });
-
-    e.onsuccess = function () {
-      var contact = this.result;
-      var name = Array.isArray(contact.name) ? contact.name[0] : contact.name;
-      var str = '';
-      ContactToVcard([contact], function (vcards, nCards) {
-        str += vcards;
-      }, function () {
-        account.connector.vcardSend(to, name, str);
-      }, 0, true);
-    };
+    if (typeof MozActivity != 'undefined') {
+	    var e = new MozActivity({
+	      name: 'pick',
+	      data: {
+	        type: 'webcontacts/tel'
+	      }
+	    });
+	
+	    e.onsuccess = function () {
+	      var contact = this.result;
+	      var name = Array.isArray(contact.name) ? contact.name[0] : contact.name;
+	      var str = '';
+	      ContactToVcard([contact], function (vcards, nCards) {
+	        str += vcards;
+	      }, function () {
+	        account.connector.vcardSend(to, name, str);
+	      }, 0, true);
+	    };
+    } else if(external && external.getUnityObject) {
+    	//Ubuntu Touch
+    	if(!Plus.UTVCardSendRegistered) {
+    		$('#vcardsend_input').change(function() {
+    			var vcardFiles = document.getElementById('vcardsend_input').files;
+    			if(vcardFiles.length > 0) {
+    				var vcard = vcardFiles[0];
+    				var fileReader = new FileReader();
+    				fileReader.onloadend = function() {
+    					VCF.parse(fileReader.result, function(vc) {
+    						var str = '';
+    						var c = vc.toJCard();
+    						var name = c.fn ? c.fn : (c.givenName && c.givenName[0] ?
+    								((c.familyName && c.familyName[0])
+    										? c.givenName[0] + c.familyName[0] : c.givenName[0]) : ''
+    						).trim();
+    						ContactToVcard([c], function (vcards, nCards) {
+    					        str += vcards;
+    					      }, function () {
+    					        account.connector.vcardSend(to, name, str);
+    					      }, 0, true);
+    					});
+    				};
+    				fileReader.readAsText(vcard);
+    			}
+    		});
+    		Plus.UTVCardSendRegistered = true;
+    	}
+    	$('#vcardsend_input').trigger('click');
+    }
   },
   
   locationSend: function () {
