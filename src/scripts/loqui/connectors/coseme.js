@@ -1295,7 +1295,7 @@ App.connectors.coseme = function (account) {
 			var fileReader = new FileReader();
 			fileReader.onloadend = function() {
 				VCF.parse(fileReader.result, function(vc) {
-					c = JSON.parse(vc.toJSON());
+					c = vc.toJCard();
 					try {
 						var fullname = c.fn ? c.fn : (c.givenName && c.givenName[0] ?
 										((c.familyName && c.familyName[0])
