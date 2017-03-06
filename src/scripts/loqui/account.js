@@ -701,7 +701,7 @@ var Account = {
     var matches = roster.filter( function ( contactMap ) {
       return ( text.filter( function ( token ) {
         var regex = new RegExp( token, 'gi' );
-        return contactMap.jid.match( regex ) || contactMap.name.match( regex );
+        return (contactMap.jid && contactMap.jid.match( regex )) || (contactMap.name && contactMap.name.match( regex ));
       } ) || [ ] ).length;
     } );
 
