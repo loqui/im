@@ -524,8 +524,9 @@
       ipad: /(iPad).*OS\s([\d_]+)/,
       iphone: /(iPhone\sOS)\s([\d_]+)/,
       Blackberry: /(BlackBerry|BB10|Playbook).*Version\/([\d.]+)/,
-      FirefoxOS: /(Mozilla).*Mobile[^\/]*\/([\d\.]*)/,
-      webOS: /(webOS|hpwOS)[\s\/]([\d.]+)/
+      FirefoxOS: /(Mozilla).*(\(Mobile)[^\/]*\/([\d\.]*)/,
+      webOS: /(webOS|hpwOS)[\s\/]([\d.]+)/,
+      UbuntuTouch: /(Mozilla).*(Ubuntu; Mobile)[^\/]*\/([\d\.]*)/
     };
     $$.isMobile = function() {
       _current = _current || _detectEnvironment();
@@ -828,7 +829,7 @@
       if (screen.addEventListener) {
         screen.addEventListener('mozorientationchange', _getSwipeMin);
       }
-      
+
       return environment.bind("touchcancel", _cleanGesture);
     };
     _onTouchStart = function(event) {
