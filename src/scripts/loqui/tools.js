@@ -41,18 +41,14 @@ var Tools = {
   convenientDate: function (stamp) {
     var day = this.day(stamp);
     var today = this.day(this.localize(this.stamp()));
-	var yesterday = this.day(this.localize(this.stamp(((new Date().getTime()) / 1000) - 86400)));
+    var yesterday = this.day(this.localize(this.stamp(((new Date().getTime()) / 1000) - 86400)));
     var dayString =
-      day.toString() == today.toString()
-      ?
-        _('Today')
-      :
-	  day.toString() == yesterday.toString()
-	  ?
-	   _('Yesterday')
-	  :
-        _('DateFormat', {day: day[2], month: day[1]})
-    ;
+      (day.toString() == today.toString()) ?
+        _('Today') : (
+          (day.toString() == yesterday.toString()) ?
+            _('Yesterday') :
+              _('DateFormat', {day: day[2], month: day[1]})
+        );
     return [
       dayString,
       this.hour(stamp)
