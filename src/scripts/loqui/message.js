@@ -336,9 +336,9 @@ var Message = {
   preRender : function (avatarize) {
     var message = this;
     var account = this.account;
-    var html= null;
+    var html = null;
 	  var htmlUT = null;
-    var onDivClick= null;
+    var onDivClick = null;
     if (this.core.text) {
       html = App.emoji[Providers.data[this.account.core.provider].emoji].fy(Tools.urlHL(Tools.HTMLescape(this.core.text)));
       html = html.replace(/(\*)([A-Za-z0-9\s]+)(\*)/g, '<b>$2</b>');
@@ -348,150 +348,146 @@ var Message = {
       html = $('<img/>').attr('src', this.core.media.thumb);
       html[0].dataset.downloaded = this.core.media.downloaded || false;
       switch (this.core.media.type) {
-        case 'url':
-		html.addClass('maps');
-		console.log('Map Received: ' + message.core.media.url);
-		if(external && external.getUnityObject) {
-			//Ubuntu Touch
-			htmlUT = $('<a></a>').attr('href', message.core.media.url);
-			htmlUT.append(html);
-			html = htmlUT;
-		} else {
-			var onClick = function(e){
-				e.preventDefault();
-				//FirefoxOS
-				return new MozActivity({
-				  name: "view",
-				  data: {
-					type: "url",
-					url: message.core.media.url
-				  }
-				});
-			  };
-		  }
-          break;
-        case 'vCard':
-          onClick = function(e){
+      case 'url':
+		    html.addClass('maps');
+		    if (App.platform === "UbuntuTouch") {
+			    htmlUT = $('<a></a>').attr('href', message.core.media.url);
+			    htmlUT.append(html);
+			    html = htmlUT;
+		    } else {
+          var onClick = function(e) {
             e.preventDefault();
-            if (typeof MozActivity != 'undefined') {
-            	//FirefoxOS
-				return new MozActivity({
-				  name: 'open',
-				  data: {
-					type: 'text/vcard',
-					blob: new Blob([ message.core.media.payload[1] ],
-								   { type : 'text/vcard' })
-				  }
-				});
-			} else if(external && external.getUnityObject) {
-            	//Ubuntu Touch
-
-            }
+            return new MozActivity({
+              name: "view",
+              data: {
+                type: "url",
+                url: message.core.media.url
+              }
+            });
           };
-          break;
+        }
+        break;
+
+      case 'vCard':
+        onClick = function(e) {
+          e.preventDefault();
+          if (App.platform === "FirefoxOS") {
+            return new MozActivity({
+              name: 'open',
+              data: {
+                type: 'text/vcard',
+                blob: new Blob([ message.core.media.payload[1] ], { type : 'text/vcard' })
+              }
+            });
+          } else if(App.platform === "UbuntuTouch") {
+            console.log("UT");
+          }
+        };
+        break;
 
         default:
           html.addClass(this.core.media.type);
           var open = function (blob) {
-            if (typeof MozActivity != 'undefined') {
-            	//FirefoxOS
-				return new MozActivity({
-				  name: 'open',
-				  data: {
-					type: blob.type,
-					blob: blob
-				  }
-				});
-			} else if(external && external.getUnityObject) {
-            	//Ubuntu Touch
-				Tools.blobToBase64(blob, function (output) {
-					if(output) {
-						var type = output.split('/')[0];
-						var h = $(window).height();
-						var w = $(window).width();
-						var chat = document.getElementById('chat');
-						if(type == 'data:image') {
-							var img = document.createElement('img');
-							var prop = new Image();
-							prop.src = output;
-							var propHeight = prop.height;
-							var propWidth = prop.width;
-							img.setAttribute('src', output);
-							if(propWidth/propHeight > w/h) {
-								img.setAttribute('width', w);
-							} else {
-								img.setAttribute('height', h);
-							}
-							chat.appendChild(img);
-							chat.addEventListener('click', function () {
-								chat.removeChild(img);
-							});
-						} else if(type == 'data:audio') {
-							var img = document.createElement('img');
-							img.setAttribute('src', "img/play.png");
-							var close = document.createElement('img');
-							close.setAttribute('src', "img/console-inactive.png");
-							var audio = document.createElement('audio');
-							audio.setAttribute("src", output);
-							chat.appendChild(img);
-							chat.appendChild(close);
-							chat.appendChild(audio);
-							close.addEventListener('click', function () {
-								audio.setAttribute("src", "");
-								audio.load();
-								chat.removeChild(audio);
-								chat.removeChild(img);
-								chat.removeChild(close);
-							});
-							img.addEventListener('click', function () {
-								if (audio.paused == false) {
-									img.setAttribute('src', "img/play.png");
-									chat.replaceChild(img, img);
-									audio.pause();
-									audio.firstChild.nodeValue = 'Play';
-								} else {
-									img.setAttribute('src', "img/audio.png");
-									chat.replaceChild(img, img);
-									audio.play();
-									audio.firstChild.nodeValue = 'Pause';
-								}
-							});
-						} else if(type == 'data:video') {
-							var close = document.createElement('img');
-							close.setAttribute('src', "img/console-inactive.png");
-							function addSourceToVideo(element, src, type) {
-								var source = document.createElement('source');
-								source.src = src;
-								source.type = type;
-								element.appendChild(source);
-							}
-							var video = document.createElement('video');
-							chat.appendChild(close);
-							chat.appendChild(video);		
-							addSourceToVideo(video, output, blob.type);
-							var propHeight = video.videoHeight;
-							var propWidth = video.videoWidth;
-							if(propWidth/propHeight > w/h) {
-								video.setAttribute('width', w);
-							} else {
-								video.setAttribute('height', h);
-							}
-							close.addEventListener('click', function () {
-								chat.removeChild(video);
-								chat.removeChild(close);
-							});
-							video.addEventListener('click', function () {
-								if (video.paused == false) {
-									video.pause();
-									video.firstChild.nodeValue = 'Play';
-								} else {
-									video.play();
-									video.firstChild.nodeValue = 'Pause';
-								}
-							});
-						}
-					}
-				});
+            if (App.platform === "FirefoxOS") {
+              return new MozActivity({
+      				  name: 'open',
+      				  data: {
+        					type: blob.type,
+        					blob: blob
+      				  }
+      				});
+			      } else if (App.platform === "UbuntuTouch") {
+              /*
+              Tools.blobToBase64(blob, function (output) {
+                if(output) {
+                  var type = output.split('/')[0];
+                  var h = $(window).height();
+                  var w = $(window).width();
+                  var chat = document.getElementById('chat');
+                  // This is not what you whant! The chat itself is
+                  // section#chat article#main ul#messages li:lastChild
+                  if (type == 'data:image') {
+                    var img = document.createElement('img');
+                    var prop = new Image();
+                    prop.src = output;
+                    var propHeight = prop.height;
+                    var propWidth = prop.width;
+                    img.setAttribute('src', output);
+                    if (propWidth/propHeight > w/h) {
+                      img.setAttribute('width', w);
+                    } else {
+                      img.setAttribute('height', h);
+                    }
+                    chat.appendChild(img);
+                    chat.addEventListener('click', function () {
+                      chat.removeChild(img);
+                    });
+                  } else if(type == 'data:audio') {
+                    var img = document.createElement('img');
+                    img.setAttribute('src', "img/play.png");
+                    var close = document.createElement('img');
+                    close.setAttribute('src', "img/console-inactive.png");
+                    var audio = document.createElement('audio');
+                    audio.setAttribute("src", output);
+                    chat.appendChild(img);
+                    chat.appendChild(close);
+                    chat.appendChild(audio);
+                    close.addEventListener('click', function () {
+                      audio.setAttribute("src", "");
+                      audio.load();
+                      chat.removeChild(audio);
+                      chat.removeChild(img);
+                      chat.removeChild(close);
+                    });
+                    img.addEventListener('click', function () {
+                      if (audio.paused == false) {
+                        img.setAttribute('src', "img/play.png");
+                        chat.replaceChild(img, img);
+                        audio.pause();
+                        audio.firstChild.nodeValue = 'Play';
+                      } else {
+                        img.setAttribute('src', "img/audio.png");
+                        chat.replaceChild(img, img);
+                        audio.play();
+                        audio.firstChild.nodeValue = 'Pause';
+                      }
+                    });
+                  } else if(type == 'data:video') {
+                    var close = document.createElement('img');
+                    close.setAttribute('src', "img/console-inactive.png");
+                    function addSourceToVideo(element, src, type) {
+                      var source = document.createElement('source');
+                      source.src = src;
+                      source.type = type;
+                      element.appendChild(source);
+                    }
+                    var video = document.createElement('video');
+                    chat.appendChild(close);
+                    chat.appendChild(video);
+                    addSourceToVideo(video, output, blob.type);
+                    var propHeight = video.videoHeight;
+                    var propWidth = video.videoWidth;
+                    if(propWidth/propHeight > w/h) {
+                      video.setAttribute('width', w);
+                    } else {
+                      video.setAttribute('height', h);
+                    }
+                    close.addEventListener('click', function () {
+                      chat.removeChild(video);
+                      chat.removeChild(close);
+                    });
+                    video.addEventListener('click', function () {
+                      if (video.paused == false) {
+                        video.pause();
+                        video.firstChild.nodeValue = 'Play';
+                      } else {
+                        video.play();
+                        video.firstChild.nodeValue = 'Pause';
+                      }
+                    });
+                  }
+                }
+              }); */
             }
           };
           onClick = function (e) {
@@ -504,7 +500,7 @@ var Message = {
               ext = 'mp3';
             }
             var localUrl = App.pathFiles + $(e.target).closest('[data-stamp]')[0].dataset.stamp.replace(/[-:]/g, '') + url.split('/').pop().substring(0, 5).toUpperCase() + '.' + ext;
-            if (img.dataset.downloaded == 'true' && typeof MozActivity != 'undefined') {
+            if (img.dataset.downloaded == 'true' && App.platform === "FirefoxOS") {
               Store.SD.recover(localUrl, function (blob) {
                 open(blob);
               });
@@ -556,18 +552,18 @@ var Message = {
           };
           break;
       }
-	if(!(external && external.getUnityObject) || this.core.media.type != 'url') {
-	      html.bind('click', onClick);
-	      onDivClick = function(e) {
-		e.preventDefault();
-		var target = $(e.target);
-		var span = target[0].lastChild;
-		if (span) {
-		  var img = span.firstChild;
-		  img.click();
-		}
-	      };
-	}
+      if (App.platform === "UbuntuTouch" || this.core.media.type != 'url') {
+        html.bind('click', onClick);
+        onDivClick = function(e) {
+          e.preventDefault();
+          var target = $(e.target);
+          var span = target[0].lastChild;
+          if (span) {
+            var img = span.firstChild;
+            img.click();
+          }
+        };
+      }
     }
     var type = (this.core.from == this.account.core.user || this.core.from == this.account.core.realJid) ? 'out' : 'in';
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', Strophe.getBareJidFromJid(this.core.from));

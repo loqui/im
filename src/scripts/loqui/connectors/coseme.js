@@ -1259,11 +1259,10 @@ App.connectors.coseme = function (account) {
           Lungo.Notification.error(_('ContactsGetError'), _('ContactsGetErrorExp'), 'exclamation-sign', 5);
           cb();
         };
-        if(external && external.getUnityObject) {
-        	// Ubuntu Touch
+        if (App.platform === "UbuntuTouch") {
         	console.log('trigger content hub for contacts import');
         	var UTcs = this.contacts.UTContactSync;
-        	if(!this.UTSyncRegistered) {
+        	if (!this.UTSyncRegistered) {
         		$('#contacts_input').change(function() {
         			UTcs(cb);
         		});
@@ -1276,52 +1275,66 @@ App.connectors.coseme = function (account) {
       }
     }.bind(this);
 
+    this.contacts.order = function (cb) {
+      this.account.core.roster.sort(function (a,b) {
+        var aname = a.name ? a.name : a.jid;
+        var bname = b.name ? b.name : b.jid;
+        return aname > bname;
+      });
+      if (cb) {
+        cb();
+      }
+    }.bind(this);
+
     this.contacts.UTContactSync = function(cb) {
-		var account = this.account;
-		var contacts = this.contacts;
-		contacts._pre = [];
-		var c;
-		function number(input) {
-			for(var i = 0; i < c.tel.length; i++) {
-				var output = input[i].value;
+		  var account = this.account;
+		  var contacts = this.contacts;
+		  contacts._pre = [];
+		  var c;
+
+      function number(input) {
+			  for(var i = 0; i < c.tel.length; i++) {
+				  var output = input[i].value;
+			  }
+			  output = output.replace('+', '');
+			  output = output.replace(/ /g, '');
+
+        return output;
 			}
-			output = output.replace('+', '');
-			output = output.replace(/ /g, '');
-			return output;
-				}
-		var cif = document.getElementById('contacts_input').files;
-		if(cif.length > 0) {
-			var contactsFile = cif[0];
-			var fileReader = new FileReader();
-			fileReader.onloadend = function() {
-				VCF.parse(fileReader.result, function(vc) {
-					c = vc.toJCard();
-					try {
-						var fullname = c.fn ? c.fn : (c.givenName && c.givenName[0] ?
-										((c.familyName && c.familyName[0])
-										? c.givenName[0] + c.familyName[0] : c.givenName[0]) : ''
-										).trim();
-						if(c.tel && number(c.tel) != account.core.fullJid.split('@')[0]) {
-							for(var i = 0; i < c.tel.length; i++) {
-								contacts._pre[c.tel[i].value] = fullname;
-							}
-						}
-					} catch (e) {
-						Tools.log('CONTACT NORMALIZATION ERROR:', e);
-					}
-				});
-				if(cb) {
-					MI.call('contacts_sync', [Object.keys(contacts._pre)]);
-					contacts._cb = cb;
-				}
-			};
-			fileReader.readAsText(contactsFile);
-		} else if(cb) {
-			MI.call('contacts_sync', [Object.keys(contacts._pre)]);
-			contacts._cb = cb;
-		}
-	}.bind(this);
-	
+
+		  var cif = document.getElementById('contacts_input').files;
+		  if (cif.length > 0) {
+			  var contactsFile = cif[0];
+			  var fileReader = new FileReader();
+			  fileReader.onloadend = function() {
+				  VCF.parse(fileReader.result, function(vc) {
+            c = vc.toJCard();
+            try {
+  						var fullname = c.fn ? c.fn : (c.givenName && c.givenName[0] ?
+  										((c.familyName && c.familyName[0])
+  										? c.givenName[0] + c.familyName[0] : c.givenName[0]) : ''
+  										).trim();
+              if(c.tel && number(c.tel) != account.core.fullJid.split('@')[0]) {
+                for(var i = 0; i < c.tel.length; i++) {
+                  contacts._pre[c.tel[i].value] = fullname;
+                }
+              }
+            } catch (e) {
+              Tools.log('CONTACT NORMALIZATION ERROR:', e);
+            }
+          });
+          if (cb) {
+            MI.call('contacts_sync', [Object.keys(contacts._pre)]);
+            contacts._cb = cb;
+          }
+        };
+        fileReader.readAsText(contactsFile);
+      } else if (cb) {
+        MI.call('contacts_sync', [Object.keys(contacts._pre)]);
+        contacts._cb = cb;
+      }
+    }.bind(this);
+
     this.contacts.order = function (cb) {
       this.account.core.roster.sort(function (a,b) {
         var aname = a.name ? a.name : a.jid;

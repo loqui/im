@@ -452,9 +452,10 @@ var Account = {
     var frag = f;
     account = this;
     this.contacts = {};
-    if(this.core.roster == undefined && external && external.getUnityObject){
-    	this.core.roster = [];
+    if(this.core.roster == undefined && App.platform === "UbuntuTouch") {
+      this.core.roster = [];
     }
+
     this.core.roster.forEach(function (contact, i, roster) {
       var name = contact.name || contact.jid;
       var nameParts = name.toLowerCase().split(' ');
@@ -555,14 +556,15 @@ var Account = {
 
           var show =_('show' + (contact.presence.show || 'na'));
           var time = (contact.presence.show != 'a') && contact.presence.last && Tools.convenientDate(Tools.localize(Tools.stamp(contact.presence.last)));
-		  var prefix = time
+          var prefix = time
             ? _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})})
             : show;
 
-          var status = ((time || show == _('showa')) ? prefix : '') + ((contact.presence.status && (time || show == _('showa')) && App.settings.showstat == true) ? (' - ') : '') +
-            ((contact.presence.status && App.settings.showstat == true)
-             ? App.emoji[Providers.data[this.core.provider].emoji].fy(Tools.HTMLescape(contact.presence.status))
-             : '');
+          var status = ( (time || show == _('showa')) ? prefix : '' ) +
+            ( (contact.presence.status && (time || show == _('showa')) && App.settings.showstat == true) ? (' - ') : '' ) +
+            ( (contact.presence.status && App.settings.showstat == true)
+                ? App.emoji[Providers.data[this.core.provider].emoji].fy(Tools.HTMLescape(contact.presence.status))
+                  : '' );
           header.find('.status').html(status);
         }
       } else {
