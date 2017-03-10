@@ -83,7 +83,7 @@ document.addEventListener("visibilitychange", function() {
   });
 });
 
-//Avatar handling for non FirefoxOS
+// Avatar handling for non FirefoxOS
 $('#avatar_input').change(function() {
     var image = document.getElementById('avatar_input').files[0];
     Messenger.avatarSet(image);
@@ -105,60 +105,59 @@ $('section#me #card span.avatar').on('click', function (e) {
       Messenger.avatarSet(image.blob);
     };
     pick.onerror = function(){};
-  } else if(external && external.getUnityObject) {
+  } else if (App.platform === "UbuntuTouch") {
 	  //Ubuntu Touch: open contentHub
-	  $('#avatar_input').trigger('click'); 
+	  $('#avatar_input').trigger('click');
   } else {
     Lungo.Notification.error(_('NoDevice'), _('FxOSisBetter', 'exclamation-sign'));
   }
 });
 
 // Tap contact or muc avatar
-var listener= function(muc){
+var listener= function(muc) {
   var jid= muc ? $('section#muc')[0].dataset.jid : $('section#contact')[0].dataset.jid;
   var avatar= App.avatars[jid];
 
-  if(avatar){
-    Store.recover((avatar.original || avatar.chunk), function(key, url, free){
+  if(avatar) {
+    Store.recover((avatar.original || avatar.chunk), function(key, url, free) {
       var blob = Tools.b64ToBlob(url.split(',').pop(), url.split(/[:;]/)[1]);
-      if (typeof MozActivity != 'undefined') {
-            	//FirefoxOS
-				return new MozActivity({
-				  name: 'open',
-				  data: {
-					type: blob.type,
-					blob: blob
-				  }
-				});
-			} else if(external && external.getUnityObject) {
-            	//Ubuntu Touch
-				var h = $(window).height();
-				var w = $(window).width();
-				var img = document.createElement('img');
-				var prop = new Image();
-				prop.src = url;
-				var propHeight = prop.height;
-				var propWidth = prop.width;
-				img.setAttribute('src', url);
-				if(propWidth/propHeight > w/h) {
-					img.setAttribute('width', w);
-				} else {
-					img.setAttribute('height', h);
-				}
-				if(muc) {
-					var group = document.getElementById('muc');
-					group.appendChild(img);
-					group.addEventListener('click', function () {
-						group.removeChild(img);
-					});
-				} else {
-					var contact = document.getElementById('contact');
-					contact.appendChild(img);
-					contact.addEventListener('click', function () {
-						contact.removeChild(img);
-					});
-				}
-            }
+
+      if (App.platform === "FirefoxOS") {
+  			return new MozActivity({
+  				name: 'open',
+  				data: {
+  					type: blob.type,
+  					blob: blob
+  				}
+  			});
+  		} else if (App.platform === "UbuntuTouch") {
+  			var h = $(window).height();
+  			var w = $(window).width();
+  			var img = document.createElement('img');
+  			var prop = new Image();
+  			prop.src = url;
+  			var propHeight = prop.height;
+  			var propWidth = prop.width;
+  			img.setAttribute('src', url);
+  			if (propWidth/propHeight > w/h) {
+  				img.setAttribute('width', w);
+  			} else {
+  				img.setAttribute('height', h);
+  			}
+  			if (muc) {
+  				var group = document.getElementById('muc');
+  				group.appendChild(img);
+  				group.addEventListener('click', function () {
+  					group.removeChild(img);
+  				});
+  			} else {
+  				var contact = document.getElementById('contact');
+  				contact.appendChild(img);
+  				contact.addEventListener('click', function () {
+  				  contact.removeChild(img);
+  			  });
+  			}
+      }
 
       free();
     });
@@ -226,7 +225,7 @@ $('section#me #card button.background.change').on('click', function (e) {
     e.onerror = function () {
       Tools.log('Picture selection was canceled');
     };
-  } else if(external && external.getUnityObject) {
+  } else if(App.platform === "UbuntuTouch") {
 	  //Ubuntu Touch: open contentHub
 	  $('#background_input').trigger('click');
   } else {
@@ -297,7 +296,7 @@ var bindings = function () {
   $('section#welcome').on('click', function() {
     Menu.show('providers');
   });
-  
+
   $('section#chat').on('swipeRight', function() {
     Lungo.Router.section('back');
   });
@@ -366,7 +365,7 @@ var bindings = function () {
       }
     }
   });
-  
+
   window.addEventListener('touchend', function() {
     VoiceRecorder.stop(duration => {
       if (duration < 1) {
