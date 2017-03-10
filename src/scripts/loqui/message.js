@@ -337,7 +337,6 @@ var Message = {
     var message = this;
     var account = this.account;
     var html= null;
-	  var htmlUT = null;
     var onDivClick= null;
     if (this.core.text) {
       html = App.emoji[Providers.data[this.account.core.provider].emoji].fy(Tools.urlHL(Tools.HTMLescape(this.core.text)));
@@ -350,14 +349,11 @@ var Message = {
       switch (this.core.media.type) {
         case 'url':
 		html.addClass('maps');
-		console.log('Map Received: ' + message.core.media.url);
-		if(external && external.getUnityObject) {
+		var onClick = function(e){
+		if(App.platform === "UbuntuTouch") {
 			//Ubuntu Touch
-			htmlUT = $('<a></a>').attr('href', message.core.media.url);
-			htmlUT.append(html);
-			html = htmlUT;
+			window.open(message.core.media.url);
 		} else {
-			var onClick = function(e){
 				e.preventDefault();
 				//FirefoxOS
 				return new MozActivity({
@@ -367,33 +363,44 @@ var Message = {
 					url: message.core.media.url
 				  }
 				});
-			  };
-		  }
+			  }
+		  };
           break;
         case 'vCard':
-          onClick = function(e){
+		var onClick = function(e){
+          if(App.platform === "FirefoxOS") {
             e.preventDefault();
-            if (typeof MozActivity != 'undefined') {
-            	//FirefoxOS
-				return new MozActivity({
-				  name: 'open',
-				  data: {
-					type: 'text/vcard',
-					blob: new Blob([ message.core.media.payload[1] ],
-								   { type : 'text/vcard' })
-				  }
-				});
-			} else if(external && external.getUnityObject) {
-            	//Ubuntu Touch
-
-            }
-          };
+			return new MozActivity({
+			  name: 'open',
+			  data: {
+				type: 'text/vcard',
+				blob: new Blob([ message.core.media.payload[1] ],
+							   { type : 'text/vcard' })
+			  }
+			});
+		} else {
+			//Ubuntu Touch
+			var fullname = message.core.media.payload[0];
+			var tel;
+			var data = message.core.media.payload[1];
+			if(data.includes(':+')) {
+				var start = data.indexOf(':+')+1;
+				var counter = 1;
+				while(data.charAt(start + counter) >= 0 && data.charAt(start + counter) <= 9 || data.charAt(start + counter) == ' ') {
+					counter = counter + 1;
+				}
+				var end = start + counter - 1;
+				tel = data.slice(start, end);
+			}
+			prompt(fullname, tel);
+          }
+		};
           break;
 
         default:
           html.addClass(this.core.media.type);
           var open = function (blob) {
-            if (typeof MozActivity != 'undefined') {
+            if (App.platform === "FirefoxOS") {
             	//FirefoxOS
 				return new MozActivity({
 				  name: 'open',
@@ -402,7 +409,7 @@ var Message = {
 					blob: blob
 				  }
 				});
-			} else if(external && external.getUnityObject) {
+			} else if(App.platform === "UbuntuTouch") {
             	//Ubuntu Touch
 				Tools.blobToBase64(blob, function (output) {
 					if(output) {
@@ -410,6 +417,22 @@ var Message = {
 						var h = $(window).height();
 						var w = $(window).width();
 						var chat = document.getElementById('chat');
+						/* console.log(output.split(',')[0]);
+						function download(filename, text) {
+							var pom = document.createElement('a');
+							pom.setAttribute('href', output.split(';')[0] + ';charset=UTF-8,' + encodeURIComponent(text));
+							pom.setAttribute('download', filename);
+
+							if (document.createEvent) {
+								var event = document.createEvent('MouseEvents');
+								event.initEvent('click', true, true);
+								pom.dispatchEvent(event);
+							}
+							else {
+								pom.click();
+							}
+						}
+						download('file.jpg', atob(output.split(',')[1])); */
 						if(type == 'data:image') {
 							var img = document.createElement('img');
 							var prop = new Image();
@@ -504,7 +527,7 @@ var Message = {
               ext = 'mp3';
             }
             var localUrl = App.pathFiles + $(e.target).closest('[data-stamp]')[0].dataset.stamp.replace(/[-:]/g, '') + url.split('/').pop().substring(0, 5).toUpperCase() + '.' + ext;
-            if (img.dataset.downloaded == 'true' && typeof MozActivity != 'undefined') {
+            if (img.dataset.downloaded == 'true' && App.platform === "FirefoxOS") {
               Store.SD.recover(localUrl, function (blob) {
                 open(blob);
               });
@@ -556,9 +579,8 @@ var Message = {
           };
           break;
       }
-	if(!(external && external.getUnityObject) || this.core.media.type != 'url') {
-	      html.bind('click', onClick);
-	      onDivClick = function(e) {
+	  html.bind('click', onClick);
+	  onDivClick = function(e) {
 		e.preventDefault();
 		var target = $(e.target);
 		var span = target[0].lastChild;
@@ -566,8 +588,7 @@ var Message = {
 		  var img = span.firstChild;
 		  img.click();
 		}
-	      };
-	}
+	  };
     }
     var type = (this.core.from == this.account.core.user || this.core.from == this.account.core.realJid) ? 'out' : 'in';
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', Strophe.getBareJidFromJid(this.core.from));

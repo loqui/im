@@ -338,7 +338,14 @@ var Store = {
         if(!quiet) Tools.log('DS IS NOT SUPPORTED');
         Store.get('fakesdcard_' + path, function (value) {
           if (value) {
-            onsuccess(new Blob(value.content, {type: value.type}));
+            if (App.platform === "FirefoxOS") {
+            	//FirefoxOS
+				onsuccess(new Blob(value.content, {type: value.type}));
+			} else if(App.platform === "UbuntuTouch") {
+            	//Ubuntu Touch
+				//var input = value.content;
+				onsuccess(new Blob([value], {type: value.type}));
+            }
           } else {
             if (onerror) {
               onerror();

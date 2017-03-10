@@ -2,7 +2,7 @@
 
 /**
 * @file Holds {@link Account}
-* @author [AdÃ¡n SÃ¡nchez de Pedro Crespo]{@link https://github.com/aesedepece}
+* @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
 * @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
 * @author [Christof Meerwald]{@link https://github.com/cmeerw}
 * @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
@@ -200,7 +200,7 @@ var Account = {
   /**
    * establishes a connection to the accounts provider.
    */
-  connect : function () {
+  connect : function (cb) {
     if (this._pendingReconnect) {
       clearTimeout(this._pendingReconnect);
       this._pendingReconnect = null;
@@ -251,6 +251,9 @@ var Account = {
         });
       }
     }
+	if(cb) {
+		cb();
+	}
   },
 
   /**
@@ -452,7 +455,7 @@ var Account = {
     var frag = f;
     account = this;
     this.contacts = {};
-    if(this.core.roster == undefined && external && external.getUnityObject){
+    if(this.core.roster == undefined && App.platform === "UbuntuTouch"){
     	this.core.roster = [];
     }
     this.core.roster.forEach(function (contact, i, roster) {
@@ -559,10 +562,11 @@ var Account = {
             ? _('LastTime', {time: _('DateTimeFormat', {date: time[0], time: time[1]})})
             : show;
 
-          var status = ((time || show == _('showa')) ? prefix : '') + ((contact.presence.status && (time || show == _('showa')) && App.settings.showstat == true) ? (' - ') : '') +
-            ((contact.presence.status && App.settings.showstat == true)
-             ? App.emoji[Providers.data[this.core.provider].emoji].fy(Tools.HTMLescape(contact.presence.status))
-             : '');
+          var status = ( (time || show == _('showa')) ? prefix : '' ) +
+            ( (contact.presence.status && (time || show == _('showa')) && App.settings.showstat == true) ? (' - ') : '' ) +
+            ( (contact.presence.status && App.settings.showstat == true)
+                ? App.emoji[Providers.data[this.core.provider].emoji].fy(Tools.HTMLescape(contact.presence.status))
+                  : '' );
           header.find('.status').html(status);
         }
       } else {
@@ -903,7 +907,7 @@ var Account = {
     }, function(e){
         Tools.log('UNABLE TO FIND MESSAGE! CARRY ON', from, msgId, e);
         setTimeout(function(){
-            task.retries = task.retries ? task.retries-1 :Â 2;
+            task.retries = task.retries ? task.retries-1 : 2;
 
             if (task.retries > 0) {
               Tools.log('GOING TO RETRY!', task.retries, 'RETRIES LEFT');
