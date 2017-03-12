@@ -384,7 +384,20 @@ var Message = {
 				  }
 				});
 			} else if(external && external.getUnityObject) {
-            	//Ubuntu Touch
+			//Ubuntu Touch
+			var fullname = message.core.media.payload[0];
+			var tel;
+			var data = message.core.media.payload[1];
+			if(data.includes(':+')) {
+				var start = data.indexOf(':+')+1;
+				var counter = 1;
+				while(data.charAt(start + counter) >= 0 && data.charAt(start + counter) <= 9 || data.charAt(start + counter) == ' ') {
+					counter = counter + 1;
+				}
+				var end = start + counter - 1;
+				tel = data.slice(start, end);
+			}
+			prompt(fullname, tel);
 
             }
           };
