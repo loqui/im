@@ -2281,3 +2281,11 @@ ul:not([data-enabled='true']) .avatar:after {
         }
     }
 }
+
+.help button {
+  background: none repeat scroll 0% 0% transparent;
+  border: 0px none;
+  position: relative;
+  font-size: 3rem;
+  color: lightgrey;
+}
