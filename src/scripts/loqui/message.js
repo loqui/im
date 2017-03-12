@@ -348,250 +348,259 @@ var Message = {
       html[0].dataset.downloaded = this.core.media.downloaded || false;
       switch (this.core.media.type) {
         case 'url':
-		html.addClass('maps');
-		var onClick = function(e){
-		if(App.platform === "UbuntuTouch") {
-			//Ubuntu Touch
-			window.open(message.core.media.url);
-		} else {
-				e.preventDefault();
-				//FirefoxOS
-				return new MozActivity({
-				  name: "view",
-				  data: {
-					type: "url",
-					url: message.core.media.url
-				  }
-				});
-			  }
-		  };
-          break;
+        html.addClass('maps');
+        var onClick = function(e){
+          if(App.platform === "UbuntuTouch") {
+            //Ubuntu Touch
+            window.open(message.core.media.url);
+          }
+          else {
+            e.preventDefault();
+            //FirefoxOS
+            return new MozActivity({
+              name: "view",
+              data: {
+                type: "url",
+                url: message.core.media.url
+              }
+            });
+          }
+        };
+        break;
         case 'vCard':
-		var onClick = function(e){
+        var onClick = function(e){
           if(App.platform === "FirefoxOS") {
             e.preventDefault();
-			return new MozActivity({
-			  name: 'open',
-			  data: {
-				type: 'text/vcard',
-				blob: new Blob([ message.core.media.payload[1] ],
-							   { type : 'text/vcard' })
-			  }
-			});
-		} else {
-			//Ubuntu Touch
-			var fullname = message.core.media.payload[0];
-			var tel;
-			var data = message.core.media.payload[1];
-			if(data.includes(':+')) {
-				var start = data.indexOf(':+')+1;
-				var counter = 1;
-				while(data.charAt(start + counter) >= 0 && data.charAt(start + counter) <= 9 || data.charAt(start + counter) == ' ') {
-					counter = counter + 1;
-				}
-				var end = start + counter - 1;
-				tel = data.slice(start, end);
-			}
-			prompt(fullname, tel);
+            return new MozActivity({
+              name: 'open',
+              data: {
+                type: 'text/vcard',
+                blob: new Blob([ message.core.media.payload[1] ],            { type : 'text/vcard' })
+              }
+            });
           }
-		};
-          break;
+          else {
+            //Ubuntu Touch
+            var fullname = message.core.media.payload[0];
+            var tel;
+            var data = message.core.media.payload[1];
+            if(data.includes(':+')) {
+              var start = data.indexOf(':+')+1;
+              var counter = 1;
+              while(data.charAt(start + counter) >= 0 && data.charAt(start + counter) <= 9 || data.charAt(start + counter) == ' ') {
+                counter = counter + 1;
+              }
+              var end = start + counter - 1;
+              tel = data.slice(start, end);
+            }
+            prompt(fullname, tel);
+          }
+        };
+        break;
 
         default:
-          html.addClass(this.core.media.type);
-          var open = function (blob) {
-            if (App.platform === "FirefoxOS") {
-            	//FirefoxOS
-				return new MozActivity({
-				  name: 'open',
-				  data: {
-					type: blob.type,
-					blob: blob
-				  }
-				});
-			} else if(App.platform === "UbuntuTouch") {
-            	//Ubuntu Touch
-				Tools.blobToBase64(blob, function (output) {
-          /* !!! this code breakes FirefoxOS
-             !!! The access to #chat is WRONG!
-					if(output) {
-						var type = output.split('/')[0];
-						var h = $(window).height();
-						var w = $(window).width();
-						var chat = document.getElementById('chat');
-						// console.log(output.split(',')[0]);
-//						function download(filename, text) {
-//							var pom = document.createElement('a');
-//							pom.setAttribute('href', output.split(';')[0] + ';charset=UTF-8,' + encodeURIComponent(text));
-//							pom.setAttribute('download', filename);
-//
-//							if (document.createEvent) {
-//								var event = document.createEvent('MouseEvents');
-//								event.initEvent('click', true, true);
-//								pom.dispatchEvent(event);
-//							}
-//							else {
-//								pom.click();
-//							}
-//						}
-//						download('file.jpg', atob(output.split(',')[1]));
-						if(type == 'data:image') {
-							var img = document.createElement('img');
-							var prop = new Image();
-							prop.src = output;
-							var propHeight = prop.height;
-							var propWidth = prop.width;
-							img.setAttribute('src', output);
-							if(propWidth/propHeight > w/h) {
-								img.setAttribute('width', w);
-							} else {
-								img.setAttribute('height', h);
-							}
-							chat.appendChild(img);
-							chat.addEventListener('click', function () {
-								chat.removeChild(img);
-							});
-						} else if(type == 'data:audio') {
-							var img = document.createElement('img');
-							img.setAttribute('src', "img/play.png");
-							var close = document.createElement('img');
-							close.setAttribute('src', "img/console-inactive.png");
-							var audio = document.createElement('audio');
-							audio.setAttribute("src", output);
-							chat.appendChild(img);
-							chat.appendChild(close);
-							chat.appendChild(audio);
-							close.addEventListener('click', function () {
-								audio.setAttribute("src", "");
-								audio.load();
-								chat.removeChild(audio);
-								chat.removeChild(img);
-								chat.removeChild(close);
-							});
-							img.addEventListener('click', function () {
-								if (audio.paused == false) {
-									img.setAttribute('src', "img/play.png");
-									chat.replaceChild(img, img);
-									audio.pause();
-									audio.firstChild.nodeValue = 'Play';
-								} else {
-									img.setAttribute('src', "img/audio.png");
-									chat.replaceChild(img, img);
-									audio.play();
-									audio.firstChild.nodeValue = 'Pause';
-								}
-							});
-						} else if(type == 'data:video') {
-							var close = document.createElement('img');
-							close.setAttribute('src', "img/console-inactive.png");
-							function addSourceToVideo(element, src, type) {
-								var source = document.createElement('source');
-								source.src = src;
-								source.type = type;
-								element.appendChild(source);
-							}
-							var video = document.createElement('video');
-							chat.appendChild(close);
-							chat.appendChild(video);
-							addSourceToVideo(video, output, blob.type);
-							var propHeight = video.videoHeight;
-							var propWidth = video.videoWidth;
-							if(propWidth/propHeight > w/h) {
-								video.setAttribute('width', w);
-							} else {
-								video.setAttribute('height', h);
-							}
-							close.addEventListener('click', function () {
-								chat.removeChild(video);
-								chat.removeChild(close);
-							});
-							video.addEventListener('click', function () {
-								if (video.paused == false) {
-									video.pause();
-									video.firstChild.nodeValue = 'Play';
-								} else {
-									video.play();
-									video.firstChild.nodeValue = 'Pause';
-								}
-							});
-						}
-					}
-          */
-				});
-            }
-          };
-          onClick = function (e) {
-            var img = e.target;
-            var url = message.core.media.url;
-            var ext = url.split('.').pop();
-            if (message.core.media.mimeType) {
-              ext = message.core.media.mimeType.split('/').pop().split(';').shift();
-            } else if (ext == 'aac') {
-              ext = 'mp3';
-            }
-            var localUrl = App.pathFiles + $(e.target).closest('[data-stamp]')[0].dataset.stamp.replace(/[-:]/g, '') + url.split('/').pop().substring(0, 5).toUpperCase() + '.' + ext;
-            if (img.dataset.downloaded == 'true' && App.platform === "FirefoxOS") {
-              Store.SD.recover(localUrl, function (blob) {
-                open(blob);
-              });
-            } else {
-              Tools.fileGet(url, function (blob) {
-                function saveBlob(blob) {
-                  Store.SD.save(localUrl, blob, function () {
-                    open(blob);
-                    var index = $(img).closest('li[data-chunk]')[0].dataset.chunk;
-                    Store.recover(index, function (key, chunk, free) {
-                      Tools.log(chunk, index);
-                      var pos = chunk.findIndex(function (elem) { return elem.id == message.core.id; });
-                      if (pos >= 0) {
-                        chunk[pos].media.downloaded = true;
-                        Store.update(key, index, chunk, function () {
-                          img.dataset.downloaded = true;
-                          free();
-                          Tools.log('SUCCESS');
-                        });
-                      } else {
-                        free();
-                      }
-                    });
-                  }, function (error) {
-                    Tools.log('SAVE ERROR', error);
-                  });
-                }
+        html.addClass(this.core.media.type);
+        var open = function (blob) {
+          if (App.platform === "FirefoxOS") {
+            //FirefoxOS
+            return new MozActivity({
+              name: 'open',
+              data: {
+                type: blob.type,
+                blob: blob
+              }
+            });
+          }
+          else if(App.platform === "UbuntuTouch") {
+            //Ubuntu Touch
+            Tools.blobToBase64(blob, function (output) {
+              if(output) {
+                var type = output.split('/')[0];
+                var h = $(window).height();
+                var w = $(window).width();
+                var chat = document.getElementById('chat');
+                console.log(output.split(',')[0]);
+                function download(filename, text) {
+                  var pom = document.createElement('a');
+                  pom.setAttribute('href', output.split(';')[0] + ';charset=UTF-8,' + encodeURIComponent(text));
+                  pom.setAttribute('download', filename);
 
-                var encKey = message.core.media.encKey;
-                if (encKey) {
-                  var reader = new FileReader();
-                  reader.addEventListener("loadend", function() {
-                    var key = CoSeMe.utils.bytesFromLatin1(encKey.key);
-                    var iv = CoSeMe.utils.bytesFromLatin1(encKey.iv);
-                    var ciphertext = reader.result.slice(0, -10);
-                    axolotlCrypto.decrypt(key, ciphertext, iv).then(function (data) {
-                      Tools.log('MEDIA DECRYPTED', data);
-                      saveBlob(new Blob([data], { type: message.core.media.mimeType } ));
-                    }, function (err) {
-                      Tools.log('MEDIA DECRYPTION FAILED', err);
-                    });
+                  if (document.createEvent) {
+                    var event = document.createEvent('MouseEvents');
+                    event.initEvent('click', true, true);
+                    pom.dispatchEvent(event);
+                  }
+                  else {
+                    pom.click();
+                  }
+                }; // ###
+                download('file.jpg', atob(output.split(',')[1]));
+                if(type == 'data:image') {
+                  var img = document.createElement('img');
+                  var prop = new Image();
+                  prop.src = output;
+                  var propHeight = prop.height;
+                  var propWidth = prop.width;
+                  img.setAttribute('src', output);
+                  if(propWidth/propHeight > w/h) {
+                    img.setAttribute('width', w);
+                  }
+                  else {
+                    img.setAttribute('height', h);
+                  }
+                  chat.appendChild(img);
+                  chat.addEventListener('click', function () {
+                    chat.removeChild(img);
                   });
-                  reader.readAsArrayBuffer(blob);
-                } else {
-                  saveBlob(blob);
                 }
-              });
-            }
-          };
-          break;
+                else if(type == 'data:audio') {
+                  var img = document.createElement('img');
+                  img.setAttribute('src', "img/play.png");
+                  var close = document.createElement('img');
+                  close.setAttribute('src', "img/console-inactive.png");
+                  var audio = document.createElement('audio');
+                  audio.setAttribute("src", output);
+                  chat.appendChild(img);
+                  chat.appendChild(close);
+                  chat.appendChild(audio);
+                  close.addEventListener('click', function () {
+                    audio.setAttribute("src", "");
+                    audio.load();
+                    chat.removeChild(audio);
+                    chat.removeChild(img);
+                    chat.removeChild(close);
+                  });
+                  img.addEventListener('click', function () {
+                    if (audio.paused == false) {
+                      img.setAttribute('src', "img/play.png");
+                      chat.replaceChild(img, img);
+                      audio.pause();
+                      audio.firstChild.nodeValue = 'Play';
+                    }
+                    else {
+                      img.setAttribute('src', "img/audio.png");
+                      chat.replaceChild(img, img);
+                      audio.play();
+                      audio.firstChild.nodeValue = 'Pause';
+                    }
+                  });
+                }
+                else if(type == 'data:video') {
+                  var close = document.createElement('img');
+                  close.setAttribute('src', "img/console-inactive.png");
+                  function addSourceToVideo(element, src, type) {
+                    var source = document.createElement('source');
+                    source.src = src;
+                    source.type = type;
+                    element.appendChild(source);
+                  }; // ###
+                  var video = document.createElement('video');
+                  chat.appendChild(close);
+                  chat.appendChild(video);
+                  addSourceToVideo(video, output, blob.type);
+                  var propHeight = video.videoHeight;
+                  var propWidth = video.videoWidth;
+                  if(propWidth/propHeight > w/h) {
+                    video.setAttribute('width', w);
+                  }
+                  else {
+                    video.setAttribute('height', h);
+                  }
+                  close.addEventListener('click', function () {
+                    chat.removeChild(video);
+                    chat.removeChild(close);
+                  });
+                  video.addEventListener('click', function () {
+                    if (video.paused == false) {
+                      video.pause();
+                      video.firstChild.nodeValue = 'Play';
+                    }
+                    else {
+                      video.play();
+                      video.firstChild.nodeValue = 'Pause';
+                    }
+                  });
+                }
+              }
+            });
+          }
+        };
+        onClick = function (e) {
+          var img = e.target;
+          var url = message.core.media.url;
+          var ext = url.split('.').pop();
+          if (message.core.media.mimeType) {
+            ext = message.core.media.mimeType.split('/').pop().split(';').shift();
+          }
+          else if (ext == 'aac') {
+            ext = 'mp3';
+          }
+          var localUrl = App.pathFiles + $(e.target).closest('[data-stamp]')[0].dataset.stamp.replace(/[-:]/g, '') + url.split('/').pop().substring(0, 5).toUpperCase() + '.' + ext;
+          if (img.dataset.downloaded == 'true' && App.platform === "FirefoxOS") {
+            Store.SD.recover(localUrl, function (blob) {
+              open(blob);
+            });
+          }
+          else {
+            Tools.fileGet(url, function (blob) {
+              function saveBlob(blob) {
+                Store.SD.save(localUrl, blob, function () {
+                  open(blob);
+                  var index = $(img).closest('li[data-chunk]')[0].dataset.chunk;
+                  Store.recover(index, function (key, chunk, free) {
+                    Tools.log(chunk, index);
+                    var pos = chunk.findIndex(function (elem) { return elem.id == message.core.id; });
+                    if (pos >= 0) {
+                      chunk[pos].media.downloaded = true;
+                      Store.update(key, index, chunk, function () {
+                        img.dataset.downloaded = true;
+                        free();
+                        Tools.log('SUCCESS');
+                      });
+                    }
+                    else {
+                      free();
+                    }
+                  });
+                },
+                function (error) {
+                  Tools.log('SAVE ERROR', error);
+                });
+              }
+
+              var encKey = message.core.media.encKey;
+              if (encKey) {
+                var reader = new FileReader();
+                reader.addEventListener("loadend", function() {
+                  var key = CoSeMe.utils.bytesFromLatin1(encKey.key);
+                  var iv = CoSeMe.utils.bytesFromLatin1(encKey.iv);
+                  var ciphertext = reader.result.slice(0, -10);
+                  axolotlCrypto.decrypt(key, ciphertext, iv).then(function (data) {
+                    Tools.log('MEDIA DECRYPTED', data);
+                    saveBlob(new Blob([data], { type: message.core.media.mimeType } ));
+                  }, function (err) {
+                      Tools.log('MEDIA DECRYPTION FAILED', err);
+                  });
+                });
+                reader.readAsArrayBuffer(blob);
+              } else {
+                saveBlob(blob);
+              }
+            });
+          }
+        };
+        break;
       }
-	  html.bind('click', onClick);
-	  onDivClick = function(e) {
-		e.preventDefault();
-		var target = $(e.target);
-		var span = target[0].lastChild;
-		if (span) {
-		  var img = span.firstChild;
-		  img.click();
-		}
-	  };
+	    html.bind('click', onClick);
+      onDivClick = function(e) {
+        e.preventDefault();
+        var target = $(e.target);
+        var span = target[0].lastChild;
+        if (span) {
+          var img = span.firstChild;
+          img.click();
+        }
+      };
     }
     var type = (this.core.from == this.account.core.user || this.core.from == this.account.core.realJid) ? 'out' : 'in';
     var contact = Lungo.Core.findByProperty(this.account.core.roster, 'jid', Strophe.getBareJidFromJid(this.core.from));
