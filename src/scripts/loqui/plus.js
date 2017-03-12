@@ -98,9 +98,9 @@ var Plus = {
   },
 
   vcardSend: function () {
-    var account = Accounts.current;
-    var to = $('section#chat')[0].dataset.jid;
     if (typeof MozActivity != 'undefined') {
+	    var account = Accounts.current;
+	    var to = $('section#chat')[0].dataset.jid;
 	    var e = new MozActivity({
 	      name: 'pick',
 	      data: {
@@ -124,6 +124,10 @@ var Plus = {
     } else if(external && external.getUnityObject) {
     	//Ubuntu Touch
     	if(!Plus.UTVCardSendRegistered) {
+	    var account = Accounts.current;
+	    var to = $('section#chat')[0].dataset.jid;
+	    var name;
+	    var str = '';
     		$('#vcardsend_input').change(function() {
     			var vcardFiles = document.getElementById('vcardsend_input').files;
     			if(vcardFiles.length > 0) {
@@ -131,19 +135,12 @@ var Plus = {
     				var fileReader = new FileReader();
     				fileReader.onloadend = function() {
     					VCF.parse(fileReader.result, function(vc) {
-    						var str = '';
-    						var c = vc.toJCard();
-    						var name = c.fn ? c.fn : (c.givenName && c.givenName[0] ?
-    								((c.familyName && c.familyName[0])
-    										? c.givenName[0] + c.familyName[0] : c.givenName[0]) : ''
-    						).trim();
-    						ContactToVcard([c], function (vcards, nCards) {
-    					        str += vcards;
-    					      }, function () {
-    					        account.connector.vcardSend(to, name, str);
-    					      }, 0, true);
-    					});
-    				};
+						var c = vc.toJCard();
+						name = c.fn;
+					});
+					str = fileReader.result;
+					account.connector.vcardSend(to, name, str);
+				};
     				fileReader.readAsText(vcard);
     			}
     		});
