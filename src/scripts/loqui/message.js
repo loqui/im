@@ -412,27 +412,29 @@ var Message = {
 			} else if(App.platform === "UbuntuTouch") {
             	//Ubuntu Touch
 				Tools.blobToBase64(blob, function (output) {
+          /* !!! this code breakes FirefoxOS
+             !!! The access to #chat is WRONG!
 					if(output) {
 						var type = output.split('/')[0];
 						var h = $(window).height();
 						var w = $(window).width();
 						var chat = document.getElementById('chat');
-						/* console.log(output.split(',')[0]);
-						function download(filename, text) {
-							var pom = document.createElement('a');
-							pom.setAttribute('href', output.split(';')[0] + ';charset=UTF-8,' + encodeURIComponent(text));
-							pom.setAttribute('download', filename);
-
-							if (document.createEvent) {
-								var event = document.createEvent('MouseEvents');
-								event.initEvent('click', true, true);
-								pom.dispatchEvent(event);
-							}
-							else {
-								pom.click();
-							}
-						}
-						download('file.jpg', atob(output.split(',')[1])); */
+						// console.log(output.split(',')[0]);
+//						function download(filename, text) {
+//							var pom = document.createElement('a');
+//							pom.setAttribute('href', output.split(';')[0] + ';charset=UTF-8,' + encodeURIComponent(text));
+//							pom.setAttribute('download', filename);
+//
+//							if (document.createEvent) {
+//								var event = document.createEvent('MouseEvents');
+//								event.initEvent('click', true, true);
+//								pom.dispatchEvent(event);
+//							}
+//							else {
+//								pom.click();
+//							}
+//						}
+//						download('file.jpg', atob(output.split(',')[1]));
 						if(type == 'data:image') {
 							var img = document.createElement('img');
 							var prop = new Image();
@@ -490,7 +492,7 @@ var Message = {
 							}
 							var video = document.createElement('video');
 							chat.appendChild(close);
-							chat.appendChild(video);		
+							chat.appendChild(video);
 							addSourceToVideo(video, output, blob.type);
 							var propHeight = video.videoHeight;
 							var propWidth = video.videoWidth;
@@ -514,6 +516,7 @@ var Message = {
 							});
 						}
 					}
+          */
 				});
             }
           };

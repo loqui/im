@@ -76,24 +76,7 @@
         </select>
       </script>
       <nav class="second-right">
-        <button type="button" onclick="mainHelp()" data-icon="question-sign"></button>
-		<script>
-			function mainHelp() {
-				if(App.platform === "FirefoxOS") {
-					if(_('MainHelpFFOS') != '{{MainHelpFFOS}}') {
-						Lungo.Notification.show('info-sign', _('MainHelpFFOS'));
-					} else {
-						Lungo.Notification.show('info-sign', 'No help available yet!');
-					}
-				} else if(App.platform === "UbuntuTouch") {
-					if(_('MainHelpUT') != '{{MainHelpUT}}') {
-						Lungo.Notification.show('info-sign', _('MainHelpUT'));
-					} else {
-						Lungo.Notification.show('info-sign', "Tap pencil, then 'Phone sync' and select contacts from addressbook to import them.");
-					}
-				}
-			}
-		</script>
+        <button type="button" data-icon="question-sign" data-help="main" data-menu-onclick="showHelp"></button>
       </nav>
     </header>
     <article id="chats" class="scroll">
@@ -170,6 +153,9 @@
     </header>
     <article id="main" class="scroll">
       <div id="card">
+        <!-- background_input is displayed outside the window, the click on this element is triggered
+      		   and for security reason it could not be hidden -->
+        <input type="file" class="ubuntu-touch-content-hub-input" id="background_input" accept="image/*" />
         <span class="avatar"><img/></span>
         <span class="name"></span>
         <span class="user"></span>
@@ -201,29 +187,15 @@
         <button data-view-section="back" data-icon="angle-up" class="up"></button>
       </nav>
       <nav class="second-right">
-        <button type="button" onclick="contactHelp()" data-icon="question-sign"></button>
-		<script>
-			function contactHelp() {
-				if(App.platform === "FirefoxOS") {
-					if(_('ContactHelpFFOS') != '{{ContactHelpFFOS}}') {
-						Lungo.Notification.show('info-sign', _('ContactHelpFFOS'));
-					} else {
-						Lungo.Notification.show('info-sign', 'No help available yet!');
-					}
-				} else if(App.platform === "UbuntuTouch") {
-					if(_('ContactHelpUT') != '{{ContactHelpUT}}') {
-						Lungo.Notification.show('info-sign', _('ContactHelpUT'));
-					} else {
-						Lungo.Notification.show('info-sign', 'Tap avatar to have a big preview (repeat to close).');
-					}
-				}
-			}
-		</script>
+        <button type="button" data-icon="question-sign" data-help="contact" data-menu-onclick="showHelp"></button>
       </nav>
     </header>
       </nav>
     <article id="main" class="scroll">
       <div id="card">
+        <!-- avatar_input is displayed outside the window, the click on this element is triggered
+             and for security reason it could not be hidden -->
+        <input type="file" class="ubuntu-touch-content-hub-input" id="avatar_input" accept="image/*" />
         <span class="avatar"><img/></span>
         <span class="name"></span>
         <span class="user"></span>
@@ -253,24 +225,7 @@
         <button data-view-section="back" data-icon="angle-up" class="up"></button>
       </nav>
       <nav class="second-right">
-        <button type="button" onclick="mucHelp()" data-icon="question-sign"></button>
-		<script>
-			function mucHelp() {
-				if(App.platform === "FirefoxOS") {
-					if(_('MucHelpFFOS') != '{{MucHelpFFOS}}') {
-						Lungo.Notification.show('info-sign', _('MucHelpFFOS'));
-					} else {
-						Lungo.Notification.show('info-sign', 'No help available yet!');
-					}
-				} else if(App.platform === "UbuntuTouch") {
-					if(_('MucHelpUT') != '{{MucHelpUT}}') {
-						Lungo.Notification.show('info-sign', _('MucHelpUT'));
-					} else {
-						Lungo.Notification.show('info-sign', 'Tap avatar to have a big preview (repeat to close).');
-					}
-				}
-			}
-		</script>
+        <button type="button" data-icon="question-sign" data-help="muc" data-menu-onclick="showHelp"></button>
       </nav>
       </header>
     <article id="main" class="scroll">
@@ -330,24 +285,7 @@
       <span class="backchange"></span>
       <span class="avatar" data-menu-onclick="chatInfo"><img/></span>
       <nav class="second-left">
-        <button type="button" onclick="chatHelp()" data-icon="question-sign"></button>
-		<script>
-			function chatHelp() {
-				if(App.platform === "FirefoxOS") {
-					if(_('ChatHelpFFOS') != '{{ChatHelpFFOS}}') {
-						Lungo.Notification.show('info-sign', _('ChatHelpFFOS'));
-					} else {
-						Lungo.Notification.show('info-sign', 'No help available yet!');
-					}
-				} else if(App.platform === "UbuntuTouch") {
-					if(_('ChatHelpUT') != '{{ChatHelpUT}}') {
-						Lungo.Notification.show('info-sign', _('ChatHelpUT'));
-					} else {
-						Lungo.Notification.show('info-sign', 'Tap pics to view (repeat to close), tap videos to view (then 1x to play / 2x to pause, x to close), tap audio to listen (then 1x to play / pause, x to close).');
-					}
-				}
-			}
-		</script>
+        <button type="button" data-icon="question-sign" data-help="chat" data-menu-onclick="showHelp"></button>
       </nav>
     </header>
     <article id="main">
@@ -474,26 +412,27 @@
           </nav>
       </header>
       <article class="scroll">
-          <ul class="itemList">
-            <li class="file" data-menu-onclick="fileSend">
-              <i class="material-icons">insert_drive_file</i>
-              <span  data-l10n-id="MediaType_file">File</span>
-            </li>
-            <li class="location" data-menu-onclick="locationSend">
-              <i class="material-icons">place</i>
-              <span data-l10n-id="MediaType_url">Location</span>
-            </li>
-            <li class="vcard" data-menu-onclick="vcardSend">
-              <i class="material-icons">contact_phone</i>
-              <span data-l10n-id="MediaType_vCard">Contact</span>
-            </li>
-            <li class="bolt" data-menu-onclick="bolt">
-              <i class="material-icons">flash_on</i>
-              <span data-l10n-id="MediaType_bolt">Bolt</span>
-            </li>
+        <input type="file" class="ubuntu-touch-content-hub-input" id="filesend_input" accept="" />
+        <ul class="itemList">
+          <li class="file" data-menu-onclick="fileSend">
+            <i class="material-icons">insert_drive_file</i>
+            <span  data-l10n-id="MediaType_file">File</span>
+          </li>
+          <li class="location" data-menu-onclick="locationSend">
+            <i class="material-icons">place</i>
+            <span data-l10n-id="MediaType_url">Location</span>
+          </li>
+          <li class="vcard" data-menu-onclick="vcardSend">
+            <i class="material-icons">contact_phone</i>
+            <span data-l10n-id="MediaType_vCard">Contact</span>
+          </li>
+          <li class="bolt" data-menu-onclick="bolt">
+            <i class="material-icons">flash_on</i>
+            <span data-l10n-id="MediaType_bolt">Bolt</span>
+          </li>
         <!--<li class="call" data-menu-onclick="call" data-icon="mobile-phone" data-l10n-id="Call">Call</li>
             <li class="videocall" data-menu-onclick="videocall" data-icon="video" data-l10n-id="VideoCall">VideoCall</li>-->
-          </ul>
+        </ul>
       </article>
   </section>
   <section id="otrMenu" data-transition="vertical">
@@ -658,6 +597,7 @@
   <script type="text/javascript" src="scripts/vcard/vcf.js"></script>
   <script type="text/javascript;version=1.7" src="scripts/TitanNano.de/Make.js"></script>
   <script type="text/javascript;version=1.7" src="scripts/emojione/emojione.js"></script>
+  <script type="text/javascript;version=1.7" src="scripts/loqui/help.js"></script>
   <script type="text/javascript;version=1.7" src="scripts/loqui/compat.js"></script>
   <script type="text/javascript;version=1.7" src="scripts/loqui/tools.js"></script>
   <script type="text/javascript;version=1.7" src="scripts/loqui/system.js"></script>
