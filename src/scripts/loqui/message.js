@@ -433,8 +433,8 @@ var Message = {
                   else {
                     pom.click();
                   }
-                }; // ###
-                download('file.jpg', atob(output.split(',')[1]));
+                }; // Not working yet
+                //download('file.jpg', atob(output.split(',')[1]));
                 if(type == 'data:image') {
                   var img = document.createElement('img');
                   var prop = new Image();
