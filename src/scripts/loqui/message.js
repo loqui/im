@@ -420,7 +420,7 @@ var Message = {
                 var w = $(window).width();
                 var chat = document.getElementById('chat');
                 console.log(output.split(',')[0]);
-                function download(filename, text) {
+                var download = function(filename, text) {
                   var pom = document.createElement('a');
                   pom.setAttribute('href', output.split(';')[0] + ';charset=UTF-8,' + encodeURIComponent(text));
                   pom.setAttribute('download', filename);
@@ -488,12 +488,12 @@ var Message = {
                 else if(type == 'data:video') {
                   var close = document.createElement('img');
                   close.setAttribute('src', "img/console-inactive.png");
-                  function addSourceToVideo(element, src, type) {
+                  var addSourceToVideo = function(element, src, type) {
                     var source = document.createElement('source');
                     source.src = src;
                     source.type = type;
                     element.appendChild(source);
-                  }; // ###
+                  };
                   var video = document.createElement('video');
                   chat.appendChild(close);
                   chat.appendChild(video);
