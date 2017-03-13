@@ -2289,3 +2289,12 @@ ul:not([data-enabled='true']) .avatar:after {
   font-size: 3rem;
   color: lightgrey;
 }
+
+.help-left button {
+  background: none repeat scroll 0% 0% transparent;
+  border: 0px none;
+  position: fixed;
+  left: 4.6rem;
+  font-size: 3rem;
+  color: lightgrey;
+}
