@@ -83,6 +83,12 @@ document.addEventListener("visibilitychange", function() {
   });
 });
 
+//Avatar handling for non FirefoxOS
+$('#avatar_input').change(function() {
+    var image = document.getElementById('avatar_input').files[0];
+    Messenger.avatarSet(image);
+});
+
 // Tap my avatar
 $('section#me #card span.avatar').on('click', function (e) {
   if (App.platform === "FirefoxOS") {
@@ -101,19 +107,7 @@ $('section#me #card span.avatar').on('click', function (e) {
     pick.onerror = function(){};
   } else if(App.platform === "UbuntuTouch") {
 	  //Ubuntu Touch: open contentHub
-		var attachment = document.getElementById('attachment');
-		var input = document.createElement("input");
-		input.type = "file";
-		input.id='avatar_input';
-		input.className = "ubuntu-touch-content-hub-input";
-		input.accept = "image/*";
-		attachment.appendChild(input);
-		input.addEventListener('change', function() {
-			var image = document.getElementById('avatar_input').files[0];
-			Messenger.avatarSet(image);
-			attachment.removeChild(input);
-		});
-    	input.click();
+	  $('#avatar_input').trigger('click');
   } else {
     Lungo.Notification.error(_('NoDevice'), _('FxOSisBetter', 'exclamation-sign'));
   }
@@ -174,6 +168,29 @@ var listener= function(muc){
 $('section#contact #card .avatar').on('click', listener.bind(null, false));
 $('section#muc #card .avatar').on('click', listener.bind(null, true));
 
+//Background handling for non FirefoxOS
+$('#background_input').change(function() {
+    var blob = document.getElementById('background_input').files[0];
+    var account = Accounts.current;
+    var sh = window.innerHeight;
+    Tools.picThumb(blob, null, sh, function (url) {
+      if (account.core.background) {
+        var key = Store.lock(account.core.background);
+        Store.update(key, account.core.background, url);
+        Store.unlock(account.core.background, key);
+      } else {
+        account.core.background = Store.save(url);
+      }
+      Store.recover(account.core.background, function (key, url, free) {
+        $('section#chat ul#messages').css('background-image', 'url('+url+')');
+        $('section.profile div#card').css('background-image', 'url('+url+')');
+        Lungo.Notification.show('star', _('backChanged'), 3);
+
+        free();
+      }.bind(this));
+    });
+});
+
 // Change background
 $('section#me #card button.background.change').on('click', function (e) {
   if (App.platform === "FirefoxOS") {
@@ -211,36 +228,7 @@ $('section#me #card button.background.change').on('click', function (e) {
     };
   } else if(App.platform === "UbuntuTouch") {
 	  //Ubuntu Touch: open contentHub
-		var attachment = document.getElementById('attachment');
-		var input = document.createElement("input");
-		input.type = "file";
-		input.id='background_input';
-		input.className = "ubuntu-touch-content-hub-input";
-		input.accept = "image/*";
-		attachment.appendChild(input);
-		input.addEventListener('change', function() {
-			var blob = document.getElementById('background_input').files[0];
-			var account = Accounts.current;
-			var sh = window.innerHeight;
-			Tools.picThumb(blob, null, sh, function (url) {
-			  if (account.core.background) {
-				var key = Store.lock(account.core.background);
-				Store.update(key, account.core.background, url);
-				Store.unlock(account.core.background, key);
-			  } else {
-				account.core.background = Store.save(url);
-			  }
-			  Store.recover(account.core.background, function (key, url, free) {
-				$('section#chat ul#messages').css('background-image', 'url('+url+')');
-				$('section.profile div#card').css('background-image', 'url('+url+')');
-				Lungo.Notification.show('star', _('backChanged'), 3);
-
-				free();
-			  }.bind(this));
-			});
-				attachment.removeChild(input);
-		});
-		input.click();
+	  $('#background_input').trigger('click');
   } else {
     Lungo.Notification.error(_('NoDevice'), _('FxOSisBetter', 'exclamation-sign'));
   }
