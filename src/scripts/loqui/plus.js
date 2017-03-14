@@ -84,19 +84,16 @@ var Plus = {
 	    };
     } else if(App.platform === "UbuntuTouch") {
     	//Ubuntu Touch
-		var attachment = document.getElementById('attachment');
-		var input = document.createElement("input");
-		input.type = "file";
-		input.id='filesend_input';
-		input.className = "ubuntu-touch-content-hub-input";
-		input.accept = fileTypes;
-		attachment.appendChild(input);
-		input.addEventListener('change', function() {
-			var image = document.getElementById('filesend_input').files[0];
-			account.connector.fileSend(to, image);
-			attachment.removeChild(input);
-		});
-    	input.click();
+    	$('#filesend_input').attr('accept', fileTypes);
+	    if(!Plus.UTFileSendRegistered) {
+	    	//File send handling for non FirefoxOS
+	    	$('#filesend_input').change(function() {
+	    	    var image = document.getElementById('filesend_input').files[0];
+	    	    account.connector.fileSend(to, image);
+	    	});
+	    	Plus.UTFileSendRegistered = true;
+    	}
+	$('#filesend_input').trigger('click');
     }
   },
 
@@ -123,35 +120,30 @@ var Plus = {
 	    };
     } else if(App.platform === "UbuntuTouch") {
     	//Ubuntu Touch
-		var attachment = document.getElementById('attachment');
-		var input = document.createElement("input");
-		input.type = "file";
-		input.id='vcardsend_input';
-		input.className = "ubuntu-touch-content-hub-input";
-		input.accept = 'text/vcard';
-		attachment.appendChild(input);
-		input.addEventListener('change', function() {
-			var account = Accounts.current;
-			var to = $('section#chat')[0].dataset.jid;
-			var name;
-			var str = '';
-			var vcardFiles = document.getElementById('vcardsend_input').files;
-			if(vcardFiles.length > 0) {
-				var vcard = vcardFiles[0];
-				var fileReader = new FileReader();
-				fileReader.onloadend = function() {
-					VCF.parse(fileReader.result, function(vc) {
+	if(!Plus.UTVCardSendRegistered) {
+	    var account = Accounts.current;
+	    var to = $('section#chat')[0].dataset.jid;
+	    var name;
+	    var str = '';
+    		$('#vcardsend_input').change(function() {
+    			var vcardFiles = document.getElementById('vcardsend_input').files;
+    			if(vcardFiles.length > 0) {
+    				var vcard = vcardFiles[0];
+    				var fileReader = new FileReader();
+    				fileReader.onloadend = function() {
+    					VCF.parse(fileReader.result, function(vc) {
 						var c = vc.toJCard();
 						name = c.fn;
 					});
 					str = fileReader.result;
 					account.connector.vcardSend(to, name, str);
 				};
-				fileReader.readAsText(vcard);
-			}
-			attachment.removeChild(input);
-			});
-    	input.click();
+    				fileReader.readAsText(vcard);
+    			}
+    		});
+    		Plus.UTVCardSendRegistered = true;
+    	}
+	$('#vcardsend_input').trigger('click');
     }
   },
   
