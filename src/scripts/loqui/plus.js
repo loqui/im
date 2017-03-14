@@ -52,11 +52,9 @@ var Plus = {
    * Triggers a file pick [{MozActivity}]{@link external:System.MozActivity}
    */
   fileSend: function () {
-    var account = Accounts.current;
-    var fileTypes = [];
-    var to = $('section#chat')[0].dataset.jid;
-
-
+	var account = Accounts.current;
+	var fileTypes = [];
+	
     if (account.supports('imageSend')) {
       fileTypes = fileTypes.concat(['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/bmp']);
     }
@@ -71,6 +69,8 @@ var Plus = {
 
     if (App.platform === "FirefoxOS") {
     	//FirefoxOS
+		var to = $('section#chat')[0].dataset.jid;
+
     	var e = new MozActivity({
 	      name: 'pick',
 	      data: {
@@ -87,7 +87,10 @@ var Plus = {
     	$('#filesend_input').attr('accept', fileTypes);
 	    if(!Plus.UTFileSendRegistered) {
 	    	//File send handling for non FirefoxOS
+
+
 	    	$('#filesend_input').change(function() {
+				var to = $('section#chat')[0].dataset.jid;
 	    	    var image = document.getElementById('filesend_input').files[0];
 	    	    account.connector.fileSend(to, image);
 	    	});
