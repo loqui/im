@@ -91,7 +91,7 @@ $('#avatar_input').change(function() {
 
 // Tap my avatar
 $('section#me #card span.avatar').on('click', function (e) {
-  if (typeof MozActivity != 'undefined') {
+  if (App.platform === "FirefoxOS") {
     var pick = new MozActivity({
       name: 'pick',
       data: {
@@ -105,9 +105,9 @@ $('section#me #card span.avatar').on('click', function (e) {
       Messenger.avatarSet(image.blob);
     };
     pick.onerror = function(){};
-  } else if(external && external.getUnityObject) {
+  } else if(App.platform === "UbuntuTouch") {
 	  //Ubuntu Touch: open contentHub
-	  $('#avatar_input').trigger('click'); 
+	  $('#avatar_input').trigger('click');
   } else {
     Lungo.Notification.error(_('NoDevice'), _('FxOSisBetter', 'exclamation-sign'));
   }
@@ -121,7 +121,7 @@ var listener= function(muc){
   if(avatar){
     Store.recover((avatar.original || avatar.chunk), function(key, url, free){
       var blob = Tools.b64ToBlob(url.split(',').pop(), url.split(/[:;]/)[1]);
-      if (typeof MozActivity != 'undefined') {
+      if (App.platform === "FirefoxOS") {
             	//FirefoxOS
 				return new MozActivity({
 				  name: 'open',
@@ -130,7 +130,7 @@ var listener= function(muc){
 					blob: blob
 				  }
 				});
-			} else if(external && external.getUnityObject) {
+			} else if(App.platform === "UbuntuTouch") {
             	//Ubuntu Touch
 				var h = $(window).height();
 				var w = $(window).width();
@@ -193,7 +193,7 @@ $('#background_input').change(function() {
 
 // Change background
 $('section#me #card button.background.change').on('click', function (e) {
-  if (typeof MozActivity != 'undefined') {
+  if (App.platform === "FirefoxOS") {
     e = new MozActivity({
       name: 'pick',
       data: {
@@ -226,7 +226,7 @@ $('section#me #card button.background.change').on('click', function (e) {
     e.onerror = function () {
       Tools.log('Picture selection was canceled');
     };
-  } else if(external && external.getUnityObject) {
+  } else if(App.platform === "UbuntuTouch") {
 	  //Ubuntu Touch: open contentHub
 	  $('#background_input').trigger('click');
   } else {

@@ -225,7 +225,7 @@ var Messenger = {
         if (label != _('Me')) {
           participantLabel.bind('click', {jid: participantJid}, function(event) {
             Chungo.Router.section('back');
-	    if (typeof MozActivity != 'undefined')	// FirefoxOS needs the section back router twice!
+	    if (App.platform === "FirefoxOS")	// FirefoxOS needs the section back router twice!
 	    {
 	      Chungo.Router.section('back');
 	    }

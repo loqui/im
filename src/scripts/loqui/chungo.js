@@ -232,6 +232,8 @@ var Chungo = {
       this._not.children('.caption').html(description || ' ');
       this._sha.addClass('show').removeClass('hidden');
       this._not.addClass('show').removeClass('hidden');
+	  $('.chungo .shader').click(function(){$('.chungo .shader').removeClass('show');});
+	  $('.chungo .notifier').click(function(){$('.chungo .notifier').removeClass('show');});
       clearTimeout(this._timeout[0]);
       if (this._timeout[1]) {
         this._timeout[1]();

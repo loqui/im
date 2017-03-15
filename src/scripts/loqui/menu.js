@@ -260,7 +260,7 @@ var Menu = {
 
       $('section#chat article#main').css("bottom", "75vw"); // reduce height for emoji div
       $('section#chat article#emoji').addClass('show');
-      
+
       if (emojiDiv.length === 0) {
         // Emojis for this provider are not loaded yet
         $('section#chat article#emoji div#emoji-loading').show();
@@ -425,6 +425,18 @@ var Menu = {
         Tools.log(App.name + ' has been reloaded');
       } else {
         Tools.log('Upps...');
+      }
+    },
+
+    showHelp: function (obj) {
+      var node = $(obj)[0].dataset.help;
+
+      switch (node) {
+        case 'main':    Help.main();          break;
+        case 'contact': Help.contact();       break;
+        case 'muc':     Help.muc();           break;
+        case 'chat':    Help.chat();          break;
+        default: break;
       }
     }
   },

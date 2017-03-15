@@ -524,8 +524,9 @@
       ipad: /(iPad).*OS\s([\d_]+)/,
       iphone: /(iPhone\sOS)\s([\d_]+)/,
       Blackberry: /(BlackBerry|BB10|Playbook).*Version\/([\d.]+)/,
-      FirefoxOS: /(Mozilla).*Mobile[^\/]*\/([\d\.]*)/,
-      webOS: /(webOS|hpwOS)[\s\/]([\d.]+)/
+      FirefoxOS: /(Mozilla).*(\(Mobile)[^\/]*\/([\d\.]*)/,
+      webOS: /(webOS|hpwOS)[\s\/]([\d.]+)/,
+      UbuntuTouch: /(WhatsApp).*Version\/([\d.]+)/
     };
     $$.isMobile = function() {
       _current = _current || _detectEnvironment();

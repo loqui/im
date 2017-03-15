@@ -52,11 +52,9 @@ var Plus = {
    * Triggers a file pick [{MozActivity}]{@link external:System.MozActivity}
    */
   fileSend: function () {
-    var account = Accounts.current;
-    var fileTypes = [];
-    var to = $('section#chat')[0].dataset.jid;
-
-
+	var account = Accounts.current;
+	var fileTypes = [];
+	
     if (account.supports('imageSend')) {
       fileTypes = fileTypes.concat(['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/bmp']);
     }
@@ -69,8 +67,10 @@ var Plus = {
       fileTypes = fileTypes.concat(['audio/mpeg', 'audio/ogg', 'audio/mp4']);
     }
 
-    if (typeof MozActivity != 'undefined') {
+    if (App.platform === "FirefoxOS") {
     	//FirefoxOS
+		var to = $('section#chat')[0].dataset.jid;
+
     	var e = new MozActivity({
 	      name: 'pick',
 	      data: {
@@ -82,25 +82,28 @@ var Plus = {
 	      var blob = this.result.blob;
 	      account.connector.fileSend(to, blob);
 	    };
-    } else if(external && external.getUnityObject) {
+    } else if(App.platform === "UbuntuTouch") {
     	//Ubuntu Touch
     	$('#filesend_input').attr('accept', fileTypes);
 	    if(!Plus.UTFileSendRegistered) {
 	    	//File send handling for non FirefoxOS
+
+
 	    	$('#filesend_input').change(function() {
+				var to = $('section#chat')[0].dataset.jid;
 	    	    var image = document.getElementById('filesend_input').files[0];
 	    	    account.connector.fileSend(to, image);
 	    	});
 	    	Plus.UTFileSendRegistered = true;
     	}
-    	$('#filesend_input').trigger('click');
+	$('#filesend_input').trigger('click');
     }
   },
 
   vcardSend: function () {
-    var account = Accounts.current;
-    var to = $('section#chat')[0].dataset.jid;
-    if (typeof MozActivity != 'undefined') {
+    if (App.platform === "FirefoxOS") {
+		var account = Accounts.current;
+		var to = $('section#chat')[0].dataset.jid;
 	    var e = new MozActivity({
 	      name: 'pick',
 	      data: {
@@ -112,18 +115,19 @@ var Plus = {
 	      var contact = this.result;
 	      var name = Array.isArray(contact.name) ? contact.name[0] : contact.name;
 	      var str = '';
-	      for (var ob in contact) {
-	    	  console.log(ob + ': ' + contact[ob]);
-	      }
 	      ContactToVcard([contact], function (vcards, nCards) {
 	        str += vcards;
 	      }, function () {
 	        account.connector.vcardSend(to, name, str);
 	      }, 0, true);
 	    };
-    } else if(external && external.getUnityObject) {
+    } else if(App.platform === "UbuntuTouch") {
     	//Ubuntu Touch
-    	if(!Plus.UTVCardSendRegistered) {
+	if(!Plus.UTVCardSendRegistered) {
+	    var account = Accounts.current;
+	    var to = $('section#chat')[0].dataset.jid;
+	    var name;
+	    var str = '';
     		$('#vcardsend_input').change(function() {
     			var vcardFiles = document.getElementById('vcardsend_input').files;
     			if(vcardFiles.length > 0) {
@@ -131,25 +135,18 @@ var Plus = {
     				var fileReader = new FileReader();
     				fileReader.onloadend = function() {
     					VCF.parse(fileReader.result, function(vc) {
-    						var str = '';
-    						var c = vc.toJCard();
-    						var name = c.fn ? c.fn : (c.givenName && c.givenName[0] ?
-    								((c.familyName && c.familyName[0])
-    										? c.givenName[0] + c.familyName[0] : c.givenName[0]) : ''
-    						).trim();
-    						ContactToVcard([c], function (vcards, nCards) {
-    					        str += vcards;
-    					      }, function () {
-    					        account.connector.vcardSend(to, name, str);
-    					      }, 0, true);
-    					});
-    				};
+						var c = vc.toJCard();
+						name = c.fn;
+					});
+					str = fileReader.result;
+					account.connector.vcardSend(to, name, str);
+				};
     				fileReader.readAsText(vcard);
     			}
     		});
     		Plus.UTVCardSendRegistered = true;
     	}
-    	$('#vcardsend_input').trigger('click');
+	$('#vcardsend_input').trigger('click');
     }
   },
   

@@ -589,6 +589,16 @@ App.connectors.coseme = function (account) {
   this.connected = false;
   this.UTSyncRegistered = false;
 
+	this.notifyUT = function() {
+		console.log('New Message!');
+		/* var push = new CoSeMe.protocol.BinaryReader(push);
+		var reader = new FileReader();
+		var debug = {hello: "world"};
+		var blob = new Blob([JSON.stringify(debug, null, 2)], {type : 'application/json'});
+		reader.readAsArrayBuffer(blob);
+		push.reader.startListening(push); */
+	}
+
   function isNotGroupJid (jid) {
     return (jid.indexOf('@g.us') < 0);
   }
@@ -1259,7 +1269,7 @@ App.connectors.coseme = function (account) {
           Lungo.Notification.error(_('ContactsGetError'), _('ContactsGetErrorExp'), 'exclamation-sign', 5);
           cb();
         };
-        if(external && external.getUnityObject) {
+        if(App.platform === "UbuntuTouch") {
         	// Ubuntu Touch
         	console.log('trigger content hub for contacts import');
         	var UTcs = this.contacts.UTContactSync;
@@ -1273,6 +1283,17 @@ App.connectors.coseme = function (account) {
         }
       } else {
         Lungo.Notification.error(_('ContactsGetError'), _('NoWhenOffline'), 'exclamation-sign', 5);
+      }
+    }.bind(this);
+	
+	this.contacts.order = function (cb) {
+      this.account.core.roster.sort(function (a,b) {
+        var aname = a.name ? a.name : a.jid;
+        var bname = b.name ? b.name : b.jid;
+        return aname > bname;
+      });
+      if (cb) {
+        cb();
       }
     }.bind(this);
 
