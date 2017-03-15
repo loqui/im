@@ -9,7 +9,7 @@ Telegram Group: https://telegram.me/joinchat/BlpqfQk1L0l0PJTnM02yxQ
 
 Ubuntu Touch lifecycle script
 ===
-Download the loqui-lifecycle.sh file from the repo's root dir (above), open the Terminal app, make the script executable by running ```Shell chmod 755 path/to/loqui-lifecycle.sh ``` and run it.
+Download the loqui-lifecycle.sh file from the repo's root dir (above), open the Terminal app, make the script executable by running ```chmod 755 path/to/loqui-lifecycle.sh ``` and run it.
 
 Providers support
 ===
