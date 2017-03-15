@@ -7,6 +7,10 @@ We are also working hard in getting this working for Ubuntu Touch due to Firefox
 
 Telegram Group: https://telegram.me/joinchat/BlpqfQk1L0l0PJTnM02yxQ
 
+Ubuntu Touch lifecycle script
+===
+Download the loqui-lifecycle.sh file from the repo's root dir (above), open the Terminal app, make the script executable by running ```Shell chmod 755 path/to/loqui-lifecycle.sh ``` and run it.
+
 Providers support
 ===
 At the moment it supports accounts from:
