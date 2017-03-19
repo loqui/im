@@ -16,13 +16,12 @@
   font-style: normal;
   font-size: 24px;  /* Preferred icon size */
   display: inline-block;
-  width: 1em;
-  height: 1em;
   line-height: 1;
   text-transform: none;
   letter-spacing: normal;
   word-wrap: normal;
-  vertical-align: middle;
+  white-space: nowrap;
+  direction: ltr;
 
   /* Support for all WebKit browsers. */
   -webkit-font-smoothing: antialiased;

@@ -203,7 +203,6 @@ section {
                 background-color: transparent;
                 color: #fff;
                 width: 4.6rem;
-                font-size: 1.6rem;
             }
         }
     }
@@ -1879,7 +1878,7 @@ aside .menu {
         margin-bottom: 1rem;
     }
 
-    .icon {
+    i {
         position: absolute;
         bottom: .9rem;
         height: 2.8rem;
@@ -2205,14 +2204,10 @@ ul:not([data-enabled='true']) .avatar:after {
     height: 5.6rem;
     box-shadow: 0 0 3px rgba(0, 0, 0, .3), 0 5px 5px rgba(0, 0, 0, .4);
     transition: all .2s ease;
-
-    &:before {
-        color: #fff;
-        font-size: 2.4rem;
-        position: relative;
-        top: 1.5rem;
-        left: 1.7rem;
-    }
+    line-height: 5.6rem;
+    text-align: center;
+    color: white;
+    font-size: 3.5rem;
 
     &.hidden {
         bottom: -10rem;
@@ -2288,7 +2283,6 @@ ul:not([data-enabled='true']) .avatar:after {
   width: 3.4rem;
   padding-left: 1rem;
   position: relative;
-  font-size: 2rem;
   color: lightgrey;
 }
 
@@ -2299,6 +2293,5 @@ ul:not([data-enabled='true']) .avatar:after {
   padding-left: 0.3rem;
   position: fixed;
   left: 4.6rem;
-  font-size: 2rem;
   color: lightgrey;
   }
