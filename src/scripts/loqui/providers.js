@@ -44,128 +44,128 @@ var Providers = {
       emoji: 'coseme'
     },
 
-    /**
-     * @type {Provider}
-     * @memberof Providers
-     * @readonly
-     */
-    'facebook': {
-      longName: 'Facebook Chat',
-      altname: 'Facebook',
-      connector: {
-        type: 'XMPP',
-        host: 'https://bosh.loqui.im/',
-        timeout: 300
-      },
-      autodomain: 'chat.facebook.com',
-      features: ['vcard', 'presence', 'easyAvatars', 'csn'],
-      color: '#3D539F',
-      terms: {
-        user: 'ProviderUsername',
-        pass: 'Password',
-        userInputType: 'text'
-      },
-      notice: true,
-      emoji: 'FB'
-    },
+    // /**						Commented providers currently not working
+     // * @type {Provider}
+     // * @memberof Providers
+     // * @readonly
+     // */
+    // 'facebook': {
+      // longName: 'Facebook Chat',
+      // altname: 'Facebook',
+      // connector: {
+        // type: 'XMPP',
+        // host: 'https://bosh.loqui.im/',
+        // timeout: 300
+      // },
+      // autodomain: 'chat.facebook.com',
+      // features: ['vcard', 'presence', 'easyAvatars', 'csn'],
+      // color: '#3D539F',
+      // terms: {
+        // user: 'ProviderUsername',
+        // pass: 'Password',
+        // userInputType: 'text'
+      // },
+      // notice: true,
+      // emoji: 'FB'
+    // },
 
-    /**
-     * @type {Provider}
-     * @memberof Providers
-     * @readonly
-     */
-    'hangouts': {
-      longName: 'Google Hangouts',
-      altname: 'Gmail',
-      connector: {
-        type: 'XMPP',
-        host: 'https://bosh.loqui.im/',
-        timeout: 300
-      },
-      autodomain: 'gmail.com',
-      features: ['multi', 'presence', 'vcard', 'easyAvatars', 'avatarChange',
-        'rosterMgmt', 'csn', 'delay', 'statusChange', 'attention', 'show'],
-      color: '#4EA43B',
-      terms: {
-        user: 'ProviderAddress',
-        pass: 'Password',
-        placeholder: 'username@gmail.com',
-        userInputType: 'email'
-      },
-      notice: true,
-      emoji: 'GTALK'
-    },
+    // /**
+     // * @type {Provider}
+     // * @memberof Providers
+     // * @readonly
+     // */
+    // 'hangouts': {
+      // longName: 'Google Hangouts',
+      // altname: 'Gmail',
+      // connector: {
+        // type: 'XMPP',
+        // host: 'https://bosh.loqui.im/',
+        // timeout: 300
+      // },
+      // autodomain: 'gmail.com',
+      // features: ['multi', 'presence', 'vcard', 'easyAvatars', 'avatarChange',
+        // 'rosterMgmt', 'csn', 'delay', 'statusChange', 'attention', 'show'],
+      // color: '#4EA43B',
+      // terms: {
+        // user: 'ProviderAddress',
+        // pass: 'Password',
+        // placeholder: 'username@gmail.com',
+        // userInputType: 'email'
+      // },
+      // notice: true,
+      // emoji: 'GTALK'
+    // },
 
-    /**
-     * @type {Provider}
-     * @memberof Providers
-     * @readonly
-     */
-    'nimbuzz': {
-      longName: 'Nimbuzz',
-      connector: {
-        type: 'XMPP',
-        host: 'https://bosh.loqui.im/',
-        timeout: 300
-      },
-      autodomain: 'nimbuzz.com',
-      features: ['multi', 'presence', 'easyAvatars', 'csn'],
-      color: '#FF8702',
-      terms: {
-        user: 'Username',
-        pass: 'Password',
-        userInputType: 'text'
-      },
-      emoji: 'XMPP'
-    },
+    // /**
+     // * @type {Provider}
+     // * @memberof Providers
+     // * @readonly
+     // */
+    // 'nimbuzz': {
+      // longName: 'Nimbuzz',
+      // connector: {
+        // type: 'XMPP',
+        // host: 'https://bosh.loqui.im/',
+        // timeout: 300
+      // },
+      // autodomain: 'nimbuzz.com',
+      // features: ['multi', 'presence', 'easyAvatars', 'csn'],
+      // color: '#FF8702',
+      // terms: {
+        // user: 'Username',
+        // pass: 'Password',
+        // userInputType: 'text'
+      // },
+      // emoji: 'XMPP'
+    // },
 
-    /**
-     * @type {Provider}
-     * @memberof Providers
-     * @readonly
-     */
-    'ovi': {
-      longName: 'Nokia ovi',
-      altname: 'ovi',
-      connector: {
-        type: 'XMPP',
-        host: 'https://bosh.loqui.im/',
-        timeout: 300
-      },
-      autodomain: 'chat.ovi.com',
-      features: ['multi', 'presence', 'easyAvatars', 'csn'],
-      color: '#39B006',
-      terms: {
-        user: 'Username',
-        pass: 'Password',
-        userInputType: 'text'
-      },
-      emoji: 'XMPP'
-    },
+    // /**
+     // * @type {Provider}
+     // * @memberof Providers
+     // * @readonly
+     // */
+    // 'ovi': {
+      // longName: 'Nokia ovi',
+      // altname: 'ovi',
+      // connector: {
+        // type: 'XMPP',
+        // host: 'https://bosh.loqui.im/',
+        // timeout: 300
+      // },
+      // autodomain: 'chat.ovi.com',
+      // features: ['multi', 'presence', 'easyAvatars', 'csn'],
+      // color: '#39B006',
+      // terms: {
+        // user: 'Username',
+        // pass: 'Password',
+        // userInputType: 'text'
+      // },
+      // emoji: 'XMPP'
+    // },
 
-    /**
-     * @type {Provider}
-     * @memberof Providers
-     */
-    'lync': {
-      longName: 'Microsoft Lync',
-      altname: 'Lync',
-      connector: {
-        type: 'XMPP',
-        host: 'https://bosh.loqui.im/',
-        timeout: 300
-      },
-      autodomain: false,
-      features: ['multi', 'presence', 'easyAvatars', 'csn'],
-      color: '#0071C5',
-      terms: {
-        user: 'ProviderAddress',
-        pass: 'Password',
-        placeholder: 'username@example.com',
-        userInputType: 'email'
-      },
-      emoji: 'XMPP'
-    },
+    // /**
+     // * @type {Provider}
+     // * @memberof Providers
+     // */
+    // 'lync': {
+      // longName: 'Microsoft Lync',
+      // altname: 'Lync',
+      // connector: {
+        // type: 'XMPP',
+        // host: 'https://bosh.loqui.im/',
+        // timeout: 300
+      // },
+      // autodomain: false,
+      // features: ['multi', 'presence', 'easyAvatars', 'csn'],
+      // color: '#0071C5',
+      // terms: {
+        // user: 'ProviderAddress',
+        // pass: 'Password',
+        // placeholder: 'username@example.com',
+        // userInputType: 'email'
+      // },
+      // emoji: 'XMPP'
+    // },
 
     /**
      * @type {provider}

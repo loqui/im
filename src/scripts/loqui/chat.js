@@ -128,6 +128,7 @@ var Chat = {
   */
   chunkRender : function (index) {
     var chat = this;
+    var cb = arguments[1];
     var ul = $('section#chat ul#messages');
     if (index >= 0 && ul.children('li[data-index="' + index + '"]').length < 1) {
       var stIndex = this.core.chunks[index];
@@ -192,8 +193,10 @@ var Chat = {
           chat.chunkRender(index - 1);
         }
         chat.account.avatarsRender();
-
         free();
+        if (typeof cb === 'function') {
+          cb();
+        }
       });
     }
   },
@@ -500,6 +503,60 @@ var Chat = {
         };
 
         Store.recover(chat.chunks[currentChunk], afterRecover);
+      }
+    });
+  },
+
+  /**
+  * Find text in messages
+  *
+  * @param {string} [search_text]
+  * @return {external:System.Promise}
+  */
+  findInChat : function(needle) {
+    var chat = this.core;
+    var needleRegExp = new RegExp(needle.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"), "i");
+    var last_match = $('ul#messages span.text.search-result:first-of-type');
+
+    var chunk_index = chat.chunks.length - 1;   // start search in last chunk
+    if (last_match.length > 0) {                // ..or start at last match
+      chunk_index = last_match.parent().parent()[0].dataset.index;
+    }
+
+    return new Promise(function(resolve, reject) {
+      var searchInChunk = function(chunk) {
+        for (var chunk_row = chunk.length-1; chunk_row>=0; chunk_row--) {
+          if (chunk[chunk_row].text) {
+            if (needleRegExp.test(chunk[chunk_row].text) &&
+                ($('ul#messages').find('div[data-id="' + chunk[chunk_row].id + '"] span.text.search-result').length == 0)) {
+                // found new match
+              return {msg_id: chunk[chunk_row].id, chunk_index : chunk_index};
+            }
+          }
+        }
+        return null;
+      };
+
+      var afterRecover = function(key, chunk, free) {
+        var result = searchInChunk(chunk);
+        free();                                 // free data block, we do not need it
+        if (result !== null) {                  // found match in current chunk
+          resolve(({msg_id: result.msg_id, chunk_index: result.chunk_index}));
+        }
+        else if (chunk_index>0) {               // no match, search in nect chunk
+          chunk_index--;
+          Store.recover(chat.chunks[chunk_index], afterRecover);
+        }
+        else {                                  // no match, no more chunks
+          reject();
+        }
+      };
+
+      if (chunk_index >= 0) {                   // start search
+        Store.recover(chat.chunks[chunk_index], afterRecover);
+      }
+      else {                                    // cannot search without chunks
+        reject();
       }
     });
   },

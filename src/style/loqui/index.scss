@@ -2295,3 +2295,49 @@ ul:not([data-enabled='true']) .avatar:after {
   left: 4.6rem;
   color: lightgrey;
   }
+
+#searchbox {
+  position: relative;
+  right: 0;
+  top: -2px;
+  left: 0;
+  padding: 1rem 0 0.5rem 0;
+  background-color: Gainsboro;
+  display: hidden;
+
+  button {
+    position: relative;
+    top: .05rem;
+    padding: 0;
+    border: 0;
+    font-weight: bold;
+    background: none;
+    box-sizing: border-box;
+    text-align: center;
+    width: 2rem;
+    float: left;
+  }
+
+  input {
+    margin-left: 0.8rem;
+    background: inherit;
+    border: 0;
+    border-bottom: 1px solid silver;
+    border-radius: 5px;
+    width: calc(100% - 3.5rem);
+  }
+
+  span {
+    position: absolute;
+    float: right;
+    right: 1rem;
+    top: 1rem;
+    height: 20px;
+    width: 20px;
+  }
+}
+
+ul#messages div span.search-result.text {
+  background-color: lightskyblue;
+  color: black;
+}

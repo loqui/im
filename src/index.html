@@ -279,7 +279,7 @@
         <button data-view-section="back" data-menu-onclick="emojiHide" class="material-icons tab">keyboard_arrow_left</button>
       </nav>
       <span class="totalUnread"></span>
-      <span class="title"></span>
+      <span class="title" data-menu-onclick="chatSearchToggle"></span>
       <span class="status"></span>
       <span class="backchange"></span>
       <span class="avatar" data-menu-onclick="chatInfo"><img/></span>
@@ -328,6 +328,13 @@
           </div>
         </script>
       </div>
+    </article>
+    <article id="searchbox">
+      <i id="search-wait" class="material-icons">hourglass_empty</i>
+      <button id="search" class="recommend left" data-menu-onclick="chatSearch"><i class="material-icons">search</i></button>
+      <button id="search-next" class="recommend left" data-menu-onclick="chatSearch"><i class="material-icons">arrow_upward</i></button>
+      <input></input>
+      <span data-menu-onclick="chatSearchClear"><i class="material-icons">cancel</i></span>
     </article>
     <article id="emoji">
       <div id="emoji-loading" class="emoji-category"><i class="material-icons md-dark md-inactive">hourglass_empty</i></div>

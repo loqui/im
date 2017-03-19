@@ -245,6 +245,69 @@ var Menu = {
       var muc = ($(obj).closest('section')[0].dataset.muc == 'true') ? true : false;
       Menu.show(muc ? 'muc' : 'contact');
     },
+    chatSearchToggle: function(obj) {
+      var searchbox = $('section#chat article#searchbox');
+      searchbox.toggle();
+      if ($(searchbox).is(':visible')) {
+        searchbox.children('span').hide();
+        searchbox.children('i#search-wait').hide();
+        searchbox.children('button#search-next').hide();
+        searchbox.children('button#search').show();
+        searchbox.children('input').val('').focus();
+      }
+      else {
+        $('ul#messages span.text.search-result').removeClass("search-result");
+      }
+    },
+    chatSearchClear: function(obj) {
+      var searchbox = $('section#chat article#searchbox');
+      searchbox.children('span').hide();
+      searchbox.children('i#search-wait').hide();
+      searchbox.children('button#search-next').hide();
+      searchbox.children('button#search').show();
+      searchbox.children('input').val('').focus();
+      $('ul#messages span.text.search-result').removeClass("search-result");
+    },
+    chatSearch: function(obj) {
+      var jid = $('section#chat')[0].dataset.jid;
+      var chat = Accounts.current.chats[Accounts.current.chatFind(jid)];
+      var searchbox = $('section#chat article#searchbox');
+      var needle = searchbox.children('input').val().trim();
+
+      searchbox.children('i#search-wait').show();
+      searchbox.children('button#search').hide();
+      searchbox.children('input')[0].disable = true;
+
+      chat.findInChat(needle).then(function(found) {
+        var msg_id = found.msg_id;
+        var chunk_index = found.chunk_index;
+
+        var scrollToMessage = function() {
+          var last_index = $('ul#messages > li:first-of-type')[0].dataset.index;
+          if (last_index > chunk_index) {
+            chat.chunkRender(last_index - 1, scrollToMessage);
+          }
+          else {
+            var message = $('ul#messages').find('div[data-id="' + msg_id + '"]')[0];
+            $(message).find("span.text").addClass("search-result");
+            message.scrollIntoView(false);
+            searchbox.children('i#search-wait').hide();
+            searchbox.children('button#search-next').show();
+          }
+        };
+
+        scrollToMessage(found.chunk_index);
+      }, function() {
+        searchbox.children('i#search-wait').hide();
+        searchbox.children('button#search-next').hide();
+        searchbox.children('button#search').show();
+        Lungo.Notification.show('info-sign', _('NoMatchFound'));
+      });
+    },
+    chatLeave: function(obj) {
+      Menu.map.emojiHide();
+      $('section#chat article#searchbox').hide();
+    },
     accountRemove: function(obj) {
       var jid = $(obj).closest('section')[0].dataset.jid;
       Messenger.accountRemove(jid);
@@ -399,22 +462,26 @@ var Menu = {
       });
     },
     powerOff: function () {
-      var will = confirm(_('ConfirmClose'));
-      if (will) {
-        Lungo.Notification.success(_('Closing'), _('AppWillClose'), 'signout', 3);
-        var req = navigator.mozAlarms.getAll();
-        req.onsuccess = function () {
-          this.result.forEach(function (alarm) {
-            navigator.mozAlarms.remove(alarm.id);
-          });
-          App.killAll();
-          setTimeout(function () {
-            Tools.log(App.name + ' has been closed');
-            window.close();
-          }, 3000);
-        };
-        req.onerror = function () { };
-      }
+		if (App.platform === "FirefoxOS") {
+		  var will = confirm(_('ConfirmClose'));
+		  if (will) {
+			Lungo.Notification.success(_('Closing'), _('AppWillClose'), 'signout', 3);
+			var req = navigator.mozAlarms.getAll();
+			req.onsuccess = function () {
+			  this.result.forEach(function (alarm) {
+				navigator.mozAlarms.remove(alarm.id);
+			  });
+			  App.killAll();
+			  setTimeout(function () {
+				Tools.log(App.name + ' has been closed');
+				window.close();
+			  }, 3000);
+			};
+			req.onerror = function () { };
+		  }
+	  } else {
+		  Lungo.Notification.error(_('NoDevice'), _('FxOSisBetter', 'exclamation-sign'));
+	  }
     },
     reloadApp: function () {
       var sure = confirm(_('ConfirmReload'));
