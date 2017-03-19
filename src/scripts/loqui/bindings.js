@@ -297,7 +297,7 @@ var bindings = function () {
   $('section#welcome').on('click', function() {
     Menu.show('providers');
   });
-  
+
   $('section#chat').on('swipeRight', function() {
     Lungo.Router.section('back');
   });
@@ -305,6 +305,15 @@ var bindings = function () {
   $('section#chat ul#messages').on('doubleTap', function(e) {
     e.delegateTarget.scrollTop = e.delegateTarget.scrollHeight;
   });
+
+  $('section#chat article#searchbox input').on('input', function(e) {
+      if ($(this).val()) {
+        $('section#chat article#searchbox span').show();
+      }
+      else {
+        $('section#chat article#searchbox span').hide();
+      }
+    });
 
   $('section#main').on('click', function(e) {
     if($(e.target).hasClass('asided')) {
@@ -366,7 +375,7 @@ var bindings = function () {
       }
     }
   });
-  
+
   window.addEventListener('touchend', function() {
     VoiceRecorder.stop(duration => {
       if (duration < 1) {

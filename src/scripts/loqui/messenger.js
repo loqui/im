@@ -205,7 +205,7 @@ var Messenger = {
               participantLabel.append($('<i/>', {class:"material-icons"}).text("supervisor_account"));
             }
             if (participantJid === chat.core.info.subjectOwner) {
-              participantLabel.append($('<i/>', {class:"material-icons"}).text("title"));
+              participantLabel.append($('<i/>', {class:"material-icons"}).text("label"));
             }
             if (participantJid === chat.core.info.owner) {
               participantLabel.append($('<i/>', {class:"material-icons"}).text("star"));
