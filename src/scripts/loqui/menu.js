@@ -399,22 +399,26 @@ var Menu = {
       });
     },
     powerOff: function () {
-      var will = confirm(_('ConfirmClose'));
-      if (will) {
-        Lungo.Notification.success(_('Closing'), _('AppWillClose'), 'signout', 3);
-        var req = navigator.mozAlarms.getAll();
-        req.onsuccess = function () {
-          this.result.forEach(function (alarm) {
-            navigator.mozAlarms.remove(alarm.id);
-          });
-          App.killAll();
-          setTimeout(function () {
-            Tools.log(App.name + ' has been closed');
-            window.close();
-          }, 3000);
-        };
-        req.onerror = function () { };
-      }
+		if (App.platform === "FirefoxOS") {
+		  var will = confirm(_('ConfirmClose'));
+		  if (will) {
+			Lungo.Notification.success(_('Closing'), _('AppWillClose'), 'signout', 3);
+			var req = navigator.mozAlarms.getAll();
+			req.onsuccess = function () {
+			  this.result.forEach(function (alarm) {
+				navigator.mozAlarms.remove(alarm.id);
+			  });
+			  App.killAll();
+			  setTimeout(function () {
+				Tools.log(App.name + ' has been closed');
+				window.close();
+			  }, 3000);
+			};
+			req.onerror = function () { };
+		  }
+	  } else {
+		  Lungo.Notification.error(_('NoDevice'), _('FxOSisBetter', 'exclamation-sign'));
+	  }
     },
     reloadApp: function () {
       var sure = confirm(_('ConfirmReload'));
