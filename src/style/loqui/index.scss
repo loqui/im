@@ -2280,8 +2280,8 @@ ul:not([data-enabled='true']) .avatar:after {
 .help button {
   background: none repeat scroll 0% 0% transparent;
   border: 0px none;
-  width: 3.4rem;
-  padding-left: 1rem;
+  width: 3.3rem;
+  padding-left: 0.6rem;
   position: relative;
   color: lightgrey;
 }
@@ -2289,12 +2289,12 @@ ul:not([data-enabled='true']) .avatar:after {
 .help-left button {
   background: none repeat scroll 0% 0% transparent;
   border: 0px none;
-  width: 2.2rem;
-  padding-left: 0.3rem;
+  width: 2.3rem;
+  padding-left: 0;
   position: fixed;
   left: 4.6rem;
   color: lightgrey;
-  }
+}
 
 #searchbox {
   position: relative;
