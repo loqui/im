@@ -221,19 +221,19 @@ var Tools = {
   },
 
   vidThumb: function (blob, width, height, callback) {
-    callback('img/video.png');
+    callback('videocam');
   },
 
   audThumb: function (blob, width, height, callback) {
-    callback('img/audio.png');
+    callback('audiotrack');
   },
 
   locThumb: function (blob, width, height, callback) {
-    callback('img/location.png');
+    callback('location_on');
   },
 
   vcardThumb: function (blob, width, height, callback) {
-    callback('img/contact.png');
+    callback('account_circle');
   },
 
   getFileType: function(type) {

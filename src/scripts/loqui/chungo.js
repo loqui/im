@@ -38,14 +38,6 @@ var Chungo = {
         Chungo.Aside.toggle(e.target.dataset.viewAside);
       });
     });
-    $$('[data-icon]').each(function () {
-      var icon = this.dataset.icon;
-      $$(this).addClass('icon').addClass(icon);
-    });
-    $$('[data-image]').each(function () {
-      var image = this.dataset.image;
-      $$(this).prepend($$('<img/>').attr('src', image).addClass('icon'));
-    });
     $$('[data-control="groupbar"]').each(function () {
       var links = $$(this).children('[data-view-article]');
       links.first().addClass('selected').siblings().removeClass('selected');
@@ -69,8 +61,6 @@ var Chungo = {
         $$('<div>').addClass('shader')
       ).append(
         $$('<div>').addClass('notifier').append(
-          $$('<span>').addClass('icon')
-        ).append(
           $$('<span>').addClass('title')
         ).append(
           $$('<span>').addClass('caption')
@@ -227,13 +217,12 @@ var Chungo = {
 
     _unified: function (type, icon, title, description, seconds, cb) {
       this._not.data('type', type);
-      this._not.children('.icon')[0].className = icon + ' icon';
       this._not.children('.title').text(title);
       this._not.children('.caption').html(description || ' ');
       this._sha.addClass('show').removeClass('hidden');
       this._not.addClass('show').removeClass('hidden');
-	  $('.chungo .shader').click(function(){$('.chungo .shader').removeClass('show');});
-	  $('.chungo .notifier').click(function(){$('.chungo .notifier').removeClass('show');});
+	    $('.chungo .shader').click(function(){$('.chungo .shader').removeClass('show');});
+	    $('.chungo .notifier').click(function(){$('.chungo .notifier').removeClass('show');});
       clearTimeout(this._timeout[0]);
       if (this._timeout[1]) {
         this._timeout[1]();

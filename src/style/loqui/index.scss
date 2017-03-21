@@ -1273,19 +1273,11 @@ section nav {
         .maps,
         .video {
             height: calc(100%);
-            &[data-downloaded='true'] {
-				background-image: url('../../img/play.png');
-				background-repeat: no-repeat;
-				background-attachment: scroll;
-				background-position: left center;
-				padding-left: 48px;
+            &[data-downloaded='true']::before {
+              content: 'play_circle_outline';
             }
-            &[data-downloaded='false'] {
-				background-image: url('../../img/download.png');
-				background-repeat: no-repeat;
-				background-attachment: scroll;
-				background-position: left center;
-				padding-left: 48px;
+            &[data-downloaded='false']::before {
+              content: 'file_download';
             }
         }
 
@@ -1502,18 +1494,20 @@ section nav {
     }
 }
 
-#chat[data-otr=true] #messages:after {
-    content: '\f023';
+#chat[data-otr=true] #messages + i {
     position: fixed;
-    font-family: lungojsicon;
     font-weight: 700;
-    font-size: 12rem;
+    font-size: 16rem;
     color: #E95644;
-    top: calc(50vh - 6rem);
-    left: calc(50vw - 4rem);
+    top: calc(50vh - 8rem);
+    left: calc(50vw - 8rem);
     transform: rotate(-20deg);
     opacity: .2;
     pointer-events: none;
+}
+
+#chat[data-otr=false] #messages + i {
+    visibility: hidden;
 }
 
 .ubuntu-touch-content-hub-input {

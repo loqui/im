@@ -1285,7 +1285,7 @@ App.connectors.coseme = function (account) {
         Lungo.Notification.error(_('ContactsGetError'), _('NoWhenOffline'), 'exclamation-sign', 5);
       }
     }.bind(this);
-	
+
 	this.contacts.order = function (cb) {
       this.account.core.roster.sort(function (a,b) {
         var aname = a.name ? a.name : a.jid;
@@ -1342,7 +1342,7 @@ App.connectors.coseme = function (account) {
 			contacts._cb = cb;
 		}
 	}.bind(this);
-	
+
     this.contacts.order = function (cb) {
       this.account.core.roster.sort(function (a,b) {
         var aname = a.name ? a.name : a.jid;
@@ -2493,17 +2493,17 @@ App.connectors.coseme = function (account) {
                        120, null, process);
         break;
         case 'video':
-        process('img/video.png');
+        process('videocam');
         break;
         case 'audio':
-        process('img/audio.png');
+        process('audiotrack');
         break;
         case 'url':
         mediaUrl = 'https://maps.google.com/maps?q=' + payload[0] + ',' + payload[1];
-        process('img/location.png');
+        process('location_on');
         break;
         case 'vCard':
-        process('img/contact.png');
+        process('contact_phone');
         break;
       }
     };

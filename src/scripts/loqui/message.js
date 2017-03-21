@@ -344,7 +344,12 @@ var Message = {
       html = html.replace(/(_)([A-Za-z0-9\s]+)(_)/g, '<i>$2</i>');
       html = html.replace(/(~)([A-Za-z0-9\s]+)(~)/g, '<s>$2</s>');
     } else if (this.core.media) {
-      html = $('<img/>').attr('src', this.core.media.thumb);
+      if (this.core.media.thumb.indexOf('base64') > 0) {
+        html = $('<img/>').attr('src', this.core.media.thumb);
+      }
+      else {
+        html = $('<i/>').attr('class', 'material-icons md-48').text(this.core.media.thumb);
+      }
       html[0].dataset.downloaded = this.core.media.downloaded || false;
       switch (this.core.media.type) {
         case 'url':
@@ -454,13 +459,12 @@ var Message = {
                   });
                 }
                 else if(type == 'data:audio') {
-                  var img = document.createElement('img');
-                  img.setAttribute('src', "img/play.png");
+                  var play = $('<i/>').attr('class', 'material-icons md-48').text('play_circle_outline')
                   var close = document.createElement('img');
                   close.setAttribute('src', "img/console-inactive.png");
                   var audio = document.createElement('audio');
                   audio.setAttribute("src", output);
-                  chat.appendChild(img);
+                  chat.appendChild(play);
                   chat.appendChild(close);
                   chat.appendChild(audio);
                   close.addEventListener('click', function () {
@@ -470,16 +474,14 @@ var Message = {
                     chat.removeChild(img);
                     chat.removeChild(close);
                   });
-                  img.addEventListener('click', function () {
+                  play.addEventListener('click', function () {
                     if (audio.paused == false) {
-                      img.setAttribute('src', "img/play.png");
-                      chat.replaceChild(img, img);
+                      play.text('play_circle_outline');
                       audio.pause();
                       audio.firstChild.nodeValue = 'Play';
                     }
                     else {
-                      img.setAttribute('src', "img/audio.png");
-                      chat.replaceChild(img, img);
+                      play.text('audiotrack');
                       audio.play();
                       audio.firstChild.nodeValue = 'Pause';
                     }
