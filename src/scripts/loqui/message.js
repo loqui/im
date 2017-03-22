@@ -421,14 +421,14 @@ var Message = {
             Tools.blobToBase64(blob, function (output) {
               if(output) {
                 var type = output.split('/')[0];
-                var h = $(window).height();
+                var h = $(window).height() - 60;
                 var w = $(window).width();
-                var chat = document.getElementById('chat');
+                var chat = $('section#chat header');
                 console.log(output.split(',')[0]);
                 var download = function(filename, text) {
                   var pom = document.createElement('a');
                   pom.setAttribute('href', output.split(';')[0] + ';charset=UTF-8,' + encodeURIComponent(text));
-                  pom.setAttribute('download', filename);
+                  pom.setAttribute('file_download', filename);
 
                   if (document.createEvent) {
                     var event = document.createEvent('MouseEvents');
@@ -441,21 +441,22 @@ var Message = {
                 }; // Not working yet
                 //download('file.jpg', atob(output.split(',')[1]));
                 if(type == 'data:image') {
-                  var img = document.createElement('img');
+                  var image = document.createElement('img');
                   var prop = new Image();
                   prop.src = output;
                   var propHeight = prop.height;
                   var propWidth = prop.width;
-                  img.setAttribute('src', output);
+                  image.setAttribute('id', 'image');
+                  image.setAttribute('src', output);
                   if(propWidth/propHeight > w/h) {
-                    img.setAttribute('width', w);
+                    image.setAttribute('width', w);
                   }
                   else {
-                    img.setAttribute('height', h);
+                    image.setAttribute('height', h);
                   }
-                  chat.appendChild(img);
-                  chat.addEventListener('click', function () {
-                    chat.removeChild(img);
+				  chat.after(image);
+                  $('img#image').click(function () {
+                    image.remove();
                   });
                 }
                 else if(type == 'data:audio') {
@@ -488,8 +489,6 @@ var Message = {
                   });
                 }
                 else if(type == 'data:video') {
-                  var close = document.createElement('img');
-                  close.setAttribute('src', "img/console-inactive.png");
                   var addSourceToVideo = function(element, src, type) {
                     var source = document.createElement('source');
                     source.src = src;
@@ -497,8 +496,10 @@ var Message = {
                     element.appendChild(source);
                   };
                   var video = document.createElement('video');
-                  chat.appendChild(close);
-                  chat.appendChild(video);
+        				  video.controls = true;
+				          video.setAttribute('id', 'vid');
+        				  video.controls = true;
+				          chat.after(video);
                   addSourceToVideo(video, output, blob.type);
                   var propHeight = video.videoHeight;
                   var propWidth = video.videoWidth;
@@ -508,11 +509,10 @@ var Message = {
                   else {
                     video.setAttribute('height', h);
                   }
-                  close.addEventListener('click', function () {
-                    chat.removeChild(video);
-                    chat.removeChild(close);
+                  $("video#vid").on('swipe', function () {
+                    video.remove();
                   });
-                  video.addEventListener('click', function () {
+                  $("video#vid").click(function () {
                     if (video.paused == false) {
                       video.pause();
                       video.firstChild.nodeValue = 'Play';

@@ -25,7 +25,7 @@
   <section id="welcome" class="show" data-transition="horizontal">
     <article id="main" class="scroll show">
       <script type="text/spacebars" name="welcome">
-        <h1>{{_ 'WelcomeTo' app.name }}<br />{{ app.version }}</h1>
+        <h1>{{_ 'WelcomeTo' app.name }}<br />{{ app.version }}{{ app.minorVersion }}</h1>
       </script>
     </article>
   </section>
@@ -335,6 +335,10 @@
       <button id="search-next" class="recommend left" data-menu-onclick="chatSearch"><i class="material-icons">arrow_upward</i></button>
       <input></input>
       <span data-menu-onclick="chatSearchClear"><i class="material-icons">cancel</i></span>
+    </article>
+    <article id="audiobox">
+	  <audio id="newAudio" controls></audio>
+      <button id="close" class="material-icons">cancel</button>
     </article>
     <article id="emoji">
       <div id="emoji-loading" class="emoji-category"><i class="material-icons md-dark md-inactive">hourglass_empty</i></div>

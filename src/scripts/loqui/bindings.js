@@ -116,6 +116,7 @@ $('section#me #card span.avatar').on('click', function (e) {
 // Tap contact or muc avatar
 var listener= function(muc){
   var jid= muc ? $('section#muc')[0].dataset.jid : $('section#contact')[0].dataset.jid;
+  var section = muc ? $('section#muc header') : $('section#contact header');
   var avatar= App.avatars[jid];
 
   if(avatar){
@@ -123,43 +124,34 @@ var listener= function(muc){
       var blob = Tools.b64ToBlob(url.split(',').pop(), url.split(/[:;]/)[1]);
       if (App.platform === "FirefoxOS") {
             	//FirefoxOS
-				return new MozActivity({
-				  name: 'open',
-				  data: {
-					type: blob.type,
-					blob: blob
-				  }
-				});
-			} else if(App.platform === "UbuntuTouch") {
+		return new MozActivity({
+		  name: 'open',
+		  data: {
+			type: blob.type,
+			blob: blob
+		  }
+		});
+	} else if(App.platform === "UbuntuTouch") {
             	//Ubuntu Touch
-				var h = $(window).height();
-				var w = $(window).width();
-				var img = document.createElement('img');
-				var prop = new Image();
-				prop.src = url;
-				var propHeight = prop.height;
-				var propWidth = prop.width;
-				img.setAttribute('src', url);
-				if(propWidth/propHeight > w/h) {
-					img.setAttribute('width', w);
-				} else {
-					img.setAttribute('height', h);
-				}
-				if(muc) {
-					var group = document.getElementById('muc');
-					group.appendChild(img);
-					group.addEventListener('click', function () {
-						group.removeChild(img);
-					});
-				} else {
-					var contact = document.getElementById('contact');
-					contact.appendChild(img);
-					contact.addEventListener('click', function () {
-						contact.removeChild(img);
-					});
-				}
+		var h = $(window).height() - 60;
+		var w = $(window).width();
+		var image = document.createElement('img');
+		var prop = new Image();
+		prop.src = url;
+		var propHeight = prop.height;
+		var propWidth = prop.width;
+		image.setAttribute('id', 'image');
+		image.setAttribute('src', url);
+		if(propWidth/propHeight > w/h) {
+			image.setAttribute('width', w);
+		} else {
+			image.setAttribute('height', h);
+		}
+		section.after(image);
+                $('img#image').click(function () {
+                  image.remove();
+                });
             }
-
       free();
     });
   }
