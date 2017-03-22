@@ -480,7 +480,7 @@ var Menu = {
 			req.onerror = function () { };
 		  }
 	  } else {
-		  Lungo.Notification.error(_('NoDevice'), _('FxOSisBetter', 'exclamation-sign'));
+		  Lungo.Notification.error(_('NoDevice'), _('FxOSisBetter'), 'exclamation-sign', 3);
 	  }
     },
     reloadApp: function () {
