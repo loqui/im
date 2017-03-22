@@ -460,32 +460,19 @@ var Message = {
                   });
                 }
                 else if(type == 'data:audio') {
-                  var play = $('<i/>').attr('class', 'material-icons md-48').text('play_circle_outline')
-                  var close = document.createElement('img');
-                  close.setAttribute('src', "img/console-inactive.png");
-                  var audio = document.createElement('audio');
+				
+                  var audio = document.getElementById('newAudio');
                   audio.setAttribute("src", output);
-                  chat.appendChild(play);
-                  chat.appendChild(close);
-                  chat.appendChild(audio);
-                  close.addEventListener('click', function () {
-                    audio.setAttribute("src", "");
-                    audio.load();
-                    chat.removeChild(audio);
-                    chat.removeChild(img);
-                    chat.removeChild(close);
-                  });
-                  play.addEventListener('click', function () {
-                    if (audio.paused == false) {
-                      play.text('play_circle_outline');
-                      audio.pause();
-                      audio.firstChild.nodeValue = 'Play';
-                    }
-                    else {
-                      play.text('audiotrack');
-                      audio.play();
-                      audio.firstChild.nodeValue = 'Pause';
-                    }
+                  audio.load();
+					
+				  var audiobox = $('section#chat article#audiobox');
+				  audiobox.show();
+				  
+                  $('section#chat article#audiobox button#close').click(function () {
+					audio.pause();
+					audio.setAttribute("src", "");
+					audio.load();
+                    audiobox.hide();
                   });
                 }
                 else if(type == 'data:video') {
@@ -496,10 +483,10 @@ var Message = {
                     element.appendChild(source);
                   };
                   var video = document.createElement('video');
-        				  video.controls = true;
-				          video.setAttribute('id', 'vid');
-        				  video.controls = true;
-				          chat.after(video);
+				  video.controls = true;
+				  video.setAttribute('id', 'vid');
+				  video.controls = true;
+				  chat.after(video);
                   addSourceToVideo(video, output, blob.type);
                   var propHeight = video.videoHeight;
                   var propWidth = video.videoWidth;
