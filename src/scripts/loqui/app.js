@@ -38,7 +38,7 @@ var App = {
   * @type {String}
   * @const
   */
-  minorVersion: 'a',
+  minorVersion: '',
   
   platform: '',
 
