@@ -60,7 +60,7 @@ var Activity = function (action, account, content, options) {
               Lungo.Router.section('back');
               chat.show();
             } else {
-              Lungo.Notification.error(_('NoSupport'), _('WhatsAppIsBetter'), 'exclamation-sign');
+              Lungo.Notification.error(_('NoSupport'), _('WhatsAppIsBetter'), 'warning');
               Lungo.Router.section('back');
             }
           }
