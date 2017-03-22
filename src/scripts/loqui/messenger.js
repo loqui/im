@@ -75,7 +75,7 @@ var Messenger = {
     if (account.supports('avatarChange')) {
       account.connector.avatarSet(blob);
     } else {
-      Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign', 3);
+      Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'warning', 3);
     }
   },
 
@@ -86,7 +86,7 @@ var Messenger = {
       var nick = $('section#me #nick input').val();
       account.connector.presence.set(null, status, nick);
     } else {
-      Lungo.Notification.error(_('Error'), _('NoWhenOffline'), 'exclamation-sign', 3);
+      Lungo.Notification.error(_('Error'), _('NoWhenOffline'), 'warning', 3);
     }
   },
 
@@ -312,10 +312,10 @@ var Messenger = {
           Lungo.Notification.success(_('ContactWasAdded', {name: name}), _('ContactWillAppear', {name: name}), 'check', 5);
         }
       } else {
-        Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign', 3);
+        Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'warning', 3);
       }
     } else {
-      Lungo.Notification.error(_('Error'), _('NoWhenOffline'), 'exclamation-sign', 3);
+      Lungo.Notification.error(_('Error'), _('NoWhenOffline'), 'warning', 3);
     }
   },
 
@@ -349,13 +349,13 @@ var Messenger = {
           account.save();
           account.allRender();
           Lungo.Router.section('main');
-          Lungo.Notification.success(_('Removed'), null, 'remove', 3);
+          Lungo.Notification.success(_('Removed'), null, 'remove_circle_outline', 3);
         }
       } else {
-        Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign', 3);
+        Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'warning', 3);
       }
     } else {
-      Lungo.Notification.error(_('Error'), _('NoWhenOffline'), 'exclamation-sign', 3);
+      Lungo.Notification.error(_('Error'), _('NoWhenOffline'), 'warning', 3);
     }
   },
 
@@ -379,11 +379,11 @@ var Messenger = {
           account.allRender();
           Lungo.Router.section('back');
           Lungo.Router.section('main');
-          Lungo.Notification.success(_('Removed'), null, 'trash', 3);
+          Lungo.Notification.success(_('Removed'), null, 'delete', 3);
         }
       }
     } else if (!force) {
-      Lungo.Notification.error(_('Error'), _('NoChatsForContact'), 'exclamation-sign', 3);
+      Lungo.Notification.error(_('Error'), _('NoChatsForContact'), 'warning', 3);
     }
   },
 
@@ -409,10 +409,10 @@ var Messenger = {
         account.allRender();
         Lungo.Router.section('back');
         Lungo.Router.section('main');
-        Lungo.Notification.success(_('Cleared'), null, 'trash', 3);
+        Lungo.Notification.success(_('Cleared'), null, 'delete', 3);
       }
     } else {
-      Lungo.Notification.error(_('Error'), _('NoChatsForContact'), 'exclamation-sign', 3);
+      Lungo.Notification.error(_('Error'), _('NoChatsForContact'), 'warning', 3);
     }
   },
 
@@ -442,7 +442,7 @@ var Messenger = {
       App.accounts.splice(accountIndex, 1);
       App.accountsCores.splice(accountIndex, 1);
       App.accounts = App.accounts;
-      Lungo.Notification.success(_('Wait'), _('WaitLong'), 'exclamation-sign', 3);
+      Lungo.Notification.success(_('Wait'), _('WaitLong'), 'warning', 3);
       setTimeout(function () {
         window.location.reload();
       }, 3000);
