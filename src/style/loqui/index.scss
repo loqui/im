@@ -2348,3 +2348,32 @@ ul#messages div span.search-result.text {
   background-color: lightskyblue;
   color: black;
 }
+
+#audiobox {
+  position: absolute;
+  top: auto;
+  bottom: 4.4rem;
+  background-color: #F9F9F9;
+  display: hidden; 
+  
+  audio {
+    position: relative;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-sizing: border-box;
+    float: left; 
+  }
+  
+  button {
+    position: absolute;
+    top: 0.3rem;
+    padding: 0;
+    border: 0;
+    font-weight: bold;
+    background: none;
+    box-sizing: border-box;
+    text-align: center;
+    float: right; 
+  }
+}
