@@ -307,7 +307,7 @@ var Store = {
         req.onerror = function () {
           if (onerror) {
             onerror(this.error);
-            if(!quiet) Lungo.Notification.error(_('Error'), _('NoSDAccess'), 'cloud-download', 5);
+            if(!quiet) Lungo.Notification.error(_('Error'), _('NoSDAccess'), 'cloud_download', 5);
           }
         };
       } else {
@@ -331,7 +331,7 @@ var Store = {
         req.onerror = function () {
           if (onerror) {
             onerror(this.error);
-            if(!quiet) Lungo.Notification.error(_('Error'), _('NoSDAccess'), 'cloud-download', 5);
+            if(!quiet) Lungo.Notification.error(_('Error'), _('NoSDAccess'), 'cloud_download', 5);
           }
         };
       } else {
@@ -370,7 +370,7 @@ var Store = {
         req.onerror = function () {
           if (onerror) {
             onerror(this.error);
-            Lungo.Notification.error(_('Error'), _('NoSDAccess'), 'cloud-download', 5);
+            Lungo.Notification.error(_('Error'), _('NoSDAccess'), 'cloud_download', 5);
           }
         };
       } else {
@@ -409,7 +409,7 @@ var Store = {
         req.onerror= function(){
           if(onerror){
             onerror(this.error);
-            Lungo.Notification.error(_('Error'), _('NoSDAccess'), 'cloud-download', 5);
+            Lungo.Notification.error(_('Error'), _('NoSDAccess'), 'cloud_download', 5);
           }
         };
 
