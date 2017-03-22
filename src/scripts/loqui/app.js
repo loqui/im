@@ -39,7 +39,7 @@ var App = {
   * @const
   */
   minorVersion: 'a',
-  
+
   platform: '',
 
   /**
@@ -853,7 +853,7 @@ var App = {
             Store.SD.save(App.pathBackup+'/'+ (new Date()).getTime() +'.backup', blob, function(){
               Lungo.Notification.success(_('Backup'), _('BackupStored'), 'save', 3);
             }, function(e){
-              Lungo.Notification.error(_('Backup'), _('BackupFailed'), 'info-outline', 5);
+              Lungo.Notification.error(_('Backup'), _('BackupFailed'), 'info_outline', 5);
               Tools.log('FAILED TO SAVE THE BACKUP', e, blob);
             });
 
@@ -999,7 +999,7 @@ var App = {
             }
           }catch(e){
             Tools.log('DECRYPT FAILED', e);
-            Lungo.Notification.error(_('DecryptionFailed'), _('DecryptionFailedLong'), 'info-outline', 4, restore.bind(null, [backupPack]));
+            Lungo.Notification.error(_('DecryptionFailed'), _('DecryptionFailedLong'), 'info_outline', 4, restore.bind(null, [backupPack]));
           }
         }, 100);
       });
@@ -1068,7 +1068,7 @@ var App = {
       callback($('section#backupPassword input')[0].value);
     };
 },
- 
+
 	runtimeApi : function() {	//Ubuntu Touch
     var trigger = 0;
   	var userSoundSet;

@@ -379,7 +379,7 @@ var bindings = function () {
   window.addEventListener('touchend', function() {
     VoiceRecorder.stop(duration => {
       if (duration < 1) {
-        Lungo.Notification.error(_('HoldToRecordTitle'), _('HoldToRecordBody'), 'info-outline', 10);
+        Lungo.Notification.error(_('HoldToRecordTitle'), _('HoldToRecordBody'), 'info_outline', 10);
       }
     });
   });
