@@ -39,7 +39,7 @@ var App = {
   * @const
   */
   minorVersion: '',
-
+  
   platform: '',
 
   /**
