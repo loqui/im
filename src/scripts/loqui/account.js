@@ -2,7 +2,7 @@
 
 /**
 * @file Holds {@link Account}
-* @author [Ad·n S·nchez de Pedro Crespo]{@link https://github.com/aesedepece}
+* @author [Ad√°n S√°nchez de Pedro Crespo]{@link https://github.com/aesedepece}
 * @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
 * @author [Christof Meerwald]{@link https://github.com/cmeerw}
 * @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
@@ -160,13 +160,13 @@ var Account = {
   test : function () {
     this.connector.connect({
       connecting: function () {
-        Lungo.Notification.show('globe', _('Connecting'));
+        Lungo.Notification.show('public', _('Connecting'));
       },
       authenticating: function () {
-        Lungo.Notification.show('key', _('SMSsending'));
+        Lungo.Notification.show('vpn_key', _('SMSsending'));
       },
       connected: function () {
-        Lungo.Notification.show('download', _('Synchronizing'));
+        Lungo.Notification.show('file_download', _('Synchronizing'));
         var cb = function () {
           // Don't add an account if already set up
           if (Accounts.find(this.core.fullJid) < 0) {
@@ -184,7 +184,7 @@ var Account = {
             Lungo.Router.section('success');
             this.connector.disconnect();
           } else {
-            //Lungo.Notification.error(_('DupliAccount'), _('DupliAccountNotice'), 'warning-sign', 5);
+            //Lungo.Notification.error(_('DupliAccount'), _('DupliAccountNotice'), 'warning', 5);
           }
           this.save();
         }.bind(this);
@@ -192,7 +192,7 @@ var Account = {
         this.sync(cb);
       }.bind(this),
       authfail: function () {
-        Lungo.Notification.error(_('NoAuth'), _('NoAuthNotice'), 'signal', 5);
+        Lungo.Notification.error(_('NoAuth'), _('NoAuthNotice'), 'settings_input_antenna', 5);
       }
     });
   },
@@ -236,7 +236,7 @@ var Account = {
           }.bind(this),
           authfail: function () {
             this._initialConnect = false;
-            Lungo.Notification.error(_('NoAuth'), _('NoAuthNotice'), 'signal', 5);
+            Lungo.Notification.error(_('NoAuth'), _('NoAuthNotice'), 'settings_input_antenna', 5);
           }.bind(this),
           connfail: function () {
             if (this.enabled == 'loading') {
@@ -732,7 +732,7 @@ var Account = {
     function OTRSetup() {
       Lungo.Router.article('otrMenu', 'otrSetup');
       $('button#setupOtr').on('click', function(e) {
-        Lungo.Notification.success(_('OTRKeygen'), _('OTRWait'), 'key', 5);
+        Lungo.Notification.success(_('OTRKeygen'), _('OTRWait'), 'vpn_key', 5);
         Lungo.Router.section('back');
         Lungo.Router.section('main');
         DSA.createInWebWorker({
@@ -744,7 +744,7 @@ var Account = {
             key: account.OTR.key.packPrivate()
           });
           account.save();
-          Lungo.Notification.success(_('OTRKeyReady'), _('OTRKeyReadyDesc'), 'ok', 5);
+          Lungo.Notification.success(_('OTRKeyReady'), _('OTRKeyReadyDesc'), 'check', 5);
           OTRSettings();
         });
       });
