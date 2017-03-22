@@ -220,7 +220,7 @@ var Menu = {
         Lungo.Router.section('main');
         Lungo.Router.section('contactAdd');
       } else {
-        Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign', 3);
+        Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'warning', 3);
       }
     },
     contactRemove: function(obj) {
@@ -301,7 +301,7 @@ var Menu = {
         searchbox.children('i#search-wait').hide();
         searchbox.children('button#search-next').hide();
         searchbox.children('button#search').show();
-        Lungo.Notification.show('info-sign', _('NoMatchFound'));
+        Lungo.Notification.show('info-outline', _('NoMatchFound'));
       });
     },
     chatLeave: function(obj) {
@@ -465,7 +465,7 @@ var Menu = {
 		if (App.platform === "FirefoxOS") {
 		  var will = confirm(_('ConfirmClose'));
 		  if (will) {
-			Lungo.Notification.success(_('Closing'), _('AppWillClose'), 'signout', 3);
+			Lungo.Notification.success(_('Closing'), _('AppWillClose'), 'cached', 3);
 			var req = navigator.mozAlarms.getAll();
 			req.onsuccess = function () {
 			  this.result.forEach(function (alarm) {
@@ -480,13 +480,13 @@ var Menu = {
 			req.onerror = function () { };
 		  }
 	  } else {
-		  Lungo.Notification.error(_('NoDevice'), _('FxOSisBetter', 'exclamation-sign'));
+		  Lungo.Notification.error(_('NoDevice'), _('FxOSisBetter'), 'warning', 3);
 	  }
     },
     reloadApp: function () {
       var sure = confirm(_('ConfirmReload'));
       if (sure) {
-        Lungo.Notification.success(_('Reloading'), _('AppWillReload'), 'signout', 3);
+        Lungo.Notification.success(_('Reloading'), _('AppWillReload'), 'cached', 3);
         App.disconnect();
         App.run();
         Tools.log(App.name + ' has been reloaded');
