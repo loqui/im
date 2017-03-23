@@ -49,7 +49,7 @@ App.connectors.XMPP = function (account) {
           if (callback.connfail) {
             callback.connfail();
           }
-          Lungo.Notification.error(_('NoAuth'), _('NoAuthNotice'), 'remove-circle', 5);
+          Lungo.Notification.error(_('NoAuth'), _('NoAuthNotice'), 'remove_circle_outline', 5);
           break;
         case Strophe.Status.AUTHENTICATING:
           Tools.log('Authenticating');

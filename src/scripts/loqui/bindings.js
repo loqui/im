@@ -109,7 +109,7 @@ $('section#me #card span.avatar').on('click', function (e) {
 	  //Ubuntu Touch: open contentHub
 	  $('#avatar_input').trigger('click');
   } else {
-    Lungo.Notification.error(_('NoDevice'), _('FxOSisBetter', 'exclamation-sign'));
+    Lungo.Notification.error(_('NoDevice'), _('FxOSisBetter', 'warning'));
   }
 });
 
@@ -176,7 +176,7 @@ $('#background_input').change(function() {
       Store.recover(account.core.background, function (key, url, free) {
         $('section#chat ul#messages').css('background-image', 'url('+url+')');
         $('section.profile div#card').css('background-image', 'url('+url+')');
-        Lungo.Notification.show('star', _('backChanged'), 3);
+        Lungo.Notification.show('star_border', _('backChanged'), 3);
 
         free();
       }.bind(this));
@@ -209,7 +209,7 @@ $('section#me #card button.background.change').on('click', function (e) {
         Store.recover(account.core.background, function (key, url, free) {
           $('section#chat ul#messages').css('background-image', 'url('+url+')');
           $('section.profile div#card').css('background-image', 'url('+url+')');
-          Lungo.Notification.show('star', _('backChanged'), 3);
+          Lungo.Notification.show('star_border', _('backChanged'), 3);
 
           free();
         }.bind(this));
@@ -222,7 +222,7 @@ $('section#me #card button.background.change').on('click', function (e) {
 	  //Ubuntu Touch: open contentHub
 	  $('#background_input').trigger('click');
   } else {
-    Lungo.Notification.error(_('NoDevice'), _('FxOSisBetter', 'exclamation-sign'));
+    Lungo.Notification.error(_('NoDevice'), _('FxOSisBetter', 'warning'));
   }
 });
 
@@ -232,7 +232,7 @@ $('section#me #card button.background.delete').on('click', function (e) {
     Store.blockDrop(account.core.background, function () {
       $('section#chat ul#messages').css('background-image', 'none');
       $('section.profile div#card').css('background-image', 'none');
-      Lungo.Notification.show('star', _('backChanged'), 3);
+      Lungo.Notification.show('star_border', _('backChanged'), 3);
     });
   }
   account.core.background = null;
@@ -371,7 +371,7 @@ var bindings = function () {
   window.addEventListener('touchend', function() {
     VoiceRecorder.stop(duration => {
       if (duration < 1) {
-        Lungo.Notification.error(_('HoldToRecordTitle'), _('HoldToRecordBody'), 'info-sign', 10);
+        Lungo.Notification.error(_('HoldToRecordTitle'), _('HoldToRecordBody'), 'info_outline', 10);
       }
     });
   });

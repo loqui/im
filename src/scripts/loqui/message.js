@@ -344,7 +344,12 @@ var Message = {
       html = html.replace(/(_)([A-Za-z0-9\s]+)(_)/g, '<i>$2</i>');
       html = html.replace(/(~)([A-Za-z0-9\s]+)(~)/g, '<s>$2</s>');
     } else if (this.core.media) {
-      html = $('<img/>').attr('src', this.core.media.thumb);
+      if (this.core.media.thumb.indexOf('base64') > 0) {
+        html = $('<img/>').attr('src', this.core.media.thumb);
+      }
+      else {
+        html = $('<i/>').attr('class', 'material-icons md-48').text(this.core.media.thumb);
+      }
       html[0].dataset.downloaded = this.core.media.downloaded || false;
       switch (this.core.media.type) {
         case 'url':

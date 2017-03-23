@@ -30,7 +30,7 @@ var Plus = {
         App.audio('thunder');
         Tools.log('Sent a bolt to', to);
       } else {
-        Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign');
+        Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'warning');
       }
     }
   },
@@ -158,7 +158,7 @@ var Plus = {
         account.connector.locationSend(to, loc);
       });
     } else {
-      Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'exclamation-sign');
+      Lungo.Notification.error(_('NoSupport'), _('XMPPisBetter'), 'warning');
     }
   },
 

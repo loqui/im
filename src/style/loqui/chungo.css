@@ -278,7 +278,7 @@ show {
   animation: popDown .2s;
   -webkit-animation: popDown .2s;
 }
-.chungo .notifier .icon {
+.chungo .notifier .material-icons {
   font-size: 5rem;
   display: block;
   width: calc(100% - 4rem);

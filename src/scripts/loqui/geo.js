@@ -42,7 +42,7 @@ var Geo = {
    */
   posGet: function (cb) {
     if (navigator && navigator.geolocation) {
-      Lungo.Notification.show('map-marker', _('Geolocating'));
+      Lungo.Notification.show('place', _('Geolocating'));
       navigator.geolocation.getCurrentPosition(Geo.success, Geo.error, {
         enableHighAccuracy : true,
         timeout : 30000
@@ -68,13 +68,13 @@ var Geo = {
    */
   error: function (err) {
     if (err.code == 1) {
-      Lungo.Notification.error(_('Error'), _('LocationDenied'), 'exclamation-sign');
+      Lungo.Notification.error(_('Error'), _('LocationDenied'), 'warning');
     } else if (err.code == 2) {
-      Lungo.Notification.error(_('Error'), _('LocationUnavailable'), 'exclamation-sign');
+      Lungo.Notification.error(_('Error'), _('LocationUnavailable'), 'warning');
     } else if (err.code == 3) {
-      Lungo.Notification.error(_('Error'), _('LocationTimedout'), 'exclamation-sign');
+      Lungo.Notification.error(_('Error'), _('LocationTimedout'), 'warning');
     } else {
-      Lungo.Notification.error(_('Error'), null, 'exclamation-sign');
+      Lungo.Notification.error(_('Error'), null, 'warning');
     }
   },
 

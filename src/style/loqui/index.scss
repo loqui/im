@@ -203,7 +203,6 @@ section {
                 background-color: transparent;
                 color: #fff;
                 width: 4.6rem;
-                font-size: 1.6rem;
             }
         }
     }
@@ -1274,19 +1273,11 @@ section nav {
         .maps,
         .video {
             height: calc(100%);
-            &[data-downloaded='true'] {
-				background-image: url('../../img/play.png');
-				background-repeat: no-repeat;
-				background-attachment: scroll;
-				background-position: left center;
-				padding-left: 48px;
+            &[data-downloaded='true']::before {
+              content: 'play_circle_outline';
             }
-            &[data-downloaded='false'] {
-				background-image: url('../../img/download.png');
-				background-repeat: no-repeat;
-				background-attachment: scroll;
-				background-position: left center;
-				padding-left: 48px;
+            &[data-downloaded='false']::before {
+              content: 'file_download';
             }
         }
 
@@ -1503,18 +1494,20 @@ section nav {
     }
 }
 
-#chat[data-otr=true] #messages:after {
-    content: '\f023';
+#chat[data-otr=true] #messages + i {
     position: fixed;
-    font-family: lungojsicon;
     font-weight: 700;
-    font-size: 12rem;
+    font-size: 16rem;
     color: #E95644;
-    top: calc(50vh - 6rem);
-    left: calc(50vw - 4rem);
+    top: calc(50vh - 8rem);
+    left: calc(50vw - 8rem);
     transform: rotate(-20deg);
     opacity: .2;
     pointer-events: none;
+}
+
+#chat[data-otr=false] #messages + i {
+    visibility: hidden;
 }
 
 .ubuntu-touch-content-hub-input {
@@ -1879,7 +1872,7 @@ aside .menu {
         margin-bottom: 1rem;
     }
 
-    .icon {
+    i {
         position: absolute;
         bottom: .9rem;
         height: 2.8rem;
@@ -2205,14 +2198,10 @@ ul:not([data-enabled='true']) .avatar:after {
     height: 5.6rem;
     box-shadow: 0 0 3px rgba(0, 0, 0, .3), 0 5px 5px rgba(0, 0, 0, .4);
     transition: all .2s ease;
-
-    &:before {
-        color: #fff;
-        font-size: 2.4rem;
-        position: relative;
-        top: 1.5rem;
-        left: 1.7rem;
-    }
+    line-height: 5.6rem;
+    text-align: center;
+    color: white;
+    font-size: 3.5rem;
 
     &.hidden {
         bottom: -10rem;
@@ -2285,23 +2274,21 @@ ul:not([data-enabled='true']) .avatar:after {
 .help button {
   background: none repeat scroll 0% 0% transparent;
   border: 0px none;
-  width: 3.4rem;
-  padding-left: 1rem;
+  width: 3.3rem;
+  padding-left: 0.6rem;
   position: relative;
-  font-size: 2rem;
   color: lightgrey;
 }
 
 .help-left button {
   background: none repeat scroll 0% 0% transparent;
   border: 0px none;
-  width: 2.2rem;
-  padding-left: 0.3rem;
+  width: 2.3rem;
+  padding-left: 0;
   position: fixed;
   left: 4.6rem;
-  font-size: 2rem;
   color: lightgrey;
-  }
+}
 
 #searchbox {
   position: relative;

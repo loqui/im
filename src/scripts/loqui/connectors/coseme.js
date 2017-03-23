@@ -1228,7 +1228,7 @@ App.connectors.coseme = function (account) {
   this.contacts.sync = function (cb) {
     if (App.online) {
       Tools.log('SYNCING CONTACTS');
-      Lungo.Notification.show('download', _('Synchronizing'), 5);
+      Lungo.Notification.show('file_download', _('Synchronizing'), 5);
       var account = this.account;
       var contacts = this.contacts;
       contacts._pre = [];
@@ -1266,7 +1266,7 @@ App.connectors.coseme = function (account) {
         };
         allContacts.onerror = function (event) {
           Tools.log('CONTACTS ERROR:', event);
-          Lungo.Notification.error(_('ContactsGetError'), _('ContactsGetErrorExp'), 'exclamation-sign', 5);
+          Lungo.Notification.error(_('ContactsGetError'), _('ContactsGetErrorExp'), 'warning', 5);
           cb();
         };
         if(App.platform === "UbuntuTouch") {
@@ -1282,7 +1282,7 @@ App.connectors.coseme = function (account) {
         	$('#contacts_input').trigger('click');
         }
       } else {
-        Lungo.Notification.error(_('ContactsGetError'), _('NoWhenOffline'), 'exclamation-sign', 5);
+        Lungo.Notification.error(_('ContactsGetError'), _('NoWhenOffline'), 'warning', 5);
       }
     }.bind(this);
 	
@@ -1487,7 +1487,7 @@ App.connectors.coseme = function (account) {
             data: aB64OrigHash
           };
           Tools.log('TEMP_STORING', aB64Hash, Store.cache[aB64Hash].data);
-          Lungo.Notification.show('up-sign', _('Uploading'), 3);
+          Lungo.Notification.show('file_upload', _('Uploading'), 3);
           var method = 'media_requestUpload';
           MI.call(method, [aB64Hash, aT, aSize]);
         });
@@ -2129,15 +2129,15 @@ App.connectors.coseme = function (account) {
     };
 
     this.events.onGroupRemoveParticipantsSuccess = function (jid, participants) {
-      Lungo.Notification.success(_('Removed'), null, 'trash', 3);
+      Lungo.Notification.success(_('Removed'), null, 'delete', 3);
     };
 
     this.events.onGroupEndSuccess = function (gid) {
-      Lungo.Notification.success(_('Removed'), null, 'trash', 3);
+      Lungo.Notification.success(_('Removed'), null, 'delete', 3);
     };
 
     this.events.onGroupCreateSuccess = function (gid, idx) {
-      Lungo.Notification.show('download', _('Synchronizing'), 5);
+      Lungo.Notification.show('file_download', _('Synchronizing'), 5);
       Lungo.Router.section('back');
       var members = this.muc.membersCache[idx];
       if (members.length) {
@@ -2369,7 +2369,7 @@ App.connectors.coseme = function (account) {
     };
 
     this.events.onProfileSetPictureError = function (err) {
-      Lungo.Notification.error(_('NotUploaded'), _('ErrorUploading'), 'warning-sign', 5);
+      Lungo.Notification.error(_('NotUploaded'), _('ErrorUploading'), 'warning', 5);
     };
 
     this.events.onUploadRequestSuccess = function (hash, url, resumeFrom) {
@@ -2409,14 +2409,14 @@ App.connectors.coseme = function (account) {
           Store.SD.save(localUrl, blob);
           delete Store.cache[hash];
         });
-        Lungo.Notification.show('up-sign', _('Uploaded'), 1);
+        Lungo.Notification.show('file_upload', _('Uploaded'), 1);
         $('#main #footbox progress').val('0');
       };
       var onError = function (error) {
         Lungo.Notification.error(
           _('NotUploaded'),
           _('ErrorUploading'),
-          'warning-sign', 5
+          'warning', 5
         );
         Tools.log(error);
         $('#main #footbox progress').val('0');
@@ -2427,10 +2427,10 @@ App.connectors.coseme = function (account) {
       media.upload(toJID, blob, uploadUrl, onSuccess, onError, onProgress);
     };
     this.events.onUploadRequestFailed = function (hash) {
-      Lungo.Notification.error(_('NotUploaded'), _('ErrorUploading'), 'warning-sign', 5);
+      Lungo.Notification.error(_('NotUploaded'), _('ErrorUploading'), 'warning', 5);
     };
     this.events.onUploadRequestDuplicate = function (hash) {
-      Lungo.Notification.error(_('NotUploaded'), _('DuplicatedUpload'), 'warning-sign', 5);
+      Lungo.Notification.error(_('NotUploaded'), _('DuplicatedUpload'), 'warning', 5);
     };
     this.addMediaMessageToChat = function(type, data, url, payload, from, to, id) {
       var account = this.account;
@@ -2493,17 +2493,17 @@ App.connectors.coseme = function (account) {
                        120, null, process);
         break;
         case 'video':
-        process('img/video.png');
+        process('videocam');
         break;
         case 'audio':
-        process('img/audio.png');
+        process('audiotrack');
         break;
         case 'url':
         mediaUrl = 'https://maps.google.com/maps?q=' + payload[0] + ',' + payload[1];
-        process('img/location.png');
+        process('location_on');
         break;
         case 'vCard':
-        process('img/contact.png');
+        process('contact_phone');
         break;
       }
     };
@@ -2637,17 +2637,17 @@ events: function (target) {
     user = $(article).find('[name="user"]').val();
     cc  = $(article).find('[name="country"]').val();
     if (cc && user) {
-      Lungo.Notification.show('envelope', _('SMSsending'));
+      Lungo.Notification.show('textsms', _('SMSsending'));
       codeGet = function (deviceId) {
         $(article)[0].dataset.deviceId= deviceId;
         var onsent = function (data) {
           Tools.log(data);
           if (data.status == 'sent') {
             Tools.log('Sent SMS to', cc, user, 'with DID', deviceId, 'retry after', data.retry_after);
-            Lungo.Notification.success(_('SMSsent'), _('SMSsentExp'), 'envelope', 3);
+            Lungo.Notification.success(_('SMSsent'), _('SMSsentExp'), 'textsms', 3);
             form.addClass('hidden');
             form.siblings('.code').removeClass('hidden');
-          } else if (data.status == 'ok') {
+          } else if (data.status == 'check') {
             if (data.type == 'existing' || data.type == 'new') {
               var account = Make(Account)({
                 user: user,
@@ -2661,11 +2661,11 @@ events: function (target) {
               account.test();
             } else {
               Tools.log('Not valid', 'Reason:', data.reason, 'with DID', deviceId);
-              Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
+              Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'warning', 5);
             }
           } else {
             Tools.log('Could not sent SMS', 'Reason:', data.reason, 'with DID', deviceId);
-            Lungo.Notification.error(_('SMSnotSent'), _('SMSreason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
+            Lungo.Notification.error(_('SMSnotSent'), _('SMSreason_' + data.reason, {retry: data.retry_after}), 'warning', 5);
           }
         };
         var onerror = function (data) {};
@@ -2701,7 +2701,7 @@ events: function (target) {
             Lungo.Notification.success(_('voicesent'), _('voicesentExp'), 'phone', 3);
             form.addClass('hidden');
             form.siblings('.code').removeClass('hidden');
-          } else if (data.status == 'ok') {
+          } else if (data.status == 'check') {
             if (data.type == 'existing' || data.type == 'new') {
               var account = Make(Account)({
                 user: user,
@@ -2715,11 +2715,11 @@ events: function (target) {
               account.test();
             } else {
               Tools.log('Not valid', 'Reason:', data.reason, 'with DID', deviceId);
-              Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
+              Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'warning', 5);
             }
           } else {
             Tools.log('Could not sent phone call', 'Reason:', data.reason, 'with DID', deviceId);
-            Lungo.Notification.error(_('VoicenotSent'), _('SMSreason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
+            Lungo.Notification.error(_('VoicenotSent'), _('SMSreason_' + data.reason, {retry: data.retry_after}), 'warning', 5);
           }
         };
         var onerror = function (data) {};
@@ -2766,9 +2766,9 @@ events: function (target) {
         };
         var onerror = function (error) {
           Tools.log('Not valid', 'Reason:', data.reason);
-          Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'exclamation-sign', 5);
+          Lungo.Notification.error(_('CodeNotValid'), _('CodeReason_' + data.reason, {retry: data.retry_after}), 'warning', 5);
         };
-        Lungo.Notification.show('copy', _('CodeValidating'));
+        Lungo.Notification.show('content_copy', _('CodeValidating'));
         CoSeMe.registration.register(cc, user, rCode, onready, onerror, deviceId);
       };
       onhasid = function (file) {

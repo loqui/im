@@ -825,7 +825,7 @@ var App = {
       Promise.all(jobs).then(function(){
         Lungo.Notification.hide();
         App.requestPassword('Backup', function(password){
-          Lungo.Notification.show('lock', _('EncryptingData'));
+          Lungo.Notification.show('lock_outline', _('EncryptingData'));
           setTimeout(function(){
             Object.keys(chatChunks).forEach(function(key){
               this[key]= CryptoJS.AES.encrypt(JSON.stringify(this[key]), password).toString();
@@ -853,7 +853,7 @@ var App = {
             Store.SD.save(App.pathBackup+'/'+ (new Date()).getTime() +'.backup', blob, function(){
               Lungo.Notification.success(_('Backup'), _('BackupStored'), 'save', 3);
             }, function(e){
-              Lungo.Notification.error(_('Backup'), _('BackupFailed'), 'info-sign', 5);
+              Lungo.Notification.error(_('Backup'), _('BackupFailed'), 'info_outline', 5);
               Tools.log('FAILED TO SAVE THE BACKUP', e, blob);
             });
 
@@ -871,7 +871,7 @@ var App = {
     var restore= function(backupPack){
       App.requestPassword('Restore', function(password){
         var backup= JSON.parse(backupPack);
-        Lungo.Notification.show('unlock', _('DecryptingData'));
+        Lungo.Notification.show('lock_open', _('DecryptingData'));
         setTimeout(function(){
           try{
             Object.keys(backup.chatChunks).forEach(function(key){
@@ -912,7 +912,7 @@ var App = {
 
             if(confirm(_('BackupApplyRequest'))){
               Tools.log('REMOVING CURRENT DATA');
-              Lungo.Notification.show('trash', _('RemovingCurrentData'));
+              Lungo.Notification.show('delete', _('RemovingCurrentData'));
 
               var jobs= [];
 
@@ -921,7 +921,7 @@ var App = {
               }
 
               Promise.all(jobs).then(function(){
-                Lungo.Notification.show('download', _('ApplyingBackup'));
+                Lungo.Notification.show('file_download', _('ApplyingBackup'));
 
                 Store.size= 0;
                 jobs= [];
@@ -999,7 +999,7 @@ var App = {
             }
           }catch(e){
             Tools.log('DECRYPT FAILED', e);
-            Lungo.Notification.error(_('DecryptionFailed'), _('DecryptionFailedLong'), 'info-sign', 4, restore.bind(null, [backupPack]));
+            Lungo.Notification.error(_('DecryptionFailed'), _('DecryptionFailedLong'), 'info_outline', 4, restore.bind(null, [backupPack]));
           }
         }, 100);
       });
@@ -1068,7 +1068,7 @@ var App = {
       callback($('section#backupPassword input')[0].value);
     };
 },
- 
+
 	runtimeApi : function() {	//Ubuntu Touch
     var trigger = 0;
   	var userSoundSet;
