@@ -228,7 +228,7 @@ var App = {
     Account: {
       core: {
         enabled: true,
-        resource: 'Loqui' + '-' + (Lungo.Core.environment().os ? Lungo.Core.environment().os.name : 'PC'),
+        resource: 'Loqui' + '-' + (Lungo.Core.environment().os ? Lungo.Core.environment().os.name : 'Ubuntu'),
         OTR: {
           enabled: false,
           key: null,
@@ -406,7 +406,7 @@ var App = {
 	  }
     App.defaults.Connector.presence.status = _('DefaultStatus', {
       app: App.name,
-      platform: (Lungo.Core.environment().os ? Lungo.Core.environment().os.name : 'PC')
+      platform: (Lungo.Core.environment().os ? Lungo.Core.environment().os.name : 'Ubuntu')
     });
 
     App.defaults.Selects.language[0] = { caption : _('Default'), value : 'default' };
