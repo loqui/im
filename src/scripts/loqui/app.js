@@ -228,7 +228,7 @@ var App = {
     Account: {
       core: {
         enabled: true,
-        resource: 'Loqui' + '-' + (Lungo.Core.environment().os ? Lungo.Core.environment().os.name : 'PC'),
+        resource: 'Loqui' + '-' + (Lungo.Core.environment().os ? Lungo.Core.environment().os.name : 'Ubuntu'),
         OTR: {
           enabled: false,
           key: null,
