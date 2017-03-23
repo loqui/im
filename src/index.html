@@ -104,7 +104,7 @@
         {{#each settings}}
           <li data-key="{{key}}" data-value="{{value}}">
             <span>{{caption}}</span>
-            <div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>
+            <div class="switch"><div class="ball"></div><i class="material-icons">check</i></div>
           </li>
         {{/each}}
       </script>
@@ -128,7 +128,7 @@
         {{#each settings}}
           <li data-key="{{key}}" data-value="{{value}}">
             <span>{{caption}}</span>
-            <div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>
+            <div class="switch"><div class="ball"></div><i class="material-icons">check</i></div>
           </li>
         {{/each}}
       </script>
@@ -331,7 +331,7 @@
     </article>
     <article id="searchbox">
       <i id="search-wait" class="material-icons">hourglass_empty</i>
-      <button id="search" class="recommend left" data-menu-onclick="chatSearch"><i class="material-icons">search</i></button>
+      <button id="search-start" class="recommend left" data-menu-onclick="chatSearch"><i class="material-icons">search</i></button>
       <button id="search-next" class="recommend left" data-menu-onclick="chatSearch"><i class="material-icons">arrow_upward</i></button>
       <input></input>
       <span data-menu-onclick="chatSearchClear"><i class="material-icons">cancel</i></span>
@@ -359,12 +359,8 @@
     </article>
   </section>
   <div id="debugConsole">
-    <div id="showConsole">
-     <img src="img/console-active.png" >
-    </div>
-    <div id="hideConsole">
-     <img src="img/console-inactive.png" >
-    </div>
+    <i id="showConsole" class="material-icons md-24">add_circle</i>
+    <i id="hideConsole" class="material-icons md-24">remove_circle</i>
     <div id="console" >
       <div id="backgroundConsole"></div>
       <div id="bodyConsole">
@@ -542,7 +538,7 @@
             <li data-account-index="{{index}}" data-value="{{enabled}}">
               <img class="provider" src="img/providers/{{data.core.provider}}.svg" />
               <span>{{data.core.user}}</span>
-              <div class="switch"><div class="ball"></div><img class="tick" src="img/tick.svg"></div>
+              <div class="switch"><div class="ball"></div><i class="material-icons">check</i></div>
             </li>
           {{/each}}
         </script>

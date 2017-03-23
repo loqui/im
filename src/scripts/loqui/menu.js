@@ -252,7 +252,7 @@ var Menu = {
         searchbox.children('span').hide();
         searchbox.children('i#search-wait').hide();
         searchbox.children('button#search-next').hide();
-        searchbox.children('button#search').show();
+        searchbox.children('button#search-start').show();
         searchbox.children('input').val('').focus();
       }
       else {
@@ -264,7 +264,7 @@ var Menu = {
       searchbox.children('span').hide();
       searchbox.children('i#search-wait').hide();
       searchbox.children('button#search-next').hide();
-      searchbox.children('button#search').show();
+      searchbox.children('button#search-start').show();
       searchbox.children('input').val('').focus();
       $('ul#messages span.text.search-result').removeClass("search-result");
     },
@@ -275,7 +275,7 @@ var Menu = {
       var needle = searchbox.children('input').val().trim();
 
       searchbox.children('i#search-wait').show();
-      searchbox.children('button#search').hide();
+      searchbox.children('button#search-start').hide();
       searchbox.children('input')[0].disable = true;
 
       chat.findInChat(needle).then(function(found) {
@@ -300,7 +300,7 @@ var Menu = {
       }, function() {
         searchbox.children('i#search-wait').hide();
         searchbox.children('button#search-next').hide();
-        searchbox.children('button#search').show();
+        searchbox.children('button#search-start').show();
         Lungo.Notification.show('info-outline', _('NoMatchFound'));
       });
     },
