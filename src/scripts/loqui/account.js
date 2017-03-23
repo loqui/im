@@ -652,18 +652,18 @@ var Account = {
     var header = $('<header/>').addClass('beige');
     var input = $('<input/>').attr('id', 'searchInput')
                 .on('input', function (event) {
-                  var ele = event.target;
-                  if(ele.value)
-                    ele.nextSibling.className = '';
+                  var ele = $(event.target);
+                  if(ele.val())
+                    ele.next().removeClass('hidden');
                   else
-                    ele.nextSibling.className = 'hidden';
+                    ele.next().addClass('hidden');
                   account.search(article, this.value, click);
                 });
     var reset = $('<span/>').attr('id', 'reset')
-                .addClass('hidden')
+                .addClass('material-icons hidden').text('cancel')
                 .on('click', function (event) {
-                  this.previousSibling.value = '';
-                  this.className = 'hidden';
+                  $(this).prev().val('');
+                  $(this).addClass('hidden');
                   account.search(article, '', click);
                 });
     header.append(input).append(reset);

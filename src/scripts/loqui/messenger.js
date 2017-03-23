@@ -142,7 +142,7 @@ var Messenger = {
       li.append(
         $('<span/>').addClass('caption').text(_('AccountSet' + key))
       ).append(
-        $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>')
+        $('<div class="switch"><div class="ball"></div><i class="material-icons">check</i></div>')
       );
 
       if (value.length > 1 && value[1]) {
@@ -258,7 +258,7 @@ var Messenger = {
         li.append(
           $('<span/>').addClass('caption').text(_('AccountSet' + key))
         ).append(
-          $('<div class="switch"><div class="ball"></div><img src="img/tick.svg" class="tick" /></div>')
+          $('<div class="switch"><div class="ball"></div><i class="material-icons">check</i></div>')
         );
         li[0].dataset.value= (value.length > 1 ? value[0] : value);
         li.bind('click', accountSwitch);
