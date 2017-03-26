@@ -448,15 +448,36 @@ var Message = {
                   var propWidth = prop.width;
                   image.setAttribute('id', 'image');
                   image.setAttribute('src', output);
-                  if(propWidth/propHeight > w/h) {
+                  if (propWidth/propHeight > w/h) {
                     image.setAttribute('width', w);
-                  }
-                  else {
+                  } else {
                     image.setAttribute('height', h);
                   }
-				  chat.after(image);
+                  var notZoomedWidth = image.getAttribute('width');
+                  var notZoomedHeight = image.getAttribute('height');
+                  var closeButton = document.createElement('p');
+                  closeButton.setAttribute('style', 'position: relative; margin-top: 54px; margin-left: 3px; z-index = 10001;');
+                  var closeImage = document.createElement('img');
+                  closeImage.setAttribute('src', 'img/console-inactive.png');
+                  closeButton.appendChild(closeImage);
+                  var divContainer = document.createElement('div');
+                  divContainer.setAttribute('style', 'overflow: auto; position: fixed; top: 0px; left: 0; height: 100%; width: 100%; z-index = 10000; -webkit-overflow-scrolling: touch;');
+                  divContainer.appendChild(closeButton);
+                  divContainer.appendChild(image);
+				  chat.after(divContainer);
+                  $(closeButton).click(function () {
+                	  divContainer.remove();
+                  });
+                  var zoomed = false;
                   $('img#image').click(function () {
-                    image.remove();
+                	  if (zoomed) {
+                    	  image.setAttribute('width', notZoomedWidth);
+                    	  image.setAttribute('height', notZoomedHeight);
+                	  } else {
+                		  image.setAttribute('width', propWidth);
+                		  image.setAttribute('height', propHeight);
+                	  }
+                	  zoomed = !zoomed;
                   });
                 }
                 else if(type == 'data:audio') {
