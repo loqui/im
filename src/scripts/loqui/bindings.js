@@ -2,7 +2,7 @@
 
 /**
 * @file Contains all the bindings
-* @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
+* @author [AdÃ¡n SÃ¡nchez de Pedro Crespo]{@link https://github.com/aesedepece}
 * @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
 * @author [Christof Meerwald]{@link https://github.com/cmeerw}
 * @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
@@ -142,15 +142,44 @@ var listener= function(muc){
 		var propWidth = prop.width;
 		image.setAttribute('id', 'image');
 		image.setAttribute('src', url);
-		if(propWidth/propHeight > w/h) {
+		if(propWidth/propHeight > w/(h - 37)) {
 			image.setAttribute('width', w);
 		} else {
-			image.setAttribute('height', h);
+			image.setAttribute('height', h - 37);
 		}
-		section.after(image);
-                $('img#image').click(function () {
-                  image.remove();
-                });
+		  var notZoomedWidth = image.getAttribute('width');
+		  var notZoomedHeight = image.getAttribute('height');
+		  var closeButton = document.createElement('i');
+		  closeButton.setAttribute('id', 'closeButton');
+		  closeButton.setAttribute('class', 'material-icons md-36');
+		  closeButton.textContent = 'cancel';
+		  var divContainer = document.createElement('div');
+		  divContainer.setAttribute('id', 'preview');
+		  divContainer.appendChild(image);
+		  divContainer.appendChild(closeButton);
+		  section.after(divContainer);
+		  $(closeButton).click(function () {
+			  divContainer.remove();
+		  });
+		  var zoomed = false;
+		  if(propHeight > (h - 37) || propWidth > w) {
+			  $('img#image').click(function () {
+				  if (zoomed) {
+					  closeButton.setAttribute('id', 'closeButton');
+					  divContainer.replaceChild(closeButton, closeButton);
+					  image.setAttribute('width', notZoomedWidth);
+					  image.setAttribute('height', notZoomedHeight);
+				  } else {
+                      if(propHeight > (h - 37)) {				
+                         closeButton.setAttribute('id', 'closeButtonZoomed');
+					     divContainer.replaceChild(closeButton, closeButton);
+                      }					
+                      image.setAttribute('width', propWidth);
+					  image.setAttribute('height', propHeight);
+				  }
+				  zoomed = !zoomed;
+			  });
+		  }
             }
       free();
     });
