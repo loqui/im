@@ -2,7 +2,7 @@
 
 /**
 * @file Holds {@link Message}
-* @author [Adán Sánchez de Pedro Crespo]{@link https://github.com/aesedepece}
+* @author [AdÃ¡n SÃ¡nchez de Pedro Crespo]{@link https://github.com/aesedepece}
 * @author [Jovan Gerodetti]{@link https://github.com/TitanNano}
 * @author [Christof Meerwald]{@link https://github.com/cmeerw}
 * @author [Giovanny Andres Gongora Granada]{@link https://github.com/Gioyik}
@@ -323,7 +323,7 @@ var Message = {
    */
   reRender : function(blockIndex, old_id){
     if($('section#chat')[0].dataset.jid == this.core.to){
-      var element= $('section#chat ul#messages li[data-chunk="' + blockIndex + '"] div[data-id="' + (old_id || this.core.id) + '"]');
+      var element= $('section#chat ul#messages li[data-chunk="' + blockIndex + '"] div[data-id="' + (old_id ||Â this.core.id) + '"]');
       element.replaceWith(this.preRender());
     }
   },
@@ -448,20 +448,21 @@ var Message = {
                   var propWidth = prop.width;
                   image.setAttribute('id', 'image');
                   image.setAttribute('src', output);
-                  if (propWidth/propHeight > w/h) {
+                  if (propWidth/propHeight > w/(h - 37)) {
                     image.setAttribute('width', w);
                   } else {
-                    image.setAttribute('height', h);
+                    image.setAttribute('height', h - 37);
                   }
                   var notZoomedWidth = image.getAttribute('width');
                   var notZoomedHeight = image.getAttribute('height');
-                  var closeButton = document.createElement('p');
-                  closeButton.setAttribute('style', 'position: relative; margin-top: 54px; margin-left: 3px; z-index = 10001;');
-                  var closeImage = document.createElement('img');
-                  closeImage.setAttribute('src', 'img/console-inactive.png');
-                  closeButton.appendChild(closeImage);
-                  var divContainer = document.createElement('div');
-                  divContainer.setAttribute('style', 'overflow: auto; position: fixed; top: 0px; left: 0; height: 100%; width: 100%; z-index = 10000; -webkit-overflow-scrolling: touch;');
+				  var closeButton = document.createElement('p');
+				  closeButton.setAttribute('id', 'closeButton');
+				  var closeImage = document.createElement('i');
+				  closeImage.setAttribute('class', 'material-icons md-36');
+				  closeImage.textContent = 'cancel';
+				  closeButton.appendChild(closeImage);
+				  var divContainer = document.createElement('div');
+                  divContainer.setAttribute('id', 'preview');
                   divContainer.appendChild(closeButton);
                   divContainer.appendChild(image);
 				  chat.after(divContainer);
@@ -469,17 +470,24 @@ var Message = {
                 	  divContainer.remove();
                   });
                   var zoomed = false;
-                  $('img#image').click(function () {
-                	  if (zoomed) {
-                    	  image.setAttribute('width', notZoomedWidth);
-                    	  image.setAttribute('height', notZoomedHeight);
-                	  } else {
-                		  image.setAttribute('width', propWidth);
-                		  image.setAttribute('height', propHeight);
-                	  }
-                	  zoomed = !zoomed;
-                  });
-                }
+                  if(propHeight > (h - 37) || propWidth > w) {
+					  $('img#image').click(function () {
+						  if (zoomed) {
+							  closeButton.setAttribute('id', 'closeButton');
+							  divContainer.replaceChild(closeButton, closeButton);
+							  image.setAttribute('width', notZoomedWidth);
+							  image.setAttribute('height', notZoomedHeight);
+						  } else {
+                              if(propHeight > (h - 37)) {						
+                                 closeButton.setAttribute('id', 'closeButtonZoomed');
+							     divContainer.replaceChild(closeButton, closeButton);
+                              }						
+                              image.setAttribute('width', propWidth);
+							  image.setAttribute('height', propHeight);
+						  }
+						  zoomed = !zoomed;
+					  });
+				  }
                 else if(type == 'data:audio') {
 				
                   var audio = document.getElementById('newAudio');
