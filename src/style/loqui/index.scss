@@ -2352,3 +2352,28 @@ ul#messages div span.search-result.text {
     float: right;
   }
 }
+
+#preview {
+	overflow: auto;
+    position: relative;
+    top: 0;
+    left: 0;
+	max-height: calc(100% - 97px);
+    width: 100%;
+    z-index = 10000;
+    -webkit-overflow-scrolling: touch; 
+}
+	
+#closeButton {
+	position: relative;
+	margin-top: 3px;
+	left: 3px;
+	z-index = 10001; 
+}
+	
+#closeButtonZoomed {
+	position: fixed;
+	bottom: 3px;
+	left: 3px;
+	z-index = 10001; 
+}
