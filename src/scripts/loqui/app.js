@@ -389,12 +389,6 @@ var App = {
   * @memberof App
   */
   get unread () {
-	  if(this.accounts.reduce(function (prev, cur) {return prev + cur.unread;}, 0) !=0 && App.platform === "UbuntuTouch") {
-		for (var i in this.accounts) {
-		  var account = this.accounts[i];
-		  account.connector.notifyUT();
-		}
-	  }
     return this.accounts.reduce(function (prev, cur) {return prev + cur.unread;}, 0);
   },
 

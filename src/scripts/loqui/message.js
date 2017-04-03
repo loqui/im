@@ -323,7 +323,7 @@ var Message = {
    */
   reRender : function(blockIndex, old_id){
     if($('section#chat')[0].dataset.jid == this.core.to){
-      var element= $('section#chat ul#messages li[data-chunk="' + blockIndex + '"] div[data-id="' + (old_id ||Â this.core.id) + '"]');
+      var element= $('section#chat ul#messages li[data-chunk="' + blockIndex + '"] div[data-id="' + (old_id || this.core.id) + '"]');
       element.replaceWith(this.preRender());
     }
   },
@@ -487,7 +487,8 @@ var Message = {
 						  }
 						  zoomed = !zoomed;
 					  });
-				  }
+				}
+				}
                 else if(type == 'data:audio') {
 				
                   var audio = document.getElementById('newAudio');
