@@ -321,9 +321,9 @@ var Message = {
    * @param {number} blockIndex
    * @param {string} old_id
    */
-  reRender : function(blockIndex, old_id){
-    if($('section#chat')[0].dataset.jid == this.core.to){
-      var element= $('section#chat ul#messages li[data-chunk="' + blockIndex + '"] div[data-id="' + (old_id ||Â this.core.id) + '"]');
+  reRender : function(blockIndex, old_id) {
+    if($('section#chat')[0].dataset.jid == this.core.to) {
+      var element = $('section#chat ul#messages li[data-chunk="' + blockIndex + '"] div[data-id="' + (old_id || this.core.id) + '"]');
       element.replaceWith(this.preRender());
     }
   },
@@ -440,7 +440,7 @@ var Message = {
                   }
                 }; // Not working yet
                 //download('file.jpg', atob(output.split(',')[1]));
-                if(type == 'data:image') {
+                if (type == 'data:image') {
                   var image = document.createElement('img');
                   var prop = new Image();
                   prop.src = output;
@@ -450,94 +450,94 @@ var Message = {
                   image.setAttribute('src', output);
                   if (propWidth/propHeight > w/(h - 37)) {
                     image.setAttribute('width', w);
-                  } else {
+                  }
+                  else {
                     image.setAttribute('height', h - 37);
                   }
                   var notZoomedWidth = image.getAttribute('width');
                   var notZoomedHeight = image.getAttribute('height');
-				  var closeButton = document.createElement('p');
-				  closeButton.setAttribute('id', 'closeButton');
-				  var closeImage = document.createElement('i');
-				  closeImage.setAttribute('class', 'material-icons md-36');
-				  closeImage.textContent = 'cancel';
-				  closeButton.appendChild(closeImage);
-				  var divContainer = document.createElement('div');
+                  var closeButton = document.createElement('p');
+                  closeButton.setAttribute('id', 'closeButton');
+                  var closeImage = document.createElement('i');
+                  closeImage.setAttribute('class', 'material-icons md-36');
+                  closeImage.textContent = 'cancel';
+                  closeButton.appendChild(closeImage);
+                  var divContainer = document.createElement('div');
                   divContainer.setAttribute('id', 'preview');
                   divContainer.appendChild(closeButton);
                   divContainer.appendChild(image);
-				  chat.after(divContainer);
+                  chat.after(divContainer);
                   $(closeButton).click(function () {
                 	  divContainer.remove();
                   });
                   var zoomed = false;
-                  if(propHeight > (h - 37) || propWidth > w) {
-					  $('img#image').click(function () {
-						  if (zoomed) {
-							  closeButton.setAttribute('id', 'closeButton');
-							  divContainer.replaceChild(closeButton, closeButton);
-							  image.setAttribute('width', notZoomedWidth);
-							  image.setAttribute('height', notZoomedHeight);
-						  } else {
-                              if(propHeight > (h - 37)) {						
-                                 closeButton.setAttribute('id', 'closeButtonZoomed');
-							     divContainer.replaceChild(closeButton, closeButton);
-                              }						
-                              image.setAttribute('width', propWidth);
-							  image.setAttribute('height', propHeight);
-						  }
-						  zoomed = !zoomed;
-					  });
-				  }
-                else if(type == 'data:audio') {
-				
-                  var audio = document.getElementById('newAudio');
-                  audio.setAttribute("src", output);
-                  audio.load();
-					
-				  var audiobox = $('section#chat article#audiobox');
-				  audiobox.show();
-				  
-                  $('section#chat article#audiobox button#close').click(function () {
-					audio.pause();
-					audio.setAttribute("src", "");
-					audio.load();
-                    audiobox.hide();
-                  });
-                }
-                else if(type == 'data:video') {
-                  var addSourceToVideo = function(element, src, type) {
-                    var source = document.createElement('source');
-                    source.src = src;
-                    source.type = type;
-                    element.appendChild(source);
-                  };
-                  var video = document.createElement('video');
-				  video.controls = true;
-				  video.setAttribute('id', 'vid');
-				  video.controls = true;
-				  chat.after(video);
-                  addSourceToVideo(video, output, blob.type);
-                  var propHeight = video.videoHeight;
-                  var propWidth = video.videoWidth;
-                  if(propWidth/propHeight > w/h) {
-                    video.setAttribute('width', w);
+                  if (propHeight > (h - 37) || propWidth > w) {
+                    $('img#image').click(function () {
+                      if (zoomed) {
+                        closeButton.setAttribute('id', 'closeButton');
+                        divContainer.replaceChild(closeButton, closeButton);
+                        image.setAttribute('width', notZoomedWidth);
+                        image.setAttribute('height', notZoomedHeight);
+                      }
+                      else {
+                        if (propHeight > (h - 37)) {
+                          closeButton.setAttribute('id', 'closeButtonZoomed');
+                          divContainer.replaceChild(closeButton, closeButton);
+                        }
+                        image.setAttribute('width', propWidth);
+                        image.setAttribute('height', propHeight);
+                      }
+                      zoomed = !zoomed;
+                    });
                   }
-                  else {
-                    video.setAttribute('height', h);
+                  else if (type == 'data:audio') {
+                    var audio = document.getElementById('newAudio');
+                    audio.setAttribute("src", output);
+                    audio.load();
+                    var audiobox = $('section#chat article#audiobox');
+                    audiobox.show();
+                    $('section#chat article#audiobox button#close').click(function () {
+                      audio.pause();
+                      audio.setAttribute("src", "");
+                      audio.load();
+                      audiobox.hide();
+                    });
                   }
-                  $("video#vid").on('swipe', function () {
-                    video.remove();
-                  });
-                  $("video#vid").click(function () {
-                    if (video.paused == false) {
-                      video.pause();
-                      video.firstChild.nodeValue = 'Play';
+                  else if (type == 'data:video') {
+                    var addSourceToVideo = function(element, src, type) {
+                      var source = document.createElement('source');
+                      source.src = src;
+                      source.type = type;
+                      element.appendChild(source);
+                    };
+                    var video = document.createElement('video');
+                    video.controls = true;
+                    video.setAttribute('id', 'vid');
+                    video.controls = true;
+                    chat.after(video);
+                    addSourceToVideo(video, output, blob.type);
+                    var propHeight = video.videoHeight;
+                    var propWidth = video.videoWidth;
+                    if (propWidth/propHeight > w/h) {
+                      video.setAttribute('width', w);
                     }
                     else {
-                      video.play();
-                      video.firstChild.nodeValue = 'Pause';
+                      video.setAttribute('height', h);
                     }
-                  });
+                    $("video#vid").on('swipe', function () {
+                      video.remove();
+                    });
+                    $("video#vid").click(function () {
+                      if (video.paused == false) {
+                        video.pause();
+                        video.firstChild.nodeValue = 'Play';
+                      }
+                      else {
+                        video.play();
+                        video.firstChild.nodeValue = 'Pause';
+                      }
+                    });
+                  }
                 }
               }
             });

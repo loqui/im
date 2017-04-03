@@ -976,7 +976,12 @@ App.connectors.coseme = function (account) {
       Promise.all(allDone).then(function (v) {
         Tools.log('DONE onDecrypted', v);
         if (msgCaption !== null) {
-          self.events.onMessage.bind(self)(msg.msgId+"c", msg.remoteJid, msgCaption, (msg.timeStamp+1), false, msg.pushName, false);
+          if (msg.groupJid) {
+            self.events.onMessage.bind(self)(msg.msgId+"c", msg.groupJid, msgCaption, (msg.timeStamp+1), false, msg.pushName, false);
+          }
+          else {
+            self.events.onMessage.bind(self)(msg.msgId+"c", msg.remoteJid, msgCaption, (msg.timeStamp+1), false, msg.pushName, false);
+          }
         }
         callback();
       }, function (e) {
@@ -1285,7 +1290,7 @@ App.connectors.coseme = function (account) {
         Lungo.Notification.error(_('ContactsGetError'), _('NoWhenOffline'), 'warning', 5);
       }
     }.bind(this);
-	
+
 	this.contacts.order = function (cb) {
       this.account.core.roster.sort(function (a,b) {
         var aname = a.name ? a.name : a.jid;
@@ -1342,7 +1347,7 @@ App.connectors.coseme = function (account) {
 			contacts._cb = cb;
 		}
 	}.bind(this);
-	
+
     this.contacts.order = function (cb) {
       this.account.core.roster.sort(function (a,b) {
         var aname = a.name ? a.name : a.jid;
