@@ -589,16 +589,6 @@ App.connectors.coseme = function (account) {
   this.connected = false;
   this.UTSyncRegistered = false;
 
-	this.notifyUT = function() {
-		console.log('New Message!');
-		/* var push = new CoSeMe.protocol.BinaryReader(push);
-		var reader = new FileReader();
-		var debug = {hello: "world"};
-		var blob = new Blob([JSON.stringify(debug, null, 2)], {type : 'application/json'});
-		reader.readAsArrayBuffer(blob);
-		push.reader.startListening(push); */
-	}
-
   function isNotGroupJid (jid) {
     return (jid.indexOf('@g.us') < 0);
   }
