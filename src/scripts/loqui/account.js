@@ -331,11 +331,20 @@ var Account = {
         li.detach();
         ul.prepend(li);
       }
+	var contact = Lungo.Core.findByProperty(this.core.roster, 'jid', chat.core.last.from);
+	var label = "";
+	if (contact) {
+		label = (contact.name).split(' ')[0] + ': ';
+	} else if (chat.core.last.from == this.core.user){
+	  label = _('Me') + ': ';
+	} else if (chat.core.last.from) {
+	  label = (chat.core.last.from).split('@')[0] + ': ';
+	}
       var lastMsg = chat.core.last.text ? App.emoji[Providers.data[this.core.provider].emoji].fy(Tools.HTMLescape(chat.core.last.text.replace(/\n/g, ' '))) : (chat.core.last.media ? _('SentYou', {type: _('MediaType_' + chat.core.last.media.type)}) : '');
       lastMsg = lastMsg.replace(/(\*)([A-Za-z0-9\s]+)(\*)/g, '<b>$2</b>');
       lastMsg = lastMsg.replace(/(_)([A-Za-z0-9\s]+)(_)/g, '<i>$2</i>');
       lastMsg = lastMsg.replace(/(~)([A-Za-z0-9\s]+)(~)/g, '<s>$2</s>');
-      li.children('.lastMessage').html(lastMsg);
+      li.children('.lastMessage').html(label + lastMsg);
       li.children('.lastStamp').children('date').attr('datetime', chat.core.last.stamp).html(chat.core.last.stamp ? Tools.convenientDate(chat.core.last.stamp).join('<br />') : '');
       li[0].dataset.unread = chat.core.unread;
       li[0].dataset.hidden = chat.core.settings.hidden[0] ? 1 : 0;
@@ -384,6 +393,15 @@ var Account = {
         var chat = this.core.chats[i];
         var name = chat.title;
         var title = App.emoji[Providers.data[this.core.provider].emoji].fy(name);
+		var contact = Lungo.Core.findByProperty(this.core.roster, 'jid', chat.last.from);
+		var label = "";
+		if (contact) {
+			label = (contact.name).split(' ')[0] + ': ';
+        } else if (chat.last.from == this.core.user){
+          label = _('Me') + ': ';
+        } else if (chat.last.from) {
+		  label = (chat.last.from).split('@')[0] + ': ';
+        }
         var lastMsg = chat.last ? (chat.last.text ? App.emoji[Providers.data[this.core.provider].emoji].fy(Tools.HTMLescape(chat.last.text.replace(/\n/g, ' '))) : (chat.last.media ? _('SentYou', {type: _('MediaType_' + chat.last.media.type)}) : '')) : '';
         lastMsg = lastMsg.replace(/(\*)([A-Za-z0-9\s]+)(\*)/g, '<b>$2</b>');
         lastMsg = lastMsg.replace(/(_)([A-Za-z0-9\s]+)(_)/g, '<i>$2</i>');
@@ -394,7 +412,7 @@ var Account = {
         li[0].dataset.unread = chat.unread;
         li.append($('<span/>').addClass('avatar').append('<img/>'));
         li.append($('<span/>').addClass('name').html(title));
-        li.append($('<span/>').addClass('lastMessage').html(lastMsg));
+        li.append($('<span/>').addClass('lastMessage').html(label + lastMsg));
         li.append($('<span/>').addClass('lastStamp').append($('<date/>').attr('datetime', chat.last.stamp).html(lastStamp)));
         li.append($('<span/>').addClass('lastAck'));
         li.append($('<span/>').addClass('show').addClass('backchange'));

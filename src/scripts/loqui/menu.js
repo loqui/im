@@ -301,7 +301,7 @@ var Menu = {
         searchbox.children('i#search-wait').hide();
         searchbox.children('button#search-next').hide();
         searchbox.children('button#search-start').show();
-        Lungo.Notification.show('info-outline', _('NoMatchFound'));
+        Lungo.Notification.show('info_outline', _('NoMatchFound'));
       });
     },
     chatLeave: function(obj) {
