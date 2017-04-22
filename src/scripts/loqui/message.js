@@ -489,7 +489,7 @@ var Message = {
                       }
                       zoomed = !zoomed;
                     });
-                  }
+				}}
                   else if (type == 'data:audio') {
                     var audio = document.getElementById('newAudio');
                     audio.setAttribute("src", output);
@@ -539,7 +539,6 @@ var Message = {
                     });
                   }
                 }
-              }
             });
           }
         };
