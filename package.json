@@ -32,7 +32,7 @@
     "grunt-contrib-copy": "~0.8.1",
     "grunt-contrib-watch": "~0.6.1",
     "grunt-execute": "~0.2.2",
-    "grunt-node-webkit-builder": "~1.0.2",
+    "grunt-nw-builder": "~1.0.2",
     "grunt-sass": "^1.0.0",
     "grunt-sed": "^0.1.1",
     "ink-docstrap": "git://github.com/TitanNano/docstrap.git",
