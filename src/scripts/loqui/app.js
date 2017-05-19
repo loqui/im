@@ -38,7 +38,7 @@ var App = {
   * @type {String}
   * @const
   */
-  minorVersion: '',
+  minorVersion: '$(Loqui.minorVersion)',
 
   platform: '',
 
