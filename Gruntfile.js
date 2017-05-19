@@ -182,6 +182,12 @@ module.exports = function(grunt) {
         replacement: '<%= pkg.version %>',
         recursive: true
       },
+      appminorversion: {
+        path: '<%= meta.build %>/',
+        pattern: '[$][(]Loqui[.]MinorVersion[)]',
+        replacement: '<%= pkg.minorVersion %>',
+        recursive: true
+      },
       manifest: {
         path: '<%= meta.build %>/chrome/index.html',
         pattern: '</head>',
