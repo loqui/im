@@ -305,8 +305,23 @@ module.exports = function(grunt) {
         pattern: ';version=1[.]7',
         replacement: ''
       },
-      ubuntujsversion: {
+      ubuntuTouchjsversion: {
         path: '<%= meta.build %>/ubuntu-touch/www/index.html',
+        pattern: ';version=1[.]7',
+        replacement: ''
+      },
+      ubuntuDesktop64jsversion: {
+        path: '<%= meta.build %>/ubuntu-desktop64/opt/loquiim/www/index.html',
+        pattern: ';version=1[.]7',
+        replacement: ''
+      },
+      ubuntuDesktop32jsversion: {
+        path: '<%= meta.build %>/ubuntu-desktop32/opt/loquiim/www/index.html',
+        pattern: ';version=1[.]7',
+        replacement: ''
+      },
+      ubuntuDesktopArmjsversion: {
+        path: '<%= meta.build %>/ubuntu-desktopArm/opt/loquiim/www/index.html',
         pattern: ';version=1[.]7',
         replacement: ''
       },
