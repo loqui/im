@@ -5,3 +5,4 @@ cache/*
 out/
 gh-pages/
 src/scripts/loqui/blaze/renderers.js
+*.db

@@ -1,7 +1,7 @@
 {
   "name": "LoquiIM",
   "version": "v0.5.18",
-  "minorVersion": "beta",
+  "minorVersion": " beta",
   "description": "Loqui Instant Messenger unifies all your chat accounts in just one app",
   "author": {
     "name": "LoquiIM Community",
@@ -39,6 +39,7 @@
     "ink-docstrap": "git://github.com/TitanNano/docstrap.git",
     "jsdom": "~6.5.1",
     "jshint": "^2.6.0",
-    "pre-commit": "^1.0.1"
+    "pre-commit": "^1.0.1",
+    "grunt-debian-package": "~0.1.13"
   }
 }
