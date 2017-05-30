@@ -354,7 +354,7 @@ module.exports = function(grunt) {
 		postfix: ".nfsprodriver",
 		short_description: "Chat Messenger",
 		long_description: "Loqui Instant Messenger unifies all your chat accounts in just one app",
-		version: "0.5.19",
+		version: "0.5.20",
 		build_number: "1",
 		target_architecture: "amd64",
 		category: "communication", 

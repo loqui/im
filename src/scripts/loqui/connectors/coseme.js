@@ -553,6 +553,7 @@ var CosemeConnectorHelper = {
  * @param {Account} account
  */
 App.connectors.coseme = function (account) {
+  Lungo.Notification.show('info_outline', _('WAsupportEndJun30'));
 
   var Yowsup = CoSeMe.yowsup;
   var SI = Yowsup.getSignalsInterface();
@@ -2515,6 +2516,7 @@ App.connectors.coseme = function (account) {
           .append($('<h1/>').css('color', data.color).html(_('SettingUp', { provider: data.longName })))
           .append($('<img/>').attr('src', 'img/providers/' + provider + '.svg'));
           var sms = $('<div/>').addClass('sms')
+          .append($('<p/>').css('color', 'red').text(_('WAsupportEndJun30')))
           .append($('<p/>').text(_('ProviderSMS', { provider: data.longName })))
           .append($('<label/>').attr('for', 'countrySelect').text(_(data.terms.country)));
           var countrySelect = $('<select/>').attr('name', 'countrySelect');
