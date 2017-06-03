@@ -307,8 +307,12 @@ App.connectors.XMPP = function (account) {
 
   this.muc.explore = function (server, resolve, reject) {
     var disco = this.connection.disco;
+    var jidok = [];
     var process = function (s) {
       if (typeof s == 'string') {
+        var r=jidok.findIndex(function (x) { return (x==s); });
+        if (r>-1) { return; }
+        jidok.push(s);
         disco.items(s, null, process, reject);
       } else {
         s = $(s);
@@ -324,6 +328,8 @@ App.connectors.XMPP = function (account) {
             if (jid.indexOf('@') > -1) {
               resolve(jid, item.attr('name'));
             } else {
+              var r=jidok.findIndex(function (x) { return (x==jid); });
+              if (r>-1) { return; }
               disco.info(jid, null, process, reject);
             }
           });
