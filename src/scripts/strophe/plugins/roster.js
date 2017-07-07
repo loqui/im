@@ -15,34 +15,6 @@
  */
 Strophe.addConnectionPlugin('roster',
 {
-    _connection: null,
-
-    _callbacks : [],
-    /** Property: items
-     * Roster items
-     * [
-     *    {
-     *        name         : "",
-     *        jid          : "",
-     *        subscription : "",
-     *        ask          : "",
-     *        groups       : ["", ""],
-     *        resources    : {
-     *            myresource : {
-     *                show   : "",
-     *                status : "",
-     *                priority : 0
-     *            }
-     *        }
-     *    }
-     * ]
-     */
-    items : [],
-    /** Property: ver
-     * current roster revision
-     * always null if server doesn't support xep 237
-     */
-    ver : null,
     /** Function: init
      * Plugin init
      *
@@ -51,8 +23,37 @@ Strophe.addConnectionPlugin('roster',
      */
     init: function(conn)
     {
-    this._connection = conn;
-        this.items = [];
+        this._connection = conn;
+        this._callbacks = [];
+        this._callbacks_request = [];
+
+        /** Property: items
+         * Roster items
+         * [
+         *    {
+         *        name         : "",
+         *        jid          : "",
+         *        subscription : "",
+         *        ask          : "",
+         *        groups       : ["", ""],
+         *        resources    : {
+         *            myresource : {
+         *                show   : "",
+         *                status : "",
+         *                priority : ""
+         *            }
+         *        }
+         *    }
+         * ]
+         */
+        var items = [];
+
+        /** Property: ver
+         * current roster revision
+         * always null if server doesn't support xep 237
+         */
+        var ver = null;
+
         // Override the connect and attach methods to always add presence and roster handlers.
         // They are removed when the connection disconnects, so must be added on connection.
         var oldCallback, roster = this, _connect = conn.connect, _attach = conn.attach;
@@ -71,33 +72,35 @@ Strophe.addConnectionPlugin('roster',
                     Strophe.error(e);
                 }
             }
-            if (oldCallback !== null)
+            if (typeof oldCallback === "function") {
                 oldCallback.apply(this, arguments);
+            }
         };
-        conn.connect = function(jid, pass, callback, wait, hold)
+        conn.connect = function(jid, pass, callback, wait, hold, route, authcid)
         {
             oldCallback = callback;
-            if (typeof arguments[0] == "undefined")
-                arguments[0] = null;
-            if (typeof arguments[1] == "undefined")
-                arguments[1] = null;
-            arguments[2] = newCallback;
-            _connect.apply(conn, arguments);
+            if (typeof jid  == "undefined")
+                jid  = null;
+            if (typeof pass == "undefined")
+                pass = null;
+            callback = newCallback;
+            _connect.apply(conn, [jid, pass, callback, wait, hold, route, authcid]);
         };
         conn.attach = function(jid, sid, rid, callback, wait, hold, wind)
         {
             oldCallback = callback;
-            if (typeof arguments[0] == "undefined")
-                arguments[0] = null;
-            if (typeof arguments[1] == "undefined")
-                arguments[1] = null;
-            if (typeof arguments[2] == "undefined")
-                arguments[2] = null;
-            arguments[3] = newCallback;
-            _attach.apply(conn, arguments);
+            if (typeof jid == "undefined")
+                jid = null;
+            if (typeof sid == "undefined")
+                sid = null;
+            if (typeof rid == "undefined")
+                rid = null;
+            callback = newCallback;
+            _attach.apply(conn, [jid, sid, rid, callback, wait, hold, wind]);
         };
 
         Strophe.addNamespace('ROSTER_VER', 'urn:xmpp:features:rosterver');
+        Strophe.addNamespace('NICK', 'http://jabber.org/protocol/nick');
     },
     /** Function: supportVersioning
      * return true if roster versioning is enabled on server
@@ -143,13 +146,12 @@ Strophe.addConnectionPlugin('roster',
     {
         this._callbacks.push(call_back);
     },
-    /** Function: clearCallbacks
-     * clear all callbacks on roster
-     */
-    clearCallbacks: function()
+
+    registerRequestCallback: function (call_back)
     {
-        this._callbacks.length = 0;
+        this._callbacks_request.push(call_back);
     },
+
     /** Function: findItem
      * Find item by JID
      *
@@ -158,13 +160,16 @@ Strophe.addConnectionPlugin('roster',
      */
     findItem : function(jid)
     {
-        for (var i = 0; i < this.items.length; i++)
-        {
-            if (this.items[i] && this.items[i].jid == jid)
-            {
-                return this.items[i];
-            }
-        }
+        if(this.items)
+	{
+          for (var i = 0; i < this.items.length; i++)
+          {
+              if (this.items[i] && this.items[i].jid == jid)
+              {
+                  return this.items[i];
+              }
+          }
+	}
         return false;
     },
     /** Function: removeItem
@@ -190,13 +195,17 @@ Strophe.addConnectionPlugin('roster',
      *
      * Parameters:
      *     (String) jid
-     *     (String) message
+     *     (String) message (optional)
+     *     (String) nick  (optional)
      */
-    subscribe: function(jid, message)
-    {
+    subscribe: function(jid, message, nick) {
         var pres = $pres({to: jid, type: "subscribe"});
-        if (message && message != "")
-            pres.c("status").t(message);
+        if (message && message !== "") {
+            pres.c("status").t(message).up();
+        }
+        if (nick && nick !== "") {
+            pres.c('nick', {'xmlns': Strophe.NS.NICK}).t(nick).up();
+        }
         this._connection.send(pres);
     },
     /** Function: unsubscribe
@@ -209,7 +218,7 @@ Strophe.addConnectionPlugin('roster',
     unsubscribe: function(jid, message)
     {
         var pres = $pres({to: jid, type: "unsubscribe"});
-        if (message && message != "")
+        if (message && message !== "")
             pres.c("status").t(message);
         this._connection.send(pres);
     },
@@ -223,7 +232,7 @@ Strophe.addConnectionPlugin('roster',
     authorize: function(jid, message)
     {
         var pres = $pres({to: jid, type: "subscribed"});
-        if (message && message != "")
+        if (message && message !== "")
             pres.c("status").t(message);
         this._connection.send(pres);
     },
@@ -237,7 +246,7 @@ Strophe.addConnectionPlugin('roster',
     unauthorize: function(jid, message)
     {
         var pres = $pres({to: jid, type: "unsubscribed"});
-        if (message && message != "")
+        if (message && message !== "")
             pres.c("status").t(message);
         this._connection.send(pres);
     },
@@ -310,7 +319,10 @@ Strophe.addConnectionPlugin('roster',
     _onReceiveRosterSuccess: function(userCallback, stanza)
     {
         this._updateItems(stanza);
-        userCallback(this.items);
+        this._call_backs(this.items);
+        if (typeof userCallback === "function") {
+            userCallback(this.items);
+        }
     },
     /** PrivateFunction: _onReceiveRosterError
      *
@@ -328,13 +340,16 @@ Strophe.addConnectionPlugin('roster',
         var jid = presence.getAttribute('from');
         var from = Strophe.getBareJidFromJid(jid);
         var item = this.findItem(from);
-        var to = Strophe.getBareJidFromJid(presence.getAttribute('to'));
+        var type = presence.getAttribute('type');
         // not in roster
         if (!item)
         {
+            // if 'friend request' presence
+            if (type === 'subscribe') {
+                this._call_backs_request(from);
+            }
             return true;
         }
-        var type = presence.getAttribute('type');
         if (type == 'unavailable')
         {
             delete item.resources[Strophe.getResourceFromJid(jid)];
@@ -343,13 +358,9 @@ Strophe.addConnectionPlugin('roster',
         {
             // TODO: add timestamp
             item.resources[Strophe.getResourceFromJid(jid)] = {
-                show     : (presence.getElementsByTagName('show').length != 0) ? Strophe.getText(presence.getElementsByTagName('show')[0]) : "",
-                status   : (presence.getElementsByTagName('status').length != 0) ? Strophe.getText(presence.getElementsByTagName('status')[0]) : "",
-                priority : (presence.getElementsByTagName('priority').length != 0) ? Number(Strophe.getText(presence.getElementsByTagName('priority')[0])) : 0,
-                photo    : (presence.getElementsByTagName('x').length != 0) ? (
-                            (presence.getElementsByTagName('x')[0].getElementsByTagName('photo').length != 0) ? Strophe.getText(presence.getElementsByTagName('x')[0].getElementsByTagName('photo')[0]) : "" 
-                           ) : "",
-                caps     : $(presence).find('c').length && $(presence).find('c').attr('node') + '#' + $(presence).find('c').attr('ver')
+                show     : (presence.getElementsByTagName('show').length !== 0) ? Strophe.getText(presence.getElementsByTagName('show')[0]) : "",
+                status   : (presence.getElementsByTagName('status').length !== 0) ? Strophe.getText(presence.getElementsByTagName('status')[0]) : "",
+                priority : (presence.getElementsByTagName('priority').length !== 0) ? Strophe.getText(presence.getElementsByTagName('priority')[0]) : ""
             };
         }
         else
@@ -357,17 +368,31 @@ Strophe.addConnectionPlugin('roster',
             // Stanza is not a presence notification. (It's probably a subscription type stanza.)
             return true;
         }
-        this._call_backs(this.items, item, to);
+        this._call_backs(this.items, item);
         return true;
     },
-    /** PrivateFunction: _call_backs
-     *
+    /** PrivateFunction: _call_backs_request
+     * call all the callbacks waiting for 'friend request' presences
      */
-    _call_backs : function(items, item, to)
+    _call_backs_request : function(from)
     {
-        for (var i in this._callbacks)
+        for (var i = 0; i < this._callbacks_request.length; i++) // [].forEach my love ...
         {
-            this._callbacks[i](items, item, to);
+            this._callbacks_request[i](from);
+        }
+    },
+
+    /** PrivateFunction: _call_backs
+     * first parameter is the full roster
+     * second is optional, newly added or updated item
+     * third is otional, in case of update, send the previous state of the
+     *  update item
+     */
+    _call_backs : function(items, item, previousItem)
+    {
+        for (var i = 0; i < this._callbacks.length; i++) // [].forEach my love ...
+        {
+            this._callbacks[i](items, item, previousItem);
         }
     },
     /** PrivateFunction: _onReceiveIQ
@@ -378,7 +403,7 @@ Strophe.addConnectionPlugin('roster',
         var id = iq.getAttribute('id');
         var from = iq.getAttribute('from');
         // Receiving client MUST ignore stanza unless it has no from or from = user's JID.
-        if (from && from != "" && from != this._connection.jid && from != Strophe.getBareJidFromJid(this._connection.jid))
+        if (from && from !== "" && from != this._connection.jid && from != Strophe.getBareJidFromJid(this._connection.jid))
             return true;
         var iqresult = $iq({type: 'result', id: id, from: this._connection.jid});
         this._connection.send(iqresult);
@@ -391,8 +416,7 @@ Strophe.addConnectionPlugin('roster',
     _updateItems : function(iq)
     {
         var query = iq.getElementsByTagName('query');
-        var to = Strophe.getBareJidFromJid($(iq).attr('to'));
-        if (query.length != 0)
+        if (query.length !== 0)
         {
             this.ver = query.item(0).getAttribute('ver');
             var self = this;
@@ -403,49 +427,66 @@ Strophe.addConnectionPlugin('roster',
                 }
            );
         }
-        this._call_backs(this.items);
     },
     /** PrivateFunction: _updateItem
      * Update internal representation of roster item
      */
-    _updateItem : function(item)
+    _updateItem : function(itemTag)
     {
-        var jid           = item.getAttribute("jid");
-        var name          = item.getAttribute("name");
-        var subscription  = item.getAttribute("subscription");
-        var ask           = item.getAttribute("ask");
+        var jid           = itemTag.getAttribute("jid");
+        var name          = itemTag.getAttribute("name");
+        var subscription  = itemTag.getAttribute("subscription");
+        var ask           = itemTag.getAttribute("ask");
         var groups        = [];
-        Strophe.forEachChild(item, 'group',
+
+        Strophe.forEachChild(itemTag, 'group',
             function(group)
             {
                 groups.push(Strophe.getText(group));
             }
         );
 
+        var item;
+        var previousItem;
+
         if (subscription == "remove")
         {
-            this.removeItem(jid);
+            var hashBeenRemoved = this.removeItem(jid);
+            if (hashBeenRemoved) {
+                this._call_backs(
+                    this.items,
+                    {jid: jid, subscription: 'remove'}
+                );
+            }
             return;
         }
 
-        var item = this.findItem(jid);
+        item = this.findItem(jid);
         if (!item)
         {
-            this.items.push({
+            item = {
                 name         : name,
                 jid          : jid,
                 subscription : subscription,
                 ask          : ask,
                 groups       : groups,
                 resources    : {}
-            });
+            };
+            this.items.push(item);
         }
         else
         {
+            previousItem = {
+                name: item.name,
+                subscription: item.subscription,
+                ask: item.ask,
+                groups: item.groups
+            };
             item.name = name;
             item.subscription = subscription;
             item.ask = ask;
             item.groups = groups;
         }
+        this._call_backs(this.items, item, previousItem);
     }
 });

@@ -7,6 +7,34 @@
  * Implement http://xmpp.org/extensions/xep-0030.html
  * TODO: manage node hierarchies, and node on info request
  */
+
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define("strophe.disco", [
+            "strophe"
+        ], function (Strophe) {
+            factory(
+                Strophe.Strophe,
+                Strophe.$build,
+                Strophe.$iq ,
+                Strophe.$msg,
+                Strophe.$pres
+            );
+            return Strophe;
+        });
+    } else {
+        // Browser globals
+        factory(
+            root.Strophe,
+            root.$build,
+            root.$iq ,
+            root.$msg,
+            root.$pres
+        );
+    }
+}(this, function (Strophe, $build, $iq, $msg, $pres) {
+
 Strophe.addConnectionPlugin('disco',
 {
     _connection: null,
@@ -21,19 +49,14 @@ Strophe.addConnectionPlugin('disco',
      */
     init: function(conn)
     {
-        this._connection = conn;
+    this._connection = conn;
         this._identities = [];
         this._features   = [];
         this._items      = [];
-    },
-    handlify: function(handler)
-    {
-        return [      
-          this._connection.addHandler(this._onDiscoInfo.bind(this), Strophe.NS.DISCO_INFO, 'iq', 'get', null, null),
-          this._connection.addHandler(this._onDiscoItems.bind(this), Strophe.NS.DISCO_ITEMS, 'iq', 'get', null, null),
-          this._connection.addHandler(handler, Strophe.NS.DISCO_INFO, 'iq', 'result', null, null),
-          this._connection.addHandler(handler, Strophe.NS.DISCO_ITEMS, 'iq', 'result', null, null)
-        ];
+        // disco info
+        conn.addHandler(this._onDiscoInfo.bind(this), Strophe.NS.DISCO_INFO, 'iq', 'get', null, null);
+        // disco items
+        conn.addHandler(this._onDiscoItems.bind(this), Strophe.NS.DISCO_ITEMS, 'iq', 'get', null, null);
     },
     /** Function: addIdentity
      * See http://xmpp.org/registrar/disco-categories.html
@@ -92,7 +115,7 @@ Strophe.addConnectionPlugin('disco',
         for (var i=0; i<this._features.length; i++)
         {
              if (this._features[i] === var_name){
-                 this._features.splice(i,1)
+                 this._features.splice(i,1);
                  return true;
              }
         }
@@ -130,7 +153,8 @@ Strophe.addConnectionPlugin('disco',
         if (node)
             attrs.node = node;
 
-        var info = $iq({from:this._connection.jid, to:jid, type:'get'}).c('query', attrs);
+        var info = $iq({from:this._connection.jid,
+                         to:jid, type:'get'}).c('query', attrs);
         this._connection.sendIQ(info, success, error, timeout);
     },
     /** Function: items
@@ -174,14 +198,15 @@ Strophe.addConnectionPlugin('disco',
     {
         var node = stanza.getElementsByTagName('query')[0].getAttribute('node');
         var attrs = {xmlns: Strophe.NS.DISCO_INFO};
+        var i;
         if (node)
         {
             attrs.node = node;
         }
         var iqresult = this._buildIQResult(stanza, attrs);
-        for (var i=0; i<this._identities.length; i++)
+        for (i=0; i<this._identities.length; i++)
         {
-            var attrs = {category: this._identities[i].category,
+            attrs = {category: this._identities[i].category,
                          type    : this._identities[i].type};
             if (this._identities[i].name)
                 attrs.name = this._identities[i].name;
@@ -189,7 +214,7 @@ Strophe.addConnectionPlugin('disco',
                 attrs['xml:lang'] = this._identities[i].lang;
             iqresult.c('identity', attrs).up();
         }
-        for (var i=0; i<this._features.length; i++)
+        for (i=0; i<this._features.length; i++)
         {
             iqresult.c('feature', {'var':this._features[i]}).up();
         }
@@ -203,11 +228,12 @@ Strophe.addConnectionPlugin('disco',
     {
         var query_attrs = {xmlns: Strophe.NS.DISCO_ITEMS};
         var node = stanza.getElementsByTagName('query')[0].getAttribute('node');
+        var items, i;
         if (node)
         {
             query_attrs.node = node;
-            var items = [];
-            for (var i = 0; i < this._items.length; i++)
+            items = [];
+            for (i = 0; i < this._items.length; i++)
             {
                 if (this._items[i].node == node)
                 {
@@ -218,10 +244,10 @@ Strophe.addConnectionPlugin('disco',
         }
         else
         {
-            var items = this._items;
+            items = this._items;
         }
         var iqresult = this._buildIQResult(stanza, query_attrs);
-        for (var i = 0; i < items.length; i++)
+        for (i = 0; i < items.length; i++)
         {
             var attrs = {jid:  items[i].jid};
             if (items[i].name)
@@ -234,4 +260,4 @@ Strophe.addConnectionPlugin('disco',
         return true;
     }
 });
-
+}));

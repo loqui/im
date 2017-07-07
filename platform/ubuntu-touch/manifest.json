@@ -1,5 +1,5 @@
 {
-    "architecture": "all",
+    "architecture": "armhf",
     "description": "Loqui Instant Messenger unifies all your chat accounts in just one app.",
     "framework": "ubuntu-sdk-15.04-html",
     "hooks": {
@@ -8,8 +8,8 @@
             "desktop": "loqui.desktop"
         }
     },
-    "maintainer": "Bjarne Roß <ross.b@freenet.de>",
-    "name": "loquiim.nfsprodriver",
-    "title": "LoquiIM",
+    "maintainer": "Loqui Group <support@loqu.im>",
+    "name": "loquiim.loqui",
+    "title": "LoquiIM alpha",
     "version": "$(Loqui.Version)"
 }
