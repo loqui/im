@@ -8,7 +8,7 @@
             "desktop": "loqui.desktop"
         }
     },
-    "maintainer": "Loqui Group <support@loqu.im>",
+    "maintainer": "Loqui Group <support@loqui.im>",
     "name": "loquiim.loqui",
     "title": "LoquiIM alpha",
     "version": "$(Loqui.Version)"
