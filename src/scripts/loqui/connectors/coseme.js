@@ -16,7 +16,7 @@
  * @class CoSeMeConnectorHelper
  */
 var CosemeConnectorHelper = {
-  tokenDataKeys : [ 'v', 'r', 'u', 't', 'd' ],
+  tokenDataKeys : [ 'v', 'r', 'u', 't', 'd', 'm' ],
 
   proto : dcodeIO.ProtoBuf.newBuilder({})['import']({
     "package": "com.whatsapp.proto",
@@ -507,7 +507,7 @@ var CosemeConnectorHelper = {
     Store.Config.get('CoSeMe.dataUpdated').then(function (dataUpdated) {
       if (ts - 3600 > Number(dataUpdated)) {
         Tools.log("UPDATING token data");
-        Tools.loadJson('https://raw.githubusercontent.com/loqui/im/dev/tokenData.json')
+        Tools.loadJson('https://raw.githubusercontent.com/loqui/im/android/tokenData.json')
           .then(function (response) {
             var updated = false;
             Store.Config.put('CoSeMe.dataUpdated', ts);
