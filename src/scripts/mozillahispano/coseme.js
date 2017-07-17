@@ -3377,13 +3377,11 @@ CoSeMe.namespace('config', (function(){
     groupDomain: 'g.us',
 
     tokenData: {
-      "v": "2.17.221", //"2.16.12", // whatsapp_scratch: e
-      // XXX: it is tokenData[d] + - + tokenData[v] + - + port
-      "r": "Xiaomi-armani",
+      "v": "2.17.221",
+      "r": "Xiaomi",
       "u": "WhatsApp/2.17.221 Android/4.3 Device/Xiaomi-armani",
-      "t": "1494451854337", // whatsapp_scratch: c
       "d": "armani",
-	  "m": "e4qMAO95WWMHgUFWwQtptw=="
+      "m": "e4qMAO95WWMHgUFWwQtptw=="
     },
 
     auth: {
