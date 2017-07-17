@@ -16,7 +16,7 @@
  * @class CoSeMeConnectorHelper
  */
 var CosemeConnectorHelper = {
-  tokenDataKeys : [ 'v', 'r', 'u', 't', 'd', 'm' ],
+  tokenDataKeys : [ 'v', 'r', 'u', 'd', 'm' ],
 
   proto : dcodeIO.ProtoBuf.newBuilder({})['import']({
     "package": "com.whatsapp.proto",
