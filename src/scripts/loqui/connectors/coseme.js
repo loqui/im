@@ -1,4 +1,4 @@
-/* global IDBKeyRange, App, CoSeMe, Providers, Tools, Avatar, Store, Message, Chat, Account, Accounts, Lungo, Make, async, axolotl, axolotlCrypto, dcodeIO, emojione */
+/* global IDBKeyRange, App, CoSeMe, Providers, Tools, Avatar, Store, Message, Chat, Account, Accounts, Lungo, Make, async, libsignal, emojione */
 
 /**
  * @file Holds {@link Connector/Coseme}
@@ -12,13 +12,52 @@
 
 'use strict';
 
+var signalLocalReg = null;
+  
+var GetLocalKeys = {
+	getLocalIdentityKeyPair : function () {
+	  Tools.log('getLocalIdentityKeyPair', signalLocalReg.identityKeyPair);
+	  return signalLocalReg.identityKeyPair;
+	},
+	getLocalRegistrationId : function () {
+	  Tools.log('getLocalRegistrationId', signalLocalReg.registrationId);
+	  return signalLocalReg.registrationId;
+	},
+	getLocalSignedPreKeyPair : function (signedPreKeyId) {
+	  Tools.log('getLocalSignedPreKeyPair', signedPreKeyId);
+
+	  return new Promise(function (ready) {
+		var tx = signalDb.transaction(['localSKeys']);
+		var req = tx.objectStore('localSKeys').get([ account.core.fullJid, signedPreKeyId ]);
+		req.onsuccess = function (e) {
+		  var signedPreKeyPair = req.result ? req.result.keyPair : null;
+		  Tools.log('getLocalSignedPreKeyPair', signedPreKeyPair);
+		  ready(signedPreKeyPair);
+		};
+	  });
+	},
+	getLocalPreKeyPair : function (preKeyId) {
+	  Tools.log('getLocalPreKeyPair', preKeyId);
+
+	  return new Promise(function (ready) {
+		var tx = signalDb.transaction(['localKeys']);
+		var req = tx.objectStore('localKeys').get([ account.core.fullJid, preKeyId ]);
+		req.onsuccess = function (e) {
+		  var preKeyPair = req.result ? req.result.keyPair : null;
+		  Tools.log('getLocalPreKeyPair', preKeyPair);
+		  ready(preKeyPair);
+		};
+	  });
+	}
+};
+
 /**
  * @class CoSeMeConnectorHelper
  */
 var CosemeConnectorHelper = {
   tokenDataKeys : [ 'v', 'r', 'u', 'd', 'm' ],
-
-  proto : dcodeIO.ProtoBuf.newBuilder({})['import']({
+  
+  /* proto : dcodeIO.ProtoBuf.newBuilder({})['import']({
     "package": "com.whatsapp.proto",
     "messages": [
         {
@@ -409,9 +448,10 @@ var CosemeConnectorHelper = {
             ]
         }
     ]
-  }).build(),
+  }).build(), */
 
-  _axolLoaded : function () {
+  
+  _signalLoaded: function () {
     function loadScript (src) {
       return new Promise(function (resolve, reject) {
         var s;
@@ -425,8 +465,8 @@ var CosemeConnectorHelper = {
 
     return loadScript('scripts/curve25519-js/axlsign.js').then(function () {
       return (window.crypto.subtle ? Promise.resolve(null) : loadScript('scripts/vibornoff/asmcrypto.js')).then(function () {
-        return loadScript('scripts/joebandenburg/axolotl-crypto.js').then(function () {
-          return loadScript('scripts/joebandenburg/axolotl.js');
+        return loadScript('scripts/whispersystems/libsignal-protocol-worker.js').then(function () {
+          return loadScript('scripts/whispersystems/libsignal-protocol.js');
         });
       });
     });
@@ -437,7 +477,7 @@ var CosemeConnectorHelper = {
   init : function () {
     if (!this._initPromise) {
       var self = this;
-      this._initPromise = this._axolLoaded.then(function () {
+      this._initPromise = this._signalLoaded.then(function () {
         CoSeMe.config.customLogger = Tools;
         CoSeMe.config.customStorage = Store.Config;
 
@@ -449,7 +489,7 @@ var CosemeConnectorHelper = {
         }));
       }).then(function () {
         return new Promise(function (resolve, reject) {
-          var req = window.indexedDB.open('AxolotlStore', 2);
+          var req = window.indexedDB.open('KeyStore', 2);
           req.onerror = function(e) {
             Tools.log('init onerror', e);
           };
@@ -558,19 +598,411 @@ App.connectors.coseme = function (account) {
   var SI = Yowsup.getSignalsInterface();
   var MI = Yowsup.getMethodsInterface();
 
-  var axol = null;
-  var axolDb = null;
-  var axolLocalReg = null;
-  var axolSendKeys = false;
-  var axolEncryptQueues = { };
-  var axolDecryptQueue = async.queue(function (task, callback) {
+  var signal = null;
+  var signalDb = null;
+  //var signalLocalReg = null;
+  var signalSendKeys = false;
+  var KeyHelper = libsignal.KeyHelper;
+  var signalEncryptQueues = { };
+  var signalDecryptQueue = async.queue(function (task, callback) {
     handleEncryptedMessage(task.self, task.msg, callback);
   });
   var requestData = {};
   var pendingAvatars = {};
   var lastKeepalive = new Date();
   var init = CosemeConnectorHelper.init();
-  var proto = CosemeConnectorHelper.proto.com.whatsapp.proto;
+  var proto = dcodeIO.ProtoBuf.newBuilder({})['import']({
+    "package": "com.whatsapp.proto",
+    "messages": [
+        {
+            "name": "Message",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "conversation",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "SenderKeyDistributionMessage",
+                    "name": "sender_key_distribution_message",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "ImageMessage",
+                    "name": "image_message",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "ContactMessage",
+                    "name": "contact_message",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "LocationMessage",
+                    "name": "location_message",
+                    "id": 5
+                },
+                {
+                    "rule": "optional",
+                    "type": "UrlMessage",
+                    "name": "url_message",
+                    "id": 6
+                },
+                {
+                    "rule": "optional",
+                    "type": "DocumentMessage",
+                    "name": "document_message",
+                    "id": 7
+                },
+                {
+                    "rule": "optional",
+                    "type": "AudioMessage",
+                    "name": "audio_message",
+                    "id": 8
+                },
+                {
+                    "rule": "optional",
+                    "type": "VideoMessage",
+                    "name": "video_message",
+                    "id": 9
+                }
+            ]
+        },
+        {
+            "name": "SenderKeyDistributionMessage",
+            "fields": [
+                {
+                    "rule": "required",
+                    "type": "string",
+                    "name": "group_id",
+                    "id": 1
+                },
+                {
+                    "rule": "required",
+                    "type": "bytes",
+                    "name": "axolotl_sender_key_distribution_message",
+                    "id": 2
+                }
+            ]
+        },
+        {
+            "name": "ImageMessage",
+            "fields": [
+                {
+                    "rule": "required",
+                    "type": "string",
+                    "name": "url",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "mime_type",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "caption",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
+                    "name": "file_sha256",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint64",
+                    "name": "file_length",
+                    "id": 5
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "height",
+                    "id": 6
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "width",
+                    "id": 7
+                },
+                {
+                    "rule": "required",
+                    "type": "bytes",
+                    "name": "media_key",
+                    "id": 8
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
+                    "name": "jpeg_thumbnail",
+                    "id": 16
+                }
+            ]
+        },
+        {
+            "name": "LocationMessage",
+            "fields": [
+                {
+                    "rule": "required",
+                    "type": "double",
+                    "name": "degrees_latitude",
+                    "id": 1
+                },
+                {
+                    "rule": "required",
+                    "type": "double",
+                    "name": "degrees_longitude",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "name",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "address",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "url",
+                    "id": 5
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
+                    "name": "jpeg_thumbnail",
+                    "id": 16
+                }
+            ]
+        },
+        {
+            "name": "DocumentMessage",
+            "fields": [
+                {
+                    "rule": "required",
+                    "type": "string",
+                    "name": "url",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "mime_type",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "title",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
+                    "name": "file_sha256",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint64",
+                    "name": "file_length",
+                    "id": 5
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "page_count",
+                    "id": 6
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
+                    "name": "media_key",
+                    "id": 7
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
+                    "name": "jpeg_thumbnail",
+                    "id": 16
+                }
+            ]
+        },
+        {
+            "name": "UrlMessage",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "text",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "matched_text",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "canonical_url",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "description",
+                    "id": 5
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "title",
+                    "id": 6
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
+                    "name": "jpeg_thumbnail",
+                    "id": 16
+                }
+            ]
+        },
+        {
+            "name": "AudioMessage",
+            "fields": [
+                {
+                    "rule": "required",
+                    "type": "string",
+                    "name": "url",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "mime_type",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
+                    "name": "file_sha256",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint64",
+                    "name": "file_length",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint64",
+                    "name": "duration",
+                    "id": 5
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "unk",
+                    "id": 6
+                },
+                {
+                    "rule": "required",
+                    "type": "bytes",
+                    "name": "media_key",
+                    "id": 7
+                }
+            ]
+        },
+        {
+            "name": "VideoMessage",
+            "fields": [
+                {
+                    "rule": "required",
+                    "type": "string",
+                    "name": "url",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "mime_type",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
+                    "name": "file_sha256",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint64",
+                    "name": "file_length",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint64",
+                    "name": "duration",
+                    "id": 5
+                },
+                {
+                    "rule": "required",
+                    "type": "bytes",
+                    "name": "media_key",
+                    "id": 6
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "caption",
+                    "id": 7
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
+                    "name": "jpeg_thumbnail",
+                    "id": 16
+                }
+            ]
+        },
+        {
+            "name": "ContactMessage",
+            "fields": [
+                {
+                    "rule": "required",
+                    "type": "string",
+                    "name": "display_name",
+                    "id": 1
+                },
+                {
+                    "rule": "required",
+                    "type": "string",
+                    "name": "vcard",
+                    "id": 16
+                }
+            ]
+        }
+    ]
+  });
 
   this.account = account;
   this.provider = Providers.data[account.core.provider];
@@ -623,28 +1055,27 @@ App.connectors.coseme = function (account) {
   }
 
   function sendSetKeys (jid) {
-    axolSendKeys = true;
-    axol.generatePreKeys(Math.floor(Math.random() * 0xfffffe), 50).then(function (preKeys) {
-      Tools.log('generatePreKeys done', preKeys.length, preKeys);
+    signalSendKeys = true;
+	var keyId= Math.floor(Math.random() * 0xfffffe);
+    KeyHelper.generatePreKey(keyId).then(function(preKey) {
+      Tools.log('generatePreKeys done', preKey.keyId, preKey.keyPair);
 
-      var tx = axolDb.transaction(['localKeys'], 'readwrite');
+      var tx = signalDb.transaction(['localKeys'], 'readwrite');
       var objStore = tx.objectStore('localKeys');
-      for (var idx in preKeys) {
-        preKeys[idx].jid = jid;
-        objStore.put(preKeys[idx]);
-      }
-      Tools.log('generatePreKeys stored');
+      preKey.jid = jid;
+      objStore.put(preKey);
+      Tools.log('generatePreKey stored');
 
-      axol.generateSignedPreKey(axolLocalReg.identityKeyPair, Math.floor(Math.random() * 0xfffffe)).then(function (signedPreKey) {
-        Tools.log('generateSignedPreKey done', signedPreKey);
+      KeyHelper.generateSignedPreKey(identityKeyPair, keyId).then(function(signedPreKey) {
+        Tools.log('generateSignedPreKey done', signedPreKey.keyId, signedPreKey.keyPair);
 
-        var tx = axolDb.transaction(['localSKeys'], 'readwrite');
+        var tx = signalDb.transaction(['localSKeys'], 'readwrite');
         signedPreKey.jid = jid;
         tx.objectStore('localSKeys').put(signedPreKey);
 
         CoSeMe.yowsup.getMethodsInterface().call('encrypt_setKeys', [
-          axolLocalReg.identityKeyPair.public.slice(1),
-          axolLocalReg.registrationId,
+          signalLocalReg.identityKeyPair.public.slice(1),
+          signalLocalReg.registrationId,
           '\x05',
           preKeys.map(function (x) {
             return { id: x.id, value: x.keyPair.public.slice(1) }; }),
@@ -660,39 +1091,41 @@ App.connectors.coseme = function (account) {
   }
 
   function sendRegistration (myJid) {
-    axol.generateIdentityKeyPair().then(function (identityKeyPair) {
-      axol.generateRegistrationId(true).then(function (registrationId) {
-        axolLocalReg = { jid : myJid,
+    KeyHelper.generateIdentityKeyPair().then(function (identityKeyPair) {
+      KeyHelper.generateRegistrationId(true).then(function (registrationId) {
+        signalLocalReg = { jid : myJid,
                          identityKeyPair : identityKeyPair,
                          registrationId : registrationId };
-        Tools.log('GENERATED REGISTRATION ID', axolLocalReg.registrationId);
+        Tools.log('GENERATED REGISTRATION ID', signalLocalReg.registrationId);
 
-        var tx = axolDb.transaction(['localReg'], 'readwrite');
-        tx.objectStore('localReg').put(axolLocalReg);
+        var tx = signalDb.transaction(['localReg'], 'readwrite');
+        tx.objectStore('localReg').put(signalLocalReg);
 
         sendSetKeys(myJid);
-        axolDecryptQueue.resume();
+        signalDecryptQueue.resume();
       }, function (e) {
         Tools.log('FAILED generateIdentityKeyPair');
-        axolDecryptQueue.resume();
+        signalDecryptQueue.resume();
       });
     }, function (e) {
       Tools.log('FAILED generateIdentityKeyPair');
-      axolDecryptQueue.resume();
+      signalDecryptQueue.resume();
     });
   }
 
   function encryptMessageWorker(task, callback) {
     var cpuLock = navigator.requestWakeLock('cpu');
     var myJid = account.core.fullJid;
-    var tx = axolDb.transaction(['session']);
+    var tx = signalDb.transaction(['session']);
     var req = tx.objectStore('session').get([ myJid, task.remoteJid ]);
+	var sessionCipher = new libsignal.SessionCipher(req, task.remoteJid);
     req.onsuccess = function (e) {
       if (req.result) {
-        axol.encryptMessage(req.result.session, task.plaintext).then(function (m) {
-          Tools.log('ENCRYPTED MESSAGE', m, CoSeMe.utils.hex(m.body));
+	  sessionCipher.encrypt(task.plaintext).then(function(m) {
+		handle(m.type, m.body);
+		Tools.log('ENCRYPTED MESSAGE', m, CoSeMe.utils.hex(m.body));
 
-          var tx = axolDb.transaction(['session'], 'readwrite');
+          var tx = signalDb.transaction(['session'], 'readwrite');
           var req = tx.objectStore('session').put({ jid: myJid,
                                                     remoteJid : task.remoteJid,
                                                     session: m.session });
@@ -700,18 +1133,18 @@ App.connectors.coseme = function (account) {
           task.ready(m);
           callback();
           cpuLock.unlock();
-        }, function (e) {
+        }), function (e) {
           Tools.log('ENCRYPT ERROR', e);
           task.reject();
           callback();
           cpuLock.unlock();
-        });
+        };
       } else {
         task.reject();
         callback();
         cpuLock.unlock();
       }
-    };
+	};
     req.onerror = function(e) {
       Tools.log('error getting session from db', task.remoteJid);
       cpuLock.unlock();
@@ -722,14 +1155,14 @@ App.connectors.coseme = function (account) {
     return new Promise(function (ready, reject) {
       var myJid = account.core.fullJid;
 
-      if (axolLocalReg && isNotGroupJid(remoteJid)) {
-        if (!(remoteJid in axolEncryptQueues)) {
+      if (signalLocalReg && isNotGroupJid(remoteJid)) {
+        if (!(remoteJid in signalEncryptQueues)) {
           var cpuLock = navigator.requestWakeLock('cpu');
           var q = async.queue(encryptMessageWorker);
           q.pause();
-          axolEncryptQueues[remoteJid] = q;
+          signalEncryptQueues[remoteJid] = q;
 
-          var tx = axolDb.transaction(['session']);
+          var tx = signalDb.transaction(['session']);
           var req = tx.objectStore('session').get([ myJid, remoteJid ]);
           req.onsuccess = function (e) {
             if (req.result) {
@@ -748,7 +1181,7 @@ App.connectors.coseme = function (account) {
           };
         }
 
-        axolEncryptQueues[remoteJid].push({ remoteJid : remoteJid,
+        signalEncryptQueues[remoteJid].push({ remoteJid : remoteJid,
                                             plaintext : plaintext,
                                             ready : ready, reject : reject });
       } else {
@@ -821,10 +1254,10 @@ App.connectors.coseme = function (account) {
         // ignore decryption error for non-skmsg group messages, we'll
         // handle these on the skmsg
       } else {
-        if (axolLocalReg && (!msg.count || Number(msg.count) < 5)) {
+        if (signalLocalReg && (!msg.count || Number(msg.count) < 5)) {
           var count = msg.count ? Number(msg.count) + 1 : 1;
           MI.call('message_retry', [msg.groupJid ? msg.groupJid : msg.remoteJid,
-                                    msg.msgId, axolLocalReg.registrationId,
+                                    msg.msgId, signalLocalReg.registrationId,
                                     count.toString(),
                                     '1',
                                     msg.timeStamp,
@@ -844,6 +1277,7 @@ App.connectors.coseme = function (account) {
       Tools.log('DECODED MESSAGE', v2msg, session);
       var allDone = [];
       var msgCaption = null;
+	  var HKDF = libsignal.HKDF;
 
       if (v2msg.conversation) {
         onMessage(v2msg.conversation);
@@ -865,7 +1299,7 @@ App.connectors.coseme = function (account) {
         var imgEncKey = new Uint8Array(img_msg.media_key.toArrayBuffer());
         msgCaption = v2msg.image_message.caption;
 
-        allDone.push(axolotlCrypto.deriveHKDFv3Secrets(imgEncKey, CoSeMe.utils.bytesFromHex('576861747341707020496d616765204b657973'), 112).then(function (deriv) {
+        allDone.push(HKDF.deriveSecrets(imgEncKey, CoSeMe.utils.bytesFromHex('576861747341707020496d616765204b657973'), 112).then(function (deriv) {
           var iv = deriv.subarray(0, 16);
           var key = deriv.subarray(16, 48);
           Tools.log('MEDIA ENCRYPTION KEYS', CoSeMe.utils.hex(iv), CoSeMe.utils.hex(key));
@@ -881,7 +1315,7 @@ App.connectors.coseme = function (account) {
         var docEncKey = new Uint8Array(doc_msg.media_key.toArrayBuffer());
         msgCaption = v2msg.document_message.caption;
 
-        allDone.push(axolotlCrypto.deriveHKDFv3Secrets(docEncKey, CoSeMe.utils.bytesFromHex('576861747341707020446f63756d656e74204b657973'), 112).then(function (deriv) {
+        allDone.push(HKDF.deriveSecrets(docEncKey, CoSeMe.utils.bytesFromHex('576861747341707020446f63756d656e74204b657973'), 112).then(function (deriv) {
           var iv = deriv.subarray(0, 16);
           var key = deriv.subarray(16, 48);
           Tools.log('MEDIA ENCRYPTION KEYS', CoSeMe.utils.hex(iv), CoSeMe.utils.hex(key));
@@ -891,7 +1325,7 @@ App.connectors.coseme = function (account) {
         var audio_msg = v2msg.audio_message;
         var audioEncKey = new Uint8Array(audio_msg.media_key.toArrayBuffer());
 
-        allDone.push(axolotlCrypto.deriveHKDFv3Secrets(audioEncKey, CoSeMe.utils.bytesFromHex('576861747341707020417564696f204b657973'), 112).then(function (deriv) {
+        allDone.push(HKDF.deriveSecrets(audioEncKey, CoSeMe.utils.bytesFromHex('576861747341707020417564696f204b657973'), 112).then(function (deriv) {
           var iv = deriv.subarray(0, 16);
           var key = deriv.subarray(16, 48);
           Tools.log('MEDIA ENCRYPTION KEYS', CoSeMe.utils.hex(iv), CoSeMe.utils.hex(key));
@@ -903,17 +1337,17 @@ App.connectors.coseme = function (account) {
         var videoEncKey = new Uint8Array(video_msg.media_key.toArrayBuffer());
         msgCaption = v2msg.video_message.caption;
 
-        allDone.push(axolotlCrypto.deriveHKDFv3Secrets(videoEncKey, CoSeMe.utils.bytesFromHex('576861747341707020566964656f204b657973'), 112).then(function (deriv) {
+        allDone.push(HKDF.deriveSecrets(videoEncKey, CoSeMe.utils.bytesFromHex('576861747341707020566964656f204b657973'), 112).then(function (deriv) {
           var iv = deriv.subarray(0, 16);
           var key = deriv.subarray(16, 48);
           Tools.log('MEDIA ENCRYPTION KEYS', CoSeMe.utils.hex(iv), CoSeMe.utils.hex(key));
           onVideo(videoThumb, video_msg.url, video_msg.file_length.toNumber(), video_msg.mime_type, { iv: CoSeMe.utils.latin1FromBytes(iv), key: CoSeMe.utils.latin1FromBytes(key) });
         }));
-      } else if (!v2msg.sender_key_distribution_message) {
+      } else {
         Tools.log('UNHANDLED v2msg');
       }
 
-      if (v2msg.sender_key_distribution_message) {
+      /* if (v2msg.sender_key_distribution_message) {
         var skdm_msg = v2msg.sender_key_distribution_message;
         var skdm_axolotl = new Uint8Array(skdm_msg.axolotl_sender_key_distribution_message.toArrayBuffer());
         Tools.log('SKDM', skdm_msg.group_id, CoSeMe.utils.hex(skdm_axolotl));
@@ -940,11 +1374,11 @@ App.connectors.coseme = function (account) {
             reject(e);
           };
         }));
-      }
+      } */
 
       if (msg.type == 'skmsg') {
         allDone.push(new Promise(function (resolve, reject) {
-          var skreq = axolDb.transaction(['sksession'], 'readwrite')
+          var skreq = signalDb.transaction(['sksession'], 'readwrite')
               .objectStore('sksession').put({ jid : msg.jid,
                                               groupJid : msg.groupJid,
                                               remoteJid : msg.remoteJid,
@@ -954,7 +1388,7 @@ App.connectors.coseme = function (account) {
         }));
       } else {
         allDone.push(new Promise(function (resolve, reject) {
-          var req = axolDb.transaction(['session'], 'readwrite')
+          var req = signalDb.transaction(['session'], 'readwrite')
               .objectStore('session').put({ jid : msg.jid,
                                             remoteJid : msg.remoteJid,
                                             session : session });
@@ -980,12 +1414,12 @@ App.connectors.coseme = function (account) {
       });
     }
 
-    if (axolLocalReg && (msg.type == 'pkmsg' || msg.type == 'msg')) {
-      var req = axolDb.transaction(['session'])
+    if (signalLocalReg && (msg.type == 'pkmsg' || msg.type == 'msg')) {
+      var req = signalDb.transaction(['session'])
           .objectStore('session').get([ msg.jid, msg.remoteJid ]);
       req.onsuccess = function (e) {
         var session = req.result ? req.result.session : null;
-        var decryptFn = (msg.type == 'pkmsg') ? axol.decryptPreKeyWhisperMessage : axol.decryptWhisperMessage;
+        var decryptFn = (msg.type == 'pkmsg') ? signal.decryptPreKeyWhisperMessage : signal.decryptWhisperMessage;
         decryptFn(session, msg.msgData).then(function (m) {
           var data = new Uint8Array(m.message);
           Tools.log('DECRYPTED MESSAGE', CoSeMe.utils.hex(data));
@@ -1007,13 +1441,13 @@ App.connectors.coseme = function (account) {
       req.onerror = function(e) {
         Tools.log('error getting session from db', msg.remoteJid);
       };
-    } else if (axolLocalReg && (msg.type == 'skmsg')) {
-      var skreq = axolDb.transaction(['sksession'])
+    } else if (signalLocalReg && (msg.type == 'skmsg')) {
+      var skreq = signalDb.transaction(['sksession'])
           .objectStore('sksession').get([ msg.jid, msg.groupJid, msg.remoteJid ]);
       skreq.onsuccess = function (e) {
         var session = skreq.result ? skreq.result.session : null;
         if (session) {
-          axol.decryptSenderKeyMessage(session, msg.msgData).then(function (m) {
+          signal.decryptWhisperMessage (session, msg.msgData).then(function (m) {
             var data = new Uint8Array(m.message);
             Tools.log('DECRYPTED MESSAGE', CoSeMe.utils.hex(data));
 
@@ -1047,45 +1481,10 @@ App.connectors.coseme = function (account) {
 
       requestData = {};
       pendingAvatars = {};
-      axolDb = db;
-      axolSendKeys = false;
-      axolDecryptQueue.pause();
-      axol = axolotl({
-        getLocalIdentityKeyPair : function () {
-          Tools.log('getLocalIdentityKeyPair', axolLocalReg.identityKeyPair);
-          return axolLocalReg.identityKeyPair;
-        },
-        getLocalRegistrationId : function () {
-          Tools.log('getLocalRegistrationId', axolLocalReg.registrationId);
-          return axolLocalReg.registrationId;
-        },
-        getLocalSignedPreKeyPair : function (signedPreKeyId) {
-          Tools.log('getLocalSignedPreKeyPair', signedPreKeyId);
-
-          return new Promise(function (ready) {
-            var tx = axolDb.transaction(['localSKeys']);
-            var req = tx.objectStore('localSKeys').get([ account.core.fullJid, signedPreKeyId ]);
-            req.onsuccess = function (e) {
-              var signedPreKeyPair = req.result ? req.result.keyPair : null;
-              Tools.log('getLocalSignedPreKeyPair', signedPreKeyPair);
-              ready(signedPreKeyPair);
-            };
-          });
-        },
-        getLocalPreKeyPair : function (preKeyId) {
-          Tools.log('getLocalPreKeyPair', preKeyId);
-
-          return new Promise(function (ready) {
-            var tx = axolDb.transaction(['localKeys']);
-            var req = tx.objectStore('localKeys').get([ account.core.fullJid, preKeyId ]);
-            req.onsuccess = function (e) {
-              var preKeyPair = req.result ? req.result.keyPair : null;
-              Tools.log('getLocalPreKeyPair', preKeyPair);
-              ready(preKeyPair);
-            };
-          });
-        }
-      });
+      signalDb = db;
+      signalSendKeys = false;
+      signalDecryptQueue.pause();
+      signal = GetLocalKeys;
 
       var connTimeoutId = setTimeout(function () {
         Tools.log("AUTH TIMED OUT");
@@ -1164,23 +1563,23 @@ App.connectors.coseme = function (account) {
 
     var myJid = this.account.core.fullJid;
 
-    var tx = axolDb.transaction(['localReg']);
+    var tx = signalDb.transaction(['localReg']);
     var req = tx.objectStore('localReg').get(myJid);
     req.onsuccess = function (e) {
-      axolLocalReg = e.target.result;
-      if (! axolLocalReg) {
+      signalLocalReg = e.target.result;
+      if (! signalLocalReg) {
         sendRegistration(myJid);
       } else {
-        if (axolLocalReg) {
-          Tools.log('LOCAL REGISTRATION ID', axolLocalReg.registrationId);
+        if (signalLocalReg) {
+          Tools.log('LOCAL REGISTRATION ID', signalLocalReg.registrationId);
         } else {
           Tools.log('ENCRYPTION NOT SUPPORTED');
         }
 
-        if (axolSendKeys && axolLocalReg) {
+        if (signalSendKeys && signalLocalReg) {
           sendSetKeys(myJid);
         }
-        axolDecryptQueue.resume();
+        signalDecryptQueue.resume();
       }
     };
   };
@@ -1401,7 +1800,7 @@ App.connectors.coseme = function (account) {
           encryptMessage(to, encodeV2Text(text)).then(function (m) {
             ready(MI.call('encrypt_sendMessage',
                           [options.msgId, to, m.body, null,
-                           (m.isPreKeyWhisperMessage ? 'pkmsg' : 'msg'),
+                           'pkmsg',
                            '2']));
           }, function (e) {
             Tools.log('PLAINTEXT FALLBACK', e);
@@ -1646,10 +2045,10 @@ App.connectors.coseme = function (account) {
       var method = 'notification_ack';
       MI.call(method, [from, id]);
 
-      if (!axolSendKeys && axolLocalReg) {
+      if (!signalSendKeys && signalLocalReg) {
         sendSetKeys(this.account.core.fullJid);
       } else {
-        axolSendKeys = true;
+        signalSendKeys = true;
       }
     };
 
@@ -1667,10 +2066,10 @@ App.connectors.coseme = function (account) {
       }
 
       function noSession(cpuLock, jid) {
-        var tx = axolDb.transaction(['session'], 'readwrite');
+        var tx = signalDb.transaction(['session'], 'readwrite');
         var req = tx.objectStore('session').delete([ myJid, jid ]);
         req.onsuccess = function (e) {
-          var q = axolEncryptQueues[jid];
+          var q = signalEncryptQueues[jid];
           if (q) { q.resume(); }
           cpuLock.unlock();
         };
@@ -1687,21 +2086,21 @@ App.connectors.coseme = function (account) {
         }
 
         if (v.key && v.skey) {
-          axol.createSessionFromPreKeyBundle( {
+          libsignal.SessionCipher( {
             identityKey : prependType(v.type, v.identity),
             preKeyId : v.key.id,
             preKey : prependType(v.type, v.key.value),
             signedPreKeyId : v.skey.id,
             signedPreKey : prependType(v.type, v.skey.value),
             signedPreKeySignature : v.skey.signature
-          }).then(function (session) {
+          }, v.jid).then(function (session) {
             Tools.log('session created from pre keys', v.jid, session);
-            var tx = axolDb.transaction(['session'], 'readwrite');
+            var tx = signalDb.transaction(['session'], 'readwrite');
             var req = tx.objectStore('session').put({ jid : myJid,
                                                       remoteJid : v.jid,
                                                       session : session });
             req.onsuccess = function (e) {
-              var q = axolEncryptQueues[jid];
+              var q = signalEncryptQueues[jid];
               if (q) { q.resume(); }
               cpuLock.unlock();
             };
@@ -1727,15 +2126,15 @@ App.connectors.coseme = function (account) {
       Tools.log('SET KEYS', errorCode);
       if (errorCode) {
         // keys weren't accepted, so reschedule
-        axolLocalReg = null;
-        axolDecryptQueue.pause();
+        signalLocalReg = null;
+       signalDecryptQueue.pause();
         setTimeout(function () {
-          if (this.connected && axolSendKeys && !axolLocalReg) {
+          if (this.connected && signalSendKeys && !signalLocalReg) {
             sendRegistration(this.account.core.fullJid);
           }
         }.bind(this), 120000);
       } else {
-        axolSendKeys = false;
+        signalSendKeys = false;
       }
     };
 
@@ -1754,7 +2153,7 @@ App.connectors.coseme = function (account) {
                   pushName : pushName };
 
       var cpuLock = navigator.requestWakeLock('cpu');
-      axolDecryptQueue.push({ self : self, msg : msg },
+      signalDecryptQueue.push({ self : self, msg : msg },
                             function () { cpuLock.unlock(); });
     };
 
@@ -1774,7 +2173,7 @@ App.connectors.coseme = function (account) {
                   pushName : pushName };
 
       var cpuLock = navigator.requestWakeLock('cpu');
-      axolDecryptQueue.push({ self : self, msg : msg },
+      signalDecryptQueue.push({ self : self, msg : msg },
                             function () { cpuLock.unlock(); });
     };
 
@@ -1977,11 +2376,11 @@ App.connectors.coseme = function (account) {
         if (Number(count) >= 5) {
           MI.call('message_send', [msg.id, from, msg.text]);
         } else {
-          var q = axolEncryptQueues[from];
+          var q = signalEncryptQueues[from];
           if (!q || !q.paused) {
             if (!q) {
               q = async.queue(encryptMessageWorker);
-              axolEncryptQueues[from] = q;
+              signalEncryptQueues[from] = q;
             }
 
             q.pause();
