@@ -3,11 +3,6 @@
   "version": "v0.5.22",
   "minorVersion": "",
   "description": "Loqui Instant Messenger unifies all your chat accounts in just one app",
-  "tokenVersion": "2.17.279",
-  "tokenManufacturer": "Xiaomi",
-  "tokenUserAgent" : "WhatsApp/2.17.251 Android/4.3 Device/Xiaomi-armani",
-  "tokenDevice": "armani",
-  "tokenMd5": "3jYxFPSrhqjabEm5b2sXhA==",
   "author": {
     "name": "LoquiIM Community",
     "site": "loqui.im"
