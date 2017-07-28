@@ -290,6 +290,36 @@ module.exports = function(grunt) {
         replacement: '<%= pkg.minorVersion %>',
         recursive: true
       },
+      apptokenversion: {
+        path: '<%= meta.build %>/',
+        pattern: '[$][(]Token[.]Version[)]',
+        replacement: '<%= pkg.tokenVersion %>',
+        recursive: true
+      },
+      apptokenmanufacturer: {
+        path: '<%= meta.build %>/',
+        pattern: '[$][(]Token[.]Manufacturer[)]',
+        replacement: '<%= pkg.tokenManufacturer %>',
+        recursive: true
+      },
+      apptokenuseragent: {
+        path: '<%= meta.build %>/',
+        pattern: '[$][(]Token[.]UserAgent[)]',
+        replacement: '<%= pkg.tokenUserAgent %>',
+        recursive: true
+      },
+      apptokendevice: {
+        path: '<%= meta.build %>/',
+        pattern: '[$][(]Token[.]Device[)]',
+        replacement: '<%= pkg.tokenDevice %>',
+        recursive: true
+      },
+      apptokenmd5: {
+        path: '<%= meta.build %>/',
+        pattern: '[$][(]Token[.]Md5[)]',
+        replacement: '<%= pkg.tokenMd5 %>',
+        recursive: true
+      },
       manifest: {
         path: '<%= meta.build %>/chrome/index.html',
         pattern: '</head>',
