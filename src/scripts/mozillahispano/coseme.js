@@ -3377,11 +3377,11 @@ CoSeMe.namespace('config', (function(){
     groupDomain: 'g.us',
 
     tokenData: {
-      "v": "2.17.251",
+      "v": "2.17.276",
       "r": "Xiaomi",
       "u": "WhatsApp/2.17.251 Android/4.3 Device/Xiaomi-armani",
       "d": "armani",
-      "m": "KoK/8Dy+k1yOP80RObNznw=="
+      "m": "/guUxYGHDEUmjfmT00L9yw=="
     },
 
     auth: {
