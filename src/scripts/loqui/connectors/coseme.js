@@ -500,7 +500,7 @@ var CosemeConnectorHelper = {
     }));
   },
 
-  updateTokenData : function (cb, cbUpdated) {
+  /* updateTokenData : function (cb, cbUpdated) {
     var self = this;
     var ts = (new Date()).getTime() / 1000;
 
@@ -543,7 +543,7 @@ var CosemeConnectorHelper = {
         cb();
       }
     });
-  }
+  } */
 };
 
 
