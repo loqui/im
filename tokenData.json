@@ -1,7 +1,7 @@
 {
-  "v" : '$(Token.Version)',
-  "r" : '$(Token.Manufacturer)',
-  "u" : '$(Token.UserAgent)',
-  "d" : '$(Token.Device)',
-  "m" : '$(Token.Md5)'
+  "v" : "$(Token.Version)",
+  "r" : "$(Token.Manufacturer)",
+  "u" : "$(Token.UserAgent)",
+  "d" : "$(Token.Device)",
+  "m" : "$(Token.Md5)"
 }
