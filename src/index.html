@@ -23,17 +23,21 @@
 </head>
 <body class="app" data-online="false">
   <input type="file" class="ubuntu-touch-content-hub-input" id="contacts_input" accept="text/vcard" multiple/>
-  <section id="helpWA" class="form" data-transition="horizontal">
-    <article id="main" class="scroll">
-	  <p>Test</p>
-	</article>
-  </section>
   <section id="welcome" class="show" data-transition="horizontal">
     <article id="main" class="scroll show">
       <script type="text/spacebars" name="welcome">
         <h1>{{_ 'WelcomeTo' app.name }}<br />{{ app.version }}{{ app.minorVersion }}</h1>
       </script>
     </article>
+  </section>
+  <section id="helpWA" data-transition="horizontal" class="form">
+    <article id="main" class="headless simple scroll form">
+      <h1 data-l10n-id="helpWATitle">WhatsApp registration hints</h1>
+      <p data-l10n-id="helpWAText">The rgistration process may fail due to several reasons. This could be caused by a previous registration on LoquiIM. Wait a couple of hours/days and order a new code. Also try the Voice option. If you used an official client like Android, it could help to login there again and DELETE(!) your account to avoid en- and decryption issues. This could also help at the registration itself, even if you haven't used such client. Thanks for understanding! We'll be at your disposal at any questions.</p>
+      <div class="buttongroup">
+        <button data-role="back" data-view-section="back" data-l10n-id="Ok">Ok</button>
+      </div>
+	</article>
   </section>
   <section id="providers" data-transition="horizontal" class="form">
     <article id="main" class="headless simple scroll form">

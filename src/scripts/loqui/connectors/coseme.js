@@ -2546,6 +2546,7 @@ App.connectors.coseme = function (account) {
       var codeReady = $('<button/>').addClass('codeReady').css('backgroundColor', data.color).text(_('codeReady'));
       codeReady[0].dataset.role= 'submit';
 	  var helpWA = $('<button/>').addClass('helpWA').text(_('Help'));
+	  helpWA.attr('onclick', 'Lungo.Router.section("helpWA")');
       var back = $('<button/>').addClass('back').text(_('GoBack'));
       smsButtons.append(smsReq).append(voiceReq).append(codeReady).append(helpWA).append(back);
       sms.append(smsButtons);
