@@ -2545,8 +2545,9 @@ App.connectors.coseme = function (account) {
       voiceReq[0].dataset.role= 'submit';
       var codeReady = $('<button/>').addClass('codeReady').css('backgroundColor', data.color).text(_('codeReady'));
       codeReady[0].dataset.role= 'submit';
+	  var helpWA = $('<button/>').addClass('helpWA').text(_('Help'));
       var back = $('<button/>').addClass('back').text(_('GoBack'));
-      smsButtons.append(smsReq).append(voiceReq).append(codeReady).append(back);
+      smsButtons.append(smsReq).append(voiceReq).append(codeReady).append(helpWA).append(back);
       sms.append(smsButtons);
       var code = $('<div/>').addClass('code hidden')
       .append($('<p>').text(_('recodeLabel')))

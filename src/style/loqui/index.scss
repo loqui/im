@@ -90,6 +90,12 @@ a {
             background-color: #DDD;
             color: $primary-text-color;
         }
+		
+		&[data-view-section='helpWA'],
+        &[data-role='helpWA'],
+        &.helpWA {
+            width: 100%;
+        }
 
         &[data-role='submit'] {
             width: 100%;
