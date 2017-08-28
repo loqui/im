@@ -717,7 +717,7 @@ App.logForms.XMPP = function (provider, article) {
               return result;
             });
             if (links.length) {
-              $(article).children('[name="host"]').val(links[0].href);
+              $(article).children('[name="host"]').val("https://" + domain + "/http-bind/");
             }
           };
           xhr.open('GET', 'http://xmppconnect.loqui.im/' + domain + '.json');
