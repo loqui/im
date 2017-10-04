@@ -7,6 +7,8 @@ We are also working hard in getting this working for Ubuntu Touch due to Firefox
 
 Telegram Group: https://telegram.me/joinchat/BlpqfQk1L0l0PJTnM02yxQ
 
+Telegram dev! Group: https://t.me/joinchat/BlpqfQwjDi5IcY9yygm55w
+
 Providers support
 ===
 At the moment it supports accounts from:
