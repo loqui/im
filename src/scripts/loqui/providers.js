@@ -21,28 +21,28 @@ var Providers = {
      * @memberof Providers
      * @readonly
      */
-    'whatsapp': {
-      longName: 'WhatsApp',
+    // 'whatsapp': {
+      // longName: 'WhatsApp',
 
-      connector: {
-        type: 'coseme'
-      },
+      // connector: {
+        // type: 'coseme'
+      // },
 
-      features: ['localContacts', 'receipts', 'imageSend', 'videoSend',
-                 'audioSend', 'locationSend', 'vcardSend', 'pay', 'muc', 'csn',
-                 'avatarChange', 'nickChange', 'statusChange', 'presence',
-                 'mucCreate', 'readReceipts'],
+      // features: ['localContacts', 'receipts', 'imageSend', 'videoSend',
+                 // 'audioSend', 'locationSend', 'vcardSend', 'pay', 'muc', 'csn',
+                 // 'avatarChange', 'nickChange', 'statusChange', 'presence',
+                 // 'mucCreate', 'readReceipts'],
 
-      color: '#254242',
+      // color: '#254242',
 
-      terms: {
-        user: 'YourNumber',
-        country: 'YourCountry'
-      },
+      // terms: {
+        // user: 'YourNumber',
+        // country: 'YourCountry'
+      // },
 
-      logForm: 'coseme',
-      emoji: 'coseme'
-    },
+      // logForm: 'coseme',
+      // emoji: 'coseme'
+    // },
 
     // /**						Commented providers currently not working
      // * @type {Provider}

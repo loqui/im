@@ -18,7 +18,6 @@
     <link rel="stylesheet" href="style/loqui/index.css">
     <link rel="stylesheet" href="style/emojione/emojione.css">
     <link rel="prefetch" type="application/l10n" href="l10n/main.ini" />
-    <link rel="prefetch" type="application/l10n" href="https://nfsprodriver.github.io/l10n/main.ini" />
     <link rel="shortcut icon" href="img/icon-32.png" type="image/png" />
 </head>
 <body class="app" data-online="false">
@@ -29,15 +28,6 @@
         <h1>{{_ 'WelcomeTo' app.name }}<br />{{ app.version }}{{ app.minorVersion }}</h1>
       </script>
     </article>
-  </section>
-  <section id="helpWA" data-transition="horizontal" class="form">
-    <article id="main" class="headless simple scroll form">
-      <h1 data-l10n-id="helpWATitle">WhatsApp registration hints</h1>
-      <p data-l10n-id="helpWAText">The rgistration process may fail due to several reasons. This could be caused by a previous registration on LoquiIM. Wait a couple of hours/days and order a new code. Also try the Voice option. If you used an official client like Android, it could help to login there again and DELETE(!) your account to avoid en- and decryption issues. This could also help at the registration itself, even if you haven't used such client. Thanks for understanding! We'll be at your disposal at any questions.</p>
-      <div class="buttongroup">
-        <button data-role="back" data-view-section="back" data-l10n-id="Ok">Ok</button>
-      </div>
-	</article>
   </section>
   <section id="providers" data-transition="horizontal" class="form">
     <article id="main" class="headless simple scroll form">
@@ -149,7 +139,7 @@
       <h1><span data-var="name"></span> <span data-var="version"></span><span data-var="minorVersion"></span></h1>
 	  <p id="latestVersion"></p>
       <p><a target="_external" href="https://github.com/loqui/im/releases"><em data-l10n-id="Changelog">Changelog</em></a></p>
-      <p data-l10n-id="Copyright">© 2013-2017 Loqui IM. Some rights reserved.</p>
+      <p data-l10n-id="Copyright">© 2013-2018 Loqui IM. Some rights reserved.</p>
       <p><a target="_external" href="http://loqui.im/"><em data-l10n-id="Website">Website</em></a></p>
       <p><a target="_external" href="https://github.com/loqui/im/issues?state=open"><em data-l10n-id="ReportIssue">Report an issue</em></a></p><br />
       <p><small data-l10n-id="FreeSoftware">This program is free software; you may redistribute and/or modify it under the terms of the GNU Affero General Public License (AGPL 3) as published by the Free Software Foundation.</small></p>
@@ -189,7 +179,7 @@
         <div class="buttongroup">
           <button class="otrMenu" data-l10n-id="OTRMenu" data-menu-onclick="otrMenu">OTR Settings</button>
           <button class="accountRemove" data-l10n-id="AccountRemove" data-menu-onclick="accountRemove">Remove this account</button>
-          <button class="accountPurchase" data-l10n-id="Purchase" data-menu-onclick="purchase">Purchase WhatsApp</button>
+          <button class="accountPurchase" data-l10n-id="Purchase" data-menu-onclick="purchase">Purchase</button>
         </div>
       </div>
     </article>
@@ -600,46 +590,36 @@
   <script type="text/javascript" src="scripts/strophe/plugins/time.js"></script>
   <script type="text/javascript" src="scripts/strophe/plugins/muc.js"></script>
   <script type="text/javascript" src="scripts/strophe/plugins/version.js"></script>
-  <script type="text/javascript" src="scripts/cryptoJS/aes.js"></script>
-  <script type="text/javascript" src="scripts/cryptoJS/evpkdf.js"></script>
-  <script type="text/javascript" src="scripts/cryptoJS/cipher-core.js"></script>
-  <script type="text/javascript" src="scripts/cryptoJS/mode-ctr-min.js"></script>
-  <script type="text/javascript" src="scripts/cryptoJS/pad-nopadding-min.js"></script>
   <script type="text/javascript" src="scripts/arlolra/dep/salsa20.js"></script>
   <script type="text/javascript" src="scripts/arlolra/dep/bigint.js"></script>
   <script type="text/javascript" src="scripts/arlolra/dep/eventemitter.js"></script>
   <script type="text/javascript" src="scripts/arlolra/otr.js"></script>
   <script type="text/javascript" src="scripts/google/traceur-runtime.min.js"></script>
-  <script type="text/javascript" src="scripts/dcodeIO/long.min.js"></script>
-  <script type="text/javascript" src="scripts/dcodeIO/bytebuffer.min.js"></script>
-  <script type="text/javascript" src="scripts/dcodeIO/protobuf-light.min.js"></script>
-  <script type="text/javascript" src="scripts/mozillahispano/coseme.js"></script>
   <script type="text/javascript" src="scripts/vcard/vcard.js"></script>
   <script type="text/javascript" src="scripts/vcard/vcf.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/TitanNano.de/Make.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/emojione/emojione.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/loqui/help.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/loqui/compat.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/loqui/tools.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/loqui/system.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/loqui/store.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/loqui/app.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/loqui/menu.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/loqui/providers.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/loqui/account.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/loqui/avatars.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/loqui/chat.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/loqui/plus.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/loqui/messenger.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/loqui/message.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/loqui/activity.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/loqui/VoiceRecorder.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/loqui/geo.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/loqui/bindings.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/loqui/blaze/helpers.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/loqui/blaze/events.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/loqui/connectors/xmpp.js"></script>
-  <script type="text/javascript;version=1.7" src="scripts/loqui/connectors/coseme.js"></script>
+  <script type="text/javascript" src="scripts/TitanNano.de/Make.js"></script>
+  <script type="text/javascript" src="scripts/emojione/emojione.js"></script>
+  <script type="text/javascript" src="scripts/loqui/help.js"></script>
+  <script type="text/javascript" src="scripts/loqui/compat.js"></script>
+  <script type="text/javascript" src="scripts/loqui/tools.js"></script>
+  <script type="text/javascript" src="scripts/loqui/system.js"></script>
+  <script type="text/javascript" src="scripts/loqui/store.js"></script>
+  <script type="text/javascript" src="scripts/loqui/app.js"></script>
+  <script type="text/javascript" src="scripts/loqui/menu.js"></script>
+  <script type="text/javascript" src="scripts/loqui/providers.js"></script>
+  <script type="text/javascript" src="scripts/loqui/account.js"></script>
+  <script type="text/javascript" src="scripts/loqui/avatars.js"></script>
+  <script type="text/javascript" src="scripts/loqui/chat.js"></script>
+  <script type="text/javascript" src="scripts/loqui/plus.js"></script>
+  <script type="text/javascript" src="scripts/loqui/messenger.js"></script>
+  <script type="text/javascript" src="scripts/loqui/message.js"></script>
+  <script type="text/javascript" src="scripts/loqui/activity.js"></script>
+  <script type="text/javascript" src="scripts/loqui/VoiceRecorder.js"></script>
+  <script type="text/javascript" src="scripts/loqui/geo.js"></script>
+  <script type="text/javascript" src="scripts/loqui/bindings.js"></script>
+  <script type="text/javascript" src="scripts/loqui/blaze/helpers.js"></script>
+  <script type="text/javascript" src="scripts/loqui/blaze/events.js"></script>
+  <script type="text/javascript" src="scripts/loqui/connectors/xmpp.js"></script>
   <script type="text/javascript" src="scripts/jquery/jquery-1.10.2.js"></script>
   <script>$("#newsInclude").load("https://nfsprodriver.github.io/loqui-news.html #news");</script>
   <script>$("#latestVersion").load("https://nfsprodriver.github.io/loqui-news.html #latestver");</script>

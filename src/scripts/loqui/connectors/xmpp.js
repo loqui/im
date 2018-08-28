@@ -707,18 +707,7 @@ App.logForms.XMPP = function (provider, article) {
           var domain = user.substr(idx + 1);
           var xhr = new XMLHttpRequest({mozSystem: true});
           xhr.onload = function() {
-            var links = this.response.links.filter(function (e) {
-              // we can only use direct TCP connections where the host
-              // name matches the domain due to SSL certificate name
-              // issues that would arise otherwise
-              var result = ((e.rel != 'urn:xmpp:alt-connections:tcp') ||
-                            (e.href.split(':')[1] == domain));
-              Tools.log(result ? '' : 'ignoring', e.rel, e.href);
-              return result;
-            });
-            if (links.length) {
               $(article).children('[name="host"]').val("https://" + domain + "/http-bind/");
-            }
           };
           xhr.open('GET', 'http://xmppconnect.loqui.im/' + domain + '.json');
           xhr.overrideMimeType('json');
