@@ -526,7 +526,7 @@
       Blackberry: /(BlackBerry|BB10|Playbook).*Version\/([\d.]+)/,
       FirefoxOS: /(Mozilla).*(\(Mobile)[^\/]*\/([\d\.]*)/,
       webOS: /(webOS|hpwOS)[\s\/]([\d.]+)/,
-      UbuntuTouch: /(WhatsApp).*Version\/([\d.]+)/
+      UbuntuTouch: /(Mozilla).*(\(Linux)[^\/]*\/([\d\.]*)/
     };
     $$.isMobile = function() {
       _current = _current || _detectEnvironment();
