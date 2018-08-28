@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=LoquiIM
-Exec=wssrv-tcp -d -b 127.0.0.1 -- webapp-container --app-id=loqui.im ./www/index.html
+Exec=webapp-container --app-id=loqui.im ./www/index.html
 Icon=loqui.png
 Terminal=false
 Type=Application
