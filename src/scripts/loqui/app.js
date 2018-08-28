@@ -561,10 +561,6 @@ var App = {
         Lungo.Notification.show('forward', _('Upgrading'), 5);
         from[last]();
       }
-
-      ((last != App.version) ? CosemeConnectorHelper.resetTokenData() : Promise.resolve(null)).then(function () {
-        return Store.Config.put('version', App.version);
-      });
     });
   },
 
