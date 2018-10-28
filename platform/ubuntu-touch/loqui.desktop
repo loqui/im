@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=LoquiIM
-Exec=webapp-container --app-id=loqui.im ./www/index.html
+Exec=webapp-container --local-content-can-access-remote-urls --app-id=loqui.im ./www/index.html
 Icon=loqui.png
 Terminal=false
 Type=Application

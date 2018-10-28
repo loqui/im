@@ -1,5 +1,4 @@
 {
   "template": "pure",
-  "kill": "webapp-container",
-  "sdk": "ubuntu-sdk-16.04"
+  "kill": "webapp-container"
 }
