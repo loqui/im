@@ -520,7 +520,7 @@
     _current = null;
     IS_WEBKIT = /WebKit\/([\d.]+)/;
     SUPPORTED_OS = {
-      Android: /(Android)\s+([\d.]+)/,
+      //Android: /(Android)\s+([\d.]+)/,
       ipad: /(iPad).*OS\s([\d_]+)/,
       iphone: /(iPhone\sOS)\s([\d_]+)/,
       Blackberry: /(BlackBerry|BB10|Playbook).*Version\/([\d.]+)/,
