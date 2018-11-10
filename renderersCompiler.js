@@ -15,6 +15,6 @@ jsdom.env('src/index.html', {
         renderers += renderer;
       }
     }
-    fs.writeFile('src/scripts/loqui/blaze/renderers.js', renderers);
+    fs.writeFileSync('src/scripts/loqui/blaze/renderers.js', renderers);
   }
 });
