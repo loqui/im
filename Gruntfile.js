@@ -220,6 +220,9 @@ module.exports = function(grunt) {
       }
     },
     sass: {
+        options: {
+            implementation: require('node-sass')
+        },
         compile: {
             files: {
                 'src/style/loqui/index.css' : 'src/style/loqui/index.scss'

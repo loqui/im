@@ -18,7 +18,7 @@
     "build": "grunt",
     "jshint": "node_modules/jshint/bin/jshint -c .jshintrc --exclude-path .gitignore src/scripts/loqui",
     "jsdoc-init": "git clone -b gh-pages --single-branch https://github.com/loqui/im.git gh-pages",
-    "jsdoc-build" : "sh jsdoc/build.sh",
+    "jsdoc-build": "sh jsdoc/build.sh",
     "jsdoc-publish": "sh jsdoc/publish.sh"
   },
   "pre-commit": [
@@ -32,14 +32,15 @@
     "grunt-contrib-connect": "~0.11.2",
     "grunt-contrib-copy": "~0.8.1",
     "grunt-contrib-watch": "~0.6.1",
+    "grunt-debian-package": "~0.1.13",
     "grunt-execute": "~0.2.2",
     "grunt-node-webkit-builder": "~1.0.2",
-    "grunt-sass": "^1.0.0",
+    "grunt-sass": "^3.0.2",
     "grunt-sed": "^0.1.1",
     "ink-docstrap": "git://github.com/TitanNano/docstrap.git",
     "jsdom": "~6.5.1",
     "jshint": "^2.6.0",
-    "pre-commit": "^1.0.1",
-    "grunt-debian-package": "~0.1.13"
+    "node-sass": "^4.11.0",
+    "pre-commit": "^1.0.1"
   }
 }
