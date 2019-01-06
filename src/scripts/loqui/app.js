@@ -1,4 +1,4 @@
-/* global Store, Account, Chat, Messenger, Accounts, Menu, Tools, Lungo, Make, ChatCore, CosemeConnectorHelper, emojione */
+/* global Store, Account, Chat, Messenger, Accounts, Menu, Tools, Lungo, Make, ChatCore, CosemeConnectorHelper, emojione, external */
 
 /**
  * @file Holds {@link App}

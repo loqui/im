@@ -1,4 +1,4 @@
-/* global Accounts, App, Message, Tools, Lungo, Providers, Menu, Store, Make */
+/* global Accounts, App, Message, Tools, Lungo, Providers, Menu, Store, Make, Chungo */
 
 /**
 * @file Holds {@link Connector/XMPP}
