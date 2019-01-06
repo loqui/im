@@ -140,12 +140,12 @@ module.exports = function(grunt) {
         }]
       }
     },
-    nodewebkit: {
+    nwjs: {
       options: {
-        platforms: ['win', 'osx', 'linux32', 'linux64'],
-        buildDir: '<%= meta.compress %>/desktop',
+        platforms: ['win', 'osx64', 'linux32', 'linux64'],
+        buildDir: '<%= meta.compress %>/chrome',
       },
-      src: ['dist/desktop/**/*']
+      src: ['dist/chrome/**/*']
     },
     connect: {
       server: {
@@ -237,7 +237,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-sed');
   grunt.loadNpmTasks('grunt-execute');
   grunt.registerTask('default', ['clean:build', 'execute', 'sass', 'copy', 'sed', 'clean:css', 'compress']);
-  grunt.registerTask('with-desktop', ['clean', 'execute', 'sass', 'copy', 'sed', 'clean:css', 'compress', 'nodewebkit']);
+  grunt.registerTask('with-desktop', ['clean', 'execute', 'sass', 'copy', 'sed', 'clean:css', 'compress', 'nwjs']);
   grunt.registerTask('devel', ['connect', 'watch']);
   grunt.registerTask('docstrap', ['copy:importDocstrapTemplate', 'copy:importJsdocConfig', 'copy:logoToDocstrap']);
 };

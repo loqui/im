@@ -393,7 +393,7 @@ var App = {
   },
 
   init: function () {
-	App.platform = Lungo.Core.environment().os.name;
+	App.platform = (Lungo.Core.environment().os ? Lungo.Core.environment().os.name : 'PC');
 
     App.defaults.Connector.presence.status = _('DefaultStatus', {
       app: App.name,
