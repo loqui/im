@@ -238,9 +238,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-nw-builder');
   grunt.loadNpmTasks('grunt-sass');
   grunt.loadNpmTasks('grunt-sed');
-  grunt.loadNpmTasks('grunt-execute');
-  grunt.registerTask('default', ['clean:build', 'execute', 'sass', 'copy', 'sed', 'clean:css', 'compress']);
-  grunt.registerTask('with-desktop', ['clean', 'execute', 'sass', 'copy', 'sed', 'clean:css', 'compress', 'nwjs']);
+  grunt.loadNpmTasks('grunt-exec');
+  grunt.registerTask('default', ['clean:build', 'exec', 'sass', 'copy', 'sed', 'clean:css', 'compress']);
+  grunt.registerTask('with-desktop', ['clean', 'exec', 'sass', 'copy', 'sed', 'clean:css', 'compress', 'nwjs']);
   grunt.registerTask('devel', ['connect', 'watch']);
   grunt.registerTask('docstrap', ['copy:importDocstrapTemplate', 'copy:importJsdocConfig', 'copy:logoToDocstrap']);
 };
