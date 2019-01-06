@@ -1,3 +1,4 @@
+/* global App, Lungo */
 /**
  * function for the online help
  */

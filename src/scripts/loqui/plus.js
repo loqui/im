@@ -1,4 +1,4 @@
-/* global Accounts, App, Tools, Lungo, Messenger, Geo, Chat, OTR, Message, Make, ContactToVcard */
+/* global Accounts, App, Tools, Lungo, Messenger, Geo, Chat, OTR, Message, Make, ContactToVcard, VCF */
 
 /**
 * @file Holds {@link Plus}
@@ -101,9 +101,9 @@ var Plus = {
   },
 
   vcardSend: function () {
-    if (App.platform === "FirefoxOS") {
-		var account = Accounts.current;
+    var account = Accounts.current;
 		var to = $('section#chat')[0].dataset.jid;
+    if (App.platform === "FirefoxOS") {
 	    var e = new MozActivity({
 	      name: 'pick',
 	      data: {
@@ -124,8 +124,6 @@ var Plus = {
     } else if(App.platform === "UbuntuTouch") {
     	//Ubuntu Touch
 	if(!Plus.UTVCardSendRegistered) {
-	    var account = Accounts.current;
-	    var to = $('section#chat')[0].dataset.jid;
 	    var name;
 	    var str = '';
     		$('#vcardsend_input').change(function() {

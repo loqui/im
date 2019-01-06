@@ -1,4 +1,4 @@
-/* global Lungo, Accounts, Messenger, Tools, Activity, App, Providers, Plus */
+/* global Lungo, Accounts, Messenger, Tools, Activity, App, Providers, Plus, Help */
 
 /**
 * @file Holds {@link Menu}
@@ -476,7 +476,7 @@ var Menu = {
 		    		  Tools.log(App.name + ' has been closed');
 			    	  window.close();
   			    }, 3000);
-    			}
+			};
 	    		req.onerror = function () { };
         }
       } else {

@@ -351,10 +351,11 @@ var Message = {
         html = $('<i/>').attr('class', 'material-icons md-48').text(this.core.media.thumb);
       }
       html[0].dataset.downloaded = this.core.media.downloaded || false;
+      var onClick;
       switch (this.core.media.type) {
         case 'url':
         html.addClass('maps');
-        var onClick = function(e){
+        onClick = function(e){
           if(App.platform === "UbuntuTouch") {
             //Ubuntu Touch
             window.open(message.core.media.url);
@@ -373,7 +374,7 @@ var Message = {
         };
         break;
         case 'vCard':
-        var onClick = function(e){
+        onClick = function(e){
           if(App.platform === "FirefoxOS") {
             e.preventDefault();
             return new MozActivity({
@@ -405,6 +406,7 @@ var Message = {
 
         default:
         html.addClass(this.core.media.type);
+        var propHeight, propWidth;
         var open = function (blob) {
           if (App.platform === "FirefoxOS") {
             //FirefoxOS
@@ -444,8 +446,8 @@ var Message = {
                   var image = document.createElement('img');
                   var prop = new Image();
                   prop.src = output;
-                  var propHeight = prop.height;
-                  var propWidth = prop.width;
+                  propHeight = prop.height;
+                  propWidth = prop.width;
                   image.setAttribute('id', 'image');
                   image.setAttribute('src', output);
                   if (propWidth/propHeight > w/(h - 37)) {
@@ -516,8 +518,8 @@ var Message = {
                     video.controls = true;
                     chat.after(video);
                     addSourceToVideo(video, output, blob.type);
-                    var propHeight = video.videoHeight;
-                    var propWidth = video.videoWidth;
+                    propHeight = video.videoHeight;
+                    propWidth = video.videoWidth;
                     if (propWidth/propHeight > w/h) {
                       video.setAttribute('width', w);
                     }
