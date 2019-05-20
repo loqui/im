@@ -1,3 +1,6 @@
+Please contribute on https://www.gitlab.com/nfsprodriver/im now with our new ci! 
+=====
+
 LOQUI Instant Messenger
 =====
 Loqui Instant Messenger unifies all your chat accounts in just one Firefox OS app
