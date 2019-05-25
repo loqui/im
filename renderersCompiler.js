@@ -1,7 +1,7 @@
 var fs = require('fs');
 var jsdom = require('jsdom');
 
-jsdom.env('src/index.html', {
+var dom = new jsdom.JSDOM('src/index.html', {
   scripts: ['scripts/meteor/blaze.js'],
   done: function (errors, window) {
     var renderers = '/* jshint -W069 */\nRenderers = {};';
